@@ -1,12 +1,11 @@
 from flask import Flask, render_template, request
-import imagePreview
+import imageTools
 from PIL import Image 
 import os
 import logging
 
 
 log = logging.getLogger('iris')
-log.info('Web view interface online.')
 logging.basicConfig(level=logging.DEBUG)
 
 iris = Flask('iris')
@@ -27,13 +26,11 @@ def indexRoute():
 
 @iris.route('/batch', methods = ['GET', 'POST'])
 def batchRoute():
-	# log.debug('routing to the batch upload portal')
 	# log.debug('begin printing headers -----------------------------------')
 	# log.debug(request.headers)
 	# log.debug('end printing headers -------------------------------------')
-	# log.debug(str(len(request.files)) + ' files were upload')
 	file = request.files['photo']
-	imagePreview.imageType(file)
+	validImage = imageTools.imageFromFile(file)
 	return render_template("batch.html")
 
 @iris.route('/batch/<path:specificBatch>', methods = ['GET', 'POST'])
