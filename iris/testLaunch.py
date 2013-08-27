@@ -1,12 +1,11 @@
 from flask import Flask, render_template, request
 from web import views
-from test import imagePreview
 import os
 import logging
+import taskManager
 
 iris = views.startWebViews()
-# print('approot is: ' + 	iris.root_path)
-# iris.root_path = os.path.abspath(os.path.dirname(__file__))
+tm = taskManager.TaskManager()
 port = int(os.getenv('PORT', 5000))
 
 

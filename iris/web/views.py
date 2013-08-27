@@ -26,12 +26,23 @@ def indexRoute():
 
 @iris.route('/batch', methods = ['GET', 'POST'])
 def batchRoute():
-	# log.debug('begin printing headers -----------------------------------')
-	# log.debug(request.headers)
-	# log.debug('end printing headers -------------------------------------')
-	file = request.files['photo']
-	validImage = imageTools.imageFromFile(file)
-	return render_template("batch.html")
+    # log.debug('begin printing headers -----------------------------------')
+    # log.debug(request.headers)
+    # log.debug('end printing headers -------------------------------------')
+    file = request.files['photo']
+    validImage = imageTools.imageFromFile(file)
+
+    imageTools.getDPI(validImage)
+    if(imageTools.imageConformsToOCRRequirements(validImage)):
+        log.debug('image meets req.')
+    if(imageTools.imageConformsToOCRRequirements(file)):
+    	log.debug('file meets reqs too.')
+
+    
+
+
+
+    return render_template("batch.html")
 
 @iris.route('/batch/<path:specificBatch>', methods = ['GET', 'POST'])
 def specificBatchRoute(specificBatch):	
