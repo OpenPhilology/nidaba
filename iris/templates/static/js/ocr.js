@@ -153,6 +153,46 @@ Iris.Views.Upload = Backbone.View.extend({
 								'<div class="progress"></div>' +
 							'</div>' +
 						'</div>';
+
+		var that = this;
+
+		// Initialize filedrop plugin
+		this.$el.find('#upload-area').filedrop({
+			paramname: 'pic',
+			maxfiles: 10,
+			maxfilesize: 2,
+			url: 'path/to/api',
+			uploadFinished: function(i, file, response) {
+				$.data(file).addClass('done');
+			},
+			error: function(error, file) {
+				switch(error) {
+					case 'BrowserNotSupported':
+						that.showMessage('Your browser does not support HTML5 file uploads');
+						break;
+					case 'TooManyFiles':
+						that.showMessage('Too many files!');
+						break;
+					case 'FileTooLarge':
+						that.showMessage(file.name + ' is too large');
+						break;
+					default:
+						break;
+				}
+			},
+			beforeEach: function(file) {
+				if (!file.type.match(/^image\//)) {
+					that.showMessage('Only images are allowed');
+					return false;
+				}
+			},
+			uploadStarted: function(i, file, len) {
+				that.createImage(file);
+			},
+			progressUpdated: function(i, file, progress) {
+				$.data(file).find('.progress').width(progress);
+			}
+		});
 	},
 	render: function() {
 		$('#step-progress .step-bar').eq(1).addClass('complete');
@@ -172,6 +212,15 @@ Iris.Views.Upload = Backbone.View.extend({
 		};
 
 		reader.readAsDataURL(file);
+
+		if (!this.$el.find('#upload-area').children('img'))
+			this.$el.find('#upload-area').children().slideUp('');
+
+		this.$el.find('#upload-area').append(preview);
+		$.data(file, preview);
+	},
+	showMessage: function(message) {
+		this.$el.find('#upload-area .message').html(message);
 	}
 });
 
@@ -212,7 +261,6 @@ $(function() {
 
 	// Trigger Bootstrap
 	$('#step-progress .step-bar').tooltip();
-
 
 	window.Iris = Iris; 
 });
