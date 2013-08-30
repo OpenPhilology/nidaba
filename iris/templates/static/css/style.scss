@@ -66,6 +66,9 @@ $dark-neutral: $dark-grey;
 $darker-neutral: $darker-grey;
 
 /* Override Bootstrap Styles*/
+body {
+	overflow-x: hidden;
+}
 .container {
 	margin: 0;
 	max-width: none;
