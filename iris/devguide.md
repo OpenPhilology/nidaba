@@ -9,7 +9,7 @@ Iris is designed according to the following principles:
 1. Iris is written in one language: Python, v2.7+. While there are a VERY limited number of dependencies (most notably Gamera and Redis) which exist in other languages, Iris' source is Python. This is to remedy the many problems which arose out of the previous system core being a combination of java, python and bash.
 2. Rigid standards and requirements for testing, version control, etc. 
 3. A unified system for versioning/dependency management.
-4. A platform dependent interface. Iris is controlled either through the command line, or a REST API.
+4. A platform independent interface. Iris is controlled either through the command line, or a REST API.
 
 General Coding Standards and Guidelines for Iris
 ------------------------------------------------
