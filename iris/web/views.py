@@ -1,17 +1,20 @@
 from flask import Flask, render_template, request
 import imageTools
-from PIL import Image 
+from PIL import Image
 import os
 import logging
+import taskManager
 
 
 log = logging.getLogger('iris')
 logging.basicConfig(level=logging.DEBUG)
 
 iris = Flask('iris')
+tm = taskManager.TaskManager()
+
+log.debug('tm is: ' + str(tm))
 
 def startWebViews():
-	
 	log.debug('starting webviews')
 	return iris
 
@@ -19,9 +22,8 @@ def startWebViews():
 @iris.route('/index')
 def indexRoute():
     log.debug('routing to the index')
+    tm.createArchiveJob('mechanicaesynta00philgoog', 'testUser')
     return render_template("index.html")
-
-
 
 
 @iris.route('/batch', methods = ['GET', 'POST'])
@@ -30,13 +32,14 @@ def batchRoute():
     # log.debug(request.headers)
     # log.debug('end printing headers -------------------------------------')
     file = request.files['photo']
-    validImage = imageTools.imageFromFile(file)
 
-    imageTools.getDPI(validImage)
-    if(imageTools.imageConformsToOCRRequirements(validImage)):
-        log.debug('image meets req.')
-    if(imageTools.imageConformsToOCRRequirements(file)):
-    	log.debug('file meets reqs too.')
+    # validImage = imageTools.imageFromFile(file)
+
+    # imageTools.getDPI(validImage)
+    # if(imageTools.imageConformsToOCRRequirements(validImage)):
+    #     log.debug('image meets req.')
+    # if(imageTools.imageConformsToOCRRequirements(file)):
+    # 	log.debug('file meets reqs too.')
 
     
 

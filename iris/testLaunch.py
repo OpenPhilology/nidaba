@@ -1,12 +1,21 @@
-from flask import Flask, render_template, request
-from web import views
-import os
-import logging
-import taskManager
 
-iris = views.startWebViews()
-tm = taskManager.TaskManager()
-port = int(os.getenv('PORT', 5000))
+import irisconfig
+import time
 
+from clusterfileserver import ClusterFileServer, launch_daemon_server
+from celery import Celery
+from tasks import app, checksystem
 
-iris.run(host='0.0.0.0', port=port)
+if __name__ == '__main__':
+    print 'Creating FTP file store...'
+    print irisconfig.FTP_ADDR
+    serverproc, killqueue = launch_daemon_server(irisconfig.FTP_ADDR)
+    print 'queueing test task...'
+    results = checksystem.apply_async()
+    print 'did issue system check.'
+    print 'sleeping for 5 sec'
+    time.sleep(5)
+    print 'woke up!'
+    killqueue.put('kill')
+    serverproc.join()
+    print 'quitting.'

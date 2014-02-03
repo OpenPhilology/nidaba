@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #The module implements all the functions necessary to convert an abbyy ocr file to an hOCR file for use by Gamera.
 #You will also observe that the hOCR output tags are separated by newlines, but not indented. This is because calculating indentation
 #requires the memory complexity to increase from O(length of longest tag) to O(log(number of xml tags)). Since this hOCR is fed directly to gamera, who cares?

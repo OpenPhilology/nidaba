@@ -11,7 +11,7 @@ class TestAbbyyToOCRConversion(unittest.TestCase):
 
         abbySample = open('./resources/abbyyConversion/testAbbyy.xml')
         tempdir = tempfile.mkdtemp()
-        abbyyToOCR.convertAbbyyToOCR(abbySample, tempdir, 'testAbbyy')
+        abbyyToOCR.convert_abbyy_to_ocr(abbySample, tempdir, 'testAbbyy')
 
         orig_count = len(glob.glob('resources/abbyyConversion/hocr/testHOCR_[0-9][0-9]*.hocr.html')) # And not os.listdir(), which will include crap like .DS_Store.
         new_count = len(glob.glob(os.path.join(tempdir, 'testAbbyy_[0-9][0-9]*.hocr.html')))
