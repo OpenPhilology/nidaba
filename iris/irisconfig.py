@@ -7,7 +7,7 @@ IRIS_HOME = '~/OCR'
 # Iris will generate 'http://www.archive.org/download/mechanicaesynta00philgoog/mechanicaesynta00philgoog_tif.zip' automatically.
 ARCHIVE_URL = 'http://www.archive.org/download'
 
-# Addresss of the FTP server for large result and file storage. 
+# Addresss of the FTP server for large result and file storage. In a real deployment, some other system such as NFS can be used.
 FTP_ADDR = ('localhost', 8001)
 
 # Address of used to create temporary FTP servers used for unit testing.
