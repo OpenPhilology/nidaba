@@ -13,7 +13,8 @@ from lxml import etree
 # ------------------------------------------------------------------------------------------
 
 def edit_distance(str1, str2):
-    """Calculate the Levenshtein or edit distance between two strings."""
+    """Calculate the Levenshtein or edit distance between two strings, tuples, or lists.
+    Types can be mixed (e.g. compare a string to a list of strings) """
     if len(str1) < len(str2):
         return edit_distance(str2, str1)
  
@@ -52,7 +53,7 @@ def edit_distance(str1, str2):
 
 def align(str1, str2, substitutionscore=1, insertscore=1, deletescore=1, charmatrix={}):
     """Calculate the edit distance of two strings, then backtrace to find a valid edit sequence."""
-    matrix, steps = full_edit_distance(str1, str2, substitutionscore=substitutionscore, insertscore=insertscore, deletescore=deletescore, charmatrix=charmatrix)
+    matrix, steps = full_edit_distance(str1, str2, substitutionscore=substitutionscore,  insertscore=insertscore, deletescore=deletescore, charmatrix=charmatrix)
 
     key = {'i':(0,-1), 'd':(-1,0), 'm':(-1,-1), 's':(-1, -1)}
     path = []
@@ -67,7 +68,7 @@ def align(str1, str2, substitutionscore=1, insertscore=1, deletescore=1, charmat
     return path
 
 def full_edit_distance(str1, str2, substitutionscore=1, insertscore=1, deletescore=1, charmatrix={}):
-    """An implenmentation of the Wagner-Fischer algorithm using numpy. Unlike the minimal and optimized version in the
+    """A modified implenmentation of the Wagner-Fischer algorithm using numpy. Unlike the minimal and optimized version in the
     "edit_distance" function, this returns the entire scoring matrix, and an operation matrix for backtracing and reconstructing the 
     edit operations. This should be used when an alignment is desired, not only the edit distance."""
 
@@ -150,7 +151,7 @@ def extract_hocr_tokens(hocr_file):
     del context
     return words
 
-if __name__ == '__main__':
-    print align('sitting', 'kitten')
+# if __name__ == '__main__':
+#     pass
 
 
