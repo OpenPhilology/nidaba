@@ -6,7 +6,7 @@ Overview
 
 Iris is designed according to the following principles:
 
-1. Iris is written in one language: Python, v2.7+. While there are a VERY limited number of dependencies (most notably Gamera and Redis) which exist in other languages, Iris' source is Python. This is to remedy the many problems which arose out of the previous system core being a combination of java, python and bash.
+1. Iris is written in one language: Python, v2.7+. While there are a VERY limited number of dependencies (most notably Gamera and Redis) which exist in other languages, Iris' source is Python. This is to remedy the many problems which arose out of existing systems being a combination of java, python and bash.
 2. Rigid standards and requirements for testing, version control, etc. 
 3. A unified system for versioning/dependency management.
 4. A platform independent interface.
@@ -30,7 +30,7 @@ Commenting requirements are as follows:
 Version Control Procedures
 --------------------------
 
-Iris' source is managed with Git. It's repository can be found at: https://github.com/OpenPhilology/Iris
+Iris' source is managed with Git. Its repository can be found at: https://github.com/OpenPhilology/Iris
 
 Contributors to Iris must upload source according to the following procedure:
 
@@ -43,14 +43,14 @@ Contributors to Iris must upload source according to the following procedure:
 If you encounter any difficulty working with Git or just need to brush up, refer to Atlassian's Git tutorials at: https://www.atlassian.com/git/tutorial which are excellent.
 
 
-Pull requestes will be automatically reject for any of the following reasons:
+Pull requests will be automatically rejected for any of the following reasons:
 
 1. Lack of tests/failing tests.
 2. Lack of proper commenting.
 3. Inappropriate hardcoding.
 4. Introduction of a redundant dependency, an inferior dependency, or an older version of an existing dependency.
-5. Misplaced code (i.e. code not in the proper place within the project hiararchy.)
-6. "Smelly" or mathematically substandard code. (i.e. implementing a factorial function with recursion instead of iteration.)
+5. Misplaced code (i.e. code not in the proper place within the project hierarchy.)
+6. "Smelly" or mathematically substandard code. (e.g. implementing a factorial function with recursion instead of iteration.)
 7. Lack of proper logging/exception handling.
 8. Failure to handle encodings properly.
 
@@ -60,10 +60,10 @@ Versioning and Dependency Management
 
 Versioning:
 Iris maintains two kinds of principal branches. These are the main development branch, and LTS (long term support) branches. The dev branchs are the master branch and new feature development branches. These are kept up to date with the latest dependencies.
-The LTS branches are stable versions which are available with bundled copies of all their dependencies. This is to ensure usable distributios of Iris exist in the event that new dependency updates cause temporary instability in the dev branches at the same time an older dependency version becomes unavailable. LTS branches are maintained just like the dev branch, but with critical dependency updates only.
+The LTS branches are stable versions which are available with bundled copies of all their dependencies. This is to ensure usable distributions of Iris exist in the event that new dependency updates cause temporary instability in the dev branches at the same time an older dependency version becomes unavailable. LTS branches are maintained just like the dev branch, but with critical dependency updates only.
 
 Dependencies:
-Iris uses pip and Pypi for all its dependency management. Whenever a new commit us uploaded to a branch, a copy of the pip generated requirements file is included with that commit. This way, all dependencies can be automatically synchronized with Iris source at any point in the version history using pip freeze and pip install -r.
+Iris uses pip and Pypi for all dependency management. Whenever a new commit us uploaded to a branch, a copy of the pip generated requirements file is included with that commit. This way, all dependencies can be automatically synchronized with Iris source at any point in the version history using pip freeze and pip install -r.
 If you are adding a feature which may require a new dependency, you MUST state it in the pull request message.
 
 There are currently two exceptions to this rule: redis and gamera, as these are not included in Pypi. Currently, they are to be kept up do date manually, with incompatiblities treated as any other bug.
