@@ -243,7 +243,7 @@ class AlignmentTests(unittest.TestCase):
         """Test the edit steps when only matches are needed."""
         self.assertEqual(['m', 'm', 'm', 'm', 'm'], algorithms.align('abcde', 'abcde'))
 
-    def test_matches(self):
+    def test_matches_1(self):   #TODO
         """Test the edit steps when only substitutions are needed."""
         self.assertEqual(['s', 's', 's', 's', 's'], algorithms.align('abcde', 'vwxyz'))
 
@@ -283,6 +283,47 @@ class AlignmentTests(unittest.TestCase):
     def test_wikepedia_example_2(self):
         """Test against the second general example provided at http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm, but as a list of words."""
         self.assertEqual(['m', 'i', 'i', 'm', 's', 'm', 'm', 'm'], algorithms.align(['s', 'u', 'n', 'd', 'a', 'y'], ['s','a', 't', 'u', 'r', 'd', 'a', 'y']))
+
+class BacktraceTests(unittest.TestCase):
+    """Tests the backtrace function used by the various alignment algorithms."""
+
+    def test_sequence_length_inversion(self):
+        """Test that an exception is thrown if the first sequence is > the second."""
+        self.assertRaises(algorithms.AlgorithmException, algorithms.semi_global_align, 'abcdefghi', '') #Test with a long string
+        self.assertRaises(algorithms.AlgorithmException, algorithms.semi_global_align, 'a', '') # Test with one character
+        self.assertRaises(algorithms.AlgorithmException, algorithms.semi_global_align, ['word'], []) # Test with one word
+        self.assertRaises(algorithms.AlgorithmException, algorithms.semi_global_align, ['word1', 'word2', 'word3'], ['word']) # Test with one word
+
+    def test_identical(self):
+        """Test with strings and lists of equal length."""
+        expected = ['m']
+        self.assertEqual(expected, algorithms.semi_global_align('a', 'a'))
+        self.assertEqual(expected, algorithms.semi_global_align(['a'], ['a']))
+
+    def test_identical_long(self):
+        """Test with a longer series of matches."""
+        expected = ['m', 'm', 'm', 'm', 'm']
+        self.assertEqual(expected, algorithms.semi_global_align('abcde', 'abcde'))
+
+    def test_identical_words(self):
+        """Test with a series of of matching words."""
+        expected = ['m', 'm', 'm', 'm', 'm']
+        self.assertEqual(expected, algorithms.semi_global_align(['word1', 'word2', 'word3', 'word4', 'word5'], ['word1', 'word2', 'word3', 'word4', 'word5']))
+
+    def test_simple_prefix(self):
+        """Test with a single match and a skippable prefix."""
+        expected = ['i', 'i', 'i', 'i', 'm']
+        self.assertEqual(expected, algorithms.semi_global_align('b', 'aaaab'))
+
+    def test_prefix_with_trailer(self):
+        """Test with a single match and a skippable prefix and trailer."""
+        expected = ['i', 'i', 'i', 'i', 'm']
+        self.assertEqual(expected, algorithms.semi_global_align('b', 'aaaabcccc'))
+
+    def test_word_prefix(self):
+        """Test a list of words with a prefix."""
+        expected = ['i', 'i', 'm']
+        self.assertEqual(expected, algorithms.semi_global_align(['match'], ['w1', 'w2', 'match']))
 
 
 if __name__ == '__main__':

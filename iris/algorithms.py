@@ -9,6 +9,18 @@ from lxml import etree
 
 
 # ------------------------------------------------------------------------------------------
+# Exceptions -------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------
+
+class AlgorithmException(Exception):
+    """A simple exception for algorithm specific errors."""
+    def __init__(self, message=None):
+        Exception.__init__(self, message)
+        
+
+
+
+# ------------------------------------------------------------------------------------------
 # String and alignment algorithms ----------------------------------------------------------
 # ------------------------------------------------------------------------------------------
 
@@ -51,23 +63,39 @@ def edit_distance(str1, str2):
  
     return previous_row[-1]
 
-def align(str1, str2, substitutionscore=1, insertscore=1, deletescore=1, charmatrix={}):
-    """Calculate the edit distance of two strings, then backtrace to find a valid edit sequence."""
-    matrix, steps = full_edit_distance(str1, str2, substitutionscore=substitutionscore,  insertscore=insertscore, deletescore=deletescore, charmatrix=charmatrix)
 
+
+def backtrace(matrix, start=None):
+    """Trace edit steps backward to find an edit sequence for an alignment.
+    Starts at the provided 'start' index, or in the i,j'th index if none is provided.
+    The backtrace always ends at the index 0,0."""
+
+    i,j = start if start is not None else (matrix.shape[0]-1, matrix.shape[1]-1)
     key = {'i':(0,-1), 'd':(-1,0), 'm':(-1,-1), 's':(-1, -1)}
     path = []
 
-    i = matrix.shape[0]-1
-    j = matrix.shape[1]-1
-
-    while steps[i,j] != '':
-        path.insert(0, steps[i,j])
-        i,j = tuple(map(operator.add, (i,j), key[steps[i,j]]))
+    while matrix[i,j] != '':
+        path.insert(0, matrix[i,j])
+        i,j = tuple(map(operator.add, (i,j), key[matrix[i,j]]))
 
     return path
 
-def full_edit_distance(str1, str2, substitutionscore=1, insertscore=1, deletescore=1, charmatrix={}):
+def align(str1, str2, substitutionscore=1, insertscore=1, deletescore=1, charmatrix={}):
+    """Calculate the edit distance of two strings, then backtrace to find a valid edit sequence."""
+    matrix, steps = full_edit_distance(str1, str2, substitutionscore=substitutionscore,  insertscore=insertscore, deletescore=deletescore, charmatrix=charmatrix)
+    return backtrace(steps)
+
+def semi_global_align(shortseq, longseq, substitutionscore=1, insertscore=1, deletescore=1, charmatrix={}):
+    """Find a semi-global alignment between two strings."""
+    if len(shortseq) > len(longseq):
+        raise AlgorithmException('shortseq must be <= longseq in length!')
+
+    # short, longseq = sorted((str1, str2), key=lambda x: len(x))
+    matrix, steps = full_edit_distance(shortseq, longseq, substitutionscore=substitutionscore, insertscore=insertscore, deletescore=deletescore, charmatrix=charmatrix, semiglobal=True)
+    back = backtrace(steps, start=(matrix.shape[0]-1, numpy.argmin(matrix[-1:])))
+    return back
+
+def full_edit_distance(str1, str2, substitutionscore=1, insertscore=1, deletescore=1, charmatrix={}, semiglobal=False):
     """A modified implenmentation of the Wagner-Fischer algorithm using numpy. Unlike the minimal and optimized version in the
     "edit_distance" function, this returns the entire scoring matrix, and an operation matrix for backtracing and reconstructing the 
     edit operations. This should be used when an alignment is desired, not only the edit distance."""
@@ -77,10 +105,16 @@ def full_edit_distance(str1, str2, substitutionscore=1, insertscore=1, deletesco
 
     matrix = numpy.empty(shape=(str1.size+1, str2.size+1))
     matrix[0,0] = 0
-    for i in xrange(1, matrix.shape[0]):
-        matrix[i,0] = i*charmatrix.get(('', str1[i-1]), deletescore)
-    for j in xrange(1, matrix.shape[1]):
-        matrix[0,j] = j*charmatrix.get((str2[j-1], ''), insertscore)
+    if not semiglobal:
+        for i in xrange(1, matrix.shape[0]):
+            matrix[i,0] = i*charmatrix.get(('', str1[i-1]), deletescore)
+        for j in xrange(1, matrix.shape[1]):
+            matrix[0,j] = j*charmatrix.get((str2[j-1], ''), insertscore)
+    else:
+        matrix = numpy.zeros(shape=(str1.size+1, str2.size+1))
+        for i in xrange(1, matrix.shape[0]):    # We assume that str1 >= str2. This is guaranteed by the semi_global_align function. 
+            matrix[i,0] = i*charmatrix.get(('', str1[i-1]), deletescore)
+
 
     steps = numpy.empty(shape=(str1.size+1, str2.size+1), dtype=numpy.object)
     steps[1:,0] = 'd'
@@ -91,6 +125,7 @@ def full_edit_distance(str1, str2, substitutionscore=1, insertscore=1, deletesco
         for j in xrange(1, matrix.shape[1]):
             c1 = str1[i-1]
             c2 = str2[j-1]
+
             scores = (('s', matrix[i-1, j-1] + charmatrix.get((c1, c2), substitutionscore)),
                       ('i', matrix[i, j-1] + charmatrix.get((c1, c2), insertscore)), 
                       ('d', matrix[i-1, j] + charmatrix.get((c1, c2), deletescore)))
@@ -152,6 +187,7 @@ def extract_hocr_tokens(hocr_file):
     return words
 
 # if __name__ == '__main__':
-#     pass
+
+
 
 
