@@ -284,8 +284,8 @@ class AlignmentTests(unittest.TestCase):
         """Test against the second general example provided at http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm, but as a list of words."""
         self.assertEqual(['m', 'i', 'i', 'm', 's', 'm', 'm', 'm'], algorithms.align(['s', 'u', 'n', 'd', 'a', 'y'], ['s','a', 't', 'u', 'r', 'd', 'a', 'y']))
 
-class BacktraceTests(unittest.TestCase):
-    """Tests the backtrace function used by the various alignment algorithms."""
+class SemiGlobalAlignmentTests(unittest.TestCase):
+    """Tests the semi_global_align function."""
 
     def test_sequence_length_inversion(self):
         """Test that an exception is thrown if the first sequence is > the second."""

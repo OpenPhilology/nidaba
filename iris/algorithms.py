@@ -91,11 +91,37 @@ def semi_global_align(shortseq, longseq, substitutionscore=1, insertscore=1, del
         raise AlgorithmException('shortseq must be <= longseq in length!')
 
     # short, longseq = sorted((str1, str2), key=lambda x: len(x))
-    matrix, steps = full_edit_distance(shortseq, longseq, substitutionscore=substitutionscore, insertscore=insertscore, deletescore=deletescore, charmatrix=charmatrix, semiglobal=True)
+    matrix, steps = full_edit_distance(shortseq, longseq, substitutionscore=substitutionscore, insertscore=insertscore, deletescore=deletescore, charmatrix=charmatrix, alignment_type='semi-global')
     back = backtrace(steps, start=(matrix.shape[0]-1, numpy.argmin(matrix[-1:])))
     return back
 
-def full_edit_distance(str1, str2, substitutionscore=1, insertscore=1, deletescore=1, charmatrix={}, semiglobal=False):
+# def local_align(str1, str2, substitutionscore=1, insertscore=1, deletescore=1, charmatrix={}):
+
+def global_matrix(str1, str2, substitutionscore, insertscore, deletescore, charmatrix):
+    """An initial matrix for a global sequence alignment."""
+    matrix = numpy.empty(shape=(str1.size+1, str2.size+1))
+    matrix[0,0] = 0
+    for i in xrange(1, matrix.shape[0]):
+        matrix[i,0] = i*charmatrix.get(('', str1[i-1]), deletescore)
+    for j in xrange(1, matrix.shape[1]):
+        matrix[0,j] = j*charmatrix.get((str2[j-1], ''), insertscore)
+    return matrix
+
+def semi_global_matrix(str1, str2, substitutionscore, insertscore, deletescore, charmatrix):
+    """An initial matrix for a semi-global sequence alignment."""
+    matrix = numpy.zeros(shape=(str1.size+1, str2.size+1))
+    for i in xrange(1, matrix.shape[0]): # We assume that str1 >= str2. This is guaranteed by the semi_global_align function.
+        matrix[i,0] = i*charmatrix.get(('', str1[i-1]), deletescore)
+    return matrix
+
+# def local_matrix(str1, str2, substitutionscore, insertscore, deletescore, charmatrix):
+#     """An initial matrix for a local sequence alignment."""
+#     matrix = numpy.empty(shape=(str1.size+1, str2.size+1))
+#     matrix[1:,0] = 0
+#     matrix[0,1:] = 0
+#     return matrix
+
+def full_edit_distance(str1, str2, substitutionscore=1, insertscore=1, deletescore=1, charmatrix={}, alignment_type='global'):
     """A modified implenmentation of the Wagner-Fischer algorithm using numpy. Unlike the minimal and optimized version in the
     "edit_distance" function, this returns the entire scoring matrix, and an operation matrix for backtracing and reconstructing the 
     edit operations. This should be used when an alignment is desired, not only the edit distance."""
@@ -103,18 +129,8 @@ def full_edit_distance(str1, str2, substitutionscore=1, insertscore=1, deletesco
     str1 = numpy.array(tuple(str1))
     str2 = numpy.array(tuple(str2))
 
-    matrix = numpy.empty(shape=(str1.size+1, str2.size+1))
-    matrix[0,0] = 0
-    if not semiglobal:
-        for i in xrange(1, matrix.shape[0]):
-            matrix[i,0] = i*charmatrix.get(('', str1[i-1]), deletescore)
-        for j in xrange(1, matrix.shape[1]):
-            matrix[0,j] = j*charmatrix.get((str2[j-1], ''), insertscore)
-    else:
-        matrix = numpy.zeros(shape=(str1.size+1, str2.size+1))
-        for i in xrange(1, matrix.shape[0]):    # We assume that str1 >= str2. This is guaranteed by the semi_global_align function. 
-            matrix[i,0] = i*charmatrix.get(('', str1[i-1]), deletescore)
-
+    types = {'global': global_matrix, 'semi-global':semi_global_matrix}
+    matrix = types[alignment_type](str1, str2, substitutionscore, insertscore, deletescore, charmatrix)
 
     steps = numpy.empty(shape=(str1.size+1, str2.size+1), dtype=numpy.object)
     steps[1:,0] = 'd'
