@@ -77,60 +77,6 @@ def unzip_archive(username, password, src, dst=None, fsaddr=irisconfig.STORAGE_U
 #     url = archive_url_format.format(archive_name, '_tif.zip')
     
 
-# ------------------------------------------------------------------------------------------
-# Test tasks -------------------------------------------------------------------------------
-# These tasks were created for unit testing and should not be used for other purpose. ------
-# ------------------------------------------------------------------------------------------
-
-@app.task(name='test_ftp_connect')
-def ftp_connect_task(addr, username, password):
-    """Connect to the FTP file store, then immediately disconnect."""
-
-    filestore = mount_test_filestore(username, password)
-    filestore.close()
-    return 'successful'
-
-@app.task(name='create_test_file')
-def create_test_file(addr, username, password, contents):
-    """Create a file with a random name."""
-
-    filestore = mount_test_filestore(username, password)
-    path = str(uuid.uuid4())
-    filestore.createfile(path)
-    filestore.setcontents(path, contents)
-    filestore.close()
-    return path
-
-@app.task(name='delete_file')
-def delete_file(addr, username, password, path):
-    """Delete a file for the shared file store"""
-
-    filestore = mount_test_filestore(username, password)
-
-    filestore.remove(path)
-    filestore.close()
-    return path
-
-@app.task(name='create_dir')
-def create_dir(addr, username, password):
-    """Create a directory with a random name."""
-
-    name = '/%s' % uuid.uuid4()
-    filestore = mount_test_filestore(username, password)
-    filestore.makedir(name)
-    filestore.close()
-    return name
-
-@app.task(name='delete_dir')
-def delete_dir(addr, username, password, path):
-    """Delete a directory from the shared file store."""
-
-    filestore = mount_test_filestore(username, password)
-    filestore.removedir(path)
-    filestore.close()
-    return path
-
-
 #Attempt to parse a file into an image and load it into memory. If this method returns an image, the image is guaranteed to be valid.
 @app.task(name='imageLoadTask')
 def imageFromFile(file):
