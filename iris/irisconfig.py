@@ -7,11 +7,13 @@ IRIS_HOME = '~/OCR'
 # Iris will generate 'http://www.archive.org/download/mechanicaesynta00philgoog/mechanicaesynta00philgoog_tif.zip' automatically.
 ARCHIVE_URL = 'http://www.archive.org/download'
 
-# Addresss of the FTP server for large result and file storage. In a real deployment, some other system such as NFS can be used.
-FTP_ADDR = ('localhost', 8001)
-
-# Address of used to create temporary FTP servers used for unit testing.
-FTP_TEST_ADDR = ('localhost', 8002)
-
-# Address of used to create temporary HTTP servers used for unit testing.
-HTTP_TEST_ADDR = ('localhost', 8003)
+# Storage backend URL. Can be any supported by pyfilesystem, e.g. FTP, RAM
+# disks, S3, or native fs. If local file system is used (the default), the
+# protocol field is not obligatory.
+# URLS have to be of the following format:
+# [type://][username[:password]@]hostname[:port][path]
+STORAGE_URL = '~/OCR'
+# Example for ephemeral in memory storage
+#STORAGE_URL = 'mem://'
+# Example for FTP backend
+#STORAGE_URL = 'ftp://username:password@somelocation.me/OCR'

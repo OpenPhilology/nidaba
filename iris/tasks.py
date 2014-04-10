@@ -18,7 +18,8 @@ from celery import chord
 from celery.task.sets import TaskSet
 from celery.utils.log import get_task_logger
 from requests import HTTPError, ConnectionError, Timeout
-from fs import ftpfs, path, errors
+from fs import path, errors
+from fs.opener import opener
 from cStringIO import StringIO
 
 app = Celery(main='tasks', broker=celeryConfig.BROKER_URL)
@@ -36,10 +37,10 @@ def edit_distance_task(str1, str2):
     
 
 @app.task(name='http_download')
-def http_download(username, password, url, path, fsaddr=irisconfig.FTP_ADDR):
+def http_download(username, password, url, path, fs_url=irisconfig.STORAGE_URL):
     """Download the contents of a url and store the result at the specified path."""
 
-    filestore = mount_filestore(fsaddr, username, password)
+    filestore = mount_filestore(fs_url)
     r = requests.get(url, stream=True)
     if r.status_code == 200:
         with filestore.open(path, 'w+') as f:
@@ -50,10 +51,10 @@ def http_download(username, password, url, path, fsaddr=irisconfig.FTP_ADDR):
     return path
 
 @app.task(name='unzip_archive')
-def unzip_archive(username, password, src, dst=None, fsaddr=irisconfig.FTP_ADDR):
+def unzip_archive(username, password, src, dst=None, fsaddr=irisconfig.STORAGE_URL):
     """Extract the contents of a zip archive and store them at the desired directory."""
 
-    filestore = mount_filestore(fsaddr, username, password)
+    filestore = mount_filestore(fs_url)
     extractdir = dst if dst is not None else fs.path.dirname(src)
 
     with filestore.open(src) as fh:    # Get a standard python file-like object from the filestore.
@@ -257,16 +258,18 @@ def processOrgArchive(archiveId):
     # theList2 = list(downloadResults.get())#returns None
     # print theList2
 
+# ------------------------------------------------------------------------------------------
+# Low level filestore routines -------------------------------------------------------------
+# ------------------------------------------------------------------------------------------
 
-def mount_filestore(addr, username, password, attempts=10):
+def mount_filestore(fs_url, attempts=10):
     rfs = None
-    connected = False
     tries = 0
-    while(not connected and tries < attempts):
+    while(tries < attempts):
         try:
-            rfs = fs.ftpfs.FTPFS(host=addr[0], user=username, passwd=password, port=addr[1])
-            connected = True
-        except fs.errors.RemoteConnectionError as e:
+            rfs = opener.opendir(fs_url)
+            break
+        except:
             tries += 1
     return rfs
 
