@@ -21,6 +21,7 @@ from requests import HTTPError, ConnectionError, Timeout
 from fs import path, errors
 from fs.opener import opener
 from cStringIO import StringIO
+from storage import *
 
 app = Celery(main='tasks', broker=celeryConfig.BROKER_URL)
 app.config_from_object('celeryConfig')
@@ -257,31 +258,3 @@ def processOrgArchive(archiveId):
     
     # theList2 = list(downloadResults.get())#returns None
     # print theList2
-
-# ------------------------------------------------------------------------------------------
-# Low level filestore routines -------------------------------------------------------------
-# ------------------------------------------------------------------------------------------
-
-def mount_filestore(fs_url, attempts=10):
-    rfs = None
-    tries = 0
-    while(tries < attempts):
-        try:
-            rfs = opener.opendir(fs_url)
-            break
-        except:
-            tries += 1
-    return rfs
-
-def mount_test_filestore(username, password, attempts=10):
-    rfs = None
-    connected = False
-    tries = 0
-    while(not connected and tries < attempts):
-        try:
-            addr = irisconfig.FTP_TEST_ADDR
-            rfs = fs.ftpfs.FTPFS(host=addr[0], user=username, passwd=password, port=addr[1])
-            connected = True
-        except fs.errors.RemoteConnectionError as e:
-            tries += 1
-    return rfs
