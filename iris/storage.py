@@ -48,6 +48,8 @@ def list_content(stor, jobID):
 # Returns a dict containing the content of specified doc(s)
 def retrieve_content(stor, jobID, documents=None):
     if documents:
+        if isinstance(documents, basestring):
+            documents = [documents]
         return {d:stor.getcontents(fs.path.join(jobID, d)) for d in documents}
     else:
         return {}
