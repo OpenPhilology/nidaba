@@ -43,31 +43,45 @@ class LevenshteinTests(unittest.TestCase):
     # -------------------------------------------------------------------
 
     def test_equal_strings(self):
-        """Test the edit distance of identical strings"""
+        """
+        Test the edit distance of identical strings
+        """
         self.assertEqual(0, algorithms.edit_distance('test_string', 'test_string'))
 
     def test_single_insert(self):
-        """Test with strings requiring one insert"""
+        """
+        Test with strings requiring one insert
+        """
         self.assertEqual(1, algorithms.edit_distance('', 'a'))
 
     def test_tenfold_insert(self):
-        """Test with strings requiring ten inserts"""
+        """
+        Test with strings requiring ten inserts
+        """
         self.assertEqual(10, algorithms.edit_distance('', 'aaaaaaaaaa')) # A string with 10 a's.
 
     def test_single_delete(self):
-        """Test with strings requiring one delete"""
+        """
+        Test with strings requiring one delete
+        """
         self.assertEqual(1, algorithms.edit_distance('a', ''))
 
     def test_tenfold_delete(self):
-        """Test with strings requiring ten deletes"""
+        """
+        Test with strings requiring ten deletes
+        """
         self.assertEqual(10, algorithms.edit_distance('aaaaaaaaaa', '')) # A string with 10 a's.
 
     def test_singledelete_singleadd(self):
-        """Test with strings requiring a single non-trivial insert."""
+        """
+        Test with strings requiring a single non-trivial insert.
+        """
         self.assertEqual(2, algorithms.edit_distance('abbb', 'bbbbb')) # Should delete the a and insert the final b.
 
     def test_singleadd_singledelete(self):
-        """Test with strings requiring a single non-trivial delete."""
+        """
+        Test with strings requiring a single non-trivial delete.
+        """
         self.assertEqual(2, algorithms.edit_distance('bbbbb', 'abbb')) # Should delete the a and add the final b.    
 
 
@@ -76,17 +90,23 @@ class LevenshteinTests(unittest.TestCase):
     # -------------------------------------------------------------------
 
     def test_match_delete_matrix(self):
-        """Test the scoring matrix state in an edit requiring one match and delete."""
+        """
+        Test the scoring matrix state in an edit requiring one match and delete.
+        """
         expected = [[0,1,2],[1,0,1]]
         self.assertEqual(expected, algorithms.native_full_edit_distance('a', 'ab')[0])
 
     def test_match_insert_matrix(self):
-        """Test the scoring matrix state in an edit requiring one match an insert."""
+        """
+        Test the scoring matrix state in an edit requiring one match an insert.
+        """
         expected = [[0,1],[1,0],[2,1]]
         self.assertEqual(expected, algorithms.native_full_edit_distance('ab', 'a')[0])
 
     def test_all_match_matrix(self):
-        """Test the scoring matrix state in an edit consisting only of multiple matches."""
+        """
+        Test the scoring matrix state in an edit consisting only of multiple matches.
+        """
         expected = [[0,1,2,3,4,5],
                     [1,0,1,2,3,4],
                     [2,1,0,1,2,3],
@@ -97,7 +117,9 @@ class LevenshteinTests(unittest.TestCase):
 
 
     def test_all_subtitute_matrix(self):
-        """Test the scoring matrix state in an edit consisting only of multiple substitutes."""
+        """
+        Test the scoring matrix state in an edit consisting only of multiple substitutes.
+        """
         expected = [[0,1,2,3,4,5],
                     [1,1,2,3,4,5],
                     [2,2,2,3,4,5],
@@ -107,12 +129,16 @@ class LevenshteinTests(unittest.TestCase):
         self.assertEqual(expected, algorithms.native_full_edit_distance('aaaaa', 'bbbbb')[0])
 
     def test_all_insert(self):
-        """Test the scoring matrix state in an edit consisting only of multiple inserts."""
+        """
+        Test the scoring matrix state in an edit consisting only of multiple inserts.
+        """
         expected = [[0,1,2,3,4,5]]
         self.assertEqual(expected, algorithms.native_full_edit_distance('', 'abcde')[0])
 
     def test_all_delete(self):
-        """Test the scoring matrix state in an edit consisting only of deletes."""
+        """
+        Test the scoring matrix state in an edit consisting only of deletes.
+        """
         expected = [[0],
                     [1],
                     [2],
@@ -122,7 +148,9 @@ class LevenshteinTests(unittest.TestCase):
         self.assertEqual(expected, algorithms.native_full_edit_distance('abcde', '')[0])
 
     def test_all_empty(self):
-        """Test the scoring matrix state in an edit between two empty strings."""
+        """
+        Test the scoring matrix state in an edit between two empty strings.
+        """
         # expected = numpy.zeros(shape=(1,1))
         expected = [[0]]
         self.assertEqual(expected, algorithms.native_full_edit_distance('', '')[0])
@@ -133,7 +161,9 @@ class LevenshteinTests(unittest.TestCase):
     # -------------------------------------------------------------------
 
     def test_substitution_parameter(self):
-        """Test the functionality of the substitution score parameter."""
+        """
+        Test the functionality of the substitution score parameter.
+        """
         default = algorithms.edit_distance('a', 'b')
         same_as_default = algorithms.edit_distance('a', 'b', substitutionscore=1)
         with_parameter = algorithms.edit_distance('a', 'b', substitutionscore=-7)
@@ -143,7 +173,9 @@ class LevenshteinTests(unittest.TestCase):
         self.assertEqual(-7, with_parameter)
 
     def test_deletion_parameter(self):
-        """Test the functionality of the delete score parameter."""
+        """
+        Test the functionality of the delete score parameter.
+        """
         default = algorithms.edit_distance('a', '')
         same_as_default = algorithms.edit_distance('a', '', deletescore=1)
         with_parameter = algorithms.edit_distance('a', '', deletescore=-7)
@@ -153,7 +185,9 @@ class LevenshteinTests(unittest.TestCase):
         self.assertEqual(-7, with_parameter)
 
     def test_insertion_parameter(self):
-        """Test the functionality of the insert score parameter."""
+        """
+        Test the functionality of the insert score parameter.
+        """
         default = algorithms.edit_distance('', 'a')
         same_as_default = algorithms.edit_distance('', 'a', insertscore=1)
         with_parameter = algorithms.edit_distance('', 'a', insertscore=-7)
@@ -163,21 +197,27 @@ class LevenshteinTests(unittest.TestCase):
         self.assertEqual(-7, with_parameter)
 
     def test_charmatrix_one_character_substitution_lower(self):
-        """Test the functionality of the charmatrix parameter where in reduces the score of a substitution."""
+        """
+        Test the functionality of the charmatrix parameter where in reduces the score of a substitution.
+        """
         charmatrix = {('a', 'b'):0}
         expected = [[0,1],
                     [1,0]]
         self.assertEqual(expected, algorithms.native_full_edit_distance('a', 'b', charmatrix=charmatrix)[0])
 
     def test_charmatrix_one_character_substitution_higher(self):
-        """Test the functionality of the charmatrix parameter where in increases the score of a substitution."""
+        """
+        Test the functionality of the charmatrix parameter where in increases the score of a substitution.
+        """
         charmatrix = {('a', 'b'):5}
         expected = [[0,1],
                     [1,5]]
         self.assertEqual(expected, algorithms.native_full_edit_distance('a', 'b', charmatrix=charmatrix)[0])
 
     def test_charmatrix_one_character_substitution_default(self):
-        """Test the functionality of the charmatrix parameter where it does not change a character score."""
+        """
+        Test the functionality of the charmatrix parameter where it does not change a character score.
+        """
         charmatrix = {('a', 'b'):1}
         expected = [[0,1],
                     [1,1]]
@@ -185,7 +225,9 @@ class LevenshteinTests(unittest.TestCase):
 
 
     def test_charmatrix_default_delete(self):
-        """Test the case where the charmatrix mutates the score of trivial (first column) deletes."""
+        """
+        Test the case where the charmatrix mutates the score of trivial (first column) deletes.
+        """
         charmatrix = {('', 'a'):5}
         expected = [[0],
                     [5],
@@ -194,7 +236,9 @@ class LevenshteinTests(unittest.TestCase):
         self.assertEqual(expected, algorithms.native_full_edit_distance('aaa', '', charmatrix=charmatrix)[0])
 
     def test_charmatrix_default_insert(self):
-        """Test the case where the charmatrix mutates the score of trivial (first row) inserts."""
+        """
+        Test the case where the charmatrix mutates the score of trivial (first row) inserts.
+        """
         charmatrix = {('a', ''):5}
         expected = [[0,5,10,15]]
         self.assertEqual(expected, algorithms.native_full_edit_distance('', 'aaa', charmatrix=charmatrix)[0])
@@ -232,108 +276,154 @@ class LevenshteinTests(unittest.TestCase):
 class AlignmentTests(unittest.TestCase):
 
     def test_empty_strings(self):
-        """Tests the edit steps between two empty strings."""
+        """
+        Tests the edit steps between two empty strings.
+        """
         self.assertEqual([], algorithms.native_align('', ''))
     
     def test_insertions(self):
-        """Test the edit steps when only inserts are needed."""
+        """
+        Test the edit steps when only inserts are needed.
+        """
         self.assertEqual(['i', 'i', 'i', 'i', 'i'], algorithms.native_align('', 'abcde'))
 
     def test_deletions(self):
-        """Test the edit steps when only deletes are needed."""
+        """
+        Test the edit steps when only deletes are needed.
+        """
         self.assertEqual(['d', 'd', 'd', 'd', 'd'], algorithms.native_align('abcde', ''))
         
     def test_matches(self):
-        """Test the edit steps when only matches are needed."""
+        """
+        Test the edit steps when only matches are needed.
+        """
         self.assertEqual(['m', 'm', 'm', 'm', 'm'], algorithms.native_align('abcde', 'abcde'))
 
     def test_matches_1(self):   #TODO
-        """Test the edit steps when only substitutions are needed."""
+        """
+        Test the edit steps when only substitutions are needed.
+        """
         self.assertEqual(['s', 's', 's', 's', 's'], algorithms.native_align('abcde', 'vwxyz'))
 
     def test_wikepedia_example_1(self):
-        """Test against the first general example provided at http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm"""
+        """
+        Test against the first general example provided at http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm
+        """
         self.assertEqual(['s', 'm', 'm', 'm', 's', 'm', 'd'], algorithms.native_align('sitting', 'kitten'))
 
     def test_wikepedia_example_2(self):
-        """Test against the second general example provided at http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm"""
+        """
+        Test against the second general example provided at http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm
+        """
         self.assertEqual(['m', 'i', 'i', 'm', 's', 'm', 'm', 'm'], algorithms.native_align('sunday', 'saturday'))
 
 class SemiGlobalAlignmentTests(unittest.TestCase):
-    """Tests the semi_global_align function."""
+    """
+    Tests the semi_global_align function.
+    """
 
     def test_sequence_length_inversion(self):
-        """Test that an exception is thrown if the first sequence is > the second."""
+        """
+        Test that an exception is thrown if the first sequence is > the second.
+        """
         self.assertRaises(algorithms.AlgorithmException, algorithms.native_semi_global_align, 'abcdefghi', '') #Test with a long string
         self.assertRaises(algorithms.AlgorithmException, algorithms.native_semi_global_align, 'a', '') # Test with one character
         self.assertRaises(algorithms.AlgorithmException, algorithms.native_semi_global_align, ['word'], []) # Test with one word
         self.assertRaises(algorithms.AlgorithmException, algorithms.native_semi_global_align, ['word1', 'word2', 'word3'], ['word']) # Test with one word
 
     def test_identical(self):
-        """Test with strings and lists of equal length."""
+        """
+        Test with strings and lists of equal length.
+        """
         expected = ['m']
         self.assertEqual(expected, algorithms.native_semi_global_align('a', 'a'))
         self.assertEqual(expected, algorithms.native_semi_global_align(['a'], ['a']))
 
     def test_identical_long(self):
-        """Test with a longer series of matches."""
+        """
+        Test with a longer series of matches.
+        """
         expected = ['m', 'm', 'm', 'm', 'm']
         self.assertEqual(expected, algorithms.native_semi_global_align('abcde', 'abcde'))
 
     def test_identical_words(self):
-        """Test with a series of of matching words."""
+        """
+        Test with a series of of matching words.
+        """
         expected = ['m', 'm', 'm', 'm', 'm']
         self.assertEqual(expected, algorithms.native_semi_global_align(['word1', 'word2', 'word3', 'word4', 'word5'], ['word1', 'word2', 'word3', 'word4', 'word5']))
 
     def test_simple_prefix(self):
-        """Test with a single match and a skippable prefix."""
+        """
+        Test with a single match and a skippable prefix.
+        """
         expected = ['i', 'i', 'i', 'i', 'm']
         self.assertEqual(expected, algorithms.native_semi_global_align('b', 'aaaab'))
 
     def test_prefix_with_trailer(self):
-        """Test with a single match and a skippable prefix and trailer."""
+        """
+        Test with a single match and a skippable prefix and trailer.
+        """
         expected = ['i', 'i', 'i', 'i', 'm']
         self.assertEqual(expected, algorithms.native_semi_global_align('b', 'aaaabcccc'))
 
     def test_word_prefix(self):
-        """Test a list of words with a prefix."""
+        """
+        Test a list of words with a prefix.
+        """
         expected = ['i', 'i', 'm']
         self.assertEqual(expected, algorithms.native_semi_global_align(['match'], ['w1', 'w2', 'match']))
 
 
 class NumpyLevenshteinTests(unittest.TestCase):
-    """Tests the np_full_edit_distance funtion by checking both the edit distance and full matrix comparisons."""
+    """
+    Tests the np_full_edit_distance funtion by checking both the edit distance and full matrix comparisons.
+    """
 
     # -------------------------------------------------------------------
     # Edit distance tests -----------------------------------------------
     # -------------------------------------------------------------------
 
     def test_equal_strings(self):
-        """Test the edit distance of identical strings"""
+        """
+        Test the edit distance of identical strings
+        """
         self.assertEqual(0, algorithms.np_full_edit_distance('test_string', 'test_string')[0][-1,-1])
 
     def test_single_insert(self):
-        """Test with strings requiring one insert"""
+        """
+        Test with strings requiring one insert
+        """
         self.assertEqual(1, algorithms.np_full_edit_distance('', 'a')[0][-1,-1])
 
     def test_tenfold_insert(self):
-        """Test with strings requiring ten inserts"""
+        """
+        Test with strings requiring ten inserts
+        """
         self.assertEqual(10, algorithms.np_full_edit_distance('', 'aaaaaaaaaa')[0][-1,-1]) # A string with 10 a's.
 
     def test_single_delete(self):
-        """Test with strings requiring one delete"""
+        """
+        Test with strings requiring one delete
+        """
         self.assertEqual(1, algorithms.np_full_edit_distance('a', '')[0][-1,-1])
 
     def test_tenfold_delete(self):
-        """Test with strings requiring ten deletes"""
+        """
+        Test with strings requiring ten deletes
+        """
         self.assertEqual(10, algorithms.np_full_edit_distance('aaaaaaaaaa', '')[0][-1,-1]) # A string with 10 a's.
 
     def test_singledelete_singleadd(self):
-        """Test with strings requiring a single non-trivial insert."""
+        """
+        Test with strings requiring a single non-trivial insert.
+        """
         self.assertEqual(2, algorithms.np_full_edit_distance('abbb', 'bbbbb')[0][-1,-1]) # Should delete the a and insert the final b.
 
     def test_singleadd_singledelete(self):
-        """Test with strings requiring a single non-trivial delete."""
+        """
+        Test with strings requiring a single non-trivial delete.
+        """
         self.assertEqual(2, algorithms.np_full_edit_distance('bbbbb', 'abbb')[0][-1,-1]) # Should delete the a and add the final b.    
 
     # -------------------------------------------------------------------
@@ -341,17 +431,23 @@ class NumpyLevenshteinTests(unittest.TestCase):
     # -------------------------------------------------------------------
 
     def test_match_delete_matrix(self):
-        """Test the scoring matrix state in an edit requiring one match and delete."""
+        """
+        Test the scoring matrix state in an edit requiring one match and delete.
+        """
         expected = numpy.array([[0,1,2],[1,0,1]])
         self.assertTrue(numpy.array_equal(expected, algorithms.np_full_edit_distance('a', 'ab')[0]))
 
     def test_match_insert_matrix(self):
-        """Test the scoring matrix state in an edit requiring one match an insert."""
+        """
+        Test the scoring matrix state in an edit requiring one match an insert.
+        """
         expected = numpy.array([[0,1],[1,0],[2,1]])
         self.assertTrue(numpy.array_equal(expected, algorithms.np_full_edit_distance('ab', 'a')[0]))
 
     def test_all_match_matrix(self):
-        """Test the scoring matrix state in an edit consisting only of multiple matches."""
+        """
+        Test the scoring matrix state in an edit consisting only of multiple matches.
+        """
         expected = numpy.array([[0,1,2,3,4,5],
                                 [1,0,1,2,3,4],
                                 [2,1,0,1,2,3],
@@ -362,7 +458,9 @@ class NumpyLevenshteinTests(unittest.TestCase):
 
 
     def test_all_subtitute_matrix(self):
-        """Test the scoring matrix state in an edit consisting only of multiple substitutes."""
+        """
+        Test the scoring matrix state in an edit consisting only of multiple substitutes.
+        """
         expected = numpy.array([[0,1,2,3,4,5],
                                 [1,1,2,3,4,5],
                                 [2,2,2,3,4,5],
@@ -372,12 +470,16 @@ class NumpyLevenshteinTests(unittest.TestCase):
         self.assertTrue(numpy.array_equal(expected, algorithms.np_full_edit_distance('aaaaa', 'bbbbb')[0]))
 
     def test_all_insert(self):
-        """Test the scoring matrix state in an edit consisting only of multiple inserts."""
+        """
+        Test the scoring matrix state in an edit consisting only of multiple inserts.
+        """
         expected = numpy.array([[0,1,2,3,4,5]])
         self.assertTrue(numpy.array_equal(expected, algorithms.np_full_edit_distance('', 'abcde')[0]))        
 
     def test_all_delete(self):
-        """Test the scoring matrix state in an edit consisting only of deletes."""
+        """
+        Test the scoring matrix state in an edit consisting only of deletes.
+        """
         expected = numpy.array([[0],
                                 [1],
                                 [2],
@@ -387,7 +489,9 @@ class NumpyLevenshteinTests(unittest.TestCase):
         self.assertTrue(numpy.array_equal(expected, algorithms.np_full_edit_distance('abcde', '')[0]))
 
     def test_all_empty(self):
-        """Test the scoring matrix state in an edit between two empty strings."""
+        """
+        Test the scoring matrix state in an edit between two empty strings.
+        """
         expected = numpy.zeros(shape=(1,1))
         self.assertTrue(numpy.array_equal(expected, algorithms.np_full_edit_distance('', '')[0]))
 
@@ -396,7 +500,9 @@ class NumpyLevenshteinTests(unittest.TestCase):
     # -------------------------------------------------------------------
 
     def test_substitution_parameter(self):
-        """Test the functionality of the substitution score parameter."""
+        """
+        Test the functionality of the substitution score parameter.
+        """
         default = algorithms.np_full_edit_distance('a', 'b')[0][-1,-1]
         same_as_default = algorithms.np_full_edit_distance('a', 'b', substitutionscore=1)[0][-1,-1]
         with_parameter = algorithms.np_full_edit_distance('a', 'b', substitutionscore=-7)[0][-1,-1]
@@ -406,7 +512,9 @@ class NumpyLevenshteinTests(unittest.TestCase):
         self.assertEqual(-7, with_parameter)
 
     def test_deletion_parameter(self):
-        """Test the functionality of the delete score parameter."""
+        """
+        Test the functionality of the delete score parameter.
+        """
         default = algorithms.np_full_edit_distance('a', '')[0][-1,-1]
         same_as_default = algorithms.np_full_edit_distance('a', '', deletescore=1)[0][-1,-1]
         with_parameter = algorithms.np_full_edit_distance('a', '', deletescore=-7)[0][-1,-1]
@@ -416,7 +524,9 @@ class NumpyLevenshteinTests(unittest.TestCase):
         self.assertEqual(-7, with_parameter)
 
     def test_insertion_parameter(self):
-        """Test the functionality of the insert score parameter."""
+        """
+        Test the functionality of the insert score parameter.
+        """
         default = algorithms.np_full_edit_distance('', 'a')[0][-1,-1]
         same_as_default = algorithms.np_full_edit_distance('', 'a', insertscore=1)[0][-1,-1]
         with_parameter = algorithms.np_full_edit_distance('', 'a', insertscore=-7)[0][-1,-1]
@@ -426,21 +536,27 @@ class NumpyLevenshteinTests(unittest.TestCase):
         self.assertEqual(-7, with_parameter)
 
     def test_charmatrix_one_character_substitution_lower(self):
-        """Test the functionality of the charmatrix parameter where in reduces the score of a substitution."""
+        """
+        Test the functionality of the charmatrix parameter where in reduces the score of a substitution.
+        """
         charmatrix = {('a', 'b'):0}
         expected = numpy.array([[0,1],
                                 [1,0]])
         self.assertTrue(numpy.array_equal(expected, algorithms.np_full_edit_distance('a', 'b', charmatrix=charmatrix)[0]))
 
     def test_charmatrix_one_character_substitution_higher(self):
-        """Test the functionality of the charmatrix parameter where in increases the score of a substitution."""
+        """
+        Test the functionality of the charmatrix parameter where in increases the score of a substitution.
+        """
         charmatrix = {('a', 'b'):5}
         expected = numpy.array([[0,1],
                                 [1,5]])
         self.assertTrue(numpy.array_equal(expected, algorithms.np_full_edit_distance('a', 'b', charmatrix=charmatrix)[0]))
 
     def test_charmatrix_one_character_substitution_default(self):
-        """Test the functionality of the charmatrix parameter where it does not change a character score."""
+        """
+        Test the functionality of the charmatrix parameter where it does not change a character score.
+        """
         charmatrix = {('a', 'b'):1}
         expected = numpy.array([[0,1],
                                 [1,1]])
@@ -448,7 +564,9 @@ class NumpyLevenshteinTests(unittest.TestCase):
 
 
     def test_charmatrix_default_delete(self):
-        """Test the case where the charmatrix mutates the score of trivial (first column) deletes."""
+        """
+        Test the case where the charmatrix mutates the score of trivial (first column) deletes.
+        """
         charmatrix = {('', 'a'):5}
         expected = numpy.array([[0],
                                 [5],
@@ -457,7 +575,9 @@ class NumpyLevenshteinTests(unittest.TestCase):
         self.assertTrue(numpy.array_equal(expected, algorithms.np_full_edit_distance('aaa', '', charmatrix=charmatrix)[0]))
 
     def test_charmatrix_default_insert(self):
-        """Test the case where the charmatrix mutates the score of trivial (first row) inserts."""
+        """
+        Test the case where the charmatrix mutates the score of trivial (first row) inserts.
+        """
         charmatrix = {('a', ''):5}
         expected = numpy.array([[0,5,10,15]])
         self.assertTrue(numpy.array_equal(expected, algorithms.np_full_edit_distance('', 'aaa', charmatrix=charmatrix)[0]))
@@ -494,31 +614,45 @@ class NumpyLevenshteinTests(unittest.TestCase):
 class NumpyAlignmentTests(unittest.TestCase):
 
     def test_empty_strings(self):
-        """Tests the edit steps between two empty strings."""
+        """
+        Tests the edit steps between two empty strings.
+        """
         self.assertEqual([], algorithms.np_align('', ''))
     
     def test_insertions(self):
-        """Test the edit steps when only inserts are needed."""
+        """
+        Test the edit steps when only inserts are needed.
+        """
         self.assertEqual(['i', 'i', 'i', 'i', 'i'], algorithms.np_align('', 'abcde'))
 
     def test_deletions(self):
-        """Test the edit steps when only deletes are needed."""
+        """
+        Test the edit steps when only deletes are needed.
+        """
         self.assertEqual(['d', 'd', 'd', 'd', 'd'], algorithms.np_align('abcde', ''))
         
     def test_matches(self):
-        """Test the edit steps when only matches are needed."""
+        """
+        Test the edit steps when only matches are needed.
+        """
         self.assertEqual(['m', 'm', 'm', 'm', 'm'], algorithms.np_align('abcde', 'abcde'))
 
     def test_matches_1(self):   #TODO
-        """Test the edit steps when only substitutions are needed."""
+        """
+        Test the edit steps when only substitutions are needed.
+        """
         self.assertEqual(['s', 's', 's', 's', 's'], algorithms.np_align('abcde', 'vwxyz'))
 
     def test_wikepedia_example_1(self):
-        """Test against the first general example provided at http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm"""
+        """
+        Test against the first general example provided at http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm
+        """
         self.assertEqual(['s', 'm', 'm', 'm', 's', 'm', 'd'], algorithms.np_align('sitting', 'kitten'))
 
     def test_wikepedia_example_2(self):
-        """Test against the second general example provided at http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm"""
+        """
+        Test against the second general example provided at http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm
+        """
         self.assertEqual(['m', 'i', 'i', 'm', 's', 'm', 'm', 'm'], algorithms.np_align('sunday', 'saturday'))
 
 
@@ -527,67 +661,95 @@ class NumpyAlignmentTests(unittest.TestCase):
     # -------------------------------------------------------------------
 
     def test_empty_word_list(self):
-        """Tests the edit steps between two empty lists."""
+        """
+        Tests the edit steps between two empty lists.
+        """
         self.assertEqual([], algorithms.np_align([], []))
     
     def test_word_insertions(self):
-        """Test the edit steps when only inserts are needed."""
+        """
+        Test the edit steps when only inserts are needed.
+        """
         self.assertEqual(['i', 'i', 'i', 'i', 'i'], algorithms.np_align([], ['word1', 'word2', 'word3', 'word4', 'word5']))
 
     def test_word_deletions(self):
-        """Test the edit steps when only inserts are needed."""
+        """
+        Test the edit steps when only inserts are needed.
+        """
         self.assertEqual(['d', 'd', 'd', 'd', 'd'], algorithms.np_align(['word1', 'word2', 'word3', 'word4', 'word5'], []))
 
     def test_word_matches(self):
-        """Test the edit steps when only matches are needed."""
+        """
+        Test the edit steps when only matches are needed.
+        """
         self.assertEqual(['m', 'm', 'm', 'm', 'm'], algorithms.np_align(['word1', 'word2', 'word3', 'word4', 'word5'], ['word1', 'word2', 'word3', 'word4', 'word5']))
 
     def test_wikepedia_example_1(self):
-        """Test against the first general example provided at http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm, but as a list of words."""
+        """
+        Test against the first general example provided at http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm, but as a list of words.
+        """
         self.assertEqual(['s', 'm', 'm', 'm', 's', 'm', 'd'], algorithms.np_align(['s','i', 't', 't', 'i', 'n', 'g'], ['k','i', 't', 't', 'e', 'n']))
 
     def test_wikepedia_example_2(self):
-        """Test against the second general example provided at http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm, but as a list of words."""
+        """
+        Test against the second general example provided at http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm, but as a list of words.
+        """
         self.assertEqual(['m', 'i', 'i', 'm', 's', 'm', 'm', 'm'], algorithms.np_align(['s', 'u', 'n', 'd', 'a', 'y'], ['s','a', 't', 'u', 'r', 'd', 'a', 'y']))
 
 class NumpySemiGlobalAlignmentTests(unittest.TestCase):
-    """Tests the np_semi_global_align function."""
+    """
+    Tests the np_semi_global_align function.
+    """
 
     def test_sequence_length_inversion(self):
-        """Test that an exception is thrown if the first sequence is > the second."""
+        """
+        Test that an exception is thrown if the first sequence is > the second.
+        """
         self.assertRaises(algorithms.AlgorithmException, algorithms.np_semi_global_align, 'abcdefghi', '') #Test with a long string
         self.assertRaises(algorithms.AlgorithmException, algorithms.np_semi_global_align, 'a', '') # Test with one character
         self.assertRaises(algorithms.AlgorithmException, algorithms.np_semi_global_align, ['word'], []) # Test with one word
         self.assertRaises(algorithms.AlgorithmException, algorithms.np_semi_global_align, ['word1', 'word2', 'word3'], ['word']) # Test with one word
 
     def test_identical(self):
-        """Test with strings and lists of equal length."""
+        """
+        Test with strings and lists of equal length.
+        """
         expected = ['m']
         self.assertEqual(expected, algorithms.np_semi_global_align('a', 'a'))
         self.assertEqual(expected, algorithms.np_semi_global_align(['a'], ['a']))
 
     def test_identical_long(self):
-        """Test with a longer series of matches."""
+        """
+        Test with a longer series of matches.
+        """
         expected = ['m', 'm', 'm', 'm', 'm']
         self.assertEqual(expected, algorithms.np_semi_global_align('abcde', 'abcde'))
 
     def test_identical_words(self):
-        """Test with a series of of matching words."""
+        """
+        Test with a series of of matching words.
+        """
         expected = ['m', 'm', 'm', 'm', 'm']
         self.assertEqual(expected, algorithms.np_semi_global_align(['word1', 'word2', 'word3', 'word4', 'word5'], ['word1', 'word2', 'word3', 'word4', 'word5']))
 
     def test_simple_prefix(self):
-        """Test with a single match and a skippable prefix."""
+        """
+        Test with a single match and a skippable prefix.
+        """
         expected = ['i', 'i', 'i', 'i', 'm']
         self.assertEqual(expected, algorithms.np_semi_global_align('b', 'aaaab'))
 
     def test_prefix_with_trailer(self):
-        """Test with a single match and a skippable prefix and trailer."""
+        """
+        Test with a single match and a skippable prefix and trailer.
+        """
         expected = ['i', 'i', 'i', 'i', 'm']
         self.assertEqual(expected, algorithms.np_semi_global_align('b', 'aaaabcccc'))
 
     def test_word_prefix(self):
-        """Test a list of words with a prefix."""
+        """
+        Test a list of words with a prefix.
+        """
         expected = ['i', 'i', 'm']
         self.assertEqual(expected, algorithms.np_semi_global_align(['match'], ['w1', 'w2', 'match']))
 
