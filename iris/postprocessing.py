@@ -32,7 +32,7 @@ def spell_check(lang, text, suggs = 0, suggest_correct = False):
         return None
 
     # Hunspell always requires an affix file, but an empty one is valid.
-    aff_path = '/dev/null'
+    aff_path = path.join(irisconfig.DICT_URL, irisconfig.DEFAULT_AFFIX)
     if len(irisconfig.LANG_DICTS[lang]) == 2:
         try:
             aff_path = path.join(irisconfig.DICT_URL, irisconfig.LANG_DICTS[lang][1])
@@ -56,7 +56,7 @@ def spell_check(lang, text, suggs = 0, suggest_correct = False):
         if not suggest_correct and h.spell(eword):
             ret_list.append((word, []))
         else:
-            s = h.suggest(eword)
+            s = [s.decode(h.get_dic_encoding()) for s in h.suggest(eword)]
             if suggs:
                 s = s[0:suggs]
             ret_list.append((word, s))
