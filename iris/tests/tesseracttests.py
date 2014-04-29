@@ -26,7 +26,7 @@ class TesseractTests(unittest.TestCase):
         """
         pngpath = os.path.join(resources, 'image.png')
         outpath = os.path.join(self.tempdir, 'output.hocr')
-        ocr = tesseract.ocr(pngpath, outpath, 'grc')
+        ocr = tesseract.ocr(pngpath, outpath, ['grc'])
         expected = outpath + '.html'
 
         self.assertEqual(ocr[0], expected)
@@ -45,7 +45,7 @@ class TesseractTests(unittest.TestCase):
         tiffpath = os.path.join(resources, 'image.tiff')
         outpath = os.path.join(self.tempdir, 'output.hocr')
         expected = outpath + '.html'
-        ocr = tesseract.ocr(tiffpath, outpath, 'grc')
+        ocr = tesseract.ocr(tiffpath, outpath, ['grc'])
         self.assertTrue(os.path.isfile(expected),
                         msg='Tesseract did not output a file!')
         try:
@@ -61,7 +61,7 @@ class TesseractTests(unittest.TestCase):
         jpgpath = os.path.join(resources, 'image.jpg')
         outpath = os.path.join(self.tempdir, 'output.hocr')
         expected = outpath + '.html'
-        tesseract.ocr(jpgpath, outpath, 'grc')
+        tesseract.ocr(jpgpath, outpath, ['grc'])
         ocr = self.assertTrue(os.path.isfile(expected),
                         msg='Tesseract did not output a file!')
         try:
@@ -77,7 +77,7 @@ class TesseractTests(unittest.TestCase):
         """
         baddir = os.path.join(resources, 'idontexist')
         try:
-            tesseract.ocrdir(baddir, 'irrelevant', 'grc')
+            tesseract.ocrdir(baddir, 'irrelevant', ['grc'])
             self.fail()
         except Exception as e:
             self.assertEqual('Directory did not exist!', str(e))
@@ -87,7 +87,7 @@ class TesseractTests(unittest.TestCase):
         Test that the ocrdir raises the appropriate exception if the
         path for the input dir is not a dir.
         """
-        hocr = tesseract.ocrdir(resources, self.tempdir, 'grc')
+        hocr = tesseract.ocrdir(resources, self.tempdir, ['grc'])
         self.assertEqual(3, len(hocr))
         self.assertEqual(3, len(os.listdir(self.tempdir)))
         self.assertIn('image.png.html', os.listdir(self.tempdir))

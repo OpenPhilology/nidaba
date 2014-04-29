@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 import errno
-import tempfile as temp
 import subprocess
-import StringIO
 import glob
-from irisconfig import TESS_PATH as tesseract
 
 #More readable aliases for tesseract's language abbreviations.
 greek = 'grc'
@@ -13,7 +10,7 @@ greek = 'grc'
 #Formats for filtering when ocring directories.
 fileformats = ('png', 'tiff', 'jpg')
 
-def ocr(imagepath, outputfilepath, language):
+def ocr(imagepath, outputfilepath, languages):
     """
     Scan a single image with tesseract using the specified language,
     and writing output to the specified file. Returns a 3 tuple of the
@@ -22,8 +19,8 @@ def ocr(imagepath, outputfilepath, language):
     """
     abs_in = os.path.abspath(os.path.expanduser(imagepath))
     abs_out = os.path.abspath(os.path.expanduser(outputfilepath))
-    p = subprocess.Popen(['tesseract', '-l', language, abs_in, abs_out, 'hocr'],
-                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(['tesseract', '-l', '+'.join(languages), abs_in,
+        abs_out, 'hocr'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     resultpath = abs_out + '.html'
     out, err = p.communicate()
     return (resultpath, out, err)
@@ -56,5 +53,4 @@ def ocrdir(dirpath, outputdir, language):
     return results
     
 if __name__ == '__main__':
-	pass
-    # ocrdir('tests/resources/tesseract', 'tests/resources/tesseract', greek)
+    pass
