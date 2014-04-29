@@ -307,3 +307,22 @@ def extract_hocr_tokens(hocr_file):
             del element.getparent()[0]
     del context
     return word
+
+if __name__ == '__main__':
+    print edit_distance('Socat e5', 'Socrates')
+    print mr(native_full_edit_distance('Socat e5', 'Socrates')[0])
+    print native_align('Socat e5', 'Socrates')
+
+    print '------'
+
+    print edit_distance('ocat e5', 'pineapple')
+    print mr(native_full_edit_distance('ocat e5', 'pineapple')[0])
+    print native_align('ocat e5', 'pineapple')
+
+    print '-----'
+
+    print edit_distance('ocat e5', 'cactus')
+    print mr(native_full_edit_distance('ocat e5', 'cactus')[0])
+    print native_align('ocat e5', 'cactus')
+
+
