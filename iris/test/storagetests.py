@@ -24,13 +24,20 @@ class StorageTests(unittest.TestCase):
         id = unicode(uuid.uuid4())
         storage.prepare_filestore(id)
         f = u'bananagram'
-        d = 3 * u'banana '
+        d = 3 * '\x01\x02\x03\x04\x05\x99'
         self.assertEqual(len(d), storage.write_content(id, f, d), 'Writing data failed.')
-        #self.assertEqual(d, .getcontents(path.join(id, f)), 'Retrieved data is not equal to written data.')
+        with open(storage._sanitize_path(irisconfig.STORAGE_PATH, path.join(id, f)), 'rb') as f:
+            self.assertEqual(d, f.read(), 'Retrieved data does not match written data.')
 
     def test_write_text(self):
         '''Tests (text) content writing.'''
-        pass
+        id = unicode(uuid.uuid4())
+        storage.prepare_filestore(id)
+        f = u'bananagram'
+        d = 3 * u'bananaøö«¬áßðgï '
+        storage.write_text(id, f, d)
+        with open(storage._sanitize_path(irisconfig.STORAGE_PATH, path.join(id, f)), 'rb') as f:
+            self.assertEqual(d, f.read().decode('utf-8'), 'Retrieved data does not match written data.')
 
     def test_retrieve_content(self):
         '''Tests (binary) content retrieval.'''
@@ -40,6 +47,7 @@ class StorageTests(unittest.TestCase):
         d = 3 * u'banana '
         with open(storage._sanitize_path(irisconfig.STORAGE_PATH, path.join(id, f)), 'wb') as fi:
             fi.write(d.encode('utf-8'))
+        r = storage.retrieve_content(id, f)
         self.assertDictEqual({f:d.encode('utf-8')}, storage.retrieve_content(id, f), 'Retrieved data not equal.')
 
     def test_retrieve_multiple_content(self):
@@ -49,18 +57,32 @@ class StorageTests(unittest.TestCase):
         fdict = {}
         for i in range(0, 2048):
             f = unicode(uuid.uuid4())
-            fdict[unicode(f)] = unicode(uuid.uuid4())
+            fdict[f] = str(uuid.uuid4()) + '\x01\x02\x03\x99'
             with open(storage._sanitize_path(irisconfig.STORAGE_PATH, path.join(id, f)), 'wb') as fi:
-                fi.write(fdict[f].encode('utf-8'))
+                fi.write(fdict[f])
         self.assertDictEqual(fdict, storage.retrieve_content(id, fdict.keys()), 'Retrieved data does not match written data.')
 
     def test_retrieve_text(self):
         '''Tests (text) content retrieval.'''
-        pass
+        id = unicode(uuid.uuid4())
+        storage.prepare_filestore(id)
+        f = u'bananagram'
+        d = 3 * u'bananaøö«¬áßðgï '
+        with open(storage._sanitize_path(irisconfig.STORAGE_PATH, path.join(id, f)), 'wb') as fi:
+            fi.write(d.encode('utf-8'))
+        self.assertEqual(d, storage.retrieve_text(id, f)[f], 'Retrieved data does not match written data.')
 
     def test_retrieve_multiple_text(self):
         '''Tests retrieval of multiple text documents.'''
-        pass
+        id = unicode(uuid.uuid4())
+        storage.prepare_filestore(id)
+        fdict = {}
+        for i in range(0, 2048):
+            f = unicode(uuid.uuid4())
+            fdict[unicode(f)] = unicode(uuid.uuid4())
+            with open(storage._sanitize_path(irisconfig.STORAGE_PATH, path.join(id, f)), 'wb') as fi:
+                fi.write(fdict[f].encode('utf-8'))
+        self.assertDictEqual(fdict, storage.retrieve_content(id, fdict.keys()), 'Retrieved data does not match written data.')
 
     def test_list_content(self):
         '''Tests listing of content to a job.'''
