@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import re
 import numpy
 import codecs
 import operator
@@ -12,8 +13,17 @@ from lxml import etree
 # Exceptions -----------------------------------------------------------
 # ----------------------------------------------------------------------
 
+class UnibarrierException(Exception):
+    """
+    An exception for the unibarrier decorator function.
+    """
+    def __init__(self, message=None):
+        Exception.__init__(self, message)
+
 class AlgorithmException(Exception):
-    """A simple exception for algorithm specific errors."""
+    """
+    A simple exception for algorithm specific errors.
+    """
     def __init__(self, message=None):
         Exception.__init__(self, message)
 
@@ -253,39 +263,90 @@ def np_full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
     return matrix, steps
 
 # ----------------------------------------------------------------------
-# Greek algorithms -----------------------------------------------------
+# Language algorithms --------------------------------------------------
 # ----------------------------------------------------------------------
 
-def greek_and_coptic_range():
-    """Return a range representing the Greek and Coptic unicode
-    block."""
-    return range(ord('\u0370'.decode('unicode-escape')),
-                 ord('\u03FF'.decode('unicode-escape'))+1)
+# Useful unicode ranges
+greek_coptic_range = (u'Greek Coptic', u'\u0370', u'\u03FF')
+extended_greek_range = (u'Extended Greek', u'\u1F00', u'\u1FFF')
+combining_diacritical_mark_range = (u'Combining Diacritical', u'\u0300', u'\u0360')
 
-def extended_greek_range():
-    """Return a range representing the Extended Greek unicode block."""
-    return range(ord('\u1F00'.decode('unicode-escape')),
-                 ord('\u1FFF'.decode('unicode-escape'))+1)
+def unibarrier(func):
+    """
+    A decorator function; used to ensure that no str objects can be
+    passed as either args or kwargs.
+    """
+    def unishielded(*args, **kwargs):
+        for arg in args:
+            if type(arg) == type(str('')):
+                raise UnibarrierException(message='%s was a string!' % arg)
+        for key, val in kwargs.iteritems():
+            if type(val) == type(str('')):
+                raise UnibarrierException(message='%s was a string!' % val)
+        return func(*args, **kwargs)
+    return unishielded
 
-def combining_diacritical_mark_range():
-    """Return a range representing the Combined Diacritical Mark unicode
-    block."""
-    return range(ord('\u0300'.decode('unicode-escape')),
-                 ord('\u0360'.decode('unicode-escape'))+1)
+
+def uniblock(start, stop):
+    """
+    Return a range containing all the characters in the unicode table
+    starting with 'start' (inclusive) and ending with end (inclusive).
+    """
+    ints = range(ord(start.decode('unicode-escape')),
+                 ord(stop.decode('unicode-escape'))+1)
+
+    return map(unichr, ints)  
+
+def inblock(c, bounds):
+    """
+    Check that the character c is equal to or between the two bounding
+    characters in the unicode table.
+    """
+    return ord(c) >= ord(bounds[0]) and ord(c) <= ord(bounds[1])
+
+@unibarrier
+def identify(string, unicode_blocks):
+    """
+    Determine percent-wise how many characters in the given string
+    belong in each given unicode block. Ranges may be user defined, and
+    not official unicode ranges. It is assumed that ranges do not
+    overlap. unicode_blocks is an iterable of 3-tuples of the form
+    (<name of block>, <first unichar in block>, <last unichar in the 
+    block>).
+    """
+    result = {b[0]:0 for b in unicode_blocks}
+    for c in string:
+        for r in unicode_blocks:
+            if inblock(c, (r[1], r[2])):
+                result[r[0]] += 1
+
+    return result
+
+
+def unifilter(string, rangelist):
+    filterset = []
+    for block in rangelist:
+        for i in unirange(block):
+            filterset.append(unichar(i))
+    return filter(filterset.__contains__, string)
 
 def greek_chars():
-    """Return a list containing all the characters from the Greek and
-    Coptic, Extended Greek, and Combined Diacritical unicode blocks."""
+    """
+    Return a list containing all the characters from the Greek and
+    Coptic, Extended Greek, and Combined Diacritical unicode blocks.
+    """
 
-    chars = [unichr(i) for i in greek_and_coptic_range()]
-    for i in extended_greek_range():
+    chars = [unichr(i) for i in unirange(greek_coptic_range)]
+    for i in unirange(extended_greek_range):
         chars.append(unichr(i))
-    for i in combining_diacritical_mark_range():
+    for i in unirange(combining_diacritical_mark_range):
         chars.append(unichr(i))
     return chars
 
 def greek_filter(string):
-    """Remove all non-Greek characters from a string."""
+    """
+    Remove all non-Greek characters from a string.
+    """
     return filter(greek_chars().__contains__, string)
 
 # ----------------------------------------------------------------------
@@ -293,36 +354,52 @@ def greek_filter(string):
 # ----------------------------------------------------------------------
 
 def extract_hocr_tokens(hocr_file):
-    """Extracts all the nonempty words in an hOCR file and returns them
-    as a list."""
+    """
+    Extracts all the nonempty words in an hOCR file and returns them
+    as a list.
+    """
     words = []
     context = etree.iterparse(hocr_file, events=('end',), tag='span', html=True)
     for event, element in context:
         # Strip extraneous newlines generated by the ocr_line span tags.
-        word = to_unicode(element.text.rstrip())
+        if element.text is not None:
+            word = to_unicode(element.text.rstrip())
         if len(word) > 0:
             words.append(word)
         element.clear()
         while element.getprevious() is not None:
             del element.getparent()[0]
     del context
-    return word
+    return words
+
+def extract_bboxes(hocr_file):
+    """
+    Extracts a list of bboxes as 4-tuples, in the same order that they
+    appear in the hocr file.
+    """
+    context = etree.parse(hocr_file)
+    elements_with_bbox = context.xpath(u'//@title')
+    pattern = r'.*(bbox+ [0-9]+ [0-9]+ [0-9]+ [0-9]+)'
+    bboxes = []
+    for e in elements_with_bbox:
+        match = re.match(pattern, str(e))
+        bbox = tuple(map(int, match.groups()[0].decode(u'utf-8')[5:].split(u' ')))
+        bboxes.append(bbox)
+    return bboxes
+
 
 if __name__ == '__main__':
-    print edit_distance('Socat e5', 'Socrates')
-    print mr(native_full_edit_distance('Socat e5', 'Socrates')[0])
-    print native_align('Socat e5', 'Socrates')
+    path = os.path.expanduser('~/Desktop/tess/out.hocr.html')
+    with open(path) as f:
+        extract_bboxes(f)    
 
-    print '------'
+    #bbox+[0-9]+ [0-9]+ [0-9]+ [0-9]+
 
-    print edit_distance('ocat e5', 'pineapple')
-    print mr(native_full_edit_distance('ocat e5', 'pineapple')[0])
-    print native_align('ocat e5', 'pineapple')
-
-    print '-----'
-
-    print edit_distance('ocat e5', 'cactus')
-    print mr(native_full_edit_distance('ocat e5', 'cactus')[0])
-    print native_align('ocat e5', 'cactus')
+    # path = os.path.expanduser('~/Desktop/tess/out.hocr.html')
+    # print path
+    # with open(path) as f:
+    #     tokens = extract_hocr_tokens(f)
+    #     for t in tokens:
+    #         print t
 
 

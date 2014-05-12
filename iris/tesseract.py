@@ -51,6 +51,7 @@ def ocrdir(dirpath, outputdir, language):
             results.append(outfile)
 
     return results
+
     
 if __name__ == '__main__':
     pass
