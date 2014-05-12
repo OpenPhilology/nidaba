@@ -45,7 +45,6 @@ def previewbboxs(imgfile, hocrfile, color='blue'):
     Display a preview of the specified image with the bboxes from the
     hocr file drawn on it.
     """
-    print 'running'
     opened = Image.open(imgfile)
     draw = ImageDraw.Draw(opened)
     for bbox in extract_bboxes(hocrfile):
