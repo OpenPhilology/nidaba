@@ -379,7 +379,7 @@ def extract_bboxes(hocr_file):
     """
     context = etree.parse(hocr_file)
     elements_with_bbox = context.xpath(u'//@title')
-    pattern = r'.*(bbox+ [0-9]+ [0-9]+ [0-9]+ [0-9]+)'
+    pattern = r'.*(bbox{1} [0-9]+ [0-9]+ [0-9]+ [0-9]+)'
     bboxes = []
     for e in elements_with_bbox:
         match = re.match(pattern, str(e))
