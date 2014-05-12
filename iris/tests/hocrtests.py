@@ -3,7 +3,6 @@ import unittest
 import hocr
 import re
 import tempfile
-from kitchen.text.converters import to_unicode, to_bytes
 
 class HocrTests(unittest.TestCase):
     """

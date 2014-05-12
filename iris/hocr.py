@@ -2,6 +2,7 @@
 import re
 from lxml import etree
 from kitchen.text.converters import to_unicode, to_bytes
+from PIL import Image, ImageDraw
 
 
 def extract_hocr_tokens(hocr_file):
@@ -37,3 +38,20 @@ def extract_bboxes(hocr_file):
         bbox = tuple(map(int, match.groups()[0].decode(u'utf-8')[5:].split(u' ')))
         bboxes.append(bbox)
     return bboxes
+
+
+def previewbboxs(imgfile, hocrfile, color='blue'):
+    """
+    Display a preview of the specified image with the bboxes from the
+    hocr file drawn on it.
+    """
+    print 'running'
+    opened = Image.open(imgfile)
+    draw = ImageDraw.Draw(opened)
+    for bbox in extract_bboxes(hocrfile):
+        draw.rectangle(((bbox[0], bbox[1]),(bbox[2], bbox[3])), outline=color)
+
+    opened.show()
+
+
+# if __name__ == '__main__':
