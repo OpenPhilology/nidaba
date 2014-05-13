@@ -3,9 +3,11 @@
 
 from os import path
 from lock import lock
+
 import irisconfig
 import os
 import fnmatch
+
 
 # Sanitizes a given path with respect to a base path. Returns an absolute path
 # garantueed to be beneath base_path.
@@ -13,14 +15,19 @@ def _sanitize_path(base_path, rel_path):
     base_path = path.expanduser(base_path)
     base_path = path.abspath(base_path)
     rel_path = path.abspath(path.join(base_path, rel_path))
-    if path.commonprefix([path.normpath(rel_path), path.normpath(base_path)]) == base_path:
+    if path.commonprefix([path.normpath(rel_path),
+                          path.normpath(base_path)]) == base_path:
         return rel_path
     else:
         return ''
 
-# Checks if filestore has been prepared for a job.
+
 def is_valid_job(jobID):
+    """
+    Checks if filestore has been prepared for a job.
+    """
     return path.isdir(_sanitize_path(irisconfig.STORAGE_PATH, jobID))
+
 
 def prepare_filestore(jobID):
     """
@@ -36,6 +43,7 @@ def prepare_filestore(jobID):
     except Exception as err:
         return None
 
+
 def list_content(jobID, pattern=u'*'):
     """
     Lists all files to a job ID, optionally applying a glob-like filter.
@@ -47,6 +55,7 @@ def list_content(jobID, pattern=u'*'):
     for root, dirs, files in os.walk(jpath):
         flist.extend([path.relpath(path.join(root, s), jpath) for s in files])
     return fnmatch.filter(flist, pattern)
+
 
 def retrieve_content(jobID, documents=None):
     """
@@ -69,12 +78,14 @@ def retrieve_content(jobID, documents=None):
         return fdict
         map(lambda x: x.release(), locks)
 
+
 def retrieve_text(jobID, documents=None):
     """
     Retrieves UTF-8 encoded text from a single or a list of documents.
     """
     res = retrieve_content(jobID, documents)
-    return {t:res[t].decode('utf-8') for t in res}
+    return {t: res[t].decode('utf-8') for t in res}
+
 
 def write_content(jobID, dest, data):
     """
@@ -86,7 +97,8 @@ def write_content(jobID, dest, data):
     if not isinstance(data, basestring):
         return None
     try:
-        with open(_sanitize_path(irisconfig.STORAGE_PATH, path.join(jobID, dest)), 'wb') as f:
+        with open(_sanitize_path(irisconfig.STORAGE_PATH,
+                                 path.join(jobID, dest)), 'wb') as f:
             l = lock(f.name)
             l.acquire()
             f.write(data)
@@ -95,18 +107,9 @@ def write_content(jobID, dest, data):
         return None
     return len(data)
 
+
 def write_text(jobID, dest, text):
     """
     Writes text data encoded as UTF-8 to a file beneath a jobID.
     """
     return write_content(jobID, dest, text.encode('utf-8'))
-
-## Writes a document to a path below a job.
-#def write_content(stor, jobID, dest, data):
-#    try:
-#        stor.setcontents(fs.path.join(jobID, dest), data)
-#        return len(data)
-#    except:
-#        # log.debug('Writing content for job: ' + jobID + ' failed.')
-#        # log.debug(err)
-#        return None
