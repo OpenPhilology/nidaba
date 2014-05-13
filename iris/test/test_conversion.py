@@ -7,7 +7,10 @@ import glob
 import difflib
 import abbyyToOCR
 
-#The unit tests for abbyy to hOCR conversion. Each XML to HTML tag transform method is individually tested, then the output of a full conversion is compared against a directory of originals.
+
+# The unit tests for abbyy to hOCR conversion. Each XML to HTML tag transform
+# method is individually tested, then the output of a full conversion is compared
+# against a directory of originals.
 class TestAbbyyToOCRConversion(unittest.TestCase):
     def testConverstion(self):
 
@@ -15,7 +18,7 @@ class TestAbbyyToOCRConversion(unittest.TestCase):
         tempdir = tempfile.mkdtemp()
         abbyyToOCR.convert_abbyy_to_ocr(abbySample, tempdir, 'testAbbyy')
 
-        orig_count = len(glob.glob('resources/abbyyConversion/hocr/testHOCR_[0-9][0-9]*.hocr.html')) # And not os.listdir(), which will include crap like .DS_Store.
+        orig_count = len(glob.glob('resources/abbyyConversion/hocr/testHOCR_[0-9][0-9]*.hocr.html'))  # And not os.listdir(), which will include crap like .DS_Store.
         new_count = len(glob.glob(os.path.join(tempdir, 'testAbbyy_[0-9][0-9]*.hocr.html')))
 
         self.assertEqual(orig_count, new_count)
