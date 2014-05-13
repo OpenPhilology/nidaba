@@ -9,7 +9,7 @@ from os import path
 from multiprocessing import Process
 from lock import lock
 
-class LockTests(unittest.TestCase):
+class test_locking(unittest.TestCase):
     """
     Tests the locking implementation.
     """

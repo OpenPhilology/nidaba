@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 import unittest
 import storage
@@ -7,7 +8,7 @@ from os import path
 
 from tempfile import mkdtemp
 
-class StorageTests(unittest.TestCase):
+class test_storage(unittest.TestCase):
     '''
     Tests the storage backend.
     '''
