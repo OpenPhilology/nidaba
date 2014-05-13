@@ -18,7 +18,7 @@ ARCHIVE_URL = 'http://www.archive.org/download'
 # protocol field is not obligatory.
 # URLS have to be of the following format:
 # [type://][username[:password]@]hostname[:port][path]
-STORAGE_URL = '~/OCR'
+STORAGE_PATH = '~/OCR'
 # Example for ephemeral in memory storage
 #STORAGE_URL = 'mem://'
 # Example for FTP backend
