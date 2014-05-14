@@ -24,6 +24,8 @@ def extract_hocr_tokens(hocr_file):
     del context
     return words
 
+
+
 def extract_bboxes(hocr_file):
     """
     Extracts a list of bboxes as 4-tuples, in the same order that they
@@ -31,14 +33,33 @@ def extract_bboxes(hocr_file):
     """
     context = etree.parse(hocr_file)
     elements_with_bbox = context.xpath(u'//@title')
+
     pattern = r'.*(bbox{1} [0-9]+ [0-9]+ [0-9]+ [0-9]+)'
     bboxes = []
     for e in elements_with_bbox:
         match = re.match(pattern, str(e))
-        bbox = tuple(map(int, match.groups()[0].decode(u'utf-8')[5:].split(u' ')))
+        bbox = tuple(map(int, match.groups()[0][5:].split(u' ')))
         bboxes.append(bbox)
     return bboxes
 
+def extract_bboxes_by_class(hocrfile, classes):
+    """
+    Extracts bboxes of the specified tags. Returns a dictionary which
+    maps tag names to lists of bboxs. These lists are ordered as the are
+    in the hocr document.
+    """
+    context = etree.parse(hocrfile)
+    results = {hocrclass:[] for hocrclass in classes}
+    pattern = r'.*(bbox{1} [0-9]+ [0-9]+ [0-9]+ [0-9]+)'
+
+    for c in classes:
+        xpath = u"//*[@class='%s' and @title]" % c
+        for element in context.xpath(xpath):
+            match = re.match(pattern, element.attrib[u'title'])
+            bbox = tuple(map(int, match.groups()[0][5:].split(u' ')))
+            results[c].append(bbox)
+
+    return results
 
 def previewbboxs(imgfile, hocrfile, color='blue'):
     """
