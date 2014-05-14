@@ -1,7 +1,6 @@
 This does not represent all tasks neeeded to finish Iris (oh the irony), merely those that have been determined for the immediate future!
 
 General:
-Remove PIL, replace with pillow.
 Eliminate the imagetasks module.
 Rewrite the image tasks with pillow/merge them into the tasks module.
 Create image task tests.
@@ -10,3 +9,6 @@ OCR:
 Design general OCR wrapper
 Create gamera wrapper
 Create tesseract wrapper (lower priority)
+
+Algorithms:
+Create native python versions of Levenshtein distance, alignment, and benchmark against numpy versions.

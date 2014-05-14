@@ -71,3 +71,8 @@ There are currently two exceptions to this rule: redis and gamera, as these are 
 Final note: Please know that commits prior to October 29 2013 were primarily for experimentation with different libraries and basic preliminary work. Code from them should be considered unreliable/uncompliant with the above standards, and should NOT be taken as standards.
 
 If you have any questions or would like to contribute, please contact to openPhilology@informatik.uni-leipzig.de.
+
+Useful  References
+------------------
+
+[Hocr Standard Definition](https://docs.google.com/document/d/1QQnIQtvdAC_8n92-LhwPcjtAUFwBlzE8EWnKAxlgVf0/preview)

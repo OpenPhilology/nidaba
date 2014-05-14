@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
-#The home directory for Iris to store files created by OCR jobs. For example, tifs, jp2s, meta.xml, and abbyy file downloaded from archive.org are stored here. Each new job is automatically placed in a uniquely named subdir named after its archiveID, creator, and timestamp.
+# The home directory for Iris to store files created by OCR jobs. For example, tifs, jp2s, meta.xml, and abbyy file downloaded from archive.org are stored here. Each new job is automatically placed in a uniquely named subdir named after its archiveID, creator, and timestamp.
 IRIS_HOME = '~/OCR'	
+
+# The location of the tesseract binay you wish to use.
+TESS_PATH = '/usr/local/bin/tesseract'
+# The location of the directory containing tesseract training data.
+TESS_DATA_PATH = '/usr/local/share/tessdata'
 
 # The prefix of the URL for archive.org downloads, which will have the remainder dynamically appended to it based on a job's archiveID. 
 # For example, if we wish to process archive mechanicaesynta00philgoog, 
@@ -8,10 +13,10 @@ IRIS_HOME = '~/OCR'
 ARCHIVE_URL = 'http://www.archive.org/download'
 
 # Addresss of the FTP server for large result and file storage. In a real deployment, some other system such as NFS can be used.
-FTP_ADDR = ('localhost', 8001)
+# FTP_ADDR = ('localhost', 8001)
 
 # Address of used to create temporary FTP servers used for unit testing.
-FTP_TEST_ADDR = ('localhost', 8002)
+# FTP_TEST_ADDR = ('localhost', 8002)
 
 # Address of used to create temporary HTTP servers used for unit testing.
-HTTP_TEST_ADDR = ('localhost', 8003)
+# HTTP_TEST_ADDR = ('localhost', 8003)
