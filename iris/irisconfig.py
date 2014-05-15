@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
-# The home directory for Iris to store files created by OCR jobs. For example, tifs, jp2s, meta.xml, and abbyy file downloaded from archive.org are stored here. Each new job is automatically placed in a uniquely named subdir named after its archiveID, creator, and timestamp.
+# The home directory for Iris to store files created by OCR jobs. For example,
+# tifs, jp2s, meta.xml, and abbyy file downloaded from archive.org are stored
+# here. Each new job is automatically placed in a uniquely named subdir named
+# after its archiveID, creator, and timestamp.
 IRIS_HOME = '~/OCR'	
 
-# The location of the tesseract binay you wish to use.
-TESS_PATH = '/usr/local/bin/tesseract'
-# The location of the directory containing tesseract training data.
-TESS_DATA_PATH = '/usr/local/share/tessdata'
-
-# The prefix of the URL for archive.org downloads, which will have the remainder dynamically appended to it based on a job's archiveID. 
-# For example, if we wish to process archive mechanicaesynta00philgoog, 
-# Iris will generate 'http://www.archive.org/download/mechanicaesynta00philgoog/mechanicaesynta00philgoog_tif.zip' automatically.
+# The prefix of the URL for archive.org downloads, which will have the
+# remainder dynamically appended to it based on a job's archiveID.  For
+# example, if we wish to process archive mechanicaesynta00philgoog, Iris will
+# generate
+# 'http://www.archive.org/download/mechanicaesynta00philgoog/mechanicaesynta00philgoog_tif.zip'
+# automatically.
 ARCHIVE_URL = 'http://www.archive.org/download'
 
-# Addresss of the FTP server for large result and file storage. In a real deployment, some other system such as NFS can be used.
-# FTP_ADDR = ('localhost', 8001)
-
-# Address of used to create temporary FTP servers used for unit testing.
-# FTP_TEST_ADDR = ('localhost', 8002)
-
-# Address of used to create temporary HTTP servers used for unit testing.
-# HTTP_TEST_ADDR = ('localhost', 8003)
+# Storage backend URL. Can be any supported by pyfilesystem, e.g. FTP, RAM
+# disks, S3, or native fs. If local file system is used (the default), the
+# protocol field is not obligatory.
+# URLS have to be of the following format:
+# [type://][username[:password]@]hostname[:port][path]
+STORAGE_PATH = '~/OCR'
+# Example for ephemeral in memory storage
+#STORAGE_URL = 'mem://'
+# Example for FTP backend
+#STORAGE_URL = 'ftp://username:password@somelocation.me/OCR'
