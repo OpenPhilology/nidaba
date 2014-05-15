@@ -269,7 +269,7 @@ def np_full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
 # Useful unicode ranges
 greek_coptic_range = (u'Greek Coptic', u'\u0370', u'\u03FF')
 extended_greek_range = (u'Extended Greek', u'\u1F00', u'\u1FFF')
-combining_diacritical_mark_range = (u'Combining Diacritical', u'\u0300', u'\u0360')
+combining_diacritical_mark_range = (u'Combining Diacritical', u'\u0300', u'\u036f')
 
 def unibarrier(func):
     """
