@@ -42,7 +42,7 @@ def extract_bboxes(hocr_file):
         bboxes.append(bbox)
     return bboxes
 
-def extract_bboxes_by_class(hocrfile, classes):
+def extract_bboxes_by_classes(hocrfile, classes):
     """
     Extracts bboxes of the specified tags. Returns a dictionary which
     maps tag names to lists of bboxs. These lists are ordered as the are
@@ -61,17 +61,44 @@ def extract_bboxes_by_class(hocrfile, classes):
 
     return results
 
+def drawbboxes(bboxes, pil_img, color='blue'):
+    """
+    Draw all bboxes in the specified color. Returnss a 
+    """
+    draw = ImageDraw.Draw(pil_img)
+    for bbox in bboxes:
+        draw.rectangle(((bbox[0], bbox[1]),(bbox[2], bbox[3])), outline=color)
+    del draw
+    return pil_img
+
 def previewbboxs(imgfile, hocrfile, color='blue'):
     """
     Display a preview of the specified image with the bboxes from the
     hocr file drawn on it.
     """
     opened = Image.open(imgfile)
-    draw = ImageDraw.Draw(opened)
-    for bbox in extract_bboxes(hocrfile):
-        draw.rectangle(((bbox[0], bbox[1]),(bbox[2], bbox[3])), outline=color)
-
+    # draw = ImageDraw.Draw(opened)
+    # for bbox in extract_bboxes(hocrfile):
+        # draw.rectangle(((bbox[0], bbox[1]),(bbox[2], bbox[3])), outline=color)
+    drawbboxes(extract_bboxes(hocrfile), opened, color)
     opened.show()
 
+def markbboxes(imgfile, hocrfile, tagcolors):
+    """
+    Draw all the bboxes of the specified hocr class with the specified
+    colors. Returns a PIL image file.
+    """
+    bboxesperclass = extract_bboxes_by_classes(hocrfile, tagcolors.keys())
+    pil_img = Image.open(imgfile)
+    for hocr_class, bboxlist in bboxesperclass.iteritems():
+        drawbboxes(bboxlist, pil_img, tagcolors[hocr_class])
 
-# if __name__ == '__main__':
+    pil_img.show()
+    return pil_img
+
+if __name__ == '__main__':
+    with open('/u/frazier/Desktop/tess/hocr_greek.html') as f:
+        with open('/u/frazier/Desktop/tess/img.tif') as i:
+            # previewbboxs(i, f, 'red')
+            markbboxes(i, f, {'ocrx_word':'blue'})
+

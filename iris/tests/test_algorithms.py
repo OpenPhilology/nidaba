@@ -868,6 +868,43 @@ class LanguageTests(unittest.TestCase):
         self.assertEqual({greek[0]:len(u'Πλάτων')},
                          algorithms.identify(u'Πλάτων', [greek]))
 
+    def test_is_lang_threshhold_check(self):
+        """
+        Test that an exception is raised if an invalid threshold value
+        is entered.
+        """
+        self.assertRaises(Exception, algorithms.islang, None, None, -0.00001)
+        self.assertRaises(Exception, algorithms.islang, None, None, 1.00001)
+        self.assertRaises(Exception, algorithms.islang, None, None, 0.0)
+
+    def test_is_lang_100percent_ascii(self):
+        """
+        Test with a pure ascii string.
+        """
+        asciistr = (u"""!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUV
+                     WXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~""")
+        self.assertTrue(algorithms.islang(asciistr, [algorithms.ascii_range]))
+
+    def test_is_lang_100percent_greek(self):
+        """
+        Test with two strings containing characters from the Greek and
+        Coptic block.
+        """
+        gk1 = u'Σωκράτης'
+        gk2 = u'Πλάτων'
+        self.assertTrue(algorithms.islang(gk1, [algorithms.greek_coptic_range]))
+        self.assertTrue(algorithms.islang(gk2, [algorithms.greek_coptic_range]))
+
+    def test_is_lang_50percent_greekascii(self):
+        """
+        Test with a string that is half ascii and half Greek and Coptic.
+        """
+        halfandhalf = u'Πλάτων_ascii'
+        self.assertTrue(algorithms.islang(halfandhalf, [algorithms.ascii_range], threshold=0.5))
+        self.assertTrue(algorithms.islang(halfandhalf, [algorithms.greek_coptic_range], threshold=0.5))
+        
+        self.assertFalse(algorithms.islang(halfandhalf, [algorithms.greek_coptic_range], threshold=0.5000001))
+        self.assertFalse(algorithms.islang(halfandhalf, [algorithms.greek_coptic_range], threshold=0.5000001))
 
 
 if __name__ == '__main__':

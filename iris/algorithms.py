@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
 import os
 import re
 import numpy
@@ -267,6 +268,7 @@ def np_full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
 # ----------------------------------------------------------------------
 
 # Useful unicode ranges
+ascii_range = (u'Ascii', unichr(0), unichr(127))
 greek_coptic_range = (u'Greek Coptic', u'\u0370', u'\u03FF')
 extended_greek_range = (u'Extended Greek', u'\u1F00', u'\u1FFF')
 combining_diacritical_mark_range = (u'Combining Diacritical', u'\u0300', u'\u036f')
@@ -322,6 +324,24 @@ def identify(string, unicode_blocks):
 
     return result
 
+@unibarrier
+def islang(unistr, unicode_blocks, threshold=1.0):
+    """
+    Determine if a given (unicode) string belongs to a certain langauge.
+    This calls the identify function to determine what fraction of the
+    string's characters are in the specified blocks. It returns true if
+    the number of chars in those blocks is >= threshold.
+    Threshold is a float between 0 and 1.
+    """
+    if threshold > 1.0 or threshold <= 0.0:
+        raise Exception(u'Threshold must be > 0.0 and <= 1.0')
+
+    res = identify(unistr, unicode_blocks)
+    inlang = 0
+    for block in unicode_blocks:
+        inlang += res[block[0]]
+
+    return inlang/len(unistr) >= threshold
 
 def unifilter(string, rangelist):
     filterset = []
@@ -358,10 +378,8 @@ if __name__ == '__main__':
     #bbox+[0-9]+ [0-9]+ [0-9]+ [0-9]+
 
     # path = os.path.expanduser('~/Desktop/tess/out.hocr.html')
-    # print path
     # with open(path) as f:
     #     tokens = extract_hocr_tokens(f)
     #     for t in tokens:
-    #         print t
 
 
