@@ -35,7 +35,7 @@ STORAGE_PATH = '~/OCR'
 # the dictionary does not contain them, but will reduce memory utilization
 # greatly and they contain the dictionary encoding. Refer to the hunspell
 # documentation for more information.
-LANG_DICTS = { 'greek': ('greek.dic',),  'lojban': ('test/lojban.txt',), 'german': ('test/german.txt',)}
+LANG_DICTS = { 'polytonic_greek': ('greek.dic',),  'lojban': ('test/lojban.txt',), 'german': ('test/german.txt',)}
 # A default affix file is necessary to determine the encoding for dictionaries
 # which don't have an own one. We default to UTF-8. 
 DEFAULT_AFFIX = 'default.aff'

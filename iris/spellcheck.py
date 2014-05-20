@@ -15,7 +15,7 @@ class spellcheck():
     def __init__(self, lang):
         if lang not in irisconfig.LANG_DICTS:
             # yes exceptions only accept byte strings
-            return ValueError((u'No dictionary defined for ' + lang).encode('utf-8'))
+            raise ValueError((u'No dictionary defined for ' + lang).encode('utf-8'))
         try:
             dict_path = storage._sanitize_path(irisconfig.DICT_PATH, irisconfig.LANG_DICTS[lang][0])
         except Exception as err:
