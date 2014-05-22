@@ -4,6 +4,11 @@ from lxml import etree
 from kitchen.text.converters import to_unicode, to_bytes
 from PIL import Image, ImageDraw
 
+# Useful xpath queries for selecting items with bboxes form hocr.
+ALL_BBOXES = u"//*[@title]"
+PAGES = u"//*[@class='ocr_page' and @title]"
+LINES = u"//*[@class='ocr_line' and @title]"
+WORD = u"//*[@class='ocrx_word' and @title]"
 
 def extract_hocr_tokens(hocr_file):
     """
@@ -26,38 +31,22 @@ def extract_hocr_tokens(hocr_file):
 
 
 
-def extract_bboxes(hocr_file):
+def extract_bboxes(hocr_file, xpaths=[ALL_BBOXES]):
     """
     Extracts a list of bboxes as 4-tuples, in the same order that they
-    appear in the hocr file.
+    appear in the hocr file. BBoxes are only extracted from those
+    elements matching the specified xpath bboxes.
     """
     context = etree.parse(hocr_file)
-    elements_with_bbox = context.xpath(u'//@title')
-
-    pattern = r'.*(bbox{1} [0-9]+ [0-9]+ [0-9]+ [0-9]+)'
-    bboxes = []
-    for e in elements_with_bbox:
-        match = re.match(pattern, str(e))
-        bbox = tuple(map(int, match.groups()[0][5:].split(u' ')))
-        bboxes.append(bbox)
-    return bboxes
-
-def extract_bboxes_by_classes(hocrfile, classes):
-    """
-    Extracts bboxes of the specified tags. Returns a dictionary which
-    maps tag names to lists of bboxs. These lists are ordered as the are
-    in the hocr document.
-    """
-    context = etree.parse(hocrfile)
-    results = {hocrclass:[] for hocrclass in classes}
-    pattern = r'.*(bbox{1} [0-9]+ [0-9]+ [0-9]+ [0-9]+)'
-
-    for c in classes:
-        xpath = u"//*[@class='%s' and @title]" % c
-        for element in context.xpath(xpath):
-            match = re.match(pattern, element.attrib[u'title'])
+    bboxpattern = r'.*(bbox{1} [0-9]+ [0-9]+ [0-9]+ [0-9]+)'
+    results = {}
+    for xpath in xpaths:
+        bboxes = []
+        for e in context.xpath(xpath):
+            match = re.match(bboxpattern, e.attrib[u'title'])
             bbox = tuple(map(int, match.groups()[0][5:].split(u' ')))
-            results[c].append(bbox)
+            bboxes.append(bbox)
+        results[xpath] = bboxes
 
     return results
 
@@ -77,28 +66,24 @@ def previewbboxs(imgfile, hocrfile, color='blue'):
     hocr file drawn on it.
     """
     opened = Image.open(imgfile)
-    # draw = ImageDraw.Draw(opened)
-    # for bbox in extract_bboxes(hocrfile):
-        # draw.rectangle(((bbox[0], bbox[1]),(bbox[2], bbox[3])), outline=color)
-    drawbboxes(extract_bboxes(hocrfile), opened, color)
+    drawbboxes(extract_bboxes(hocrfile)[ALL_BBOXES], opened, color)
     opened.show()
 
-def markbboxes(imgfile, hocrfile, tagcolors):
+def markbboxes(imgfile, hocrfile, tag_color_dict):
     """
     Draw all the bboxes of the specified hocr class with the specified
-    colors. Returns a PIL image file.
+    colors. Returns a PIL image file. Tag_color_dict is a dictionary of the
+    form {'hocrclass':'color'}.
     """
-    bboxesperclass = extract_bboxes_by_classes(hocrfile, tagcolors.keys())
+    # bboxesperclass = extract_bboxes_by_classes(hocrfile, tag_color_dict.keys())
+    bboxesperclass = extract_bboxes(hocrfile, tag_color_dict.keys())
     pil_img = Image.open(imgfile)
     for hocr_class, bboxlist in bboxesperclass.iteritems():
-        drawbboxes(bboxlist, pil_img, tagcolors[hocr_class])
+        drawbboxes(bboxlist, pil_img, tag_color_dict[hocr_class])
 
     pil_img.show()
     return pil_img
 
 if __name__ == '__main__':
-    with open('/u/frazier/Desktop/tess/hocr_greek.html') as f:
-        with open('/u/frazier/Desktop/tess/img.tif') as i:
-            # previewbboxs(i, f, 'red')
-            markbboxes(i, f, {'ocrx_word':'blue'})
+    pass
 

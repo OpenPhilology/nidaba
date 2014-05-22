@@ -29,25 +29,22 @@ class HocrTests(unittest.TestCase):
         self.temp.write(u'<root title="bbox 1 2 3 4"></root>')
         self.temp.seek(0,0)
         bboxes = hocr.extract_bboxes(self.temp)
-        self.assertEqual([(1, 2, 3, 4)], bboxes)
+        self.assertEqual([(1, 2, 3, 4)], bboxes[hocr.ALL_BBOXES])
 
     def test_bbox_extract_complex(self):
         """
-        Test hocr bbox extraction on a larger document which exercises 
-        the bbox identifying regex.
+        Test hocr bbox extraction on a larger document.
         """
-        self.temp.write(u"""<root>"""
-                         """<p title="text before bbox 1 2 3 4"></p>"""
-                         """<p title="bbox 5 6 7 8textafter"></p>"""
-                         """<p title="textbeforebbox 9 10 11 12textafter"></p>"""
-                         """</root>""")
+        self.temp.write(u"""<root>
+                         <p title="text before bbox 1 2 3 4"></p>
+                         <p title="bbox 5 6 7 8textafter"></p>
+                         <p title="textbeforebbox 9 10 11 12textafter"></p>
+                         </root>""")
         self.temp.seek(0,0)
 
         bboxes = hocr.extract_bboxes(self.temp)
-        self.assertEqual((1, 2, 3, 4), bboxes[0])
-        self.assertEqual((5, 6, 7, 8), bboxes[1])
-        self.assertEqual((9, 10, 11, 12), bboxes[2])
-
+        self.assertEqual([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)],
+                         bboxes[u'//*[@title]'])
     def test_bbox_extract_by_name(self):
         """
         Extract a single class of bboxes.
@@ -59,8 +56,8 @@ class HocrTests(unittest.TestCase):
                 </root>"""
         self.temp.write(xml)
         self.temp.seek(0,0)
-        expected = {u'c1':[(1,2,3,4),(5,6,7,8),(9,10,11,12)]}
-        self.assertEqual(expected, hocr.extract_bboxes_by_class(self.temp, ['c1']))
+        expected = {u"//*[@class='c1' and @title]":[(1,2,3,4),(5,6,7,8),(9,10,11,12)]}
+        self.assertEqual(expected, hocr.extract_bboxes(self.temp, [u"//*[@class='c1' and @title]"]))
 
 
     def test_bbox_extract_by_name_multi(self):
@@ -76,8 +73,12 @@ class HocrTests(unittest.TestCase):
                 </root>"""
         self.temp.write(xml)
         self.temp.seek(0,0)
-        expected = {u'c1':[(1,2,3,4)], u'c2':[(5,6,7,8)], u'c3':[(9,10,11,12)]}
-        actual = hocr.extract_bboxes_by_class(self.temp, [u'c1', u'c2', u'c3'])
+        expected = {u"//*[@class='c1' and @title]":[(1,2,3,4)],
+                    u"//*[@class='c2' and @title]":[(5,6,7,8)],
+                    u"//*[@class='c3' and @title]":[(9,10,11,12)]}
+        actual = hocr.extract_bboxes(self.temp, [u"//*[@class='c1' and @title]",
+                                                          u"//*[@class='c2' and @title]",
+                                                          u"//*[@class='c3' and @title]"])
         self.assertEqual(expected, actual)
 
 
