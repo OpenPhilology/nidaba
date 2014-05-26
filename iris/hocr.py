@@ -1,14 +1,40 @@
 # -*- coding: utf-8 -*-
+import os
 import re
 from lxml import etree
 from kitchen.text.converters import to_unicode, to_bytes
 from PIL import Image, ImageDraw
 
-# Useful xpath queries for selecting items with bboxes form hocr.
+# Useful xpath queries for selecting items with bboxes from hocr.
 ALL_BBOXES = u"//*[@title]"
 PAGES = u"//*[@class='ocr_page' and @title]"
 LINES = u"//*[@class='ocr_line' and @title]"
-WORD = u"//*[@class='ocrx_word' and @title]"
+WORDS = u"//*[@class='ocrx_word' and @title]"
+
+
+class HocrContext(object):
+    """
+    A context manager for working with parsed hocr.
+    """
+    def __init__(self, hocrfilepath):
+        super(HocrContext, self).__init__()
+        self.hocrfilepath = hocrfilepath
+
+    def __enter__(self):
+        abspath = os.path.abspath(os.path.expanduser(self.hocrfilepath))
+        print 'absp: ' + abspath
+        with open(abspath) as hocrfile:
+            self.parsedhocr = etree.parse(hocrfile)
+            return self.parsedhocr
+
+
+    def __exit__(self, type, value, traceback):
+        del self.parsedhocr
+        return False    # No exception suppression.
+        # self.cr.restore()
+
+        
+
 
 def extract_hocr_tokens(hocr_file):
     """
@@ -28,8 +54,6 @@ def extract_hocr_tokens(hocr_file):
             del element.getparent()[0]
     del context
     return words
-
-
 
 def extract_bboxes(hocr_file, xpaths=[ALL_BBOXES]):
     """
@@ -84,6 +108,9 @@ def markbboxes(imgfile, hocrfile, tag_color_dict):
     pil_img.show()
     return pil_img
 
+# def detect_word_lang(hocrfile, uni_blocks, threshold=1.0):
+    
+    
+
 if __name__ == '__main__':
     pass
-
