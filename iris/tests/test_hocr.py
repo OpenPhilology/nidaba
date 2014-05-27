@@ -44,7 +44,7 @@ class HocrTests(unittest.TestCase):
 
         bboxes = hocr.extract_bboxes(self.temp)
         self.assertEqual([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)],
-                         bboxes[u'//*[@title]'])
+                         bboxes[u'//*[@title]'])  
     def test_bbox_extract_by_name(self):
         """
         Extract a single class of bboxes.

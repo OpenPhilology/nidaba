@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+import algorithms
 from lxml import etree
 from kitchen.text.converters import to_unicode, to_bytes
 from PIL import Image, ImageDraw
@@ -22,7 +23,6 @@ class HocrContext(object):
 
     def __enter__(self):
         abspath = os.path.abspath(os.path.expanduser(self.hocrfilepath))
-        print 'absp: ' + abspath
         with open(abspath) as hocrfile:
             self.parsedhocr = etree.parse(hocrfile)
             return self.parsedhocr
@@ -34,6 +34,17 @@ class HocrContext(object):
         # self.cr.restore()
 
         
+def extract_words(context):
+    """
+    Extract all hocr words. Return a list of 2 tuples containing the
+    word, and an absolute xpath to locate it in the given hocr document.
+    """
+    # words = [(e.text, context.getpath(e)) for e in context.xpath(WORDS)]
+    words = []
+    for e in context.xpath(WORDS):
+        word = (to_unicode(e.text), context.getpath(e))
+        words.append(word)
+    return words
 
 
 def extract_hocr_tokens(hocr_file):
@@ -112,5 +123,4 @@ def markbboxes(imgfile, hocrfile, tag_color_dict):
     
     
 
-if __name__ == '__main__':
-    pass
+# if __name__ == '__main__':
