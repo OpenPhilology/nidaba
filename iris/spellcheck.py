@@ -3,13 +3,12 @@
 import irisconfig
 import storage
 import uuid
-
-from hunspell import HunSpell
-
+import ngram
+import unicodedata
 
 class spellcheck():
     """
-    A spell checker based on Hunspell.
+    A ngram similarity spell checker.
     """
 
     def __init__(self, lang):
@@ -17,44 +16,35 @@ class spellcheck():
             # yes exceptions only accept byte strings
             raise ValueError((u'No dictionary defined for ' + lang).encode('utf-8'))
         try:
-            dict_path = storage._sanitize_path(irisconfig.DICT_PATH, irisconfig.LANG_DICTS[lang][0])
+            dict_path = storage._sanitize_path(irisconfig.DICT_PATH, irisconfig.LANG_DICTS[lang])
         except Exception as err:
             raise ValueError(u'Dictionary path not valid.')
 
-        # Hunspell always requires an affix file, but an empty one is valid.
-        aff_path = storage._sanitize_path(irisconfig.DICT_PATH, irisconfig.DEFAULT_AFFIX)
-        if len(irisconfig.LANG_DICTS[lang]) == 2:
-            try:
-                aff_path = storage._sanitize_path(irisconfig.DICT_PATH, irisconfig.LANG_DICTS[lang][1])
-            except Exception as err:
-                raise ValueError(u'Affix file path not valid.')
         try:
-            self.h = HunSpell(dict_path.encode('utf-8'), aff_path.encode('utf-8'))
+            self.nset = ngram.NGram()
+            with open(dict_path) as f:
+                for line in f:
+                    self.nset.add(unicodedata.normalize('NFD', line.decode('utf-8')))
         except Exception as err:
-            raise ValueError(u'Hunspell initialization failed.')
+            raise ValueError((u'Spellcheck initialization failed: ' + unicode(err)).encode('utf-8'))
 
     def suggest(self, text, suggest_correct=False, count=5):
         """
         Spell checks a list of words (text). Returns at most count suggestions for
-        each word (or as many as hunspell returns for 0). If suggest_correct is
+        each word (or all matches for 0). If suggest_correct is
         set, suggestions will be generated even for words the spell checker deems
         correct.
         The returned object is a list of tuples containing the original word and a
         list of possible alternatives.
-
-        Note that words will be re-encoded to match the coding of the dictionary
-        file, causing silent failure or erratic behavior. Keep everything in UTF-8
-        and the FSM will be happy.
+        The spell checker is highly sensitive to unicode normalization; to
+        ensure good results make sure input is in NFD.
         """
         ret_list = []
         for word in text:
-            # If your input and dictionary encoding do not match you're probably
-            # screwed anyway so loss of information of perfectly acceptable.
-            eword = word.encode(self.h.get_dic_encoding(), 'replace')
-            if not suggest_correct and self.h.spell(eword):
+            if not suggest_correct and word in self.nset:
                 ret_list.append((word, []))
             else:
-                s = [s.decode(self.h.get_dic_encoding()) for s in self.h.suggest(eword)]
+                s = [s[0] for s in self.nset.search(word)]
                 if count:
                     s = s[0:count]
                 ret_list.append((word, s))
@@ -65,4 +55,4 @@ class spellcheck():
         Given a list of words, returns only the ones recognized as correct by
         the dictionary.
         """
-        return [s for s in text if self.h.spell(s.encode(self.h.get_dic_encoding(), 'replace'))]
+        return [s for s in text if s in self.nset]
