@@ -24,7 +24,7 @@ class spellcheck():
             self.nset = ngram.NGram()
             with open(dict_path) as f:
                 for line in f:
-                    self.nset.add(unicodedata.normalize('NFD', line.decode('utf-8')).strip())
+                    self.nset.add(unicodedata.normalize('NFC', line.decode('utf-8')).strip())
         except Exception as err:
             raise ValueError((u'Spellcheck initialization failed: ' + unicode(err)).encode('utf-8'))
 
@@ -37,7 +37,7 @@ class spellcheck():
         The returned object is a list of tuples containing the original word and a
         list of possible alternatives.
         The spell checker is highly sensitive to unicode normalization; to
-        ensure good results make sure input is in NFD.
+        ensure good results make sure input is in NFC.
         """
         ret_list = []
         for word in text:
