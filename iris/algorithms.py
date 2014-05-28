@@ -6,6 +6,7 @@ import numpy
 import codecs
 import operator
 import time
+import unicodedata
 from kitchen.text.converters import to_unicode, to_bytes
 from lxml import etree
 
@@ -288,6 +289,12 @@ def unibarrier(func):
         return func(*args, **kwargs)
     return unishielded
 
+@unibarrier
+def sanitize(unistr):
+    """
+    Strip leading and trailing whitespace, convert to NFC.
+    """
+    return unicodedata.normalize(u'NFD', unistr.strip())
 
 def uniblock(start, stop):
     """

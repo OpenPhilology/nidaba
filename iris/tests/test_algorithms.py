@@ -906,6 +906,28 @@ class LanguageTests(unittest.TestCase):
         self.assertFalse(algorithms.islang(halfandhalf, [algorithms.greek_coptic_range], threshold=0.5000001))
         self.assertFalse(algorithms.islang(halfandhalf, [algorithms.greek_coptic_range], threshold=0.5000001))
 
+    def test_sanitize_strip(self):
+        """
+        Test that sanitize correctly strips leading and trailing whitespace.
+        """
+        s = u'\n\t abcde \n\t fghij \n\t'
+        self.assertEqual(u'abcde \n\t fghij', algorithms.sanitize(s))
+
+    def test_sanitize_NFD_decompose(self):
+        """
+        Test that sanitize correctly converts to NFC codepoints.
+        """
+        # Small alpha with a tone mark
+        alpha = u'\u03AC'
+        self.assertNotEqual(alpha, algorithms.sanitize(alpha))
+        self.assertEqual(u'\u03B1' + u'\u0301', algorithms.sanitize(alpha))
+
+        # Greek small letter upsilon with dialytika and tonos
+        upsilon = u'\u03B0'
+        self.assertNotEqual(upsilon, algorithms.sanitize(upsilon))
+        self.assertEqual(u'\u03C5' + u'\u0308' + u'\u0301',
+                         algorithms.sanitize(upsilon))
+
 
 if __name__ == '__main__':
     unittest.main()
