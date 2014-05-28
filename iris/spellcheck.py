@@ -24,7 +24,7 @@ class spellcheck():
             self.nset = ngram.NGram()
             with open(dict_path) as f:
                 for line in f:
-                    self.nset.add(unicodedata.normalize('NFD', line.decode('utf-8')))
+                    self.nset.add(unicodedata.normalize('NFD', line.decode('utf-8')).strip())
         except Exception as err:
             raise ValueError((u'Spellcheck initialization failed: ' + unicode(err)).encode('utf-8'))
 
