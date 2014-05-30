@@ -289,12 +289,17 @@ def unibarrier(func):
         return func(*args, **kwargs)
     return unishielded
 
-@unibarrier
-def sanitize(unistr):
+def sanitize(string, encoding=u'utf-8'):
     """
-    Strip leading and trailing whitespace, convert to NFC.
+    Strip leading and trailing whitespace, convert to NFD. If the passed
+    string is a str rather than an unicode, decode it with the specified
+    encoding.
     """
-    return unicodedata.normalize(u'NFD', unistr.strip())
+    if type(string) == type(''):
+        string = string.decode(encoding)
+
+    return unicodedata.normalize(u'NFD', string.strip())
+
 
 def uniblock(start, stop):
     """

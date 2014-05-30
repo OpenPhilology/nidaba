@@ -928,6 +928,18 @@ class LanguageTests(unittest.TestCase):
         self.assertEqual(u'\u03C5' + u'\u0308' + u'\u0301',
                          algorithms.sanitize(upsilon))
 
+    def test_sanitize_decode(self):
+        """
+        Test that strings are converted to unicode correctly.
+        """
+        utf8 = u'I contain a non-ascii character: \u03B1'.encode(u'utf-8')
+        utf16 = u'I contain a non-ascii character: \u03B1'.encode(u'utf-16')
+        utf32 = u'I contain a non-ascii character: \u03B1'.encode(u'utf-32')
+        expected = u'I contain a non-ascii character: \u03B1'
+        self.assertEqual(expected, algorithms.sanitize(utf8))
+        self.assertEqual(expected, algorithms.sanitize(utf16, encoding=u'utf-16'))
+        self.assertEqual(expected, algorithms.sanitize(utf32, encoding=u'utf-32'))
+
 
 if __name__ == '__main__':
     unittest.main()
