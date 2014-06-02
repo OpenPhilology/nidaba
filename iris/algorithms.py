@@ -49,7 +49,7 @@ def unibarrier(func):
         return func(*args, **kwargs)
     return unishielded
 
-def sanitize(string, encoding=u'utf-8'):
+def sanitize(string, encoding=u'utf-8', normalization=u'NFD'):
     """
     Strip leading and trailing whitespace, convert to NFD. If the passed
     string is a str rather than an unicode, decode it with the specified
@@ -58,7 +58,7 @@ def sanitize(string, encoding=u'utf-8'):
     if type(string) == type(''):
         string = string.decode(encoding)
 
-    return unicodedata.normalize(u'NFD', string.strip())
+    return unicodedata.normalize(normalization, string.strip())
 
 @unibarrier
 def strings_by_deletion(unistr, dels):
@@ -394,7 +394,28 @@ def greek_filter(string):
     return filter(greek_chars().__contains__, string)
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+    d = strings_by_deletion(u'aaaaaaa', 2)
+    for i in d:
+        print i, type(i)
 
+    onedels = []
+    with open('dictionaries/greek.txt') as gd:
+        print 'sanitizing dict...'
+        dictionary = map(sanitize, gd.readlines())
+        print 'done.'
+        for word in dictionary[:50]:
+            dels = strings_by_deletion(word, 1)
+            onedels.append(word + u' : ' + u' '.join(dels))
+
+    with codecs.open('onedels.txt', 'w+', 'utf-8') as done:
+        print 'Done. Writing %i new words to file' % len(onedels)
+        for d in onedels[:50]:
+            # done.write("%s\n" % d)
+            print d, type(d)
+            done.write(d)
+            done.write(u'\n')
+
+    print 'Process complete.'
 
 

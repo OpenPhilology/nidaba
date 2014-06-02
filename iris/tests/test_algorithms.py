@@ -915,7 +915,7 @@ class LanguageTests(unittest.TestCase):
 
     def test_sanitize_NFD_decompose(self):
         """
-        Test that sanitize correctly converts to NFC codepoints.
+        Test that sanitize correctly converts to NFD codepoints.
         """
         # Small alpha with a tone mark
         alpha = u'\u03AC'
@@ -927,6 +927,23 @@ class LanguageTests(unittest.TestCase):
         self.assertNotEqual(upsilon, algorithms.sanitize(upsilon))
         self.assertEqual(u'\u03C5' + u'\u0308' + u'\u0301',
                          algorithms.sanitize(upsilon))
+
+    def test_sanitize_NFC(self):
+        """
+        Test that sanitize correctly converts to NFC codepoints.
+        """
+        decomp_alpha = u'\u03B1' + u'\u0301'
+        self.assertNotEqual(decomp_alpha, algorithms.sanitize(decomp_alpha,
+                            normalization=u'NFC'))
+        self.assertEqual(u'\u03AC', algorithms.sanitize(decomp_alpha,
+                                                        normalization=u'NFC'))
+
+        decomp_upsilon = u'\u03C5' + u'\u0308' + u'\u0301'
+        self.assertNotEqual(decomp_upsilon, algorithms.sanitize(decomp_upsilon,
+                                                                 normalization=u'NFC'))
+        self.assertEqual(u'\u03B0', algorithms.sanitize(decomp_upsilon, normalization=u'NFC'))
+
+
 
     def test_sanitize_decode(self):
         """
