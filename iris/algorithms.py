@@ -7,6 +7,7 @@ import codecs
 import operator
 import time
 import unicodedata
+import itertools
 from kitchen.text.converters import to_unicode, to_bytes
 from lxml import etree
 
@@ -32,6 +33,44 @@ class AlgorithmException(Exception):
 # ----------------------------------------------------------------------
 # String and alignment algorithms --------------------------------------
 # ----------------------------------------------------------------------
+
+def unibarrier(func):
+    """
+    A decorator function; used to ensure that no str objects can be
+    passed as either args or kwargs.
+    """
+    def unishielded(*args, **kwargs):
+        for arg in args:
+            if type(arg) == type(str('')):
+                raise UnibarrierException(message='%s was a string!' % arg)
+        for key, val in kwargs.iteritems():
+            if type(val) == type(str('')):
+                raise UnibarrierException(message='%s was a string!' % val)
+        return func(*args, **kwargs)
+    return unishielded
+
+def sanitize(string, encoding=u'utf-8'):
+    """
+    Strip leading and trailing whitespace, convert to NFD. If the passed
+    string is a str rather than an unicode, decode it with the specified
+    encoding.
+    """
+    if type(string) == type(''):
+        string = string.decode(encoding)
+
+    return unicodedata.normalize(u'NFD', string.strip())
+
+@unibarrier
+def strings_by_deletion(unistr, dels):
+    """
+    Compute the unique strings which can be formed from a string by
+    deleting the specified number of characters from it. The results
+    are sorted in ascending order.
+    """
+    new_words = set([])
+    for comb in itertools.combinations(range(len(unistr)), dels):
+        new_words.add(u''.join((c for i, c in enumerate(unistr) if i not in comb)))
+    return sorted(list(new_words))
 
 def initmatrix(rows, columns, defaultval=0):
     """Initializes a 2d list to the desired dimensions."""
@@ -274,33 +313,6 @@ greek_coptic_range = (u'Greek Coptic', u'\u0370', u'\u03FF')
 extended_greek_range = (u'Extended Greek', u'\u1F00', u'\u1FFF')
 combining_diacritical_mark_range = (u'Combining Diacritical', u'\u0300', u'\u036f')
 
-def unibarrier(func):
-    """
-    A decorator function; used to ensure that no str objects can be
-    passed as either args or kwargs.
-    """
-    def unishielded(*args, **kwargs):
-        for arg in args:
-            if type(arg) == type(str('')):
-                raise UnibarrierException(message='%s was a string!' % arg)
-        for key, val in kwargs.iteritems():
-            if type(val) == type(str('')):
-                raise UnibarrierException(message='%s was a string!' % val)
-        return func(*args, **kwargs)
-    return unishielded
-
-def sanitize(string, encoding=u'utf-8'):
-    """
-    Strip leading and trailing whitespace, convert to NFD. If the passed
-    string is a str rather than an unicode, decode it with the specified
-    encoding.
-    """
-    if type(string) == type(''):
-        string = string.decode(encoding)
-
-    return unicodedata.normalize(u'NFD', string.strip())
-
-
 def uniblock(start, stop):
     """
     Return a range containing all the characters in the unicode table
@@ -382,16 +394,7 @@ def greek_filter(string):
     return filter(greek_chars().__contains__, string)
 
 
-if __name__ == '__main__':
-    path = os.path.expanduser('~/Desktop/tess/out.hocr.html')
-    with open(path) as f:
-        extract_bboxes(f)    
+# if __name__ == '__main__':
 
-    #bbox+[0-9]+ [0-9]+ [0-9]+ [0-9]+
-
-    # path = os.path.expanduser('~/Desktop/tess/out.hocr.html')
-    # with open(path) as f:
-    #     tokens = extract_hocr_tokens(f)
-    #     for t in tokens:
 
 

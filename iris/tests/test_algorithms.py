@@ -940,6 +940,19 @@ class LanguageTests(unittest.TestCase):
         self.assertEqual(expected, algorithms.sanitize(utf16, encoding=u'utf-16'))
         self.assertEqual(expected, algorithms.sanitize(utf32, encoding=u'utf-32'))
 
+    def test_strings_by_deletion_1(self):
+        """
+        Test the strings_by_deletion function with one delete.
+        """
+        expected = [u'abcd', u'abce', u'abde', u'acde', u'bcde']
+        self.assertEqual(expected, algorithms.strings_by_deletion(u'abcde', 1))
+
+    def test_strings_by_deletion_2(self):
+        """
+        Test the strings_by_deletion function with two deletes.
+        """
+        expected = [u'a', u'e', u'p']
+        self.assertEqual(expected, algorithms.strings_by_deletion(u'ape', 2)) 
 
 if __name__ == '__main__':
     unittest.main()
