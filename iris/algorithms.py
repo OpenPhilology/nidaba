@@ -8,6 +8,7 @@ import operator
 import time
 import unicodedata
 import itertools
+import codecs
 from kitchen.text.converters import to_unicode, to_bytes
 from lxml import etree
 
@@ -72,6 +73,44 @@ def strings_by_deletion(unistr, dels):
         new_words.add(u''.join((c for i, c in enumerate(unistr) if i not in comb)))
     return sorted(list(new_words))
 
+
+def load_sym_dict(path):
+    path = os.path.abspath(os.path.expanduser(path))
+    dic = {}
+    with codecs.open(path, encoding='utf-8') as dfile:
+        for line in dfile:
+            word, dels = line.split(u' : ')
+            dic[word] = [s.strip(u'\n') for s in dels.split(u' ')]
+
+    return dic
+
+@unibarrier
+def sym_suggest(ustr, dic, depth, ret_count=-1):
+    """
+    Return a list of "spelling" corrections using a symmetric deletion
+    search. Dic is is a dictionary of the form {word:[list of deletion
+    combinations]}. Depth is the delete count (the dictionary must
+    match.) Ret_count is the number of suggestions to return. Returns
+    a list of tuples of the form (suggestion, edit_distance). A negative
+    value for ret_count returns all results
+    """
+    suggestions = []
+    for word, del_list in dic.iteritems():
+        if ustr == word:
+            suggestions.append((word, 0))
+        elif ustr in del_list:
+            suggestions.append((word, depth))
+
+        if len(suggestions) == ret_count: break
+
+    # Python's sort is stable; sort alphabetically then by distance.
+    return sorted(sorted(suggestions), key=lambda s: s[1])
+
+
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+
 def initmatrix(rows, columns, defaultval=0):
     """Initializes a 2d list to the desired dimensions."""
     return [[defaultval for j in xrange(columns)] for i in xrange(rows)]
@@ -116,7 +155,7 @@ def native_align(str1, str2, substitutionscore=1, insertscore=1, deletescore=1,
                                               charmatrix=charmatrix)
     return native_backtrace(steps)
 
-def native_semi_global_align(shortseq, longseq, substitutionscore=1,
+def native_semi_global_align(shortseq, longseq, substtutionscore=1,
                              insertscore=1, deletescore=1, charmatrix={}):
     if len(shortseq) > len(longseq):
         raise AlgorithmException('shortseq must be <= longseq in length!')
@@ -192,6 +231,9 @@ def edit_distance(str1, str2, substitutionscore=1, insertscore=1,
                                   charmatrix=charmatrix,
                                   alignment_type=alignment_type)[0]
     return m[-1][ -1]
+
+
+
 
 # ----------------------------------------------------------------------
 # String and alignment algorithms (numpy versions) ---------------------
@@ -394,28 +436,4 @@ def greek_filter(string):
     return filter(greek_chars().__contains__, string)
 
 
-if __name__ == '__main__':
-    d = strings_by_deletion(u'aaaaaaa', 2)
-    for i in d:
-        print i, type(i)
-
-    onedels = []
-    with open('dictionaries/greek.txt') as gd:
-        print 'sanitizing dict...'
-        dictionary = map(sanitize, gd.readlines())
-        print 'done.'
-        for word in dictionary[:50]:
-            dels = strings_by_deletion(word, 1)
-            onedels.append(word + u' : ' + u' '.join(dels))
-
-    with codecs.open('onedels.txt', 'w+', 'utf-8') as done:
-        print 'Done. Writing %i new words to file' % len(onedels)
-        for d in onedels[:50]:
-            # done.write("%s\n" % d)
-            print d, type(d)
-            done.write(d)
-            done.write(u'\n')
-
-    print 'Process complete.'
-
-
+# if __name__ == '__main__':

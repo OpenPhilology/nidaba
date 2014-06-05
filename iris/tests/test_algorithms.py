@@ -943,8 +943,6 @@ class LanguageTests(unittest.TestCase):
                                                                  normalization=u'NFC'))
         self.assertEqual(u'\u03B0', algorithms.sanitize(decomp_upsilon, normalization=u'NFC'))
 
-
-
     def test_sanitize_decode(self):
         """
         Test that strings are converted to unicode correctly.
@@ -956,6 +954,12 @@ class LanguageTests(unittest.TestCase):
         self.assertEqual(expected, algorithms.sanitize(utf8))
         self.assertEqual(expected, algorithms.sanitize(utf16, encoding=u'utf-16'))
         self.assertEqual(expected, algorithms.sanitize(utf32, encoding=u'utf-32'))
+
+# ---------------------------------------------------------------------- 
+# Symmetric spell check tests ------------------------------------------
+# ---------------------------------------------------------------------- 
+
+class SymSpellTests(unittest.TestCase):
 
     def test_strings_by_deletion_1(self):
         """
@@ -969,7 +973,53 @@ class LanguageTests(unittest.TestCase):
         Test the strings_by_deletion function with two deletes.
         """
         expected = [u'a', u'e', u'p']
-        self.assertEqual(expected, algorithms.strings_by_deletion(u'ape', 2)) 
+        self.assertEqual(expected, algorithms.strings_by_deletion(u'ape', 2))
+
+    def test_sym_suggest_already_word(self):
+        """
+        Test sym_suggest in the case where the specified string is
+        already a word in the dictionary.
+        """
+        dic = {u'word':[u'ord', u'wod', u'wor', u'wrd'],
+               u'tree':[u'ree', u'tee', u'tre']}
+        self.assertEqual([(u'word', 0)], algorithms.sym_suggest(u'word', dic, 1))
+        self.assertEqual([(u'tree', 0)], algorithms.sym_suggest(u'tree', dic, 1))
+
+    def test_sym_suggest_single_delete(self):
+        """
+        Test sym_suggest where the string differs from words by a 
+        single delete.
+        """
+        dic = {u'word':[u'ord', u'wod', u'wor', u'wrd'],
+               u'tree':[u'ree', u'tee', u'tre']}
+        self.assertEqual([(u'word', 1)], algorithms.sym_suggest(u'ord', dic, 1))
+        self.assertEqual([(u'word', 1)], algorithms.sym_suggest(u'wod', dic, 1))
+        self.assertEqual([(u'word', 1)], algorithms.sym_suggest(u'wor', dic, 1))
+        self.assertEqual([(u'word', 1)], algorithms.sym_suggest(u'wrd', dic, 1))
+
+    def test_load_sym_dict(self):
+        """
+        Tests that the load_sym_dict function correctly loads into a
+        python dictionary object.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write(u'word : ord wod wor wrd\n')
+        df.write(u'tree : ree tee tre\n')
+        df.seek(0,0)
+        actual = algorithms.load_sym_dict(os.path.abspath(df.name))
+        expected = {u'word':[u'ord', u'wod', u'wor', u'wrd'],
+               u'tree':[u'ree', u'tee', u'tre']}
+        self.assertEqual(expected, actual)
+        df.close()
+
+
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
