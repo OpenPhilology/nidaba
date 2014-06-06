@@ -68,7 +68,7 @@ def strings_by_deletion(unistr, dels):
     deleting the specified number of characters from it. The results
     are sorted in ascending order.
     """
-    new_words = set([])
+    new_words = set()
     for comb in itertools.combinations(range(len(unistr)), dels):
         new_words.add(u''.join((c for i, c in enumerate(unistr) if i not in comb)))
     return sorted(list(new_words))
