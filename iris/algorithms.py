@@ -73,7 +73,6 @@ def strings_by_deletion(unistr, dels):
         new_words.add(u''.join((c for i, c in enumerate(unistr) if i not in comb)))
     return sorted(list(new_words))
 
-
 def load_sym_dict(path):
     path = os.path.abspath(os.path.expanduser(path))
     dic = {}
@@ -87,24 +86,29 @@ def load_sym_dict(path):
 @unibarrier
 def sym_suggest(ustr, dic, depth, ret_count=-1):
     """
-    Return a list of "spelling" corrections using a symmetric deletion
-    search. Dic is is a dictionary of the form {word:[list of deletion
-    combinations]}. Depth is the delete count (the dictionary must
-    match.) Ret_count is the number of suggestions to return. Returns
-    a list of tuples of the form (suggestion, edit_distance). A negative
-    value for ret_count returns all results
+    Return a list of "spelling" corrections using a symmetric deletion search.
+    Dic is is a dictionary of the form {edit_term:[(candidate1, edit_distance),
+    (candidate2, edit_distance), ...]}.
     """
-    suggestions = []
-    for word, del_list in dic.iteritems():
-        if ustr == word:
-            suggestions.append((word, 0))
-        elif ustr in del_list:
-            suggestions.append((word, depth))
-
-        if len(suggestions) == ret_count: break
-
+    suggestions = set()
+    for ed in xrange(0, depth + 1):
+        for term in strings_by_deletion(ustr, ed):
+            if term in dic:
+                for sugg in dic[term]:
+                    # desymmetrizise edit distance
+                    if sugg == ustr:
+                        suggestions.add((sugg[0], 0))
+                    elif sugg[1] == 0:
+                        suggestions.add((sugg[0], ed))
+                    elif ed == 0:
+                        suggestions.add(sugg)
+                    else:
+                        suggestions.add((sugg[0], edit_distance(sugg[0], ustr)))
     # Python's sort is stable; sort alphabetically then by distance.
-    return sorted(sorted(suggestions), key=lambda s: s[1])
+    if ret_count > 0 and len(suggestions) > ret_count: 
+        return sorted(sorted(suggestions), key=lambda s: s[1])[:ret_count]
+    else: 
+        return sorted(sorted(suggestions), key=lambda s: s[1])
 
 
 # ----------------------------------------------------------------------
