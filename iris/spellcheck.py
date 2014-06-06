@@ -3,12 +3,14 @@
 import irisconfig
 import storage
 import uuid
-import ngram
+import cPickle
 import unicodedata
+
+from algorithms import sym_suggest
 
 class spellcheck():
     """
-    A ngram similarity spell checker.
+    A spell checker utilizing the symmetric edit distance algorithm.
     """
 
     def __init__(self, lang):
@@ -21,10 +23,10 @@ class spellcheck():
             raise ValueError(u'Dictionary path not valid.')
 
         try:
-            self.nset = ngram.NGram()
             with open(dict_path) as f:
-                for line in f:
-                    self.nset.add(unicodedata.normalize('NFC', line.decode('utf-8')).strip())
+                st = cPickle.load(f)
+                self.dic = st[u'dictionary']
+                self.ed = st[u'edit_distance']
         except Exception as err:
             raise ValueError((u'Spellcheck initialization failed: ' + unicode(err)).encode('utf-8'))
 
@@ -37,14 +39,14 @@ class spellcheck():
         The returned object is a list of tuples containing the original word and a
         list of possible alternatives.
         The spell checker is highly sensitive to unicode normalization; to
-        ensure good results make sure input is in NFC.
+        ensure good results make sure input is in NFD.
         """
         ret_list = []
         for word in text:
-            if not suggest_correct and word in self.nset:
+            if not suggest_correct and word in self.dic.iterkeys():
                 ret_list.append((word, []))
             else:
-                s = [s[0] for s in self.nset.search(word)]
+                s = [s[0] for s in sym_suggest(word, self.dic, self.ed, count)]
                 if count:
                     s = s[0:count]
                 ret_list.append((word, s))
@@ -55,4 +57,11 @@ class spellcheck():
         Given a list of words, returns only the ones recognized as correct by
         the dictionary.
         """
-        return [s for s in text if s in self.nset]
+        ret = []
+        for word in text:
+            suggestions = sym_suggest(word, self.dic, 0)
+            for s in suggestions:
+                if s[1] == 0:
+                    ret.append(word)
+                    break
+        return ret
