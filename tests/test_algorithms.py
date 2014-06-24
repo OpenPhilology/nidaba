@@ -2,10 +2,11 @@
 import unittest
 import os
 import tempfile
-import algorithms
 import numpy
 import StringIO
 import unicodedata
+
+from iris import algorithms
 
 thisfile = os.path.abspath(os.path.dirname(__file__))
 resources = os.path.abspath(os.path.join(thisfile, 'resources/tesseract'))

@@ -3,7 +3,8 @@ import os
 import tempfile
 import glob
 import difflib
-import abbyyToOCR
+
+from iris import abbyyToOCR
 
 #The unit tests for abbyy to hOCR conversion. Each XML to HTML tag transform method is individually tested, then the output of a full conversion is compared against a directory of originals.
 class TestAbbyyToOCRConversion(unittest.TestCase):

@@ -1,13 +1,11 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 import unittest
-import storage
-import irisconfig
 import uuid
 
 from os import path
 from tempfile import mkdtemp
-
+from iris import storage, irisconfig
 
 class test_storage(unittest.TestCase):
     '''
