@@ -35,6 +35,12 @@ in the root directory. pip is required to extract the dependencies for
 setuptools from the requirements file, so there is no reason the run setup.py
 directly.
 
+The image deskewing C extension requires the leptonica image processing library:
+
+```
+$ apt-get install libleptonica-dev
+```
+
 Tests
 =====
 
