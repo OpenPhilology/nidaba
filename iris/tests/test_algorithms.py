@@ -980,22 +980,59 @@ class SymSpellTests(unittest.TestCase):
         Test sym_suggest in the case where the specified string is
         already a word in the dictionary.
         """
-        dic = {u'word':[u'ord', u'wod', u'wor', u'wrd'],
-               u'tree':[u'ree', u'tee', u'tre']}
-        self.assertEqual([(u'word', 0)], algorithms.sym_suggest(u'word', dic, 1))
-        self.assertEqual([(u'tree', 0)], algorithms.sym_suggest(u'tree', dic, 1))
+        delete_dic = {u'ord':[u'word'], u'wod':[u'word'], u'wor':[u'word'], u'wrd':[u'word'],
+                      u'ree':[u'tree'], u'tee':[u'tree'], u'tre':[u'tree']}
+        dic = {u'tree', u'word'}
+
+        # delete_dic = {u'word':[u'ord', u'wod', u'wor', u'wrd'],
+        #        u'tree':[u'ree', u'tee', u'tre']}
+
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'word', dic, delete_dic, 1))
+        self.assertEqual([u'tree'], algorithms.sym_suggest(u'tree', dic, delete_dic, 1))
 
     def test_sym_suggest_single_delete(self):
         """
         Test sym_suggest where the string differs from words by a 
         single delete.
         """
-        dic = {u'word':[u'ord', u'wod', u'wor', u'wrd'],
-               u'tree':[u'ree', u'tee', u'tre']}
-        self.assertEqual([(u'word', 1)], algorithms.sym_suggest(u'ord', dic, 1))
-        self.assertEqual([(u'word', 1)], algorithms.sym_suggest(u'wod', dic, 1))
-        self.assertEqual([(u'word', 1)], algorithms.sym_suggest(u'wor', dic, 1))
-        self.assertEqual([(u'word', 1)], algorithms.sym_suggest(u'wrd', dic, 1))
+        delete_dic = {u'ord':[u'word'], u'wod':[u'word'], u'wor':[u'word'], u'wrd':[u'word'],
+                      u'ree':[u'tree'], u'tee':[u'tree'], u'tre':[u'tree']}
+        dic = {u'tree', u'word'}
+
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'ord', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'wod', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'wor', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'wrd', dic, delete_dic, 1))
+
+    def test_sym_suggest_single_insert(self):
+        """
+        Test sym_suggest where the string differs from words by a single
+        insert.
+        """
+        delete_dic = {u'Xword':[u'word'], u'wXord':[u'word'], u'woXrd':[u'word'], u'worXd':[u'word'], u'wordX':[u'word'],
+                      u'Xtree':[u'tree']}
+        dic = {u'tree', u'word'}
+
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'Xword', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'wXord', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'woXrd', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'worXd', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'wordX', dic, delete_dic, 1))
+        self.assertEqual([u'tree'], algorithms.sym_suggest(u'Xtree', dic, delete_dic, 1))
+
+
+    def test_sym_suggest_single_substitution(self):
+        """
+        Test sym_suggest where the string differs from words by a single
+        insert.
+        """
+        delete_dic = {u'Word':[u'word'], u'wOrd':[u'word'], u'woRd':[u'word'], u'worD':[u'word']}
+        dic = {u'word'}
+
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'Word', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'wOrd', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'woRd', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'worD', dic, delete_dic, 1))
 
     def test_load_sym_dict(self):
         """
@@ -1011,7 +1048,6 @@ class SymSpellTests(unittest.TestCase):
                u'tree':[u'ree', u'tee', u'tre']}
         self.assertEqual(expected, actual)
         df.close()
-
 
 
 

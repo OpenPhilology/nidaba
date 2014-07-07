@@ -84,31 +84,28 @@ def load_sym_dict(path):
     return dic
 
 @unibarrier
-def sym_suggest(ustr, dic, depth, ret_count=-1):
+def sym_suggest(ustr, dic, delete_dic, depth, ret_count=0):
     """
-    Return a list of "spelling" corrections using a symmetric deletion search.
-    Dic is is a dictionary of the form {edit_term:[(candidate1, edit_distance),
-    (candidate2, edit_distance), ...]}.
+    Return a list of "spelling" corrections using a symmetric deletion 
+    search. Dic is a set of correct words. Delete_dic is of the form 
+    {edit_term:[(candidate1, edit_distance), (candidate2, edit_distance), ...]}.
     """
     suggestions = set()
-    for ed in xrange(0, depth + 1):
-        for term in strings_by_deletion(ustr, ed):
-            if term in dic:
-                for sugg in dic[term]:
-                    # desymmetrizise edit distance
-                    if sugg == ustr:
-                        suggestions.add((sugg[0], 0))
-                    elif sugg[1] == 0:
-                        suggestions.add((sugg[0], ed))
-                    elif ed == 0:
-                        suggestions.add(sugg)
-                    else:
-                        suggestions.add((sugg[0], edit_distance(sugg[0], ustr)))
-    # Python's sort is stable; sort alphabetically then by distance.
-    if ret_count > 0 and len(suggestions) > ret_count: 
-        return sorted(sorted(suggestions), key=lambda s: s[1])[:ret_count]
-    else: 
-        return sorted(sorted(suggestions), key=lambda s: s[1])
+    dels = strings_by_deletion(ustr, depth)
+    if ustr in dic:
+        suggestions.add(ustr)
+
+    if ustr in delete_dic: # ustr is missing characters.
+        suggestions = suggestions.union(set(delete_dic[ustr]))
+    for s in dels:
+        if s in dic:    # ustr has extra characters.
+            suggestions.add(s)
+        if s in delete_dic: #ustr has substitutions of twiddles
+            suggestions = suggestions.union(set(delete_dic[s]))
+
+    return list(suggestions if ret_count <= 0 else suggestions[:ret_count])
+
+
 
 
 # ----------------------------------------------------------------------
@@ -159,7 +156,7 @@ def native_align(str1, str2, substitutionscore=1, insertscore=1, deletescore=1,
                                               charmatrix=charmatrix)
     return native_backtrace(steps)
 
-def native_semi_global_align(shortseq, longseq, substtutionscore=1,
+def native_semi_global_align(shortseq, longseq, substitutionscore=1,
                              insertscore=1, deletescore=1, charmatrix={}):
     if len(shortseq) > len(longseq):
         raise AlgorithmException('shortseq must be <= longseq in length!')
