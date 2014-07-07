@@ -19,7 +19,7 @@ setup(
     description = "The OCR pipeline to succeed Rigaudon",
     packages = find_packages(exclude=['tests']),
     data_files = datafiles,
-    ext_modules = [Extension("deskew", sources=["exts/deskew.c"], libraries=["lept"])],
+    ext_modules = [Extension("leper", sources=["exts/leper.c"], libraries=["lept"], extra_compile_args=["-std=c99"])],
     include_package_data=True,
     test_suite="nose.collector",
     tests_require="nose",
