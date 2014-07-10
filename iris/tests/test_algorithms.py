@@ -955,6 +955,28 @@ class LanguageTests(unittest.TestCase):
         self.assertEqual(expected, algorithms.sanitize(utf16, encoding=u'utf-16'))
         self.assertEqual(expected, algorithms.sanitize(utf32, encoding=u'utf-32'))
 
+    def test_diacritic_strip_combining(self):
+        """
+        Tests the strip_diacritic fuction on the combining diacritics
+        unicode block.
+        """
+        cd = algorithms.combining_diacritical_mark_range
+        diacritics = algorithms.uniblock(cd[1], cd[2])
+        self.assertNotEqual(len(diacritics), 0)
+        self.assertEqual(u'', algorithms.strip_diacritics(diacritics))
+
+    def test_diacritic_strip_noncombining(self):
+        """
+        Test the strip_diacritic function on all the diacritics not in
+        the combining diacritical range.
+        """
+        gc_diacritics = u'ͺ΄΅'
+        gx_diacritics = u'᾽ι᾿῀῁῍῎῏῝῟῞῭΅`´῾'
+        diacritics = gc_diacritics + gx_diacritics
+        self.assertNotEqual(len(diacritics), 0)
+        self.assertEqual(u'', algorithms.strip_diacritics(diacritics))
+        
+
 # ---------------------------------------------------------------------- 
 # Symmetric spell check tests ------------------------------------------
 # ---------------------------------------------------------------------- 

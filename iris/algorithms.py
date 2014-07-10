@@ -9,6 +9,7 @@ import time
 import unicodedata
 import itertools
 import codecs
+import string
 from kitchen.text.converters import to_unicode, to_bytes
 from lxml import etree
 
@@ -350,19 +351,27 @@ def np_full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
 # Language algorithms --------------------------------------------------
 # ----------------------------------------------------------------------
 
-# Useful unicode ranges
+# Useful unicode rang
 ascii_range = (u'Ascii', unichr(0), unichr(127))
 greek_coptic_range = (u'Greek Coptic', u'\u0370', u'\u03FF')
 extended_greek_range = (u'Extended Greek', u'\u1F00', u'\u1FFF')
 combining_diacritical_mark_range = (u'Combining Diacritical', u'\u0300', u'\u036f')
 
+# This is a list of all tone mark code points not in the combining
+# diacritial block. They are from the "Greek and Coptic" and "Extended
+# Greek" blocks.
+greek_and_coptic_diacritics = [u'\u037A', u'\u0384', u'\u0385']
+extended_greek_diacritics = [u'\u1fbd', u'\u1fbe', u'\u1fbf', u'\u1fc0',
+                             u'\u1fc1', u'\u1fcd', u'\u1fce', u'\u1fcf',
+                             u'\u1fdd', u'\u1fde', u'\u1fdf', u'\u1fed',
+                             u'\u1fee', u'\u1fef', u'\u1ffd', u'\u1ffe']
+
 def uniblock(start, stop):
     """
-    Return a range containing all the characters in the unicode table
+    Return a list containing all the characters in the unicode table
     starting with 'start' (inclusive) and ending with end (inclusive).
     """
-    ints = range(ord(start.decode('unicode-escape')),
-                 ord(stop.decode('unicode-escape'))+1)
+    ints = range(ord(start), ord(stop)+1)
 
     return map(unichr, ints)  
 
@@ -436,5 +445,19 @@ def greek_filter(string):
     """
     return filter(greek_chars().__contains__, string)
 
+@unibarrier
+def strip_diacritics(ustr):
+    """
+    Remove all Greek diacritics from the specified string. Expects the
+    string to be in NFD.
+    """
+    diacritics = uniblock(combining_diacritical_mark_range[1],
+                          combining_diacritical_mark_range[2])
+    diacritics += greek_and_coptic_diacritics + extended_greek_diacritics
+    return u''.join(c for c in ustr if c not in diacritics)
 
-# if __name__ == '__main__':
+
+if __name__ == '__main__':
+    print strip_diacritics(u'foobar' + u'\u0302')
+    # b = uniblock(combining_diacritical_mark_range[1], combining_diacritical_mark_range[2])
+    # print type(b)
