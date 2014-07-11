@@ -61,6 +61,29 @@ char *param_path(char *path, int val) {
 	return res;
 }
 
+/* Dewarps a single page. TODO: Create a function to build a dewarp model for a
+ * whole codex and apply to all pages. */
+int dewarp(char *in, char *out) {
+	PIX *pix = pixRead(in);
+	PIX *ret;
+	dewarpSinglePage(pix, 0, 0, 1, &ret, NULL, 0);
+	pixWriteImpliedFormat(out, ret, 100, 0);
+	pixDestroy(&pix);
+	pixDestroy(&ret);
+	return 0;
+}
+
+static PyObject *leper_dewarp(PyObject *self, PyObject *args) {
+	char *in, *out;
+	if(!PyArg_ParseTuple(args, "ss", &in, &out)) {
+		return NULL;
+	}
+	int r = dewarp(in, out);
+	PyObject *ret = Py_BuildValue("i", r);
+	return ret;
+}
+
+
 /* Converts a 32bpp input image to an 8bpp grayscale one. */
 int rgb_to_gray(char *in, char *out) {
 	PIX *pix = pixRead(in);
@@ -228,17 +251,25 @@ static PyObject *leper_deskew(PyObject *self, PyObject *args) {
 }
 
 static char module_docstring[] = "This module provides an interface to useful functions from leptonica.";
-static char deskew_docstring[] = "Deskews an image.";
-static char otsu_binarize_docstring[] = "Creates one or more binarizations of an input image using Otsu thresholding.";
-static char sauvola_binarize_docstring[] = "Creates one or more binarizations of an input image using Sauvola thresholding";
+static char deskew_docstring[] = "Deskews an image. Accepts input of arbitrary depth.";
+static char dewarp_docstring[] = "Dewarps (removing optical distortion) an\
+				  image. Accepts 1 bpp (binarized) input images.";
+static char otsu_binarize_docstring[] = "Creates one or more binarizations of\
+					 an input image using Otsu\
+					 thresholding. Accepts 8 bpp\
+					 (grayscale) input images.";
+static char sauvola_binarize_docstring[] = "Creates one or more binarizations\
+					    of an input image using Sauvola\
+					    thresholding. Accepts 8 bpp\
+					    (grayscale) input images.";
 static char rgb_to_gray_docstring[] = "Converts an 24bpp image to a gray-scaled 8bpp one.";
 
 static PyMethodDef module_methods[] = {
 	{"deskew", leper_deskew, METH_VARARGS, deskew_docstring},
+	{"dewarp", leper_dewarp, METH_VARARGS, dewarp_docstring},
 	{"otsu_binarize", leper_otsu_binarize, METH_VARARGS, otsu_binarize_docstring},
 	{"sauvola_binarize", leper_sauvola_binarize, METH_VARARGS, sauvola_binarize_docstring},
 	{"rgb_to_gray", leper_rgb_to_gray, METH_VARARGS, rgb_to_gray_docstring},
-
 	{NULL, NULL, 0, NULL},
 };
 
