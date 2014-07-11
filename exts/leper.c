@@ -65,6 +65,13 @@ char *param_path(char *path, int val) {
  * whole codex and apply to all pages. */
 int dewarp(char *in, char *out) {
 	PIX *pix = pixRead(in);
+	if(!pix) {
+		return -1;
+	}
+	if(pix->d != 1) {
+		pixDestroy(&pix);
+		return -1;
+	}
 	PIX *ret;
 	dewarpSinglePage(pix, 0, 0, 1, &ret, NULL, 0);
 	pixWriteImpliedFormat(out, ret, 100, 0);
@@ -87,6 +94,9 @@ static PyObject *leper_dewarp(PyObject *self, PyObject *args) {
 /* Converts a 32bpp input image to an 8bpp grayscale one. */
 int rgb_to_gray(char *in, char *out) {
 	PIX *pix = pixRead(in);
+	if(!pix) {
+		return -1;
+	}
         PIX *r;
 	if((r = pixConvertRGBToGray(pix, 0.0, 0.0, 0.0)) == NULL) {
 		return -1;
@@ -112,6 +122,10 @@ int sauvola_binarize(char *in, char *out, l_int32 bins, l_int32 min_wsize, l_int
 
 	PIX* pix = pixRead(in);
 	if(!pix) {
+		return -1;
+	}
+	if(pix->d != 8) {
+		pixDestroy(&pix);
 		return -1;
 	}
 	/* Different binarizations are produced by manipulating the window size
@@ -167,6 +181,11 @@ int otsu_binarize(char *in, char *out, l_int32 bins, l_int32 tiles,
 	if(!pix) {
 		return -1;
 	}
+	if(pix->d != 8) {
+		pixDestroy(&pix);
+		return -1;
+	}
+
 	l_int32 sx, sy;
 	if(tiles > 0) {
 		sx = pix->w / tiles;
@@ -229,6 +248,7 @@ int deskew(char *in, char *out) {
 	if(!pix) {
 		return -1;
 	}
+
 	PIX *r;
 	l_float32 skew;
 	if((r = pixFindSkewAndDeskew(pix, 4, &skew, NULL)) == NULL) {
