@@ -143,7 +143,7 @@ int sauvola_binarize(char *in, char *out, l_int32 bins, l_int32 min_wsize, l_int
 			pixDestroy(&r);
 			return -1;
 		}
-		pixWriteImpliedFormat(res, pixConvert1To8(NULL, r, 255, 0), 100, 0);
+		pixWriteImpliedFormat(res, r, 100, 0);
 		pixDestroy(&r);
 		free(res);
 		t += (max_wsize - min_wsize)/bins;
@@ -277,11 +277,13 @@ static char dewarp_docstring[] = "Dewarps (removing optical distortion) an\
 static char otsu_binarize_docstring[] = "Creates one or more binarizations of\
 					 an input image using Otsu\
 					 thresholding. Accepts 8 bpp\
-					 (grayscale) input images.";
+					 (grayscale) input images. Use an image\
+					 format capable of 1 bpp.";
 static char sauvola_binarize_docstring[] = "Creates one or more binarizations\
 					    of an input image using Sauvola\
 					    thresholding. Accepts 8 bpp\
-					    (grayscale) input images.";
+					    (grayscale) input images. Use an\
+					    image format capable of 1 bpp.";
 static char rgb_to_gray_docstring[] = "Converts an 24bpp image to a gray-scaled 8bpp one.";
 
 static PyMethodDef module_methods[] = {
