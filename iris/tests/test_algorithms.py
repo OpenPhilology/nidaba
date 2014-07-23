@@ -6,6 +6,7 @@ import algorithms
 import numpy
 import StringIO
 import unicodedata
+import mmap
 
 thisfile = os.path.abspath(os.path.dirname(__file__))
 resources = os.path.abspath(os.path.join(thisfile, 'resources/tesseract'))
@@ -1060,7 +1061,7 @@ class SymSpellTests(unittest.TestCase):
         """
         Tests that the load_sym_dict function correctly loads into a
         python dictionary object.
-        """
+        """ 
         df = tempfile.NamedTemporaryFile()
         df.write(u'word : ord wod wor wrd\n')
         df.write(u'tree : ree tee tre\n')
@@ -1071,12 +1072,145 @@ class SymSpellTests(unittest.TestCase):
         self.assertEqual(expected, actual)
         df.close()
 
+    def test_string_compare(self):
+        """
+        Test the string comparison function.
+        """
+        self.assertEqual(1, algorithms.compare_strings(u'a', u'b'))
+        self.assertEqual(-1, algorithms.compare_strings(u'b', u'a'))
+        self.assertEqual(0, algorithms.compare_strings(u'a', u'a'))
+        self.assertEqual(1, algorithms.compare_strings(u'a', u'aaaaa'))
+        self.assertEqual(-1, algorithms.compare_strings(u'aaaaa', u'a'))
 
+    def test_previous_newline_no_newline(self):
+        """
+        Test the previous newline function when it should move to the
+        beginning of the file.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write(u'abc')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            mm = mmap.mmap(f.fileno(), 0)
+            self.assertEqual(0, algorithms.prev_newline(mm, 50))
+        df.close()
 
+    def test_previous_newline_single_overflow(self):
+        """
+        Test the previous newline function.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write(u'abc\ndef')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            mm = mmap.mmap(f.fileno(), 0)
+            # Test the points to the left of the newline character
+            mm.seek(0)
+            self.assertEqual(0, algorithms.prev_newline(mm, 50))
+            mm.seek(1)
+            self.assertEqual(0, algorithms.prev_newline(mm, 50))
+            mm.seek(2)
+            self.assertEqual(0, algorithms.prev_newline(mm, 50))
+            mm.seek(3)
+            self.assertEqual(0, algorithms.prev_newline(mm, 50))
 
+            # Test the points to the left of the newline character
+            mm.seek(4)
+            self.assertEqual(4, algorithms.prev_newline(mm, 50))
+            mm.seek(5)
+            self.assertEqual(4, algorithms.prev_newline(mm, 50))
+            mm.seek(6)
+            self.assertEqual(4, algorithms.prev_newline(mm, 50))
+            mm.seek(7)
+            self.assertEqual(4, algorithms.prev_newline(mm, 50))
+        df.close()
 
+    def test_previous_newline_multiple_left(self):
+        """
+        Test the prev_newline function when it would pass several
+        newlines.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write(u'abcde\nfghijk\nlmnopq\nrstuv\nwxyz')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            mm = mmap.mmap(f.fileno(), 0)
+            mm.seek(30)
+            self.assertEqual(26, algorithms.prev_newline(mm, 50))
+        df.close()
 
+    def test_delete_dict_line_parser(self):
+        """
+        Tests the parse_sym_dict function.
+        """
+        single_entry = u'key : val1'
+        multiple_entries = u'key : val1 val2 val3'
+        self.assertEqual((u'key', [u'val1']),
+                         algorithms.parse_sym_entry(single_entry))
+        self.assertEqual((u'key', [u'val1', u'val2', u'val3']),
+                         algorithms.parse_sym_entry(multiple_entries))
 
+    def test_deldict_bin_search_single(self):
+        """
+        Tests the deldict_bin_search algorithm with a dictionary with
+        one item.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write(u'only_entry : some_value')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            mm = mmap.mmap(f.fileno(), 0)
+            expected = (u'only_entry', [u'some_value'])
+            dpath = os.path.abspath(df.name).decode(u'utf-8')
+            self.assertEqual(expected,
+                             algorithms.deldict_bin_search(u'only_entry', dpath))
+
+    def test_deldict_bin_search_double(self):
+        """
+        Tests the deldict_bin_search algorithm with a dictionary with
+        one item.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write(u'first_entry : first_value\n')
+        df.write(u'second_entry : second_value')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            mm = mmap.mmap(f.fileno(), 0)
+            expected_first = (u'first_entry', [u'first_value'])
+            expected_second = (u'second_entry', [u'second_value'])
+            dpath = os.path.abspath(df.name).decode(u'utf-8')
+            self.assertEqual(expected_first,
+                             algorithms.deldict_bin_search(u'first_entry', dpath))
+            self.assertEqual(expected_second,
+                             algorithms.deldict_bin_search(u'second_entry', dpath))
+
+    def test_deldict_bin_search_general(self):
+        """
+        Test the deldict_bin_search function in a general case.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write('akey : aval\n')
+        df.write('bkey : bval\n')
+        df.write('ckey : cval\n')
+        df.write('dkey : dval\n')
+        df.write('ekey : eval\n')
+        df.write('fkey : fval\n')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            dpath = os.path.abspath(df.name).decode(u'utf-8')
+            ex_a = (u'akey', [u'aval'])
+            ex_b = (u'bkey', [u'bval'])
+            ex_c = (u'ckey', [u'cval'])
+            ex_d = (u'dkey', [u'dval'])
+            ex_e = (u'ekey', [u'eval'])
+            ex_f = (u'fkey', [u'fval'])
+            self.assertEqual(ex_a, algorithms.deldict_bin_search(u'akey', dpath))
+            self.assertEqual(ex_b, algorithms.deldict_bin_search(u'bkey', dpath))
+            self.assertEqual(ex_c, algorithms.deldict_bin_search(u'ckey', dpath))
+            self.assertEqual(ex_d, algorithms.deldict_bin_search(u'dkey', dpath))
+            self.assertEqual(ex_e, algorithms.deldict_bin_search(u'ekey', dpath))
+            self.assertEqual(ex_f, algorithms.deldict_bin_search(u'fkey', dpath))
+            self.assertEqual(None, algorithms.deldict_bin_search(u'gkey', dpath))
 
 
 if __name__ == '__main__':
