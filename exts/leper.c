@@ -73,7 +73,10 @@ int dewarp(char *in, char *out) {
 		return -1;
 	}
 	PIX *ret;
-	dewarpSinglePage(pix, 0, 0, 1, &ret, NULL, 0);
+	if(dewarpSinglePage(pix, 0, 0, 1, &ret, NULL, 0) == 1) {
+		pixDestroy(&pix);
+		return -1;
+	}
 	pixWriteImpliedFormat(out, ret, 100, 0);
 	pixDestroy(&pix);
 	pixDestroy(&ret);
