@@ -14,24 +14,16 @@ import gzip
 import zipfile
 import requests
 import algorithms
+import leper
 
 from celery import Celery
 from celery import group
 from celery import chord
 from celery.task.sets import TaskSet
 from celery.utils.log import get_task_logger
-from requests import HTTPError, ConnectionError, Timeout
-from fs import ftpfs, path, errors
-from cStringIO import StringIO
 
 app = Celery(main='tasks', broker=celeryConfig.BROKER_URL)
 app.config_from_object('celeryConfig')
-
-archive_url_format = 'http://www.archive.org/download/{0}/{0}{1}'
-
-# Meta tasks
-# Meta tasks execute application tasks and facilitate data exchange between sub
-# tasks in the pipeline.
 
 @app.task(name='ocr_entry')
 def ocr_batch(config):
@@ -45,24 +37,28 @@ def ocr_batch(config):
 # on it.
 
 @app.task(name='rgb_to_gray')
-def rgb_to_gray(id, input_dir, output_dir):
-    """Converts arbitrary bit depth images in input_dir and writes then into the output directory."""
-    pass
+def rgb_to_gray(id=u'', in_files=[], out_dir=u'gray'):
+    """Converts arbitrary bit depth images in input_dir and writes then into
+       the output directory."""
+    @app.task(name='ctg_util')
+    def ctg_util(input, output):
+        return leper.rgb_to_gray(input, output)
+    group([ctg_util.s(storage.get_abs_path(id, input), 
+            storage.get_abs_path(id, out_dir)) for input in in_files])
 
 @app.task(name='binarize')
-def binarize(config):
+def binarize(in_files=[], configuration={}):
     """Binarizes a group of input documents and writes them into an output directory. Expects grayscale input"""
-    pass
 
 @app.task(name='dewarp')
-def deskew(id, input_dir, output_dir):
+def dewarp(in_files=[], id=u'', out_dir=u'dewarp'):
     """Removes perspective distortion (as commonly exhibited by overhead scans)
     from images in input_dir and writes them into an output directory.  Expects
     binarized input."""
     pass
 
 @app.task(name='deskew')
-def deskew(id, input_dir, output_dir):
+def deskew(in_files=[], id=u'', out_dir=u'deskew'):
     """Removes skew (rotational distortion) from a set of images in input_dir
     and writes them into an output directory. Expects binarized input."""
     pass
@@ -76,3 +72,4 @@ def ocr_tesseract(config):
 def ocr_ocropus(config):
     """Runs ocropus on the input documents set."""
     pass
+
