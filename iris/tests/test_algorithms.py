@@ -7,6 +7,7 @@ import numpy
 import StringIO
 import unicodedata
 import mmap
+import bz2
 
 thisfile = os.path.abspath(os.path.dirname(__file__))
 resources = os.path.abspath(os.path.join(thisfile, 'resources/tesseract'))
@@ -998,6 +999,13 @@ class SymSpellTests(unittest.TestCase):
         expected = [u'a', u'e', u'p']
         self.assertEqual(expected, algorithms.strings_by_deletion(u'ape', 2))
 
+    def test_strings_bzy_deletion_exceed(self):
+        """
+        Test the strings_by_deletion function where the number of
+        deletes exceeds characters in the string.
+        """
+        self.assertEqual([], algorithms.strings_by_deletion(u'aaa', 10))
+
     def test_sym_suggest_already_word(self):
         """
         Test sym_suggest in the case where the specified string is
@@ -1114,7 +1122,7 @@ class SymSpellTests(unittest.TestCase):
             mm.seek(3)
             self.assertEqual(0, algorithms.prev_newline(mm, 50))
 
-            # Test the points to the left of the newline character
+            # Test the points to the right of the newline character
             mm.seek(4)
             self.assertEqual(4, algorithms.prev_newline(mm, 50))
             mm.seek(5)
@@ -1211,6 +1219,60 @@ class SymSpellTests(unittest.TestCase):
             self.assertEqual(ex_e, algorithms.deldict_bin_search(u'ekey', dpath))
             self.assertEqual(ex_f, algorithms.deldict_bin_search(u'fkey', dpath))
             self.assertEqual(None, algorithms.deldict_bin_search(u'gkey', dpath))
+
+    # def test_bz_previous_line_no_newline(self):
+    #     """
+    #     Test the bz newline function when it should move to the
+    #     beginning of the file.
+    #     """
+    #     td = tempfile.mkdtemp()
+    #     with bz2.BZ2File(os.path.join(td, 'temp-bz.bz2'), 'w') as f:
+    #         f.write(u'abc'.encode('utf-8'))
+    #         f.close()
+
+    #     with bz2.BZ2File(os.path.join(td, 'temp-bz.bz2'), 'r') as f:
+    #         self.assertEqual(0, algorithms.bz_prev_newline(f, len(u'abc')))
+
+    # def test_bz_previous_line_single_overflow(self):
+    #     td = tempfile.mkdtemp()
+    #     with bz2.BZ2File(os.path.join(td, 'temp-bz.bz2'), 'w') as f:
+    #         f.write(u'abc\ndef'.encode('utf-8'))
+    #         f.close()
+    #     with bz2.BZ2File(os.path.join(td, 'temp-bz.bz2'), 'r') as f:
+    #         # Test the points to the left of the newline character
+    #         self.assertEqual(0, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
+    #         f.seek(1)
+    #         self.assertEqual(0, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
+    #         f.seek(2)
+    #         self.assertEqual(0, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
+    #         f.seek(3)
+    #         self.assertEqual(0, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
+
+    #         # Test the points to the right of the newline character
+    #         f.seek(4)
+    #         self.assertEqual(4, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
+    #         f.seek(5)
+    #         self.assertEqual(4, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
+    #         f.seek(6)
+    #         self.assertEqual(4, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
+    #         f.seek(7)
+    #         self.assertEqual(4, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
+
+
+
+    # def test_mapped_sym_suggest(self):
+    #     """
+    #     Test the disk-mapped suggestor.
+    #     """
+    #     df = tempfile.NamedTemporaryFile()
+    #     df.write('akey : aval\n')
+    #     df.write('bkey : bval\n')
+    #     df.write('ckey : cval\n')
+    #     df.write('dkey : dval\n')
+    #     df.write('ekey : eval\n')
+    #     df.write('fkey : fval\n')
+
+        
 
 
 if __name__ == '__main__':

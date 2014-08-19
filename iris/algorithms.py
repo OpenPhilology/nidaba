@@ -122,6 +122,39 @@ def sym_suggest(ustr, dic, delete_dic, depth, ret_count=0):
     return list(suggestions if ret_count <= 0 else suggestions[:ret_count])
 
 @unibarrier
+def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
+    """
+    Generate a list of spelling suggestions using the memory mapped
+    dictionary search/symmetric delete algorithm. Return only
+    suggestions at the specified depth, not up to and including that
+    depth.
+    """
+    suggestions = set()
+    # print 'generating dels'
+    dels = strings_by_deletion(ustr, depth)
+    # print 'done'
+    # print 'the dels for <%s> are ' % ustr.encode('utf-8'), list_to_uni(dels)
+    # print 'search...'
+    line_for_ustr = deldict_bin_search(ustr, del_dic_path)
+    # print 'done...'
+    if line_for_ustr is not None:
+        suggestions = suggestions.union(set(line_for_ustr[1]))
+    # print 'begin for'
+    for s in dels:
+        # print 'Checking d...'
+        if s in dic:
+            suggestions.add(s)
+        # print 'done'
+        # else:
+        line_for_s = deldict_bin_search(s, del_dic_path)
+        # if line_for_s is not None:
+        # else:
+        if line_for_s is not None:
+            suggestions = suggestions.union(set(line_for_s[1]))
+    # print 'returning...'
+    return list(suggestions)
+
+@unibarrier
 def edits1(ustr, alphabet):
    splits     = [(ustr[:i], ustr[i:]) for i in range(len(ustr) + 1)]
    deletes    = [a + b[1:] for a, b in splits if b]
@@ -160,7 +193,7 @@ def count_lines(path):
                               stderr=subprocess.PIPE)
 
     out, err = p.communicate()
-    return out.split(u' ', 1)[0]
+    return float(out.split(u' ', 1)[0])
 
 
 def prev_newline(mm, line_buffer_size=100):
@@ -207,7 +240,7 @@ def deldict_bin_search(ustr, dictionary_path, line_buffer_size=200):
         rawline = mm.readline()
         mm.seek(start)
         return parse_sym_entry(rawline.decode(u'utf-8'))
- 
+
     with codecs.open(dictionary_path, 'r+b') as f:
         # memory-map the file, size 0 means whole file
         mm = mmap.mmap(f.fileno(), 0)
@@ -234,6 +267,67 @@ def deldict_bin_search(ustr, dictionary_path, line_buffer_size=200):
         return None
 
 
+def bz_prev_newline(bzf, unc_len, line_buffer_size=200):
+    # bzf.seek(bzf.tell - line_buffer_size)
+    # TODO this fails on a line greater than line_buffer_size in length
+    # print type(bzf)
+    op = bzf.tell()
+    # print 'first op is %i' % op
+    np = op - line_buffer_size
+    bzf.seek(np)
+    # print 'second np is %i' % np
+    # print bzf.tell()
+    # print 'third= np is %i' % np
+    while np < op:
+        # print 'looping'
+        bzf.readline()
+        np = bzf.tell()
+    # print 'will return %i' % np
+    if bzf.tell() == unc_len:
+        print 'returning 0 by default'
+        return 0
+    else:
+        print 'returning %i' % np
+        return np
+
+@unibarrier
+def bz_deldict_bin_search(ustr, dictionary_path, unc_len, line_buffer_size=200):
+    def current_key(archive):
+        start = archive.tell()
+        rawline = archive.readline()
+        archive.seek(start)
+        return parse_sym_entry(rawline.decode(u'utf-8'))
+
+
+
+    import bz2
+    with bz2.BZ2File(dictionary_path, 'r', ) as f:
+        print 'reading comp lines...'
+        print f.readline()
+        print f.readline()
+        print f.readline()
+        print 'done reading lines.'
+        imin = 0
+        imax = unc_len
+        count = 0
+        while True:
+            mid = imin + int(math.floor((imax - imin)/2))
+            f.seek(mid)
+            f.seek(bz_prev_newline(f))
+            parsedline = current_key(f)
+            key = parsedline[0]
+
+            if key == ustr:
+                return parsedline
+            elif key < ustr:
+                imin = mid + 1
+            else:
+                imax = mid - 1 
+
+            count += 1
+            if imin >= imax:
+                break
+        return None
 
 
 def load_del_dic(path, encoding='utf-8'):
@@ -656,85 +750,7 @@ def list_to_uni(l, encoding=u'utf-8'):
     result += u']'
     return result.encode(encoding)
 
-if __name__ == '__main__':
-    d = 'dictionaries/greek/greek-nfd-1del.txt'
-    from timeit import Timer
-
-
-
-
-
-    # df.close()
-
-
-    # t = Timer(lambda: load_lines('dictionaries/greek/mini.txt'))
-    # print t.timeit(number=1) * 23
-
-    # del_dic = load_del_dic('dictionaries/greek/mini.txt')
-    # deldict_bin_search(u'foo', u'dictionaries/greek/greek-nfd-1del.txt')
-    # del_dic = load_del_dic('dictionaries/greek/greek-nfd-1del.txt')
-    # del_dic = load_del_dic('dictionaries/greek/greek-nfd-1del.txt')
-
-
-    # df = tempfile.NamedTemporaryFile()
-
-    # words = [u'́ας : ίας foobar waffle Wagner',
-    #          u'́δε : άδε foobar waffle Wagner',
-    #          u'́δος : ίδος foobar waffle Wagner',
-    #          u'́δων : άδων foobar waffle Wagner',
-    #          u'́ν : έν foobar waffle Wagner',
-    #          u'́νος : όνος foobar waffle Wagner',
-    #          u'́νων : όνων foobar waffle Wagner',
-    #          u'́σται : έσται foobar waffle Wagner',
-    #          u'́στιν : έστιν foobar waffle Wagner',
-    #          u'́σως : ίσως foobar waffle Wagner',
-    #          u'́τητα : ότητα foobar waffle Wagner',
-    #          u'́τητά : ότητά foobar waffle Wagner',
-    #          u'́τητάς : ότητάς foobar waffle Wagner',
-    #          u'́τητας : ότητας foobar waffle Wagner',
-    #          u'́τητι : ότητι foobar waffle Wagner',
-    #          u'́τητί : ότητί foobar waffle Wagner',
-    #          u'́τητός : ότητός foobar waffle Wagner',
-    #          u'́τητος : ότητος foobar waffle Wagner']
-    # for w in words:
-    #     # df.write(u'abcde\nfghijk\nlmnopq\nrstuv\nwxyzX')
-    #     df.write(w.encode('utf-8') + '\n')
-    # df.seek(0,0)
-
-    # with open(os.path.abspath(df.name), 'r+b') as f:
-        # print deldict_bin_search(u'́δος', os.path.abspath(df.name).decode('utf-8'))
-        # print '------------------'
-        # print '------------------'
-        # print deldict_bin_search(u'́τητός', os.path.abspath(df.name).decode('utf-8'))
-        # print '------------------'
-        # print '------------------'
-        # print deldict_bin_search(u'foo', os.path.abspath(df.name).decode('utf-8'))
-        # print '------------------'
-        # print '------------------'
-
-        # val = deldict_bin_search(u'́τητός', os.path.abspath(u'dictionaries/greek/greek-nfd-1del.txt'))
-        # print val[0].encode('utf-8')
-        # for b in val[1]:
-        #     print b.encode('utf-8')
-
-
-    # t = Timer(lambda: deldict_bin_search(u'́τητός', os.path.abspath(u'dictionaries/greek/greek-nfd-1del.txt')))
-    # print t.timeit(number=1000)
-
-
-        # print deldict_bin_search(u'foo', os.path.abspath(u'dictionaries/greek/greek-nfd-1del.txt'))
-
-    print deldict_bin_search(u'ζεσαν', os.path.abspath(u'scripts/test3.txt'))[1][0].encode('utf-8')
-    print deldict_bin_search(u'ἔαν', os.path.abspath(u'scripts/test3.txt'))[1][0].encode('utf-8')
-    print deldict_bin_search(u'̓́εσν', os.path.abspath(u'scripts/test3.txt'))[1][0].encode('utf-8')
-    print deldict_bin_search(u'̓́ζεν', os.path.abspath(u'scripts/test3.txt'))[1][0].encode('utf-8')
- 
-    # print mapped_sym_suggest(u'́τητος', os.path.abspath(u'dictionaries/greek/greek-nfd-1del.txt'), os.path.abspath(u'dictionaries/greek/greek.txt'), 1)
-
-
-
-
-
+# if __name__ == '__main__':
 
 
 
