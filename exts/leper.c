@@ -63,213 +63,190 @@ char *param_path(char *path, int val) {
 
 /* Dewarps a single page. TODO: Create a function to build a dewarp model for a
  * whole codex and apply to all pages. */
-int dewarp(char *in, char *out) {
+char *dewarp(char *in, char *out) {
 	PIX *pix = pixRead(in);
 	if(!pix) {
-		return -1;
+		return NULL;
 	}
 	if(pix->d != 1) {
 		pixDestroy(&pix);
-		return -1;
+		return NULL;
 	}
 	PIX *ret;
 	if(dewarpSinglePage(pix, 0, 0, 1, &ret, NULL, 0) == 1) {
 		pixDestroy(&pix);
-		return -1;
+		return NULL;
 	}
 	pixWriteImpliedFormat(out, ret, 100, 0);
 	pixDestroy(&pix);
 	pixDestroy(&ret);
-	return 0;
+	return out;
 }
 
 static PyObject *leper_dewarp(PyObject *self, PyObject *args) {
-	char *in, *out;
-	if(!PyArg_ParseTuple(args, "ss", &in, &out)) {
+	PyUnicodeObject *uin, *uout;
+	if(!PyArg_ParseTuple(args, "UU", &uin, &uout)) {
 		return NULL;
 	}
-	int r = dewarp(in, out);
-	PyObject *ret = Py_BuildValue("i", r);
+	char *in = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uin));
+	char *out = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uout));
+	char *r = dewarp(in, out);
+	PyObject *ret = PyUnicode_FromString(r);
 	return ret;
 }
 
 
 /* Converts a 32bpp input image to an 8bpp grayscale one. */
-int rgb_to_gray(char *in, char *out) {
+char *rgb_to_gray(char *in, char *out) {
 	PIX *pix = pixRead(in);
 	if(!pix) {
-		return -1;
+		return NULL;
 	}
         PIX *r;
 	if((r = pixConvertRGBToGray(pix, 0.0, 0.0, 0.0)) == NULL) {
-		return -1;
+		return NULL;
 	}
 	pixWriteImpliedFormat(out, r, 100, 0);
 	pixDestroy(&pix);
 	pixDestroy(&r);
-	return 0;
+	return out;
 }
 
 static PyObject *leper_rgb_to_gray(PyObject *self, PyObject *args) {
-	char *in, *out;
-	if(!PyArg_ParseTuple(args, "ss", &in, &out)) {
+	PyUnicodeObject *uin, *uout;
+	if(!PyArg_ParseTuple(args, "UU", &uin, &uout)) {
 		return NULL;
 	}
-	int r = rgb_to_gray(in, out);
-	PyObject *ret = Py_BuildValue("i", r);
+	char *in = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uin));
+	char *out = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uout));
+	char *r = rgb_to_gray(in, out);
+	PyObject *ret = PyUnicode_FromString(r);
 	return ret;
 }
 
 /* Runs a tiled localized binarization of the input images */
-int sauvola_binarize(char *in, char *out, l_int32 bins, l_int32 min_wsize, l_int32 max_wsize, l_float32 factor) {
+char *sauvola_binarize(char *in, char *out, l_int32 thresh, l_float32 factor) {
 
 	PIX* pix = pixRead(in);
 	if(!pix) {
-		return -1;
+		return NULL;
 	}
 	if(pix->d != 8) {
 		pixDestroy(&pix);
-		return -1;
+		return NULL;
 	}
-	/* Different binarizations are produced by manipulating the window size
-	 * of the local threshold calculation. */
-	l_int32 t = min_wsize;
-	do {
-		PIX *r = NULL;
-		if(pixSauvolaBinarize(pix, t, factor, 0, NULL, NULL, NULL, &r) == 1) {
-			pixDestroy(&pix);
-			return -1;
-		}
-		char *res;
-		if((res = param_path(out, t)) == NULL) {
-			pixDestroy(&pix);
-			pixDestroy(&r);
-			return -1;
-		}
-		pixWriteImpliedFormat(res, r, 100, 0);
+	PIX *r = NULL;
+	if(pixSauvolaBinarize(pix, thresh, factor, 0, NULL, NULL, NULL, &r) == 1) {
+		pixDestroy(&pix);
+		return NULL;
+	}
+	char *res;
+	if((res = param_path(out, thresh)) == NULL) {
+		pixDestroy(&pix);
 		pixDestroy(&r);
-		free(res);
-		t += (max_wsize - min_wsize)/bins;
-	} while(t < max_wsize);
+		return NULL;
+	}
+	pixWriteImpliedFormat(res, r, 100, 0);
+	pixDestroy(&r);
 	pixDestroy(&pix);
-	return 0;
+	return res;
 }
 
 static PyObject *leper_sauvola_binarize(PyObject *self, PyObject *args) {
-	char *in, *out;
-	l_int32 bins = 1;
-	l_int32 min_wsize = 10;
-	l_int32 max_wsize = 10;
+	PyUnicodeObject *uin, *uout;
+	l_int32 thresh = 10;
 	l_float32 factor = 0.3;
-	if(!PyArg_ParseTuple(args, "ss|iiif", &in, &out, &bins, &min_wsize, &max_wsize, &factor)) {
+	if(!PyArg_ParseTuple(args, "UU|if", &uin, &uout, &thresh, &factor)) {
 		return NULL;
 	}
-	int r = sauvola_binarize(in, out, bins, min_wsize, max_wsize, factor);
-	PyObject *ret = Py_BuildValue("i", r);
+	char *in = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uin));
+	char *out = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uout));
+	char *r = sauvola_binarize(in, out, thresh, factor);
+	PyObject *ret = PyUnicode_FromString(r);
+	free(r);
 	return ret;
 }
 
-/* Runs a tiled global binarization of the input image. Different binarizations
- * of the same input are created by manipulating the threshold of the
- * background normalization. */
-int otsu_binarize(char *in, char *out, l_int32 bins, l_int32 tiles, 
-		  l_int32 min_thresh, l_int32 max_thresh, l_int32 mincount,
+char *otsu_binarize(char *in, char *out, l_int32 thresh, l_int32 mincount,
 		  l_int32 bgval, l_int32 smoothx, l_int32 smoothy) {
-
-	if(min_thresh > max_thresh) { 
-		return -1;
-	}
 
 	PIX* pix = pixRead(in);
 	if(!pix) {
-		return -1;
+		return NULL;
 	}
 	if(pix->d != 8) {
 		pixDestroy(&pix);
-		return -1;
+		return NULL;
 	}
 
-	l_int32 sx, sy;
-	if(tiles > 0) {
-		sx = pix->w / tiles;
-		sy = pix->h / tiles;
-	} else {
-		sx = 10;
-		sy = 15;
+	l_int32 sx = 10, sy = 15;
+	/* Normalizes the background followd by Otsu thresholding. Refer to the
+	 * leptonica documentation for further details. */
+	PIX *r;
+	if((r = pixOtsuThreshOnBackgroundNorm(pix, NULL, sx, sy, thresh,
+					mincount, bgval, smoothx,
+					smoothy, 0.1, NULL)) == NULL) {
+		pixDestroy(&pix);
+		return NULL;
 	}
-
-	/* thresholds are spaced out equally between min_thresh and max_thresh */
-	l_int32 t = min_thresh;
-	do {
-		/* Normalizes the background followd by Otsu thresholding. Refer to the
-		 * leptonica documentation for further details. */
-		PIX *r;
-		if((r = pixOtsuThreshOnBackgroundNorm(pix, NULL, sx, sy, t,
-						mincount, bgval, smoothx,
-						smoothy, 0.1, NULL)) == NULL) {
-			pixDestroy(&pix);
-			return -1;
-		}
-		char *res;
-		if((res = param_path(out, t)) == NULL) {
-			pixDestroy(&pix);
-			pixDestroy(&r);
-			return -1;
-		}
-		pixWriteImpliedFormat(res, pixConvert1To8(NULL, r, 255, 0), 100, 0);
+	char *res;
+	if((res = param_path(out, thresh)) == NULL) {
+		pixDestroy(&pix);
 		pixDestroy(&r);
-		free(res);
-		t += (max_thresh - min_thresh)/bins;
-	} while(t < max_thresh);
+		return NULL;
+	}
+	pixWriteImpliedFormat(res, pixConvert1To8(NULL, r, 255, 0), 100, 0);
+	pixDestroy(&r);
 	pixDestroy(&pix);
-	return 0;
+	return res;
 }
 
 static PyObject *leper_otsu_binarize(PyObject *self, PyObject *args) {
-	char *in, *out;
-	l_int32 bins = 1;
-	l_int32 tiles = 0;
-	l_int32 min_thresh = 100;
-	l_int32 max_thresh = 100;
+	PyUnicodeObject *uin, *uout;
+	l_int32 thresh = 100;
 	l_int32 mincount = 50;
 	l_int32 bgval = 255;
 	l_int32 smoothx = 2;
 	l_int32 smoothy = 2;
-	if(!PyArg_ParseTuple(args, "ss|iiiiiiii", &in, &out, &bins, &tiles,
-				&min_thresh, &max_thresh, &mincount, &bgval,
-				&smoothx, &smoothy)) {
+	if(!PyArg_ParseTuple(args, "UU|iiiii", &uin, &uout, &thresh,
+				&mincount, &bgval, &smoothx, &smoothy)) {
 		return NULL;
 	}
-	int r = otsu_binarize(in, out, bins, tiles, min_thresh, max_thresh,
-			mincount, bgval, smoothx, smoothy);
-	PyObject *ret = Py_BuildValue("i", r);
+	char *in = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uin));
+	char *out = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uout));
+	char *r = otsu_binarize(in, out, thresh, mincount, bgval, smoothx,
+			smoothy);
+	PyObject *ret = PyUnicode_FromString(r);
+	free(r);
 	return ret;
 }
 
-int deskew(char *in, char *out) {
+char *deskew(char *in, char *out) {
 	PIX* pix = pixRead(in);
 	if(!pix) {
-		return -1;
+		return NULL;
 	}
 
 	PIX *r;
 	l_float32 skew;
 	if((r = pixFindSkewAndDeskew(pix, 4, &skew, NULL)) == NULL) {
-		return -1;
+		return NULL;
 	}
 	pixWriteImpliedFormat(out, r, 100, 0);
 	pixDestroy(&pix);
 	pixDestroy(&r);
-	return 0;
+	return out;
 }
 
 static PyObject *leper_deskew(PyObject *self, PyObject *args) {
-	char *in, *out;
-	if(!PyArg_ParseTuple(args, "ss", &in, &out)) {
+	PyUnicodeObject *uin, *uout;
+	if(!PyArg_ParseTuple(args, "UU", &uin, &uout)) {
 		return NULL;
 	}
-	int r = deskew(in, out);
-	PyObject *ret = Py_BuildValue("i", r);
+	char *in = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uin));
+	char *out = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uout));
+	char *r = deskew(in, out);
+	PyObject *ret = PyUnicode_FromString(r);
 	return ret;
 }
 
