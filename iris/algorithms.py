@@ -267,67 +267,67 @@ def deldict_bin_search(ustr, dictionary_path, line_buffer_size=200):
         return None
 
 
-def bz_prev_newline(bzf, unc_len, line_buffer_size=200):
-    # bzf.seek(bzf.tell - line_buffer_size)
-    # TODO this fails on a line greater than line_buffer_size in length
-    # print type(bzf)
-    op = bzf.tell()
-    # print 'first op is %i' % op
-    np = op - line_buffer_size
-    bzf.seek(np)
-    # print 'second np is %i' % np
-    # print bzf.tell()
-    # print 'third= np is %i' % np
-    while np < op:
-        # print 'looping'
-        bzf.readline()
-        np = bzf.tell()
-    # print 'will return %i' % np
-    if bzf.tell() == unc_len:
-        print 'returning 0 by default'
-        return 0
-    else:
-        print 'returning %i' % np
-        return np
+# def bz_prev_newline(bzf, unc_len, line_buffer_size=200):
+#     # bzf.seek(bzf.tell - line_buffer_size)
+#     # TODO this fails on a line greater than line_buffer_size in length
+#     # print type(bzf)
+#     op = bzf.tell()
+#     # print 'first op is %i' % op
+#     np = op - line_buffer_size
+#     bzf.seek(np)
+#     # print 'second np is %i' % np
+#     # print bzf.tell()
+#     # print 'third= np is %i' % np
+#     while np < op:
+#         # print 'looping'
+#         bzf.readline()
+#         np = bzf.tell()
+#     # print 'will return %i' % np
+#     if bzf.tell() == unc_len:
+#         print 'returning 0 by default'
+#         return 0
+#     else:
+#         print 'returning %i' % np
+#         return np
 
-@unibarrier
-def bz_deldict_bin_search(ustr, dictionary_path, unc_len, line_buffer_size=200):
-    def current_key(archive):
-        start = archive.tell()
-        rawline = archive.readline()
-        archive.seek(start)
-        return parse_sym_entry(rawline.decode(u'utf-8'))
+# @unibarrier
+# def bz_deldict_bin_search(ustr, dictionary_path, unc_len, line_buffer_size=200):
+#     def current_key(archive):
+#         start = archive.tell()
+#         rawline = archive.readline()
+#         archive.seek(start)
+#         return parse_sym_entry(rawline.decode(u'utf-8'))
 
 
 
-    import bz2
-    with bz2.BZ2File(dictionary_path, 'r', ) as f:
-        print 'reading comp lines...'
-        print f.readline()
-        print f.readline()
-        print f.readline()
-        print 'done reading lines.'
-        imin = 0
-        imax = unc_len
-        count = 0
-        while True:
-            mid = imin + int(math.floor((imax - imin)/2))
-            f.seek(mid)
-            f.seek(bz_prev_newline(f))
-            parsedline = current_key(f)
-            key = parsedline[0]
+#     import bz2
+#     with bz2.BZ2File(dictionary_path, 'r', ) as f:
+#         print 'reading comp lines...'
+#         print f.readline()
+#         print f.readline()
+#         print f.readline()
+#         print 'done reading lines.'
+#         imin = 0
+#         imax = unc_len
+#         count = 0
+#         while True:
+#             mid = imin + int(math.floor((imax - imin)/2))
+#             f.seek(mid)
+#             f.seek(bz_prev_newline(f))
+#             parsedline = current_key(f)
+#             key = parsedline[0]
 
-            if key == ustr:
-                return parsedline
-            elif key < ustr:
-                imin = mid + 1
-            else:
-                imax = mid - 1 
+#             if key == ustr:
+#                 return parsedline
+#             elif key < ustr:
+#                 imin = mid + 1
+#             else:
+#                 imax = mid - 1 
 
-            count += 1
-            if imin >= imax:
-                break
-        return None
+#             count += 1
+#             if imin >= imax:
+#                 break
+#         return None
 
 
 def load_del_dic(path, encoding='utf-8'):
