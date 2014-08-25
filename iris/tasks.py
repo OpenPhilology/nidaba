@@ -1,16 +1,9 @@
 # -*- coding: utf-8 -*-
 #This module contains all celery tasks. All tasks should be try-except safed, to guarantee A:graceful recovery from a failed OCR task, and B:immediate point-of-failure indentification for debugging purposes, or to easily identify bad OCR data.
-import celeryConfig
+import celeryconfig
 import irisconfig
-import uuid
-import logging
-import inspect
-import time
-import gzip
-import zipfile
-import requests
-import fs
 import algorithms
+import tesseract
 
 from celery import Celery
 from celery import group
@@ -21,14 +14,19 @@ from requests import HTTPError, ConnectionError, Timeout
 from fs import ftpfs, path, errors
 from cStringIO import StringIO
 
-app = Celery(main='tasks', broker=celeryConfig.BROKER_URL)
-app.config_from_object('celeryConfig')
+app = Celery(main='tasks', broker=celeryconfig.BROKER_URL)
+app.config_from_object('celeryconfig')
 
 archive_url_format = 'http://www.archive.org/download/{0}/{0}{1}'
 
 # ------------------------------------------------------------------------------------------
 # The tasks. -------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------
+
+@app.task(name=u'tesseract_ocr_page')
+def tesseract_ocr_page(imgpath, outputpath, languages):
+	return ocr(imgpath, outputpath, languages)
+
 
 # @app.task(name='edit_distance_task')
 # def edit_distance_task(str1, str2):
