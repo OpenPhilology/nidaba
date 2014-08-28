@@ -103,8 +103,6 @@ def rgb_to_gray(id=u'', in_files=[], out_suffix=u'gray'):
         g |= ctg_util.s(storage.get_abs_path(id, input),
                 storage.get_abs_path(id, output))
     g.apply_async()
->>>>>>> tasks
-    
 
 @app.task(name='binarize')
 def binarize(in_files=[], configuration={}):
@@ -126,7 +124,7 @@ def deskew(in_files=[], id=u'', out_suffix=u'deskew'):
 @app.task(name='ocr_tesseract')
 def ocr_tesseract(imgpath, outputpath, languages):
     """Runs tesseract on an input document."""
-        return ocr(imgpath, outputpath, languages)
+    return ocr(imgpath, outputpath, languages)
 
 @app.task(name='ocr_ocropus')
 def ocr_ocropus(config):
