@@ -3,8 +3,8 @@ import unittest
 import os
 import shutil
 import tempfile
-import tesseract
 from lxml import etree
+from iris import tesseract
 
 thisfile = os.path.abspath(os.path.dirname(__file__))
 resources = os.path.abspath(os.path.join(thisfile, 'resources/tesseract'))
@@ -25,9 +25,9 @@ class TesseractTests(unittest.TestCase):
         Test that tesseract creates hocr output for pngs.
         """
         pngpath = os.path.join(resources, 'image.png')
-        outpath = os.path.join(self.tempdir, 'output.hocr')
+        outpath = os.path.join(self.tempdir, 'output')
         ocr = tesseract.ocr(pngpath, outpath, ['grc'])
-        expected = outpath + '.html'
+        expected = outpath + '.hocr'
 
         self.assertEqual(ocr[0], expected)
         self.assertTrue(os.path.isfile(expected),
@@ -43,8 +43,8 @@ class TesseractTests(unittest.TestCase):
         Test that tesseract creates hocr output for tiffs.
         """
         tiffpath = os.path.join(resources, 'image.tiff')
-        outpath = os.path.join(self.tempdir, 'output.hocr')
-        expected = outpath + '.html'
+        outpath = os.path.join(self.tempdir, 'output')
+        expected = outpath + '.hocr'
         ocr = tesseract.ocr(tiffpath, outpath, ['grc'])
         self.assertTrue(os.path.isfile(expected),
                         msg='Tesseract did not output a file!')
@@ -59,8 +59,8 @@ class TesseractTests(unittest.TestCase):
         Test that tesseract creates hocr output for jpgs.
         """
         jpgpath = os.path.join(resources, 'image.jpg')
-        outpath = os.path.join(self.tempdir, 'output.hocr')
-        expected = outpath + '.html'
+        outpath = os.path.join(self.tempdir, 'output')
+        expected = outpath + '.hocr'
         tesseract.ocr(jpgpath, outpath, ['grc'])
         ocr = self.assertTrue(os.path.isfile(expected),
                         msg='Tesseract did not output a file!')
@@ -90,9 +90,9 @@ class TesseractTests(unittest.TestCase):
         hocr = tesseract.ocrdir(resources, self.tempdir, ['grc'])
         self.assertEqual(3, len(hocr))
         self.assertEqual(3, len(os.listdir(self.tempdir)))
-        self.assertIn('image.png.html', os.listdir(self.tempdir))
-        self.assertIn('image.tiff.html', os.listdir(self.tempdir))
-        self.assertIn('image.jpg.html', os.listdir(self.tempdir))
+        self.assertIn('image.png.hocr', os.listdir(self.tempdir))
+        self.assertIn('image.tiff.hocr', os.listdir(self.tempdir))
+        self.assertIn('image.jpg.hocr', os.listdir(self.tempdir))
 
 
 

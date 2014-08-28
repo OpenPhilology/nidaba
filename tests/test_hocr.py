@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import unittest
-import hocr
 import re
 import tempfile
+
+from iris import hocr
 
 class HocrTests(unittest.TestCase):
     """

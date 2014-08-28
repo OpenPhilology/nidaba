@@ -1,14 +1,13 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 import unittest
-import storage
 import time
 import uuid
-import irisconfig
 from os import path
 from multiprocessing import Process
 from lock import lock
 
+from iris import irisconfig, storage
 
 class test_locking(unittest.TestCase):
     """
