@@ -31,6 +31,15 @@ def get_abs_path(jobID, *path):
     # Run twice to ensure resulting path is beneath jobID.
     return _sanitize_path(_sanitize_path(irisconfig.STORAGE_PATH, jobID), *path)
 
+def insert_suffix(orig_path, *suffix):
+    """
+    Inserts one or more suffixes just before the file extension.
+    """
+    pathname, extension = path.splitext(orig_path)
+    for i in suffix:
+        pathname += u'_' + i
+    return pathname + extension
+
 def is_valid_job(jobID):
     """
     Checks if filestore has been prepared for a job.
