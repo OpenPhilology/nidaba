@@ -4,12 +4,12 @@
 # point-of-failure indentification for debugging purposes, or to easily identify
 # bad OCR data.
 
-from iris import celeryconfig
-from iris import irisconfig
-from iris import algorithms
-from iris import tesseract
-from iris import leper
-from iris import storage
+from . import celeryconfig
+from . import irisconfig
+from . import algorithms
+from . import tesseract
+from . import storage
+from . import leper
 
 import uuid
 import logging

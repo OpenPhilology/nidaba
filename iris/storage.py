@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # This module contains all file handling/storage management/ID mapping methods
 
-from iris.lock import lock
-from iris import irisconfig
+from lock import lock
+from . import irisconfig
 from os import path
 
 import os
