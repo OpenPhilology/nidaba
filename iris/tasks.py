@@ -4,10 +4,13 @@
 # point-of-failure indentification for debugging purposes, or to easily identify
 # bad OCR data.
 
-import celeryconfig
-import irisconfig
-import algorithms
-import tesseract
+from iris import celeryconfig
+from iris import irisconfig
+from iris import algorithms
+from iris import tesseract
+from iris import leper
+from iris import storage
+
 import uuid
 import logging
 import inspect
@@ -15,9 +18,8 @@ import time
 import gzip
 import zipfile
 import requests
-import leper
 import os
-import storage
+
 
 from celery import Celery
 from celery import group
@@ -26,7 +28,7 @@ from celery.task.sets import TaskSet
 from celery.utils.log import get_task_logger
 
 app = Celery(main='tasks', broker=celeryconfig.BROKER_URL)
-app.config_from_object('celeryconfig')
+app.config_from_object(celeryconfig)
 
 # ------------------------------------------------------------------------------------------
 # The tasks. -------------------------------------------------------------------------------
@@ -124,7 +126,7 @@ def deskew(in_files=[], id=u'', out_suffix=u'deskew'):
 @app.task(name='ocr_tesseract')
 def ocr_tesseract(imgpath, outputpath, languages):
     """Runs tesseract on an input document."""
-    return ocr(imgpath, outputpath, languages)
+    return tesseract.ocr(imgpath, outputpath, languages)
 
 @app.task(name='ocr_ocropus')
 def ocr_ocropus(config):
