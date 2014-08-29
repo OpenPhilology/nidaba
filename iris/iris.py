@@ -53,15 +53,14 @@ def batch(config):
         raise IrisInputException('No batch ID given.')
 
     res = []
-    cgroup = group()
     for sequence in product(config[u'input_files'], *config[u'actions']):
         method = getattr(tasks, sequence[1]['method'])
         ch = chain(method.s(sequence[0], id=config['batch_id'], **(sequence[1])))
         for seq in sequence[2:]:
             method = getattr(tasks, seq['method'])
             ch |= method.s(id=config['batch_id'], **seq)
-        cgroup |= ch
-    return cgroup.apply_async()
+        res.append(ch)
+    return group(res).apply_async()
 
 def get_progress(task_id):
     return AsyncResult(task_id)
