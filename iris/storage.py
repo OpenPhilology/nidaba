@@ -1,26 +1,44 @@
 # -*- coding: utf-8 -*-
 # This module contains all file handling/storage management/ID mapping methods
 
-from os import path
 from lock import lock
+from . import irisconfig
+from os import path
 
-import irisconfig
 import os
 import fnmatch
 
-
 # Sanitizes a given path with respect to a base path. Returns an absolute path
 # garantueed to be beneath base_path.
-def _sanitize_path(base_path, rel_path):
+def _sanitize_path(base_path, *paths):
+    if len(paths) < 1:
+        return u''
     base_path = path.expanduser(base_path)
     base_path = path.abspath(base_path)
-    rel_path = path.abspath(path.join(base_path, rel_path))
+    rel_path = path.abspath(path.join(base_path, *paths))
     if path.commonprefix([path.normpath(rel_path),
                           path.normpath(base_path)]) == base_path:
         return rel_path
     else:
-        return ''
+        return u''
 
+def get_abs_path(jobID, *path):
+    """
+    Returns the absolute path of a file.
+    """
+    if len(path) < 1:
+        raise Exception('No path given')
+    # Run twice to ensure resulting path is beneath jobID.
+    return _sanitize_path(_sanitize_path(irisconfig.STORAGE_PATH, jobID), *path)
+
+def insert_suffix(orig_path, *suffix):
+    """
+    Inserts one or more suffixes just before the file extension.
+    """
+    pathname, extension = path.splitext(orig_path)
+    for i in suffix:
+        pathname += u'_' + i
+    return pathname + extension
 
 def is_valid_job(jobID):
     """

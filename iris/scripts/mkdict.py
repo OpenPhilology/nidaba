@@ -5,7 +5,7 @@ import sys
 import codecs
 import cPickle
 from time import sleep
-from algorithms import strings_by_deletion,sanitize 
+from iris.algorithms import strings_by_deletion,sanitize 
 
 
 def file_len(fname):
