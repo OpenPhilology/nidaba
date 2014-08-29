@@ -4,6 +4,8 @@ import errno
 import subprocess
 import glob
 
+from irisexceptions import IrisTesseractException
+
 #More readable aliases for tesseract's language abbreviations.
 greek = 'grc'
 
@@ -23,7 +25,9 @@ def ocr(imagepath, outputfilepath, languages):
         abs_out, 'hocr'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     resultpath = abs_out + '.html'
     out, err = p.communicate()
-    return (resultpath, out, err)
+    if err:
+        raise IrisTesseractException(err)
+    return resultpath
 
 
 def ocrdir(dirpath, outputdir, language):

@@ -71,4 +71,12 @@ exposed by the ''batch'' function of the iris package:
 <GroupResult: 6222f675-330e-461c-94de-1d0ea0a2f444 [0cb9c912-1818-43d3-afd4-9f66e0b9b6f0, c47729a6-cbd6-4882-bec1-73f52400f6d9]>
 ```
 
-The (absolute) path of the final output is contained in the result field of the subtasks. 
+The (absolute) path of the final output is contained in the result field of the subtasks.
+
+
+Issues
+======
+
+* Currently the distributed storage medium has to be mounted in the same
+  location on each node. This is caused by the missing conversion of absolute
+  paths into storage module format (id, doc tuples).
