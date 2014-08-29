@@ -25,7 +25,7 @@ def ocr(imagepath, outputfilepath, languages):
         abs_out, 'hocr'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     resultpath = abs_out + '.html'
     out, err = p.communicate()
-    if err:
+    if p.returncode:
         raise IrisTesseractException(err)
     return resultpath
 
