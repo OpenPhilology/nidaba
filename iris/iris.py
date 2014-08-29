@@ -9,7 +9,7 @@ from itertools import product
 from celery import Celery
 from celery import chain
 from celery import group
-from celery.result import AsyncResult
+from celery.result import GroupResult
 
 def batch(config):
     """Creates a series of celery tasks OCRing a set of documents (among other
@@ -60,7 +60,17 @@ def batch(config):
             method = getattr(tasks, seq['method'])
             ch |= method.s(id=config['batch_id'], **seq)
         res.append(ch)
-    return group(res).apply_async()
+    r = group(res).apply_async()
+    r.save()
+    return r.id
 
 def get_progress(task_id):
-    return AsyncResult(task_id)
+    r = GroupResult.restore(task_id)
+    return (r.completed_count(), len(r.subtasks))
+
+def get_results(task_id):
+    r = GroupResult.restore(task_id)
+    if r.ready() and r.successful():
+        return r.get()
+    else:
+        return None
