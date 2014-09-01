@@ -36,10 +36,18 @@ in the root directory. pip is required to extract the dependencies for
 setuptools from the requirements file, so there is no reason the run setup.py
 directly.
 
-The image processing C extension requires the leptonica image processing library:
+The image processing C extension requires the leptonica image processing
+library (>=1.70, available from Debian Jessie):
 
 ```
 $ apt-get install libleptonica-dev
+```
+
+If a manual install is required, don't forget to install the apropriate image
+format libraries and their headers (libtiff, libpng, libjpeg) or run:
+
+```
+$ apt-get build-dep leptonlib
 ```
 
 Tests
