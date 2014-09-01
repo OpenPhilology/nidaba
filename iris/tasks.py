@@ -59,15 +59,15 @@ def binarize(doc, id=u'', method=u'binarize', algorithm=u'sauvola', thresh=10,
     
     Args:
         doc (unicode): The filename of the input document.
-        id (unicode): The unique id underneath all fles are situated.
+        id (unicode): The unique id underneath all files are situated.
         method (unicode): The suffix string appended to all output files.
         algorithm (unicode): Either ''sauvola'' or ''otsu''
         thresh (int): Threshold/window size used by either algorithm.
         factor (float): (sauvola only) Threshold reduction factor.
-        mincount (int): (otsu only) 
-        bgval (int): (otsu only)
-        smoothx (int): (otsu only)
-        smoothy (int): (otsu only)
+        mincount (int): (otsu only) Min theshold on counts in a tile.
+        bgval (int): (otsu only) Target background value.
+        smoothx (int): (otsu only) Half-width of block convolution kernel width.
+        smoothy (int): (otsu only) Half-width of block convolution kernel height.
 
     Returns:
         unicode: Path of the output file.
@@ -93,9 +93,9 @@ def dewarp(doc, id=u'', method=u'dewarp'):
     from an 1bpp input image.
     
     Args:
-        doc (unicode):
-        id (unicode):
-        method (unicode):
+        doc (unicode): The filename of the input document.
+        id (unicode): The unique id underneath all files are situated.
+        method (unicode): The suffix string appended to all output files.
 
     Returns:
         unicode: Path of the output file.
@@ -109,9 +109,9 @@ def deskew(doc, id=u'', method=u'deskew'):
     """Removes skew (rotational distortion) from an 1bpp input image.
     
     Args:
-        doc (unicode):
-        id (unicode):
-        method (unicode):
+        doc (unicode): The filename of the input document.
+        id (unicode): The unique id underneath all files are situated.
+        method (unicode): The suffix string appended to all output files.
 
     Returns:
         unicode: Path of the output file.
@@ -125,10 +125,10 @@ def ocr_tesseract(doc, id=u'', method=u'ocr_tesseract', languages=None):
     """Runs tesseract on an input document.
     
     Args:
-        doc (unicode):
-        id (unicode):
-        method (unicode):
-        languages (list of unicode):
+        doc (unicode): The filename of the input document.
+        id (unicode): The unique id underneath all files are situated.
+        method (unicode): The suffix string appended to all output files.
+        languages (list of unicode): A list of languages for the tesseract language model.
         
     Returns:
         unicode: Path of the output file.
