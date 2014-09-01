@@ -31,36 +31,6 @@
 /* leper is Iris' wrapper around leptonica doing miscellaneous image processing
  * work that is too cumbersome or slow for python. */
 
-/* inserts val into a file name just before the extension, e.g.
- * /foo/bar/baz.jpg -> /foo/bar/baz_10.jpg. Run multiple times for more than
- * one value. */
-char *param_path(char *path, int val) {
-        char *dirc, *basec, *d, *f;
-
-        if((dirc = strdup(path)) == NULL) {
-                return NULL;
-        }
-        if((basec = strdup(path)) == NULL) {
-                free(dirc);
-                return NULL;
-        }
-        d = dirname(dirc);
-        f = basename(basec);
-        char *ext;
-        char *dot = strrchr(f, '.');
-        if((ext = strdup(dot)) == NULL) {
-                free(dirc);
-                free(basec);
-                return NULL;
-        }
-        *dot = 0;
-        char *res;
-        if(asprintf(&res, "%s/%s_%d%s", d, f, val, ext) == -1) {
-                return NULL;
-        }
-	return res;
-}
-
 /* Dewarps a single page. TODO: Create a function to build a dewarp model for a
  * whole codex and apply to all pages. */
 char *dewarp(char *in, char *out) {
@@ -140,16 +110,10 @@ char *sauvola_binarize(char *in, char *out, l_int32 thresh, l_float32 factor) {
 		pixDestroy(&pix);
 		return NULL;
 	}
-	char *res;
-	if((res = param_path(out, thresh)) == NULL) {
-		pixDestroy(&pix);
-		pixDestroy(&r);
-		return NULL;
-	}
-	pixWriteImpliedFormat(res, r, 100, 0);
+	pixWriteImpliedFormat(out, r, 100, 0);
 	pixDestroy(&r);
 	pixDestroy(&pix);
-	return res;
+	return out;
 }
 
 static PyObject *leper_sauvola_binarize(PyObject *self, PyObject *args) {
@@ -189,16 +153,10 @@ char *otsu_binarize(char *in, char *out, l_int32 thresh, l_int32 mincount,
 		pixDestroy(&pix);
 		return NULL;
 	}
-	char *res;
-	if((res = param_path(out, thresh)) == NULL) {
-		pixDestroy(&pix);
-		pixDestroy(&r);
-		return NULL;
-	}
-	pixWriteImpliedFormat(res, pixConvert1To8(NULL, r, 255, 0), 100, 0);
+	pixWriteImpliedFormat(out, r, 100, 0);
 	pixDestroy(&r);
 	pixDestroy(&pix);
-	return res;
+	return out;
 }
 
 static PyObject *leper_otsu_binarize(PyObject *self, PyObject *args) {
