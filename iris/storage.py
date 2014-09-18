@@ -3,39 +3,56 @@
 
 from lock import lock
 from . import irisconfig
-from os import path
+from .irisexceptions import IrisStorageViolationException, IrisNoSuchStorageBin
 
 import os
 import fnmatch
+import re
 
-# Sanitizes a given path with respect to a base path. Returns an absolute path
-# garantueed to be beneath base_path.
+# Sanitizes a given path with respect to a base os.path. Returns an absolute path
+# garantueed to be beneath base_os.path.
 def _sanitize_path(base_path, *paths):
     if len(paths) < 1:
-        return u''
-    base_path = path.expanduser(base_path)
-    base_path = path.abspath(base_path)
-    rel_path = path.abspath(path.join(base_path, *paths))
-    if path.commonprefix([path.normpath(rel_path),
-                          path.normpath(base_path)]) == base_path:
+        raise IrisStorageViolationException('Path not beneath STORAGE_PATH')
+    base_path = os.path.expanduser(base_path)
+    base_path = os.path.abspath(base_path)
+    rel_path = os.path.abspath(os.path.join(base_path, *paths))
+    if os.path.commonprefix([os.path.normpath(rel_path),
+                          os.path.normpath(base_path)]) == base_path:
         return rel_path
     else:
-        return u''
+        raise IrisStorageViolationException('Path not beneath STORAGE_PATH')
 
 def get_abs_path(jobID, *path):
     """
     Returns the absolute path of a file.
     """
     if len(path) < 1:
-        raise Exception('No path given')
+        raise IrisStorageViolationException('Path not beneath STORAGE_PATH')
     # Run twice to ensure resulting path is beneath jobID.
     return _sanitize_path(_sanitize_path(irisconfig.STORAGE_PATH, jobID), *path)
+
+def get_storage_path(path):
+    """
+    Converts an absolute path to a storage tuple of the form (id, path).
+    """
+    base_path = _sanitize_path(irisconfig.STORAGE_PATH, u'')
+    if os.path.commonprefix([os.path.normpath(base_path),
+            os.path.normpath(path)]) != base_path:
+        raise IrisStorageViolationException('Path not beneath STORAGE_PATH')
+    path = path.replace(base_path, u'', 1)
+    m = re.match('^(?P<id>.+?)\/(?P<p>.+)', path)
+    id = os.path.split(m.groupdict()['id'])[1]
+    if is_valid_job(id):
+        return (id, m.groups()[1])
+    else:
+        raise IrisNoSuchStorageBin('ID ' + m.groupdict()['id'] + ' not known.')
 
 def insert_suffix(orig_path, *suffix):
     """
     Inserts one or more suffixes just before the file extension.
     """
-    pathname, extension = path.splitext(orig_path)
+    pathname, extension = os.path.splitext(orig_path)
     for i in suffix:
         pathname += u'_' + i
     return pathname + extension
@@ -44,7 +61,7 @@ def is_valid_job(jobID):
     """
     Checks if filestore has been prepared for a job.
     """
-    return path.isdir(_sanitize_path(irisconfig.STORAGE_PATH, jobID))
+    return os.path.isdir(_sanitize_path(irisconfig.STORAGE_PATH, jobID))
 
 
 def prepare_filestore(jobID):
@@ -71,7 +88,7 @@ def list_content(jobID, pattern=u'*'):
     flist = []
     jpath = _sanitize_path(irisconfig.STORAGE_PATH, jobID)
     for root, dirs, files in os.walk(jpath):
-        flist.extend([path.relpath(path.join(root, s), jpath) for s in files])
+        flist.extend([os.path.relpath(os.path.join(root, s), jpath) for s in files])
     return fnmatch.filter(flist, pattern)
 
 
@@ -116,7 +133,7 @@ def write_content(jobID, dest, data):
         return None
     try:
         with open(_sanitize_path(irisconfig.STORAGE_PATH,
-                                 path.join(jobID, dest)), 'wb') as f:
+                                 os.path.join(jobID, dest)), 'wb') as f:
             l = lock(f.name)
             l.acquire()
             f.write(data)
