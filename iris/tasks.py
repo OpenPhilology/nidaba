@@ -10,6 +10,7 @@ from . import algorithms
 from . import tesseract
 from . import storage
 from . import leper
+from .irisexceptions import IrisNoSuchAlgorithmException
 
 import uuid
 import logging
@@ -35,7 +36,7 @@ app.config_from_object(celeryconfig)
 # on it.
 
 @app.task(name=u'rgb_to_gray')
-def rgb_to_gray(doc, id=u'', method=u'rgb_to_gray'):
+def rgb_to_gray(doc, method=u'rgb_to_gray'):
     """Converts an arbitrary bit depth image to grayscale and writes it back
     appending a suffix.
     
@@ -47,12 +48,12 @@ def rgb_to_gray(doc, id=u'', method=u'rgb_to_gray'):
     Returns:
         unicode: Path of the output file.
     """
-    input_path = storage.get_abs_path(id, doc)
+    input_path = storage.get_abs_path(*doc)
     output_path = storage.insert_suffix(input_path, method)
-    return leper.rgb_to_gray(input_path, output_path)
+    return storage.get_storage_path(leper.rgb_to_gray(input_path, output_path))
 
 @app.task(name=u'binarize')
-def binarize(doc, id=u'', method=u'binarize', algorithm=u'sauvola', thresh=10,
+def binarize(doc, method=u'binarize', algorithm=u'sauvola', thresh=10,
         factor=0.3, mincount=50, bgval=255, smoothx=2, smoothy=2):
     """Binarizes an input document utilizing ether Sauvola or Otsu
     thresholding. Expects grayscale images as input.
@@ -72,23 +73,24 @@ def binarize(doc, id=u'', method=u'binarize', algorithm=u'sauvola', thresh=10,
     Returns:
         unicode: Path of the output file.
     """
-    input_path = storage.get_abs_path(id, doc)
+    input_path = storage.get_abs_path(*doc)
     if algorithm == u'sauvola':
         output_path = storage.insert_suffix(input_path, method, algorithm,
                                             unicode(thresh), unicode(factor))
-        return leper.sauvola_binarize(input_path, output_path, thresh, factor)
+        return storage.get_storage_path(leper.sauvola_binarize(input_path,
+            output_path, thresh, factor))
     elif algorithm == u'otsu':
         output_path = storage.insert_suffix(input_path, method, algorithm,
                                             unicode(thresh), unicode(mincount),
                                             unicode(bgval), unicode(smoothx),
                                             unicode(smoothy))
-        return leper.otsu_binarize(input_path, output_path, thresh, mincount,
-                                    bgval, smoothx, smoothy)
+        return storage.get_storage_path(leper.otsu_binarize(input_path,
+            output_path, thresh, mincount, bgval, smoothx, smoothy))
     else:
         raise IrisNoSuchAlgorithmException('No binarization ' + method + ' available')
 
 @app.task(name=u'dewarp')
-def dewarp(doc, id=u'', method=u'dewarp'):
+def dewarp(doc, method=u'dewarp'):
     """Removes perspective distortion (as commonly exhibited by overhead scans)
     from an 1bpp input image.
     
@@ -100,12 +102,12 @@ def dewarp(doc, id=u'', method=u'dewarp'):
     Returns:
         unicode: Path of the output file.
     """
-    input_path = storage.get_abs_path(id, doc)
+    input_path = storage.get_abs_path(*doc)
     output_path = storage.insert_suffix(input_path, method)
-    return leper.dewarp(input_path, output_path)
+    return storage.get_storage_path(leper.dewarp(input_path, output_path))
 
 @app.task(name=u'deskew')
-def deskew(doc, id=u'', method=u'deskew'):
+def deskew(doc, method=u'deskew'):
     """Removes skew (rotational distortion) from an 1bpp input image.
     
     Args:
@@ -116,12 +118,12 @@ def deskew(doc, id=u'', method=u'deskew'):
     Returns:
         unicode: Path of the output file.
     """
-    input_path = storage.get_abs_path(id, doc)
+    input_path = storage.get_abs_path(*doc)
     output_path = storage.insert_suffix(input_path, method)
-    return leper.deskew(input_path, output_path)
+    return storage.get_storage_path(leper.deskew(input_path, output_path))
 
 @app.task(name=u'ocr_tesseract')
-def ocr_tesseract(doc, id=u'', method=u'ocr_tesseract', languages=None):
+def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None):
     """Runs tesseract on an input document.
     
     Args:
@@ -133,9 +135,9 @@ def ocr_tesseract(doc, id=u'', method=u'ocr_tesseract', languages=None):
     Returns:
         unicode: Path of the output file.
     """
-    input_path = storage.get_abs_path(id, doc)
+    input_path = storage.get_abs_path(*doc)
     output_path = storage.insert_suffix(input_path, method, *languages)
-    return tesseract.ocr(input_path, output_path, languages)
+    return storage.get_storage_path(tesseract.ocr(input_path, output_path, languages))
 
 @app.task(name=u'ocr_ocropus')
 def ocr_ocropus(config):

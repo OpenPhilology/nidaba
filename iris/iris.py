@@ -55,10 +55,10 @@ def batch(config):
     res = []
     for sequence in product(config[u'input_files'], *config[u'actions']):
         method = getattr(tasks, sequence[1]['method'])
-        ch = chain(method.s(sequence[0], id=config['batch_id'], **(sequence[1])))
+        ch = chain(method.s((config['batch_id'], sequence[0]), **(sequence[1])))
         for seq in sequence[2:]:
             method = getattr(tasks, seq['method'])
-            ch |= method.s(id=config['batch_id'], **seq)
+            ch |= method.s(**seq)
         res.append(ch)
     r = group(res).apply_async()
     r.save()

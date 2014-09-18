@@ -84,7 +84,3 @@ The (absolute) path of the final output is contained in the result field of the 
 
 Issues
 ======
-
-* Currently the distributed storage medium has to be mounted in the same
-  location on each node. This is caused by the missing conversion of absolute
-  paths into storage module format (id, doc tuples).
