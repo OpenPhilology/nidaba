@@ -27,13 +27,28 @@
 #include <Python.h>
 #include <stdio.h>
 #include <libgen.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /* leper is Iris' wrapper around leptonica doing miscellaneous image processing
  * work that is too cumbersome or slow for python. */
 
+int exists(char *path) {
+	struct stat sb;
+	if(stat(path, &sb) || !S_ISREG(sb.st_mode)) {
+		return -1;
+	}
+	return 0;
+}
+
 /* Dewarps a single page. TODO: Create a function to build a dewarp model for a
  * whole codex and apply to all pages. */
 char *dewarp(char *in, char *out) {
+	
+	if(exists(in)) {
+		return NULL;
+	}
 	PIX *pix = pixRead(in);
 	if(!pix) {
 		return NULL;
@@ -61,6 +76,10 @@ static PyObject *leper_dewarp(PyObject *self, PyObject *args) {
 	char *in = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uin));
 	char *out = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uout));
 	char *r = dewarp(in, out);
+	if(r == NULL) {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
 	PyObject *ret = PyUnicode_FromString(r);
 	return ret;
 }
@@ -68,6 +87,11 @@ static PyObject *leper_dewarp(PyObject *self, PyObject *args) {
 
 /* Converts a 32bpp input image to an 8bpp grayscale one. */
 char *rgb_to_gray(char *in, char *out) {
+
+	if(exists(in)) {
+		return NULL;
+	}
+
 	PIX *pix = pixRead(in);
 	if(!pix) {
 		return NULL;
@@ -90,12 +114,20 @@ static PyObject *leper_rgb_to_gray(PyObject *self, PyObject *args) {
 	char *in = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uin));
 	char *out = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uout));
 	char *r = rgb_to_gray(in, out);
+	if(r == NULL) {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
 	PyObject *ret = PyUnicode_FromString(r);
 	return ret;
 }
 
 /* Runs a tiled localized binarization of the input images */
 char *sauvola_binarize(char *in, char *out, l_int32 thresh, l_float32 factor) {
+
+	if(exists(in)) {
+		return NULL;
+	}
 
 	PIX* pix = pixRead(in);
 	if(!pix) {
@@ -126,14 +158,20 @@ static PyObject *leper_sauvola_binarize(PyObject *self, PyObject *args) {
 	char *in = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uin));
 	char *out = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uout));
 	char *r = sauvola_binarize(in, out, thresh, factor);
+	if(r == NULL) {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
 	PyObject *ret = PyUnicode_FromString(r);
-	free(r);
 	return ret;
 }
 
 char *otsu_binarize(char *in, char *out, l_int32 thresh, l_int32 mincount,
 		  l_int32 bgval, l_int32 smoothx, l_int32 smoothy) {
 
+	if(exists(in)) {
+		return NULL;
+	}
 	PIX* pix = pixRead(in);
 	if(!pix) {
 		return NULL;
@@ -174,12 +212,20 @@ static PyObject *leper_otsu_binarize(PyObject *self, PyObject *args) {
 	char *out = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uout));
 	char *r = otsu_binarize(in, out, thresh, mincount, bgval, smoothx,
 			smoothy);
+	if(r == NULL) {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
 	PyObject *ret = PyUnicode_FromString(r);
-	free(r);
 	return ret;
 }
 
 char *deskew(char *in, char *out) {
+
+	if(exists(in)) {
+		return NULL;
+	}
+
 	PIX* pix = pixRead(in);
 	if(!pix) {
 		return NULL;
@@ -204,6 +250,9 @@ static PyObject *leper_deskew(PyObject *self, PyObject *args) {
 	char *in = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uin));
 	char *out = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uout));
 	char *r = deskew(in, out);
+	if(r == NULL) {
+		r =  Py_BuildValue("s", "");
+	}
 	PyObject *ret = PyUnicode_FromString(r);
 	return ret;
 }
