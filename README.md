@@ -76,11 +76,22 @@ exposed by the ''batch'' function of the iris package:
 ```
 >>> import iris
 >>> iris.batch({'batch_id': '1234', 'input_files': [u'input.tiff'], 'actions': [[{'method': 'rgb_to_gray'}], [{'method':'binarize', 'thresh': 10}, {'method': 'binarize', 'thresh': 5}], [{'method': 'ocr_tesseract', 'languages': ['eng']}]]})
-<GroupResult: 6222f675-330e-461c-94de-1d0ea0a2f444 [0cb9c912-1818-43d3-afd4-9f66e0b9b6f0, c47729a6-cbd6-4882-bec1-73f52400f6d9]>
+'6222f675-330e-461c-94de-1d0ea0a2f444'
 ```
 
-The (absolute) path of the final output is contained in the result field of the subtasks.
+Progress of the batch can be checked using the return value of the batch function:
 
+```
+>>> iris.get_progress('6222f675-330e-461c-94de-1d0ea0a2f444')
+(2, 4)
+```
+
+The final output can be gathered using the get_results function:
+
+```
+>>> iris.get_results('6222f675-330e-461c-94de-1d0ea0a2f444')
+[['1234', 'foo.txt'],['1234', 'bar.txt'] ...]
+```
 
 Issues
 ======
