@@ -9,7 +9,7 @@ from . import irisconfig
 from . import algorithms
 from . import tesseract
 from . import storage
-from . import leper
+# from . import leper
 
 import uuid
 import logging
