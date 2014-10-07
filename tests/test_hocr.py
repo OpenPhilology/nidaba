@@ -15,7 +15,6 @@ class HocrTests(unittest.TestCase):
 
     def tearDown(self):
         self.temp.close()
-        
 
     def test_simple_word_extract(self):
         self.temp.write("""<html><body><span class='ocrx_word' id='word_10' title="bbox 260 196 305 232">εἰς</span></body><html>""")
@@ -45,7 +44,8 @@ class HocrTests(unittest.TestCase):
 
         bboxes = hocr.extract_bboxes(self.temp)
         self.assertEqual([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)],
-                         bboxes[u'//*[@title]'])  
+                         bboxes[u'//*[@title]'])
+
     def test_bbox_extract_by_name(self):
         """
         Extract a single class of bboxes.
@@ -59,7 +59,6 @@ class HocrTests(unittest.TestCase):
         self.temp.seek(0,0)
         expected = {u"//*[@class='c1' and @title]":[(1,2,3,4),(5,6,7,8),(9,10,11,12)]}
         self.assertEqual(expected, hocr.extract_bboxes(self.temp, [u"//*[@class='c1' and @title]"]))
-
 
     def test_bbox_extract_by_name_multi(self):
         """

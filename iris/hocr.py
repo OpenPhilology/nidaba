@@ -33,7 +33,6 @@ class HocrContext(object):
         return False    # No exception suppression.
         # self.cr.restore()
 
-        
 def extract_words(context):
     """
     Extract all hocr words. Return a list of 2 tuples containing the
@@ -87,7 +86,7 @@ def extract_bboxes(hocr_file, xpaths=[ALL_BBOXES]):
 
 def drawbboxes(bboxes, pil_img, color='blue'):
     """
-    Draw all bboxes in the specified color. Returnss a 
+    Draw all bboxes in the specified color. Returnss a
     """
     draw = ImageDraw.Draw(pil_img)
     for bbox in bboxes:
@@ -120,7 +119,5 @@ def markbboxes(imgfile, hocrfile, tag_color_dict):
     return pil_img
 
 # def detect_word_lang(hocrfile, uni_blocks, threshold=1.0):
-    
-    
 
 # if __name__ == '__main__':
