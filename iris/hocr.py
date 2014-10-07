@@ -10,7 +10,8 @@ from PIL import Image, ImageDraw
 ALL_BBOXES = u"//*[@title]"
 PAGES = u"//*[@class='ocr_page' and @title]"
 LINES = u"//*[@class='ocr_line' and @title]"
-WORDS = u"//*[@class='ocrx_word' and @title]"
+WORDS = u"//*[@class='ocr_word' and @title]"
+XWORDS = u"//*[@class='ocrx_word' and @title]"
 
 
 class HocrContext(object):
