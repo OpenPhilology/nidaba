@@ -102,8 +102,8 @@ def load_sym_dict(path):
 @unibarrier
 def sym_suggest(ustr, dic, delete_dic, depth, ret_count=0):
     """
-    Return a list of "spelling" corrections using a symmetric deletion 
-    search. Dic is a set of correct words. Delete_dic is of the form 
+    Return a list of "spelling" corrections using a symmetric deletion
+    search. Dic is a set of correct words. Delete_dic is of the form
     {edit_term:[(candidate1, edit_distance), (candidate2, edit_distance), ...]}.
     """
     suggestions = set()
@@ -228,7 +228,7 @@ def todec(ustr):
 def deldict_bin_search(ustr, dictionary_path, line_buffer_size=200):
     """
     Perform a binary search on a memory mapped dictionary file, and
-    return the paresed entry, or None if the specified entry cannot be
+    return the parsed entry, or None if the specified entry cannot be
     found. This function assumes that the dictionary is properly
     formatted and well-formed, otherwise the behavior is undefined.
     Line buffer must not be shorter than the longest line in the
@@ -259,7 +259,7 @@ def deldict_bin_search(ustr, dictionary_path, line_buffer_size=200):
             elif key < ustr:
                 imin = mid + 1
             else:
-                imax = mid - 1 
+                imax = mid - 1
 
             count += 1
             if imin >= imax:
@@ -322,7 +322,7 @@ def deldict_bin_search(ustr, dictionary_path, line_buffer_size=200):
 #             elif key < ustr:
 #                 imin = mid + 1
 #             else:
-#                 imax = mid - 1 
+#                 imax = mid - 1
 
 #             count += 1
 #             if imin >= imax:
@@ -387,11 +387,11 @@ def load_del_dic(path, encoding='utf-8'):
         mm.close()
 
 # def set_pointer_to_prev(mm):
-    
+
 
 # @unibarrier
 # def get_entry(mm, ustr):
-    
+
 
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
@@ -402,7 +402,7 @@ def initmatrix(rows, columns, defaultval=0):
     return [[defaultval for j in xrange(columns)] for i in xrange(rows)]
 
 def mr(matrix):
-    """Returns a string rep of a 2d list as a matrix. Useful for 
+    """Returns a string rep of a 2d list as a matrix. Useful for
     debugging."""
     if matrix == []: return '[]'
     string = '['
@@ -495,7 +495,7 @@ def native_full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
             c2 = str2[j-1]
 
             scores = (('s', matrix[i-1][j-1] + charmatrix.get((c1, c2), substitutionscore)),
-                      ('i', matrix[i][j-1] + charmatrix.get((c1, c2), insertscore)), 
+                      ('i', matrix[i][j-1] + charmatrix.get((c1, c2), insertscore)),
                       ('d', matrix[i-1][j] + charmatrix.get((c1, c2), deletescore)))
             if str1[i-1] == str2[j-1]:
                 matrix[i][j] = matrix[i-1][j-1]
@@ -541,7 +541,7 @@ def np_backtrace(matrix, start=None):
 
     return path
 
-def np_align(str1, str2, substitutionscore=1, insertscore=1, deletescore=1, 
+def np_align(str1, str2, substitutionscore=1, insertscore=1, deletescore=1,
           charmatrix={}):
     """Calculate the edit distance of two strings, then backtrace to
     find a valid edit sequence."""
@@ -583,7 +583,7 @@ def np_semi_global_matrix(str1, str2, substitutionscore, insertscore, deletescor
                        charmatrix):
     """An initial matrix for a semi-global sequence alignment."""
     matrix = numpy.zeros(shape=(str1.size+1, str2.size+1))
-    
+
     # We assume that str1 >= str2.
     # This is guaranteed by the semi_global_align function.
     for i in xrange(1, matrix.shape[0]):
@@ -598,7 +598,7 @@ def np_full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
     """A modified implenmentation of the Wagner-Fischer algorithm using
     numpy. Unlike the minimal and optimized version in the
     "edit_distance" function, this returns the entire scoring matrix,
-    and an operation matrix for backtracing and reconstructing the 
+    and an operation matrix for backtracing and reconstructing the
     edit operations. This should be used when an alignment is desired,
     not only the edit distance."""
 
@@ -619,7 +619,7 @@ def np_full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
             c2 = str2[j-1]
 
             scores = (('s', matrix[i-1, j-1] + charmatrix.get((c1, c2), substitutionscore)),
-                      ('i', matrix[i, j-1] + charmatrix.get((c1, c2), insertscore)), 
+                      ('i', matrix[i, j-1] + charmatrix.get((c1, c2), insertscore)),
                       ('d', matrix[i-1, j] + charmatrix.get((c1, c2), deletescore)))
             if str1[i-1] == str2[j-1]:
                 matrix[i, j] = matrix[i-1, j-1]
@@ -657,7 +657,7 @@ def uniblock(start, stop):
     """
     ints = range(ord(start), ord(stop)+1)
 
-    return map(unichr, ints)  
+    return map(unichr, ints)
 
 def inblock(c, bounds):
     """
@@ -673,7 +673,7 @@ def identify(string, unicode_blocks):
     belong in each given unicode block. Ranges may be user defined, and
     not official unicode ranges. It is assumed that ranges do not
     overlap. unicode_blocks is an iterable of 3-tuples of the form
-    (<name of block>, <first unichar in block>, <last unichar in the 
+    (<name of block>, <first unichar in block>, <last unichar in the
     block>).
     """
     result = {b[0]:0 for b in unicode_blocks}
