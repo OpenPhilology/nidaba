@@ -130,28 +130,17 @@ def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
     depth.
     """
     suggestions = set()
-    # print 'generating dels'
     dels = strings_by_deletion(ustr, depth)
-    # print 'done'
-    # print 'the dels for <%s> are ' % ustr.encode('utf-8'), list_to_uni(dels)
-    # print 'search...'
     line_for_ustr = deldict_bin_search(ustr, del_dic_path)
-    # print 'done...'
     if line_for_ustr is not None:
         suggestions = suggestions.union(set(line_for_ustr[1]))
-    # print 'begin for'
     for s in dels:
-        # print 'Checking d...'
         if s in dic:
             suggestions.add(s)
-        # print 'done'
-        # else:
         line_for_s = deldict_bin_search(s, del_dic_path)
-        # if line_for_s is not None:
-        # else:
+
         if line_for_s is not None:
             suggestions = suggestions.union(set(line_for_s[1]))
-    # print 'returning...'
     return list(suggestions)
 
 @unibarrier
