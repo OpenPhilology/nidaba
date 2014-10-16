@@ -985,7 +985,6 @@ class LanguageTests(unittest.TestCase):
 # ----------------------------------------------------------------------
 
 class SymSpellTests(unittest.TestCase):
-
     def test_strings_by_deletion_1(self):
         """
         Test the strings_by_deletion function with one delete.
@@ -1221,59 +1220,102 @@ class SymSpellTests(unittest.TestCase):
             self.assertEqual(ex_f, algorithms.deldict_bin_search(u'fkey', dpath))
             self.assertEqual(None, algorithms.deldict_bin_search(u'gkey', dpath))
 
-    # def test_bz_previous_line_no_newline(self):
-    #     """
-    #     Test the bz newline function when it should move to the
-    #     beginning of the file.
-    #     """
-    #     td = tempfile.mkdtemp()
-    #     with bz2.BZ2File(os.path.join(td, 'temp-bz.bz2'), 'w') as f:
-    #         f.write(u'abc'.encode('utf-8'))
-    #         f.close()
+            
+class SpellCheckTests(unittest.TestCase):
 
-    #     with bz2.BZ2File(os.path.join(td, 'temp-bz.bz2'), 'r') as f:
-    #         self.assertEqual(0, algorithms.bz_prev_newline(f, len(u'abc')))
+    def setUp(self):
+        self.temp = tempfile.NamedTemporaryFile()
+        self.temp.write(u'123 : 1234\n')
+        self.temp.write(u'124 : 1234\n')
+        self.temp.write(u'134 : 1234\n')
+        self.temp.write(u'234 : 1234\n')
+        self.temp.write(u'aaaa : aaaaa\n')
+        self.temp.write(u'bbbb : bbbbb\n')
+        self.temp.seek(0, 0)
 
-    # def test_bz_previous_line_single_overflow(self):
-    #     td = tempfile.mkdtemp()
-    #     with bz2.BZ2File(os.path.join(td, 'temp-bz.bz2'), 'w') as f:
-    #         f.write(u'abc\ndef'.encode('utf-8'))
-    #         f.close()
-    #     with bz2.BZ2File(os.path.join(td, 'temp-bz.bz2'), 'r') as f:
-    #         # Test the points to the left of the newline character
-    #         self.assertEqual(0, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
-    #         f.seek(1)
-    #         self.assertEqual(0, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
-    #         f.seek(2)
-    #         self.assertEqual(0, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
-    #         f.seek(3)
-    #         self.assertEqual(0, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
+        self.dic = set()
+        self.dic.add(u'aaaaa')
+        self.dic.add(u'bbbbb')
+        self.dic.add(u'1234')
 
-    #         # Test the points to the right of the newline character
-    #         f.seek(4)
-    #         self.assertEqual(4, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
-    #         f.seek(5)
-    #         self.assertEqual(4, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
-    #         f.seek(6)
-    #         self.assertEqual(4, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
-    #         f.seek(7)
-    #         self.assertEqual(4, algorithms.bz_prev_newline(f, len(u'abc\ndef')))
+    def tearDown(self):
+        self.temp.close()
+
+    def test_suggest_empty_string_1(self):
+        """
+        Test the spelling suggestor with an empty input string
+        """
+        result = algorithms.mapped_sym_suggest(u'',
+                                                self.temp.name.decode('utf-8'),
+                                                self.dic, 1)
+        self.assertEqual(len(result[u'ins']), 0)
+        self.assertEqual(len(result[u'dels']), 0)
+        self.assertEqual(len(result[u'subs']), 0)
+        self.assertEqual(len(result[u'ins+dels']), 0)
 
 
+    def test_suggest_1_insert(self):
+        """
+        Test the spellchecker in the case of a single delete.
+        """
+        result_a = algorithms.mapped_sym_suggest(u'aaaa',
+                                                self.temp.name.decode('utf-8'),
+                                                self.dic, 1)
+        result_b = algorithms.mapped_sym_suggest(u'bbbb',
+                                                self.temp.name.decode('utf-8'),
+                                                self.dic, 1)
+        self.assertEqual(len(result_a[u'ins']), 1)
+        self.assertEqual(len(result_a[u'dels']), 0)
+        self.assertEqual(len(result_a[u'subs']), 0)
+        self.assertEqual(len(result_a[u'ins+dels']), 0)
 
-    # def test_mapped_sym_suggest(self):
-    #     """
-    #     Test the disk-mapped suggestor.
-    #     """
-    #     df = tempfile.NamedTemporaryFile()
-    #     df.write('akey : aval\n')
-    #     df.write('bkey : bval\n')
-    #     df.write('ckey : cval\n')
-    #     df.write('dkey : dval\n')
-    #     df.write('ekey : eval\n')
-    #     df.write('fkey : fval\n')
+        self.assertEqual(len(result_b[u'ins']), 1)
+        self.assertEqual(len(result_b[u'dels']), 0)
+        self.assertEqual(len(result_b[u'subs']), 0)
+        self.assertEqual(len(result_b[u'ins+dels']), 0)
+
+    def test_suggest_1_delete(self):
+        """
+        Test the spellchecker in the case of a single delete.
+        """
+        result_a = algorithms.mapped_sym_suggest(u'aaXaaa',
+                                                self.temp.name.decode('utf-8'),
+                                                self.dic, 1)
+        result_b = algorithms.mapped_sym_suggest(u'Xbbbbb',
+                                                self.temp.name.decode('utf-8'),
+                                                self.dic, 1)
+
+        self.assertEqual(len(result_a[u'ins']), 0)
+        self.assertEqual(len(result_a[u'dels']), 1)
+        self.assertEqual(len(result_a[u'subs']), 0)
+        self.assertEqual(len(result_a[u'ins+dels']), 0)
+
+        self.assertEqual(len(result_b[u'ins']), 0)
+        self.assertEqual(len(result_b[u'dels']), 1)
+        self.assertEqual(len(result_b[u'subs']), 0)
+        self.assertEqual(len(result_b[u'ins+dels']), 0)
 
 
+    def test_suggest_1_substitute(self):
+        """
+        Test the spellchecker in the case of a single delete.
+        """
+        result_a = algorithms.mapped_sym_suggest(u'aaXaa',
+                                                self.temp.name.decode('utf-8'),
+                                                self.dic, 1)
+        result_b = algorithms.mapped_sym_suggest(u'Xbbbb',
+                                                self.temp.name.decode('utf-8'),
+                                                self.dic, 1)
+
+        self.assertEqual(len(result_a[u'ins']), 0)
+        self.assertEqual(len(result_a[u'dels']), 0)
+        self.assertEqual(len(result_a[u'subs']), 1)
+        self.assertEqual(len(result_a[u'ins+dels']), 0)
+
+        self.assertEqual(len(result_b[u'ins']), 0)
+        self.assertEqual(len(result_b[u'dels']), 0)
+        self.assertEqual(len(result_b[u'subs']), 1)
+        self.assertEqual(len(result_b[u'ins+dels']), 0)
 
 
 if __name__ == '__main__':

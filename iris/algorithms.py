@@ -129,19 +129,33 @@ def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
     suggestions at the specified depth, not up to and including that
     depth.
     """
-    suggestions = set()
+    deletes = set()
+    inserts = set()
+    int_and_dels = set()
+    subs = set()
+
     dels = strings_by_deletion(ustr, depth)
     line_for_ustr = deldict_bin_search(ustr, del_dic_path)
     if line_for_ustr is not None:
-        suggestions = suggestions.union(set(line_for_ustr[1]))
+        inserts = set(w for w in line_for_ustr[1])  # get the words reachable by adding to ustr.
     for s in dels:
         if s in dic:
-            suggestions.add(s)
-        line_for_s = deldict_bin_search(s, del_dic_path)
+            deletes.add(s) # Add a word reachable by deleting from ustr.
 
+        line_for_s = deldict_bin_search(s, del_dic_path)
         if line_for_s is not None:
-            suggestions = suggestions.union(set(line_for_s[1]))
-    return list(suggestions)
+            # Get the words reachable by deleting from originals, adding to them.
+            # Note that this is NOT the same as 'Levehsein' substitution.
+            for sug in line_for_s[1]:
+                distance = edit_distance(sug, ustr)
+                if distance == depth:
+                    subs.add(sug)
+                elif distance > depth:
+                    int_and_dels.add(sug)
+                else:   #Only possible if ustr is in the dictionary; hence distance == 0.
+                    pass
+
+    return {u'dels':deletes, u'ins':inserts, u'subs':subs, u'ins+dels':int_and_dels}
 
 @unibarrier
 def edits1(ustr, alphabet):
@@ -211,6 +225,12 @@ def todec(ustr):
         uthex += u'<' + cp + u'>' + u',' + unicode(ord(cp)) + u':'
     return uthex.encode('utf-8')
 
+
+@unibarrier
+def truestring(unicode):
+    out = u'<' + u':'.join([u for u in unicode]) + u'>'
+    return out
+
 # TODO Implement doubling-length backward search to make line_buffer_size
 # irrelevant.
 @unibarrier
@@ -254,70 +274,6 @@ def deldict_bin_search(ustr, dictionary_path, line_buffer_size=200):
             if imin >= imax:
                 break
         return None
-
-
-# def bz_prev_newline(bzf, unc_len, line_buffer_size=200):
-#     # bzf.seek(bzf.tell - line_buffer_size)
-#     # TODO this fails on a line greater than line_buffer_size in length
-#     # print type(bzf)
-#     op = bzf.tell()
-#     # print 'first op is %i' % op
-#     np = op - line_buffer_size
-#     bzf.seek(np)
-#     # print 'second np is %i' % np
-#     # print bzf.tell()
-#     # print 'third= np is %i' % np
-#     while np < op:
-#         # print 'looping'
-#         bzf.readline()
-#         np = bzf.tell()
-#     # print 'will return %i' % np
-#     if bzf.tell() == unc_len:
-#         print 'returning 0 by default'
-#         return 0
-#     else:
-#         print 'returning %i' % np
-#         return np
-
-# @unibarrier
-# def bz_deldict_bin_search(ustr, dictionary_path, unc_len, line_buffer_size=200):
-#     def current_key(archive):
-#         start = archive.tell()
-#         rawline = archive.readline()
-#         archive.seek(start)
-#         return parse_sym_entry(rawline.decode(u'utf-8'))
-
-
-
-#     import bz2
-#     with bz2.BZ2File(dictionary_path, 'r', ) as f:
-#         print 'reading comp lines...'
-#         print f.readline()
-#         print f.readline()
-#         print f.readline()
-#         print 'done reading lines.'
-#         imin = 0
-#         imax = unc_len
-#         count = 0
-#         while True:
-#             mid = imin + int(math.floor((imax - imin)/2))
-#             f.seek(mid)
-#             f.seek(bz_prev_newline(f))
-#             parsedline = current_key(f)
-#             key = parsedline[0]
-
-#             if key == ustr:
-#                 return parsedline
-#             elif key < ustr:
-#                 imin = mid + 1
-#             else:
-#                 imax = mid - 1
-
-#             count += 1
-#             if imin >= imax:
-#                 break
-#         return None
-
 
 def load_del_dic(path, encoding='utf-8'):
     # mfd = os.open(path, os.O_RDONLY)
