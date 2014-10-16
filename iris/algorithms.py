@@ -145,7 +145,7 @@ def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
         line_for_s = deldict_bin_search(s, del_dic_path)
         if line_for_s is not None:
             # Get the words reachable by deleting from originals, adding to them.
-            # Note that this is NOT the same as 'Levehsein' substitution.
+            # Note that this is NOT the same as 'Levenshtein' substitution.
             for sug in line_for_s[1]:
                 distance = edit_distance(sug, ustr)
                 if distance == depth:
