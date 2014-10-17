@@ -26,12 +26,15 @@ class hocrWord():
 class hocrLine():
     """Associates lines, words with their text and bboxes"""
 
-def parse_bbox(stringIn):
-    dimensions = stringIn.split()
-    if not dimensions[0] == 'bbox' or not len(dimensions) == 5:
-        raise ValueError('bounding box not in proper format: "%s"'%dimensions)
-    a_rect = Rect((int(dimensions[1]),int(dimensions[2])),(int(dimensions[3]),int(dimensions[4])))
-    return a_rect
+def parse_bbox(prop_str):
+    """Parses the property string in the title field."""
+    for prop in prop_str.split(';'):
+        p = prop.split()
+        if p[0] == 'bbox':
+            return Rect((p[1], p[2]),(p[3], p[4]))
+        else:
+            continue
+    raise ValueError('bounding box not in proper format')
 
 def get_hocr_lines_for_tree(treeIn):
     root = treeIn.getroot()
@@ -118,7 +121,6 @@ def merge(docs, lang, output):
     tree1 = etree.parse(storage.get_abs_path(docs[0][0], docs[0][1]))
     lines_1, words_1 = get_hocr_lines_for_tree(tree1)
     sort_words_bbox(words_1)
-    
     other_words = []
     for doc in docs[1:]:
         try:
@@ -132,7 +134,7 @@ def merge(docs, lang, output):
     positional_lists = []
     positional_list = []
     x = 0
-    
+   
     # Make a list of positional_lists, that is alternatives for a give position,
     # skipping duplicate position-words
     while x < len(other_words):
@@ -155,7 +157,7 @@ def merge(docs, lang, output):
     # we now have a list of list of unique words for each position
     # let's select from each the first one that passes spellcheck
     replacement_words = []
-    
+   
     #make a 'replacement_words' list with all of the best, non-zero-scoring
     #suggestions for each place
     for positional_list in positional_lists:
@@ -164,7 +166,7 @@ def merge(docs, lang, output):
         positional_list.sort(key=attrgetter('score'), reverse=True)
         if positional_list[0].score > 0:
             replacement_words.append(positional_list[0])
-    
+
     #now replace the originals
     for word in words_1:
         for replacement_word in replacement_words:
@@ -177,6 +179,6 @@ def merge(docs, lang, output):
             print "##"
             for word in positional_list:
                 print word.bbox, word.text
-   
-    storage.write_text(*output, text=etree.tostring(tree1.getroot(), encoding='unicode', xml_declaration=True))
+  
+    storage.write_text(*output, text=etree.tostring(tree1.getroot(), encoding='unicode'))
     return output
