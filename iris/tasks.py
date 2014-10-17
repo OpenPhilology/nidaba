@@ -124,7 +124,7 @@ def deskew(doc, method=u'deskew'):
     return storage.get_storage_path(leper.deskew(input_path, output_path))
 
 @app.task(name=u'blend_hocr')
-def deskew(docs, language=u'',  method=u'blend_hocr'):
+def blend_hocr(docs, language=u'',  method=u'blend_hocr'):
     """Blends multiple hOCR files using the algorithm from Bruce Robertsons
     rigaudon. It requires a working spell checking for the input document's
     language; otherwise all matched bboxes will be bunched together without any
