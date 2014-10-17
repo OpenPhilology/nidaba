@@ -93,5 +93,18 @@ The final output can be gathered using the get_results function:
 [['1234', 'foo.txt'],['1234', 'bar.txt'] ...]
 ```
 
+
+Recommendations
+===============
+
+There are no sane default thresholds for the binarization algorithms as correct
+values are highly dependent on the nature and quality of the input documents.
+Some sensible values as used by Bruce Robertsons rigaudon for Otsu's
+thresholding ({'method': 'binarize', 'algorithm': 'otsu'}) are:
+
+```
+0.94,0.97,1.0,1.03,1.05,1.07,1.09,1.12,1.15,1.17
+```
+
 Issues
 ======
