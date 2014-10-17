@@ -10,6 +10,7 @@ from . import algorithms
 from . import tesseract
 from . import storage
 from . import leper
+from . import merge_hocr
 from .irisexceptions import IrisNoSuchAlgorithmException
 
 import uuid
@@ -121,6 +122,28 @@ def deskew(doc, method=u'deskew'):
     input_path = storage.get_abs_path(*doc)
     output_path = storage.insert_suffix(input_path, method)
     return storage.get_storage_path(leper.deskew(input_path, output_path))
+
+@app.task(name=u'blend_hocr')
+def deskew(docs, language=u'',  method=u'blend_hocr'):
+    """Blends multiple hOCR files using the algorithm from Bruce Robertsons
+    rigaudon. It requires a working spell checking for the input document's
+    language; otherwise all matched bboxes will be bunched together without any
+    scoring.
+    
+    Args:
+        docs [(id, path), ...]: A list of storage module tupels that will be
+        merged into a single output document.
+        language (unicode): Language used for spell-checking based scoring. If
+        not defined no scoring will be used.
+        method (unicode): The suffix string appended to the output file.
+
+
+    Returns:
+        unicode: Path of the output file.
+    """
+    input_path = storage.get_abs_path(*docs[0])
+    output_path = storage.insert_suffix(input_path, method)
+    return merge_hocr.merge(docs, language, storage.get_storage_path(output_path))
 
 @app.task(name=u'ocr_tesseract')
 def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None):
