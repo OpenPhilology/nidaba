@@ -11,6 +11,8 @@ from celery import chain
 from celery import group
 from celery.result import GroupResult
 
+import sys
+
 def batch(config):
     """Creates a series of celery tasks OCRing a set of documents (among other
     things).

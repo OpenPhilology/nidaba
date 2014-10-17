@@ -25,4 +25,7 @@ setup(
     tests_require="nose",
     install_requires=reqs,
     zip_safe = False,
+    entry_points = {
+        'console_scripts': 'iris = iris.cli:main'
+    }
 )
