@@ -152,8 +152,6 @@ def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
                     subs.add(sug)
                 elif distance > depth:
                     int_and_dels.add(sug)
-                else:   #Only possible if ustr is in the dictionary; hence distance == 0.
-                    pass
 
     return {u'dels':deletes, u'ins':inserts, u'subs':subs, u'ins+dels':int_and_dels}
 
