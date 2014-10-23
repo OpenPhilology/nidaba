@@ -12,7 +12,6 @@ celery==3.1.13
 celery-with-redis==3.0
 certifi==14.05.14
 flower==0.7.2
-fs==0.5.0
 itsdangerous==0.24
 kitchen==1.1.1
 kombu==3.0.21
