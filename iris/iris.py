@@ -54,17 +54,34 @@ def batch(config):
     if u'batch_id' not in config:
         raise IrisInputException('No batch ID given.')
 
+    groups = []
     res = []
-    for sequence in product(config[u'input_files'], *config[u'actions']):
+    # first sequence contains the input files 
+    for sequence in product(config[u'input_files'], *config[u'actions'][0]):
         method = getattr(tasks, sequence[1]['method'])
         ch = chain(method.s((config['batch_id'], sequence[0]), **(sequence[1])))
         for seq in sequence[2:]:
             method = getattr(tasks, seq['method'])
             ch |= method.s(**seq)
         res.append(ch)
-    r = group(res).apply_async()
-    r.save()
-    return r.id
+    groups.append(res)
+    if len(config[u'actions']) > 1:
+        for tset in config[u'actions'][1:]:
+            res = []
+            for sequence in product(*tset):
+                method = getattr(tasks, sequence[0]['method'])
+                ch = chain(method.s(**(sequence[0])))
+                for seq in sequence[1:]:
+                    method = getattr(tasks, seq['method'])
+                    ch |= method.s(**seq)
+                res.append(ch)
+            groups.append(res)
+        r = chain([group(x) for x in groups]).apply_async()
+        return r.id
+    else:
+        r = group(groups[0]).apply_async()
+        r.save()
+        return r.id
 
 def get_progress(task_id):
     r = GroupResult.restore(task_id)
