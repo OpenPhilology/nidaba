@@ -21,3 +21,6 @@ STORAGE_PATH = '~/OCR'
 
 LANG_DICTS = { 'polytonic_greek': 'greek.dic',  'lojban': 'test/lojban.txt', 'german': 'test/german.txt'}
 DICT_PATH = './dictionaries'
+
+# Old tesseract version create hOCR files ending in .html, current ones .hocr
+OLD_TESSERACT = False
