@@ -59,12 +59,15 @@ $ setup.py test
 
 As mentioned above pip has to be installed.
 
+Running the tests requires a working tesseract with ancient greek language
+files. 
 
 Running
 =======
 
 First edit celeryconfig.py and irisconfig.py to fit your needs. Running a
-distributed cluster requires a shared storage medium (e.g. NFS) on all nodes. Then start up the celery daemon with something like:
+distributed cluster requires a shared storage medium (e.g. NFS) on all nodes.
+Then start up the celery daemon with something like:
 
 ```
 $ celery -A iris.tasks worker
