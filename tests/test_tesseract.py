@@ -28,7 +28,7 @@ class TesseractTests(unittest.TestCase):
         outpath = os.path.join(self.tempdir, 'output')
         ocr = tesseract.ocr(pngpath, outpath, ['grc'])
         expected = outpath + '.html'
-        self.assertEqual(ocr[0], expected)
+        self.assertEqual(ocr, expected)
         self.assertTrue(os.path.isfile(expected),
                         msg='Tesseract did not output a file!')
         try:
