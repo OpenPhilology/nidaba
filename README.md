@@ -50,6 +50,9 @@ format libraries and their headers (libtiff, libpng, libjpeg) or run:
 $ apt-get build-dep leptonlib
 ```
 
+If you are building leptonica from source at a nonstandard prefix, be sure
+to pass the following arguments to build_ext: -R &lt;prefix&gt;/lib -I &lt;prefix&gt;/include -L &lt;prefix&gt;/lib
+
 Tests
 =====
 
@@ -61,6 +64,10 @@ As mentioned above pip has to be installed.
 
 Running the tests requires a working tesseract with ancient greek language
 files. 
+
+Note that users of Python 2.7.3 (The version in Debian Wheezy) will see
+[this][1] error after a successful run of setup.py test.
+This is a bug in Python 2.7.3 and is patched in later versions.
 
 Running
 =======
@@ -111,3 +118,5 @@ thresholding ({'method': 'binarize', 'algorithm': 'otsu'}) are:
 
 Issues
 ======
+
+[1]:https://github.com/travis-ci/travis-ci/issues/1778
