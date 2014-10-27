@@ -273,69 +273,6 @@ def deldict_bin_search(ustr, dictionary_path, line_buffer_size=200):
                 break
         return None
 
-def load_del_dic(path, encoding='utf-8'):
-    # mfd = os.open(path, os.O_RDONLY)
-    # data = mmap.mmap(mfd, 0, prot=mmap.PROT_READ)
-    with codecs.open(path, 'r+b') as f:
-        # memory-map the file, size 0 means whole file
-        mm = mmap.mmap(f.fileno(), 0)
-        lines = 6
-        words = []
-        for i in xrange(0,6):
-            print mm.readline()
-            print mm.tell()
-            # next_line = mm.find(u'\n')
-            # words.append(mm[mm.tell():next_line].decode('utf-8'))
-            # print words[i].encode('utf-8')
-            # mm.seek(next_line + 1)
-        # print mm.tell()
-        # print mm[mm.tell():mm.find(u'\n')]
-        # print mm[mm.tell():mm.find(u'\n')]
-
-
-
-
-
-
-
-        # print data.decode('utf-8'), type(data.decode('utf-8'))
-        # print 'line is <%s>' % mm.readline().strip().decode('utf-8')
-        # print 'line is <%s>' % mm.readline().strip().decode('utf-8')
-
-        # t = mm.readline()
-        # print t, type(t)
-        # print t.decode('utf-8').encode('utf-8')
-
-        # print mm.readline().strip()
-        # print mm.readline().strip()
-        # print mm.readline().strip()
-
-
-
-
-
-        # read content via standard file methods
-        # print mm.readline()  # prints "Hello Python!"
-        # read content via slice notation
-        # print mm[:5]  # prints "Hello"
-        # for i in xrange(0,50):
-        #     print mm[i]
-        # update content using slice notation;
-        # note that new content must have same size
-        # mm[6:] = " world!\n"
-        # ... and read again using standard file methods
-        # mm.seek(0)
-        # print mm.readline()  # prints "Hello  world!"
-        # close the map
-        mm.close()
-
-# def set_pointer_to_prev(mm):
-
-
-# @unibarrier
-# def get_entry(mm, ustr):
-
-
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
