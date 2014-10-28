@@ -141,6 +141,7 @@ def blend_hocr(docs, language=u'',  method=u'blend_hocr'):
     Returns:
         unicode: Path of the output file.
     """
+    # create the output document path from the first input document
     input_path = storage.get_abs_path(*docs[0])
     output_path = storage.insert_suffix(input_path, method)
     return merge_hocr.merge(docs, language, storage.get_storage_path(output_path))
@@ -167,3 +168,9 @@ def ocr_ocropus(config):
     """Runs ocropus on the input documents set."""
     pass
 
+# dummy task to work around celery brokenness
+@app.task(name=u'sync')
+def sync(arg):
+    """Takes ones argument and returns it. Used to synchronized stuff as
+    chaining groups is not possible with the current celery version."""
+    return arg

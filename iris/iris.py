@@ -9,7 +9,7 @@ from itertools import product
 from celery import Celery
 from celery import chain
 from celery import group
-from celery.result import GroupResult
+from celery.result import AsyncResult
 
 import sys
 
@@ -64,7 +64,8 @@ def batch(config):
             method = getattr(tasks, seq['method'])
             ch |= method.s(**seq)
         res.append(ch)
-    groups.append(res)
+    groups.append(group(res))
+    groups.append(tasks.sync.s())
     if len(config[u'actions']) > 1:
         for tset in config[u'actions'][1:]:
             res = []
@@ -75,21 +76,18 @@ def batch(config):
                     method = getattr(tasks, seq['method'])
                     ch |= method.s(**seq)
                 res.append(ch)
-            groups.append(res)
-        r = chain([group(x) for x in groups]).apply_async()
-        return r.id
-    else:
-        r = group(groups[0]).apply_async()
-        r.save()
-        return r.id
+            groups.append(group(res))
+            groups.append(tasks.sync.s())
+    r = chain(groups).apply_async()
+    return r.id
 
 def get_progress(task_id):
-    r = GroupResult.restore(task_id)
+    r = AsyncResult(task_id)
     return (r.completed_count(), len(r.subtasks))
 
 def get_results(task_id):
-    r = GroupResult.restore(task_id)
+    r = AsyncResult(task_id)
     if r.ready() and r.successful():
-        return r.get()
+        return r.result
     else:
         return None
