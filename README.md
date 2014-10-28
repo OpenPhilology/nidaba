@@ -85,9 +85,41 @@ exposed by the ''batch'' function of the iris package:
 
 ```
 >>> import iris
->>> iris.batch({'batch_id': '1234', 'input_files': [u'input.tiff'], 'actions': [[{'method': 'rgb_to_gray'}], [{'method':'binarize', 'thresh': 10}, {'method': 'binarize', 'thresh': 5}], [{'method': 'ocr_tesseract', 'languages': ['eng']}]]})
+>>> iris.iris.batch({'batch_id': u'1234', 'input_files': [u'input.tiff'], 'actions': 
+[
+	[
+		[{'method': 'rgb_to_gray'}], 
+		[{'method':'binarize', 'thresh': 10}, {'method': 'binarize', 'thresh': 5}], 
+		[{'method': 'ocr_tesseract', 'languages': ['eng']}]
+	],
+	[
+		[{'method': 'blend_hocr'}]
+	]
+]})
 '6222f675-330e-461c-94de-1d0ea0a2f444'
 ```
+
+For the less telepathically inclined: batch_id is a unique descriptor
+identifying the batch, input_files are obviously the input data, situated in
+the storage backend under the batch_id, and actions are the transformations
+applied to the input data. Those are a list of lists of lists where the
+innermost lists are methods running in parallel, while middle and outermost
+list(s) are run sequentially. So the above example is converted to 2 execution
+chains the run in parallel
+
+```
+rgb_to_gray -> binarize (thresh: 10) -> ocr_tesseract
+rgb_to_gray -> binarize (thresh: 5) -> ocr_tesseract
+```
+
+After these are finished (next outer list) new execution chains will be created
+from the next list (in this case just one):
+
+```
+merge_hocr
+```
+The final result will be the return value(s) of the last method(s) of the last
+chain(s).
 
 Progress of the batch can be checked using the return value of the batch function:
 
@@ -120,3 +152,6 @@ Issues
 ======
 
 [1]:https://github.com/travis-ci/travis-ci/issues/1778
+
+* Unparametrized function are run several times, for example rgb_to_gray will
+  be run for all chains even though the output will be identical on each run.
