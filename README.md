@@ -148,6 +148,13 @@ thresholding ({'method': 'binarize', 'algorithm': 'otsu'}) are:
 94,97,100,103,105,107,109,112,115,117
 ```
 
+Ocropus' binarization parameters using Sauvola are:
+
+```
+{'method': 'binarize', 'thresh': 40, 'factor': 0.3}
+```
+
+
 Issues
 ======
 
