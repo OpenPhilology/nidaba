@@ -124,8 +124,8 @@ chain(s).
 Progress of the batch can be checked using the return value of the batch function:
 
 ```
->>> iris.get_progress('6222f675-330e-461c-94de-1d0ea0a2f444')
-(2, 4)
+>>> iris.get_state('6222f675-330e-461c-94de-1d0ea0a2f444')
+PENDING
 ```
 
 The final output can be gathered using the get_results function:

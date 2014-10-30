@@ -81,9 +81,9 @@ def batch(config):
     r = chain(groups).apply_async()
     return r.id
 
-def get_progress(task_id):
+def get_state(task_id):
     r = AsyncResult(task_id)
-    return (r.completed_count(), len(r.subtasks))
+    return r.state
 
 def get_results(task_id):
     r = AsyncResult(task_id)
