@@ -11,7 +11,6 @@ billiard==3.3.0.18
 celery==3.1.16
 celery-with-redis==3.0
 certifi==14.05.14
-flower==0.7.3
 itsdangerous==0.24
 kitchen==1.1.1
 kombu==3.0.23
@@ -24,5 +23,4 @@ pytz==2014.7
 redis==2.10.3
 requests==2.4.3
 six==1.8.0
-tornado==4.0.2
 wsgiref==0.1.2
