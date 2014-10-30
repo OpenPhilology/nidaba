@@ -251,7 +251,8 @@ static PyObject *leper_deskew(PyObject *self, PyObject *args) {
 	char *out = PyString_AsString(PyUnicode_AsUTF8String((PyObject *)uout));
 	char *r = deskew(in, out);
 	if(r == NULL) {
-		r =  Py_BuildValue("s", "");
+		Py_INCREF(Py_None);
+		return Py_None;
 	}
 	PyObject *ret = PyUnicode_FromString(r);
 	return ret;
