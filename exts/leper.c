@@ -85,7 +85,7 @@ static PyObject *leper_dewarp(PyObject *self, PyObject *args) {
 }
 
 
-/* Converts a 32bpp input image to an 8bpp grayscale one. */
+/* Converts an arbitrary depth input image to an 8bpp grayscale one. */
 char *rgb_to_gray(char *in, char *out) {
 
 	if(exists(in)) {
@@ -97,7 +97,8 @@ char *rgb_to_gray(char *in, char *out) {
 		return NULL;
 	}
         PIX *r;
-	if((r = pixConvertRGBToGray(pix, 0.0, 0.0, 0.0)) == NULL) {
+
+	if((r = pixConvertRGBToGray(pixConvertTo32(pix), 0.0, 0.0, 0.0)) == NULL) {
 		return NULL;
 	}
 	pixWriteImpliedFormat(out, r, 100, 0);
