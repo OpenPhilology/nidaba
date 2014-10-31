@@ -13,3 +13,8 @@ LANG_DICTS = { u'polytonic_greek': (u'dicts', u'greek.dic'),
 
 # Old tesseract version create hOCR files ending in .html, current ones .hocr
 OLD_TESSERACT = False
+
+# Ocropus configuration
+OCROPUS_MODELS = { u'greek': (u'models', u'greek.pyrnn.gz'),
+                   u'atlantean': (u'models', u'atlantean.pyrnn.gz'),
+                   u'fraktur': (u'models', u'fraktur.pyrnn.gz')}

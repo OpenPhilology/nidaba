@@ -164,9 +164,12 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None):
     return storage.get_storage_path(tesseract.ocr(input_path, output_path, languages))
 
 @app.task(name=u'ocr_ocropus')
-def ocr_ocropus(config):
+def ocr_ocropus(doc, method=u'ocr_ocropus'):
     """Runs ocropus on the input documents set."""
-    pass
+    input_path = storage.get_abs_path(*doc)
+    output_path = storage.insert_suffix(input_path, method, *languages)
+    model = get_abs_path(*irisconfig.OCROPUS_MODELS[model])
+    return storage.get_storage_path(ocropus.ocr(input_path, output_path, model))
 
 # dummy task to work around celery brokenness
 @app.task(name=u'sync')
