@@ -8,6 +8,7 @@ from . import celeryconfig
 from . import irisconfig
 from . import algorithms
 from . import tesseract
+from . import ocropus
 from . import storage
 from . import leper
 from . import merge_hocr
@@ -164,11 +165,11 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None):
     return storage.get_storage_path(tesseract.ocr(input_path, output_path, languages))
 
 @app.task(name=u'ocr_ocropus')
-def ocr_ocropus(doc, method=u'ocr_ocropus'):
+def ocr_ocropus(doc, method=u'ocr_ocropus', model=None):
     """Runs ocropus on the input documents set."""
     input_path = storage.get_abs_path(*doc)
-    output_path = storage.insert_suffix(input_path, method, *languages)
-    model = get_abs_path(*irisconfig.OCROPUS_MODELS[model])
+    output_path = storage.insert_suffix(input_path, method, model)
+    model = storage.get_abs_path(*irisconfig.OCROPUS_MODELS[model])
     return storage.get_storage_path(ocropus.ocr(input_path, output_path, model))
 
 # dummy task to work around celery brokenness
