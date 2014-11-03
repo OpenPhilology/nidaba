@@ -50,14 +50,22 @@ format libraries and their headers (libtiff, libpng, libjpeg) or run:
 $ apt-get build-dep leptonlib
 ```
 
-If you are building leptonica from source at a nonstandard prefix, be sure
-to pass the following arguments to build_ext: -R &lt;prefix&gt;/lib -I &lt;prefix&gt;/include -L &lt;prefix&gt;/lib
+If you are building leptonica from source at a nonstandard prefix, be sure to
+pass the following arguments to build_ext: -R &lt;prefix&gt;/lib -I
+&lt;prefix&gt;/include -L &lt;prefix&gt;/lib
+
+Per default no dictionaries and OCR models (including data necessary to run
+tests) are installed. To download the necessary files run:
+
+```
+$ python setup.py download
+```
 
 Tests
 =====
 
 ```
-$ setup.py test
+$ python setup.py test
 ```
 
 As mentioned above pip has to be installed.
