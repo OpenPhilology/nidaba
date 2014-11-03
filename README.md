@@ -5,12 +5,6 @@ Iris is the central controller for the entire OGL OCR pipeline. It oversees and
 automates the process of converting raw images into citable collections of
 digitized texts. Images can be uploaded directly via Iris' RESTful web portal,
 or can be selected from preexisting images located on Iris' image repository.
-All images and texts processed by Iris are uniquely identifiable and
-retrievable through automatically generated URNs which Iris automatically
-assigns to everything it processes. In addition, all texts produced by Iris can
-be edited or revised concurrently by an arbitrary number of users without data
-loss. For more information on Iris' implementation, see docs/schematic.png
-
 
 Project Structure
 =================
@@ -19,12 +13,16 @@ Project Structure
 - iris: The Iris python package
 	- web: Contains all code for communicating with the frontend pages, flask routing, etc.
 - exts: C extensions
-- share: Static, "non binary" files, e.g. images, etc.
+- resources: Static, "non binary" files, e.g. ocropus models, dictionaries etc.
 - tests: Unit tests.
 	- resources: Auxiliary files required by the unit tests.
 
-Build
-=====
+Installation
+============
+
+First edit iris/celeryconfig.py and iris/irisconfig.py to fit your needs.
+Running a distributed cluster requires a shared storage medium (e.g. NFS) on
+all nodes.
 
 To build Iris run
 
@@ -43,23 +41,13 @@ library (>=1.70, available from Debian Jessie):
 $ apt-get install libleptonica-dev
 ```
 
-If a manual install is required, don't forget to install the apropriate image
-format libraries and their headers (libtiff, libpng, libjpeg) or run:
-
-```
-$ apt-get build-dep leptonlib
-```
-
-If you are building leptonica from source at a nonstandard prefix, be sure to
-pass the following arguments to build_ext: -R &lt;prefix&gt;/lib -I
-&lt;prefix&gt;/include -L &lt;prefix&gt;/lib
-
 Per default no dictionaries and OCR models (including data necessary to run
 tests) are installed. To download the necessary files run:
 
 ```
 $ python setup.py download
 ```
+
 
 Tests
 =====
@@ -68,81 +56,45 @@ Tests
 $ python setup.py test
 ```
 
-As mentioned above pip has to be installed.
+As mentioned above pip and the models have to be installed.
 
 Running the tests requires a working tesseract with ancient greek language
 files. 
 
-Note that users of Python 2.7.3 (The version in Debian Wheezy) will see
-[this][1] error after a successful run of setup.py test.
-This is a bug in Python 2.7.3 and is patched in later versions.
-
 Running
 =======
 
-First edit celeryconfig.py and irisconfig.py to fit your needs. Running a
-distributed cluster requires a shared storage medium (e.g. NFS) on all nodes.
 Then start up the celery daemon with something like:
 
 ```
 $ celery -A iris.tasks worker
 ```
 
-Right now there isn't an easy to use script available. Core functionality is
-exposed by the ''batch'' function of the iris package:
+Next jobs can be added to the pipeline using the iris executable:
 
 ```
->>> import iris
->>> iris.iris.batch({'batch_id': u'1234', 'input_files': [u'input.tiff'], 'actions': 
-[
-	[
-		[{'method': 'rgb_to_gray'}], 
-		[{'method':'binarize', 'thresh': 10}, {'method': 'binarize', 'thresh': 5}], 
-		[{'method': 'ocr_tesseract', 'languages': ['eng']}]
-	],
-	[
-		[{'method': 'blend_hocr'}]
-	]
-]})
-'6222f675-330e-461c-94de-1d0ea0a2f444'
+$ iris batch --binarize sauvola:10,20,30,40 --ocr tesseract:eng -- ./input.tiff
+35be45e9-9d6d-47c7-8942-2717f00f84cb
 ```
 
-For the less telepathically inclined: batch_id is a unique descriptor
-identifying the batch, input_files are obviously the input data, situated in
-the storage backend under the batch_id, and actions are the transformations
-applied to the input data. Those are a list of lists of lists where the
-innermost lists are methods running in parallel, while middle and outermost
-list(s) are run sequentially. So the above example is converted to 2 execution
-chains the run in parallel
+Using the return code the current state of the job can be retrieved:
 
 ```
-rgb_to_gray -> binarize (thresh: 10) -> ocr_tesseract
-rgb_to_gray -> binarize (thresh: 5) -> ocr_tesseract
-```
-
-After these are finished (next outer list) new execution chains will be created
-from the next list (in this case just one):
-
-```
-merge_hocr
-```
-The final result will be the return value(s) of the last method(s) of the last
-chain(s).
-
-Progress of the batch can be checked using the return value of the batch function:
-
-```
->>> iris.get_state('6222f675-330e-461c-94de-1d0ea0a2f444')
+$ iris status 35be45e9-9d6d-47c7-8942-2717f00f84cb
 PENDING
 ```
 
-The final output can be gathered using the get_results function:
+When the job has been processed the status command will return a list of paths
+containing the final output:
 
 ```
->>> iris.get_results('6222f675-330e-461c-94de-1d0ea0a2f444')
-[['1234', 'foo.txt'],['1234', 'bar.txt'] ...]
+$ iris status 35be45e9-9d6d-47c7-8942-2717f00f84cb
+SUCCESS
+        /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_10_0.3_ocr_tesseract_eng.tiff.hocr
+        /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_20_0.3_ocr_tesseract_eng.tiff.hocr
+        /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_30_0.3_ocr_tesseract_eng.tiff.hocr
+        /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_40_0.3_ocr_tesseract_eng.tiff.hocr
 ```
-
 
 Recommendations
 ===============
