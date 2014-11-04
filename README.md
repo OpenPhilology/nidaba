@@ -6,25 +6,32 @@ automates the process of converting raw images into citable collections of
 digitized texts. Images can be uploaded directly via Iris' RESTful web portal,
 or can be selected from preexisting images located on Iris' image repository.
 
-Project Structure
-=================
+It offers the following functionality:
 
-- docs: Miscellaneous documentation other than the README.
-- iris: The Iris python package
-	- web: Contains all code for communicating with the frontend pages, flask routing, etc.
-- exts: C extensions
-- resources: Static, "non binary" files, e.g. ocropus models, dictionaries etc.
-- tests: Unit tests.
-	- resources: Auxiliary files required by the unit tests.
+* Grayscale Conversion
+* Binarization utilizing
+  [Sauvola](http://www.mediateam.oulu.fi/publications/pdf/24.p) adaptive
+  thresholding or leptonica's
+  [Otsu](http://www.leptonica.com/binarization.html) thresholding with
+  background normalization
+* Deskewing
+* Dewarping
+* Integration of [tesseract](http://code.google.com/p/tesseract-ocr/) and ocropus OCR
+  engines
+* Merging multiple hOCR documents using scoring
 
-Installation
-============
+As it is designed to use a common storage medium on network attached storage
+and the [celery](http://celeryproject.org) distributed task queue it scales
+nicely to multi-machine clusters.
+
+Installation/Quick Start
+========================
 
 First edit iris/celeryconfig.py and iris/irisconfig.py to fit your needs.
 Running a distributed cluster requires a shared storage medium (e.g. NFS) on
 all nodes.
 
-To build Iris run
+To build Iris run:
 
 ```
 $ pip install .
@@ -48,7 +55,6 @@ tests) are installed. To download the necessary files run:
 $ python setup.py download
 ```
 
-
 Tests
 =====
 
@@ -59,7 +65,7 @@ $ python setup.py test
 As mentioned above pip and the models have to be installed.
 
 Running the tests requires a working tesseract with ancient greek language
-files. 
+files and an installed ocropus suite.
 
 Running
 =======
@@ -96,29 +102,8 @@ SUCCESS
         /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_40_0.3_ocr_tesseract_eng.tiff.hocr
 ```
 
-Recommendations
-===============
 
-There are no sane default thresholds for the binarization algorithms as correct
-values are highly dependent on the nature and quality of the input documents.
-Some sensible values as used by Bruce Robertsons rigaudon for Otsu's
-thresholding ({'method': 'binarize', 'algorithm': 'otsu'}) are:
+Documentation
+=============
 
-```
-94,97,100,103,105,107,109,112,115,117
-```
-
-Ocropus' binarization parameters using Sauvola are:
-
-```
-{'method': 'binarize', 'thresh': 40, 'factor': 0.3}
-```
-
-
-Issues
-======
-
-[1]:https://github.com/travis-ci/travis-ci/issues/1778
-
-* Unparametrized function are run several times, for example rgb_to_gray will
-  be run for all chains even though the output will be identical on each run.
+Want to learn more? [See the wiki.](https://github.com/mittagessen/iris/wiki)
