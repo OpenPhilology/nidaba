@@ -117,10 +117,5 @@ def status(args):
             print('Something somewhere went wrong.')
             print('Please contact your friendly iris support technician.')
         else:
-            # 
-            if type(ret[0]) == list:
-                for doc in ret:
-                    print('\t' + storage.get_abs_path(*doc).encode('utf-8'))
-            else:
-                print('\t' + storage.get_abs_path(*ret).encode('utf-8'))
-
+            for doc in ret:
+                print('\t' + storage.get_abs_path(*doc).encode('utf-8'))

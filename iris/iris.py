@@ -3,14 +3,16 @@
 # This modul contains all entry points to the various components of iris.
 
 from . import tasks
+from . import storage
+
 from irisexceptions import IrisInputException
 
 from itertools import product
 from celery import Celery
 from celery import chain
 from celery import group
-from celery.result import AsyncResult
-
+from celery.result import AsyncResult, GroupResult
+from celery.states import state, PENDING, SUCCESS, FAILURE
 import sys
 
 def batch(config):
@@ -54,40 +56,55 @@ def batch(config):
     if u'batch_id' not in config:
         raise IrisInputException('No batch ID given.')
 
-    groups = []
-    res = []
-    # first sequence contains the input files 
-    for sequence in product(config[u'input_files'], *config[u'actions'][0]):
-        method = getattr(tasks, sequence[1]['method'])
-        ch = chain(method.s((config['batch_id'], sequence[0]), **(sequence[1])))
-        for seq in sequence[2:]:
-            method = getattr(tasks, seq['method'])
-            ch |= method.s(**seq)
-        res.append(ch)
-    groups.append(group(res))
-    groups.append(tasks.sync.s())
-    if len(config[u'actions']) > 1:
-        for tset in config[u'actions'][1:]:
-            res = []
-            for sequence in product(*tset):
-                method = getattr(tasks, sequence[0]['method'])
-                ch = chain(method.s(**(sequence[0])))
-                for seq in sequence[1:]:
-                    method = getattr(tasks, seq['method'])
-                    ch |= method.s(**seq)
-                res.append(ch)
-            groups.append(group(res))
-            groups.append(tasks.sync.s())
-    r = chain(groups).apply_async()
-    return r.id
+    storage.prepare_filestore(u'jobs')
+    chains = []
+    for doc in config[u'input_files']:
+        groups = []
+        res = []
+        for sequence in product([doc], *config[u'actions'][0]):
+            method = getattr(tasks, sequence[1]['method'])
+            ch = chain(method.s((config['batch_id'], sequence[0]), **(sequence[1])))
+            for seq in sequence[2:]:
+                method = getattr(tasks, seq['method'])
+                ch |= method.s(**seq)
+            res.append(ch)
+        groups.append(group(res))
+        groups.append(tasks.sync.s())
+        if len(config[u'actions']) > 1:
+            for tset in config[u'actions'][1:]:
+                res = []
+                for sequence in product(*tset):
+                    method = getattr(tasks, sequence[0]['method'])
+                    ch = chain(method.s(**(sequence[0])))
+                    for seq in sequence[1:]:
+                        method = getattr(tasks, seq['method'])
+                        ch |= method.s(**seq)
+                    res.append(ch)
+                groups.append(group(res))
+                groups.append(tasks.sync.s())
+        chains.append(chain(groups))
+    rets = []
+    for ch in chains:
+        rets.append(ch.apply_async().id)
+    storage.write_content(config[u'batch_id'], u'.subtasks', u'\n'.join(rets))
+    return config[u'batch_id']
 
-def get_state(task_id):
-    r = AsyncResult(task_id)
-    return r.state
+def get_state(batch_id):
+    subtasks = storage.retrieve_content(batch_id, u'.subtasks')[u'.subtasks']
+    st = state(SUCCESS)
+    for id in subtasks.split('\n'):
+        if AsyncResult(id).state < st:
+            st = AsyncResult(id).state
+    return st
 
-def get_results(task_id):
-    r = AsyncResult(task_id)
-    if r.ready() and r.successful():
-        return r.result
-    else:
-        return None
+def get_results(batch_id):
+    subtasks = storage.retrieve_content(batch_id, u'.subtasks')[u'.subtasks']
+    outfiles = []
+    for id in subtasks.split('\n'):
+        ch = AsyncResult(id)
+        if ch.successful():
+            if type(ch.result[0]) == list:
+                outfiles.extend([tuple(x) for x in ch.result])
+            else:
+                outfiles.append(tuple(x))
+    return outfiles

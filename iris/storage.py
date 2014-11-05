@@ -110,8 +110,8 @@ def retrieve_content(jobID, documents=None):
         for doc in documents:
             with open(_sanitize_path(dpath, doc), 'rb') as f:
                 fdict[doc] = f.read()
-        return fdict
         map(lambda x: x.release(), locks)
+        return fdict
 
 
 def retrieve_text(jobID, documents=None):
