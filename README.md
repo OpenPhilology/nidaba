@@ -106,4 +106,4 @@ SUCCESS
 Documentation
 =============
 
-Want to learn more? [See the wiki.](https://github.com/mittagessen/iris/wiki)
+Want to learn more? [Read the Docs](https:///ogl-iris.readthedocs.org/)
