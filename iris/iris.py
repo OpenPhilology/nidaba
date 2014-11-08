@@ -90,6 +90,8 @@ def batch(config):
     return config[u'batch_id']
 
 def get_state(batch_id):
+    if not storage.is_valid_job(batch_id):
+        return 'UNKNOWN'
     subtasks = storage.retrieve_content(batch_id, u'.subtasks')[u'.subtasks']
     st = state(SUCCESS)
     for id in subtasks.split('\n'):
@@ -98,6 +100,8 @@ def get_state(batch_id):
     return st
 
 def get_results(batch_id):
+    if not storage.is_valid_job(batch_id):
+        return 'UNKNOWN'
     subtasks = storage.retrieve_content(batch_id, u'.subtasks')[u'.subtasks']
     outfiles = []
     for id in subtasks.split('\n'):
