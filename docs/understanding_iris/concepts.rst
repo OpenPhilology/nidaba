@@ -1,13 +1,13 @@
 :title: Concepts
-:description: Deis combines a variety of common preprocessing and OCRing steps into a single job.
+:description: Iris combines a variety of common preprocessing and OCRing steps into a single job.
 
 .. _concepts:
 
 Concepts
 ========
 
-Iris is a lightweight and flexible platform that aims to combine all steps from
-scanned input pages to the best possible text.
+Iris is a lightweight and flexible platform that aims to integrate all steps of
+an OCR workflow to produce the best possible text from scanned input pages.
 
 .. _concepts_tasks:
 
@@ -27,14 +27,15 @@ tasks are native python code while others call external software.
 Celery
 ------
 
-Executing singular tasks is rather useless and celery is used to coordinate and
+Executing singular tasks is rather useless. Celery is used to coordinate and
 distribute the execution of a set of tasks, commonly called a job. A job is
 nothing more than the execution of tasks in a predefined order and
 parallelization level. 
 
 Celery uses a message broker to communicate the tasks to be run to the machines
-of the compute cluster. To learn more about celery peruse its
-[documentation](https://celery.readthedocs.org/en/latest/).
+of the compute cluster. This documentation will not explain the use of celery
+except on the most rudimentary leve. To learn more about celery peruse its
+`documentation <https://celery.readthedocs.org/en/latest/>`_.
 
 .. _concepts_storage:
 

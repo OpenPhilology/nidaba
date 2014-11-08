@@ -74,7 +74,7 @@ iris status
 The *status* subcommand is used to check the status of a job. It requires the
 return value of the *iris batch* command.
 
-A non-existing or currently running job will always return PENDING:
+A currently running job will return PENDING:
 
 .. code-block:: console
         

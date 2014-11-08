@@ -6,7 +6,7 @@
 Building the Iris pipeline
 ==========================
 
-At least for testing purposes it is recommended to install Iris into a virtualenv.
+At least for testing purposes it is recommended to install Iris into a virtualenv. 
 
 .. _external_dependencies:
 
@@ -25,16 +25,16 @@ and lxml and the leptonica C wrapper.
         # apt-get install python python-dev build-essential libxml2-dev libxslt1-dev libleptonica-dev 
 
 leptonica's API is not stable across versions, for the current version of
-leper, the leptonica wrapper, to build a version >=1.70 is required.
+leper, the leptonica wrapper, to compile a version >=1.70 is required.
 
-Next we'll have to install some actual OCR engines and some language models. To
+Next we'll have to install some actual OCR engines and language models. To
 run the unit tests at least the ancient greek language model is required:
 
 .. code-block:: console
 
         # apt-get install tesseract-ocr tesseract-ocr-grc
 
-Further ocropus may be installed; this varies by distribution.
+Further ocropus may be installed; the process varies by distribution.
 
 .. _configuring_iris:
 
@@ -44,7 +44,7 @@ Configuration
 There are currently two configuration files that have to be edited before
 installation. irisconfig.py and celeryconfig.py. Celeryconfig is a standard
 `celery configuration object
-<http://celery.readthedocs.org/en/latest/configuration.html>` and may look like
+<http://celery.readthedocs.org/en/latest/configuration.html>`_ and may look like
 this::
 
         BROKER_URL = 'redis://127.0.0.1:6379'

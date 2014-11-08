@@ -9,11 +9,12 @@ Welcome
 Iris is an open source distributed optical character recognition pipeline that
 makes it easy to preprocess and OCR scans of text documents in a multitude of
 ways. Iris builds upon the celery distributed task queue to provide a
-lightweigth task queue that performs reasonably well across a wide spectrum of
+lightweight task queue that performs reasonably well across a wide spectrum of
 use cases.
 
 To get started with iris, first read :ref:`The Iris Architecture
-<understanding_iris>` then use :ref:`Installating Iris <installing_iris>` to start provisioning your
-pipeline. :ref:`Using Iris <using_iris>` describes different ways to use the pipeline.
+<understanding_iris>` then use :ref:`Installing Iris <installing_iris>` to
+start provisioning your pipeline. :ref:`Using Iris <using_iris>` describes
+different ways to use the pipeline.
 
 The full documentation tree can be seen :ref:`here <toctree>`.

@@ -14,6 +14,6 @@ running:
 
 	$ celery -A iris.tasks worker
 
-For further worker server options have a look at `celery`.
+For further worker server options have a look at `celery`_.
 
 .. _`celery`: https://celery.readthedocs.org/en/latest/
