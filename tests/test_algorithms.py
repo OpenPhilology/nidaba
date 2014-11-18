@@ -7,6 +7,7 @@ import StringIO
 import unicodedata
 import mmap
 import bz2
+import itertools
 
 from iris import algorithms
 
@@ -1344,6 +1345,20 @@ class SpellCheckTests(unittest.TestCase):
         self.assertEqual(len(result_b[u'subs']), 1)
         self.assertEqual(len(result_b[u'ins+dels']), 0)
 
-
+    def test_suggestions(self):
+        """
+        Test the suggestions function.
+        """
+        orig = u'aaaa'
+        s0 = u'aaaa' #match
+        s1 = u'baaa' #edit distance 1
+        s1a = u'caaa' #edit distance 1; after s1 by alphabetical order
+        s2 = u'aabb' #edit distance 2
+        s2a = u'aacc' #edit distance 2; after s2 by alphabetical order
+        s3 = u'cccc' #edit distance 4
+        s4 = u'ccccc' #edit distance 5
+        expected = [s0, s1, s1a, s2, s2a, s3, s4, s4] # s4 inserted twice to increase frequency
+        self.assertEqual(expected, algorithms.suggestions(orig, [s4, s4, s2, s2a, s0, s1, s1a, s3]))
+        
 if __name__ == '__main__':
     unittest.main()

@@ -16,7 +16,6 @@ import timeit
 import subprocess
 import math
 import tempfile
-from kitchen.text.converters import to_unicode, to_bytes
 from lxml import etree
 
 
@@ -105,7 +104,22 @@ def sym_suggest(ustr, dic, delete_dic, depth, ret_count=0):
 @unibarrier
 def parse_del_dict_entry(entry):
     return [] if entry is None else [word.strip() for word in entry.split(u' ')]
+
+@unibarrier
+def suggestions(ustr, sugs, freq=None):
+    """
+    Call mapped_sym_suggest, and return the suggestions as a
+    sorted list. Python's built in sort is stable, so we can
+    simply sort repeatedly, from least important aspect to
+    most important.
+    """
+    sugs = sorted(sugs) #Alphabetic sort
+    if freq is not None:
+        sugs = sorted(sorted(sugs), key=lambda x: freq[x]) # By frequency
+    sugs = sorted(sugs, key=lambda x: edit_distance(ustr, x)) # By edit distance
     
+    return sugs
+
 @unibarrier
 def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
     """
@@ -638,14 +652,3 @@ def list_to_uni(l, encoding=u'utf-8'):
         if i != len(l) - 1: result += u', '
     result += u']'
     return result.encode(encoding)
-
-if __name__ == '__main__':
-    import sys
-    #full_edit_distance('ab', 'ac')
-    def f(c1, c2):
-        print 'the inner func'
-        return 1
-
-    #print full_edit_distance('ab', 'ac', ins_func=f, del_func=f, sub_func=f)
-    print full_edit_distance('ab', 'ac')
-    print _native_full_edit_distance('ab', 'ac')

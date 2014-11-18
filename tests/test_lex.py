@@ -149,8 +149,20 @@ class DictTests(unittest.TestCase):
         self.assertEqual(u'dd\tddd', lines[3])
         outfile.close()
 
-
-
+    def test_unique_words_with_frequency(self):
+        """
+        Test the uniquewords_with_freq function
+        """
+        temp = tempfile.NamedTemporaryFile()
+        temp.write('a a a a b b c c c b b b b d \n foobar foobar')
+        temp.seek(0,0) 
+        f = lex.uniquewords_with_freq(temp.name.decode('utf-8'))
+        self.assertEqual(5, len(f.keys()))
+        self.assertEqual(4, f['a'])
+        self.assertEqual(6, f['b'])
+        self.assertEqual(3, f['c'])
+        self.assertEqual(1, f['d'])
+        self.assertEqual(2, f['foobar'])
 
 if __name__ == '__main__':
     unittest.main()

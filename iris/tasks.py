@@ -178,3 +178,4 @@ def sync(arg):
     """Takes ones argument and returns it. Used to synchronized stuff as
     chaining groups is not possible with the current celery version."""
     return arg
+

@@ -12,6 +12,7 @@ from celery import chain
 from celery import group
 from celery.result import AsyncResult, GroupResult
 from celery.states import state, PENDING, SUCCESS, FAILURE
+
 import sys
 
 def batch(config):
@@ -55,7 +56,6 @@ def batch(config):
     if u'batch_id' not in config:
         raise IrisInputException('No batch ID given.')
 
-    storage.prepare_filestore(u'jobs')
     chains = []
     for doc in config[u'input_files']:
         groups = []
@@ -111,4 +111,3 @@ def get_results(batch_id):
             else:
                 outfiles.append(tuple(x))
     return outfiles
-
