@@ -909,6 +909,15 @@ class LanguageTests(unittest.TestCase):
         self.assertFalse(algorithms.islang(halfandhalf, [algorithms.greek_coptic_range], threshold=0.5000001))
         self.assertFalse(algorithms.islang(halfandhalf, [algorithms.greek_coptic_range], threshold=0.5000001))
 
+    def test_isgreek(self):
+        """
+        Test the isgreek convenience function.
+        """
+        gk1 = u'Σωκράτης'
+        gk2 = u'Πλάτων'
+        self.assertTrue(algorithms.isgreek(gk1))
+        self.assertTrue(algorithms.isgreek(gk2))
+
     def test_sanitize_strip(self):
         """
         Test that sanitize correctly strips leading and trailing whitespace.
@@ -1065,21 +1074,6 @@ class SymSpellTests(unittest.TestCase):
         self.assertEqual([u'word'], algorithms.sym_suggest(u'woRd', dic, delete_dic, 1))
         self.assertEqual([u'word'], algorithms.sym_suggest(u'worD', dic, delete_dic, 1))
 
-    def test_load_sym_dict(self):
-        """
-        Tests that the load_sym_dict function correctly loads into a
-        python dictionary object.
-        """
-        df = tempfile.NamedTemporaryFile()
-        df.write(u'word : ord wod wor wrd\n')
-        df.write(u'tree : ree tee tre\n')
-        df.seek(0,0)
-        actual = algorithms.load_sym_dict(os.path.abspath(df.name))
-        expected = {u'word':[u'ord', u'wod', u'wor', u'wrd'],
-               u'tree':[u'ree', u'tee', u'tre']}
-        self.assertEqual(expected, actual)
-        df.close()
-
     def test_string_compare(self):
         """
         Test the string comparison function.
@@ -1147,90 +1141,124 @@ class SymSpellTests(unittest.TestCase):
             self.assertEqual(26, algorithms.prev_newline(mm, 50))
         df.close()
 
-    def test_delete_dict_line_parser(self):
+    def test_key_for_delete_dict_entry(self):
         """
-        Tests the parse_sym_dict function.
+        Tests the key_for_del_dict_entry function.
         """
-        single_entry = u'key : val1'
-        multiple_entries = u'key : val1 val2 val3'
-        self.assertEqual((u'key', [u'val1']),
-                         algorithms.parse_sym_entry(single_entry))
-        self.assertEqual((u'key', [u'val1', u'val2', u'val3']),
-                         algorithms.parse_sym_entry(multiple_entries))
+        single_entry = u'key\tval1'
+        multiple_entries = u'key\tval1 val2 val3'
+        self.assertEqual((u'key', u'val1'),
+                         algorithms.key_for_del_dict_entry(single_entry))
+        self.assertEqual((u'key', u'val1 val2 val3'),
+                             algorithms.key_for_del_dict_entry(multiple_entries))
 
-    def test_deldict_bin_search_single(self):
+    def test_key_for_single_word(self):
         """
-        Tests the deldict_bin_search algorithm with a dictionary with
+        Tests the test_key_for_single_word function.
+        """
+        w1 = u'word1'
+        w2 = u'word2'
+        w3 = u'word3'
+        self.assertEqual((u'word1', u'word1'), algorithms.key_for_single_word(w1))
+        self.assertEqual((u'word2', u'word2'), algorithms.key_for_single_word(w2))
+        self.assertEqual((u'word3', u'word3'), algorithms.key_for_single_word(w3))
+
+
+    def test_mmap_bin_search_single(self):
+        """
+        Tests the mmap_bin_search algorithm with a dictionary with
         one item.
         """
         df = tempfile.NamedTemporaryFile()
-        df.write(u'only_entry : some_value')
+        df.write(u'only_entry\tsome_value')
         df.seek(0,0)
         with open(os.path.abspath(df.name), 'r+b') as f:
             mm = mmap.mmap(f.fileno(), 0)
-            expected = (u'only_entry', [u'some_value'])
+            expected = u'some_value'
             dpath = os.path.abspath(df.name).decode(u'utf-8')
             self.assertEqual(expected,
-                             algorithms.deldict_bin_search(u'only_entry', dpath))
+                             algorithms.mmap_bin_search(u'only_entry', dpath))
 
-    def test_deldict_bin_search_double(self):
+    def test_mmap_bin_search_double(self):
         """
-        Tests the deldict_bin_search algorithm with a dictionary with
-        one item.
+        Tests the mmap_bin_search algorithm with a dictionary with
+        two items.
         """
         df = tempfile.NamedTemporaryFile()
-        df.write(u'first_entry : first_value\n')
-        df.write(u'second_entry : second_value')
+        df.write(u'first_key\tfirst_value\n')
+        df.write(u'second_key\tsecond_value')
         df.seek(0,0)
         with open(os.path.abspath(df.name), 'r+b') as f:
             mm = mmap.mmap(f.fileno(), 0)
-            expected_first = (u'first_entry', [u'first_value'])
-            expected_second = (u'second_entry', [u'second_value'])
+            expected_first = u'first_value'
+            expected_second = u'second_value'
             dpath = os.path.abspath(df.name).decode(u'utf-8')
             self.assertEqual(expected_first,
-                             algorithms.deldict_bin_search(u'first_entry', dpath))
+                             algorithms.mmap_bin_search(u'first_key', dpath))
             self.assertEqual(expected_second,
-                             algorithms.deldict_bin_search(u'second_entry', dpath))
+                             algorithms.mmap_bin_search(u'second_key', dpath))
 
-    def test_deldict_bin_search_general(self):
+    def test_mmap_bin_search_general(self):
         """
-        Test the deldict_bin_search function in a general case.
+        Test the mmap_bin_search function in a general case.
         """
         df = tempfile.NamedTemporaryFile()
-        df.write('akey : aval\n')
-        df.write('bkey : bval\n')
-        df.write('ckey : cval\n')
-        df.write('dkey : dval\n')
-        df.write('ekey : eval\n')
-        df.write('fkey : fval\n')
+        df.write('akey\taval\n')
+        df.write('bkey\tbval\n')
+        df.write('ckey\tcval\n')
+        df.write('dkey\tdval\n')
+        df.write('ekey\teval\n')
+        df.write('fkey\tfval\n')
         df.seek(0,0)
         with open(os.path.abspath(df.name), 'r+b') as f:
             dpath = os.path.abspath(df.name).decode(u'utf-8')
-            ex_a = (u'akey', [u'aval'])
-            ex_b = (u'bkey', [u'bval'])
-            ex_c = (u'ckey', [u'cval'])
-            ex_d = (u'dkey', [u'dval'])
-            ex_e = (u'ekey', [u'eval'])
-            ex_f = (u'fkey', [u'fval'])
-            self.assertEqual(ex_a, algorithms.deldict_bin_search(u'akey', dpath))
-            self.assertEqual(ex_b, algorithms.deldict_bin_search(u'bkey', dpath))
-            self.assertEqual(ex_c, algorithms.deldict_bin_search(u'ckey', dpath))
-            self.assertEqual(ex_d, algorithms.deldict_bin_search(u'dkey', dpath))
-            self.assertEqual(ex_e, algorithms.deldict_bin_search(u'ekey', dpath))
-            self.assertEqual(ex_f, algorithms.deldict_bin_search(u'fkey', dpath))
-            self.assertEqual(None, algorithms.deldict_bin_search(u'gkey', dpath))
+            ex_a = u'aval'
+            ex_b = u'bval'
+            ex_c = u'cval'
+            ex_d = u'dval'
+            ex_e = u'eval'
+            ex_f = u'fval'
+            self.assertEqual(ex_a, algorithms.mmap_bin_search(u'akey', dpath))
+            self.assertEqual(ex_b, algorithms.mmap_bin_search(u'bkey', dpath))
+            self.assertEqual(ex_c, algorithms.mmap_bin_search(u'ckey', dpath))
+            self.assertEqual(ex_d, algorithms.mmap_bin_search(u'dkey', dpath))
+            self.assertEqual(ex_e, algorithms.mmap_bin_search(u'ekey', dpath))
+            self.assertEqual(ex_f, algorithms.mmap_bin_search(u'fkey', dpath))
+            self.assertEqual(None, algorithms.mmap_bin_search(u'gkey', dpath))
 
-            
+
+    def test_mmap_simple_single_word(self):
+        """
+        Test the mmap_bin_search function for accessing words from a
+        simple word-per-line dictionary.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write('aval\n')
+        df.write('bval\n')
+        df.write('cval\n')
+        df.write('dval\n')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            dpath = os.path.abspath(df.name).decode(u'utf-8')
+            ex_a = u'aval'
+            ex_b = u'bval'
+            ex_c = u'cval'
+            ex_d = u'dval'
+            self.assertEqual(ex_a, algorithms.mmap_bin_search(u'aval', dpath, entryparser_fn=algorithms.key_for_single_word))
+            self.assertEqual(ex_b, algorithms.mmap_bin_search(u'bval', dpath, entryparser_fn=algorithms.key_for_single_word))
+            self.assertEqual(ex_c, algorithms.mmap_bin_search(u'cval', dpath, entryparser_fn=algorithms.key_for_single_word))
+            self.assertEqual(ex_d, algorithms.mmap_bin_search(u'dval', dpath, entryparser_fn=algorithms.key_for_single_word))
+
 class SpellCheckTests(unittest.TestCase):
 
     def setUp(self):
         self.temp = tempfile.NamedTemporaryFile()
-        self.temp.write(u'123 : 1234\n')
-        self.temp.write(u'124 : 1234\n')
-        self.temp.write(u'134 : 1234\n')
-        self.temp.write(u'234 : 1234\n')
-        self.temp.write(u'aaaa : aaaaa\n')
-        self.temp.write(u'bbbb : bbbbb\n')
+        self.temp.write(u'123\t1234\n')
+        self.temp.write(u'124\t1234\n')
+        self.temp.write(u'134\t1234\n')
+        self.temp.write(u'234\t1234\n')
+        self.temp.write(u'aaaa\taaaaa\n')
+        self.temp.write(u'bbbb\tbbbbb\n')
         self.temp.seek(0, 0)
 
         self.dic = set()
@@ -1256,7 +1284,7 @@ class SpellCheckTests(unittest.TestCase):
 
     def test_suggest_1_insert(self):
         """
-        Test the spellchecker in the case of a single delete.
+        Test the spellchecker in the case of a single insert.
         """
         result_a = algorithms.mapped_sym_suggest(u'aaaa',
                                                 self.temp.name.decode('utf-8'),
@@ -1268,7 +1296,6 @@ class SpellCheckTests(unittest.TestCase):
         self.assertEqual(len(result_a[u'dels']), 0)
         self.assertEqual(len(result_a[u'subs']), 0)
         self.assertEqual(len(result_a[u'ins+dels']), 0)
-
         self.assertEqual(len(result_b[u'ins']), 1)
         self.assertEqual(len(result_b[u'dels']), 0)
         self.assertEqual(len(result_b[u'subs']), 0)
@@ -1298,7 +1325,7 @@ class SpellCheckTests(unittest.TestCase):
 
     def test_suggest_1_substitute(self):
         """
-        Test the spellchecker in the case of a single delete.
+        Test the spellchecker in the case of a single substitution.
         """
         result_a = algorithms.mapped_sym_suggest(u'aaXaa',
                                                 self.temp.name.decode('utf-8'),

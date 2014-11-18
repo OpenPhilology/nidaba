@@ -6,7 +6,6 @@ from . import tasks
 from . import storage
 
 from irisexceptions import IrisInputException
-
 from itertools import product
 from celery import Celery
 from celery import chain
@@ -112,3 +111,4 @@ def get_results(batch_id):
             else:
                 outfiles.append(tuple(x))
     return outfiles
+

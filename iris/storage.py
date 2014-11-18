@@ -113,7 +113,6 @@ def retrieve_content(jobID, documents=None):
         map(lambda x: x.release(), locks)
         return fdict
 
-
 def retrieve_text(jobID, documents=None):
     """
     Retrieves UTF-8 encoded text from a single or a list of documents.

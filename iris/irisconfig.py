@@ -18,3 +18,4 @@ OLD_TESSERACT = False
 OCROPUS_MODELS = { u'greek': (u'models', u'greek.pyrnn.gz'),
                    u'atlantean': (u'models', u'atlantean.pyrnn.gz'),
                    u'fraktur': (u'models', u'fraktur.pyrnn.gz')}
+

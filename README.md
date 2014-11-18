@@ -31,7 +31,10 @@ First edit iris/celeryconfig.py and iris/irisconfig.py to fit your needs.
 Running a distributed cluster requires a shared storage medium (e.g. NFS) on
 all nodes.
 
-To build Iris run:
+Build
+=====
+
+To build Iris run
 
 ```
 $ pip install .

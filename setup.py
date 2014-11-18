@@ -8,7 +8,6 @@ from pip.req import parse_requirements
 from setuptools import setup, find_packages, Extension
 from distutils.core import setup, Extension, Command
 from distutils.command.install_data import install_data
-
 # All hail the pip-ian way of doing things
 install_reqs = parse_requirements('requirements.txt')
 reqs = [str(ir.req) for ir in install_reqs]

@@ -81,25 +81,6 @@ def strings_by_deletion(unistr, dels):
     return sorted(list(new_words))
 
 @unibarrier
-def parse_sym_entry(entry):
-    """
-    Parse a line from a symmetric delete dictionary into a python data
-    structure. Returns a tuple of the form (key, list of values).
-    """
-    key, words = entry.split(u' : ')
-    return (key, [word.strip() for word in words.split(u' ')])
-
-def load_sym_dict(path):
-    path = os.path.abspath(os.path.expanduser(path))
-    dic = {}
-    with codecs.open(path, encoding='utf-8') as dfile:
-        for line in dfile:
-            word, dels = line.split(u' : ')
-            dic[word] = [s.strip(u'\n') for s in dels.split(u' ')]
-
-    return dic
-
-@unibarrier
 def sym_suggest(ustr, dic, delete_dic, depth, ret_count=0):
     """
     Return a list of "spelling" corrections using a symmetric deletion
@@ -122,6 +103,10 @@ def sym_suggest(ustr, dic, delete_dic, depth, ret_count=0):
     return list(suggestions if ret_count <= 0 else suggestions[:ret_count])
 
 @unibarrier
+def parse_del_dict_entry(entry):
+    return [] if entry is None else [word.strip() for word in entry.split(u' ')]
+    
+@unibarrier
 def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
     """
     Generate a list of spelling suggestions using the memory mapped
@@ -135,18 +120,19 @@ def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
     subs = set()
 
     dels = strings_by_deletion(ustr, depth)
-    line_for_ustr = deldict_bin_search(ustr, del_dic_path)
-    if line_for_ustr is not None:
-        inserts = set(w for w in line_for_ustr[1])  # get the words reachable by adding to ustr.
+    ustr_entry = mmap_bin_search(ustr, del_dic_path)
+    word_for_ustr = parse_del_dict_entry(ustr_entry)
+    if word_for_ustr is not None:
+        inserts = set(w for w in word_for_ustr)  # get the words reachable by adding to ustr.
     for s in dels:
         if s in dic:
             deletes.add(s) # Add a word reachable by deleting from ustr.
 
-        line_for_s = deldict_bin_search(s, del_dic_path)
+        line_for_s = parse_del_dict_entry(mmap_bin_search(s, del_dic_path))
         if line_for_s is not None:
             # Get the words reachable by deleting from originals, adding to them.
             # Note that this is NOT the same as 'Levenshtein' substitution.
-            for sug in line_for_s[1]:
+            for sug in line_for_s:
                 distance = edit_distance(sug, ustr)
                 if distance == depth:
                     subs.add(sug)
@@ -154,48 +140,6 @@ def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
                     int_and_dels.add(sug)
 
     return {u'dels':deletes, u'ins':inserts, u'subs':subs, u'ins+dels':int_and_dels}
-
-@unibarrier
-def edits1(ustr, alphabet):
-   splits     = [(ustr[:i], ustr[i:]) for i in range(len(ustr) + 1)]
-   deletes    = [a + b[1:] for a, b in splits if b]
-   transposes = [a + b[1] + b[0] + b[2:] for a, b in splits if len(b)>1]
-   replaces   = [a + c + b[1:] for a, b in splits for c in alphabet if b]
-   inserts    = [a + c + b for a, b in splits for c in alphabet]
-   return set(deletes + transposes + replaces + inserts)
-
-@unibarrier
-def edits2(ustr, alphabet, dictionary):
-    return set(e2 for e1 in edits1(ustr, alphabet) for e2 in edits1(e1, alphabet) if e2 in dictionary)
-
-def known(words, dictionary):
-    return list(w for w in words if w in dictionary)
-
-@unibarrier
-def suggest(ustr, alphabet, dictionary):
-    suggestions = []
-    if ustr in dictionary:
-        suggestions.append(ustr)
-    suggestions.append(known(edits1(ustr) + edits2(ustr, alphabet, dictionary)))
-
-
-def load_lines(path, encoding='utf-8'):
-    with codecs.open(path, 'r', encoding) as f:
-        return [line for line in f]
-
-def count_lines(path):
-    """
-    Get the number of lines in a file by counting the newlines.
-    Use a call to wc so that extremely large files can be processed
-    quickly.
-    """
-    cmd = [u'wc', u'-l', path]
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                              stderr=subprocess.PIPE)
-
-    out, err = p.communicate()
-    return float(out.split(u' ', 1)[0])
-
 
 def prev_newline(mm, line_buffer_size=100):
     """
@@ -205,7 +149,6 @@ def prev_newline(mm, line_buffer_size=100):
     # mm.seek(mm.tell - line_buffer_size)
     # TODO this fails on a line greater than line_buffer_size in length
     return mm.rfind(u'\n', mm.tell() - line_buffer_size, mm.tell()) + 1
-
 
 @unibarrier
 def compare_strings(u1, u2):
@@ -229,24 +172,56 @@ def truestring(unicode):
     out = u'<' + u':'.join([u for u in unicode]) + u'>'
     return out
 
+# ----------------------------------------------------------------------
+# Binary search dictionary entry parsers -------------------------------
+# ----------------------------------------------------------------------
+
+@unibarrier
+def key_for_del_dict_entry(entry):
+    """
+    Parse a line from a symmetric delete dictionary.
+    Returns a tuple of the form (key, list of values).
+    """
+    key, val = entry.split(u'\t')
+    return (key, val.strip())
+
+
+@unibarrier
+def key_for_single_word(entry):
+    """
+    Parse a line from a simple "one word per line" dictionary.
+    """
+    cleanword = entry.strip()
+    return (cleanword, cleanword)
+
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+ 
 # TODO Implement doubling-length backward search to make line_buffer_size
 # irrelevant.
 @unibarrier
-def deldict_bin_search(ustr, dictionary_path, line_buffer_size=200):
+def mmap_bin_search(ustr, dictionary_path, entryparser_fn=key_for_del_dict_entry, line_buffer_size=200):
     """
     Perform a binary search on a memory mapped dictionary file, and
     return the parsed entry, or None if the specified entry cannot be
     found. This function assumes that the dictionary is properly
     formatted and well-formed, otherwise the behavior is undefined.
     Line buffer must not be shorter than the longest line in the
-    dictionary.
+    dictionary. Entries may be any strings which do not contain newlines
+    (newlines delimint entries); the entryparser_fn should be of the
+    form fn_name(unicodestr), decorated with @unibarrier and return a
+    tuple of the form (keytosort by, val). By default, it uses the
+    function for parsing symmetric deletion dictionary entries.
+    The line_buffer_size argument must be >= the longest line in the
+    dictionary, or behavior is undefined.
     """
 
-    def current_key(mm):
+    def current_entry(mm):
         start = mm.tell()
         rawline = mm.readline()
         mm.seek(start)
-        return parse_sym_entry(rawline.decode(u'utf-8'))
+        return entryparser_fn(rawline.decode(u'utf-8'))
 
     with codecs.open(dictionary_path, 'r+b') as f:
         # memory-map the file, size 0 means whole file
@@ -258,11 +233,12 @@ def deldict_bin_search(ustr, dictionary_path, line_buffer_size=200):
             mid = imin + int(math.floor((imax - imin)/2))
             mm.seek(mid)
             mm.seek(prev_newline(mm))
-            parsedline = current_key(mm)
-            key = parsedline[0]
+            thing = current_entry(mm)
+            key, entry = thing
+            # key, entry = current_entry(mm)
 
             if key == ustr:
-                return parsedline
+                return entry
             elif key < ustr:
                 imin = mid + 1
             else:
@@ -357,34 +333,10 @@ def native_semi_global_matrix(str1, str2, substitutionscore, insertscore,
 def native_full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
                               deletescore=1, charmatrix={},
                               alignment_type='global'):
-    """A modified implenmentation of the Wagner-Fischer algorithm using
-    numpy. This should be used when an alignment is desired,
-    not only the edit distance."""
-
-    types = {'global': native_global_matrix,
-             'semi-global':native_semi_global_matrix}
-    matrix = types[alignment_type](str1, str2, substitutionscore, insertscore,
-                                   deletescore, charmatrix)
-
-    steps = initmatrix(len(str1)+1, len(str2)+1, defaultval='')
-    steps[0][1:] = list('i'*(len(str2)))
-    for idx in xrange(1, len(matrix)): steps[idx][0] = 'd'
-    for i in xrange(1, len(matrix)):
-        for j in xrange(1, len(matrix[0])):
-            c1 = str1[i-1]
-            c2 = str2[j-1]
-
-            scores = (('s', matrix[i-1][j-1] + charmatrix.get((c1, c2), substitutionscore)),
-                      ('i', matrix[i][j-1] + charmatrix.get((c1, c2), insertscore)),
-                      ('d', matrix[i-1][j] + charmatrix.get((c1, c2), deletescore)))
-            if str1[i-1] == str2[j-1]:
-                matrix[i][j] = matrix[i-1][j-1]
-                steps[i][j] = 'm'
-            else:
-                bestoption = min(scores, key=lambda x: x[1])
-                matrix[i][j] = bestoption[1]
-                steps[i][j] = bestoption[0]
-
+    
+    matrix, steps = full_edit_distance(str1, str2, substitutionscore=substitutionscore,
+                       insertscore=insertscore, deletescore=deletescore,
+                       charmatrix=charmatrix, alignment_type=alignment_type)
     return matrix, steps
 
 def edit_distance(str1, str2, substitutionscore=1, insertscore=1,
@@ -400,6 +352,57 @@ def edit_distance(str1, str2, substitutionscore=1, insertscore=1,
 
 
 
+
+def full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
+                              deletescore=1, ins_func=None, iargs=[], ikwargs={},
+                              del_func=None, dargs=[], dkwargs={}, sub_func=None, sargs=[],
+                              skwargs={}, charmatrix={}, alignment_type='global'):
+    """
+    A version of the modified Wagner-Fischer algorithm that accepts user
+    defined scoreing functions. These functions should be of the form
+    fname(token1, token2, args*, kwargs**) and return an integer
+    >= 0. A return value of 0 indicates an optimality. The larger, the
+    integer, the worse the score. Charmatrix is here only used to
+    calulate default delete and insert scores for the initial matrix.
+    """
+
+    def dscore(c1, c2, default):
+        return charmatrix.get((c1, c2), default)
+    if ins_func is None:
+        ins_func = dscore
+        iargs = [insertscore]
+    if del_func is None:
+        del_func = dscore
+        dargs = [deletescore]
+    if sub_func is None:
+        sub_func = dscore
+        sargs = [substitutionscore]
+
+    types = {'global': native_global_matrix,
+             'semi-global':native_semi_global_matrix}
+    matrix = types[alignment_type](str1, str2, substitutionscore, insertscore,
+                                   deletescore, charmatrix)
+
+    steps = initmatrix(len(str1)+1, len(str2)+1, defaultval='')
+    steps[0][1:] = list('i'*(len(str2)))
+    for idx in xrange(1, len(matrix)): steps[idx][0] = 'd'
+    for i in xrange(1, len(matrix)):
+        for j in xrange(1, len(matrix[0])):
+            c1 = str1[i-1]
+            c2 = str2[j-1]
+
+            scores = (('s', matrix[i-1][j-1] + sub_func(c1, c2, *sargs, **skwargs)),
+                      ('i', matrix[i][j-1] + ins_func(c1, c2, *iargs, **ikwargs)),
+                      ('d', matrix[i-1][j] + del_func(c1, c2, *dargs, **dkwargs)))
+            if str1[i-1] == str2[j-1]:
+                matrix[i][j] = matrix[i-1][j-1]
+                steps[i][j] = 'm'
+            else:
+                bestoption = min(scores, key=lambda x: x[1])
+                matrix[i][j] = bestoption[1]
+                steps[i][j] = bestoption[0]
+
+    return matrix, steps
 
 # ----------------------------------------------------------------------
 # String and alignment algorithms (numpy versions) ---------------------
@@ -583,6 +586,11 @@ def islang(unistr, unicode_blocks, threshold=1.0):
 
     return inlang/len(unistr) >= threshold
 
+@unibarrier
+def isgreek(ustr):
+    return islang(ustr, [greek_coptic_range,extended_greek_diacritics,
+                         greek_and_coptic_diacritics])
+
 def unifilter(string, rangelist):
     filterset = []
     for block in rangelist:
@@ -601,6 +609,7 @@ def greek_chars():
     chars += uniblock(combining_diacritical_mark_range[1], combining_diacritical_mark_range[2])
     return chars
 
+@unibarrier
 def greek_filter(string):
     """
     Remove all non-Greek characters from a string.
@@ -630,10 +639,13 @@ def list_to_uni(l, encoding=u'utf-8'):
     result += u']'
     return result.encode(encoding)
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+    import sys
+    #full_edit_distance('ab', 'ac')
+    def f(c1, c2):
+        print 'the inner func'
+        return 1
 
-
-
-
-
-
+    #print full_edit_distance('ab', 'ac', ins_func=f, del_func=f, sub_func=f)
+    print full_edit_distance('ab', 'ac')
+    print _native_full_edit_distance('ab', 'ac')

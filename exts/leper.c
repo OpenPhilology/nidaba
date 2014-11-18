@@ -97,7 +97,6 @@ char *rgb_to_gray(char *in, char *out) {
 		return NULL;
 	}
         PIX *r;
-
 	if((r = pixConvertRGBToGray(pixConvertTo32(pix), 0.0, 0.0, 0.0)) == NULL) {
 		return NULL;
 	}
