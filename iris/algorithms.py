@@ -247,9 +247,7 @@ def mmap_bin_search(ustr, dictionary_path, entryparser_fn=key_for_del_dict_entry
             mid = imin + int(math.floor((imax - imin)/2))
             mm.seek(mid)
             mm.seek(prev_newline(mm))
-            thing = current_entry(mm)
-            key, entry = thing
-            # key, entry = current_entry(mm)
+            key, entry = current_entry(mm)
 
             if key == ustr:
                 return entry
