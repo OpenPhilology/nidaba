@@ -39,14 +39,14 @@ app.config_from_object(celeryconfig)
 
 @app.task(name=u'rgb_to_gray')
 def rgb_to_gray(doc, method=u'rgb_to_gray'):
-    """Converts an arbitrary bit depth image to grayscale and writes it back
+    """
+    Converts an arbitrary bit depth image to grayscale and writes it back
     appending a suffix.
     
     Args:
         doc (unicode): The filename of the input document.
         id (unicode): The unique id underneath all files are situated.
         method (unicode): The suffix string appended to all output files.
-
     Returns:
         unicode: Path of the output file.
     """
@@ -57,7 +57,8 @@ def rgb_to_gray(doc, method=u'rgb_to_gray'):
 @app.task(name=u'binarize')
 def binarize(doc, method=u'binarize', algorithm=u'sauvola', thresh=10,
         factor=0.3, mincount=50, bgval=255, smoothx=2, smoothy=2):
-    """Binarizes an input document utilizing ether Sauvola or Otsu
+    """
+    Binarizes an input document utilizing ether Sauvola or Otsu
     thresholding. Expects grayscale images as input.
     
     Args:
@@ -93,7 +94,8 @@ def binarize(doc, method=u'binarize', algorithm=u'sauvola', thresh=10,
 
 @app.task(name=u'dewarp')
 def dewarp(doc, method=u'dewarp'):
-    """Removes perspective distortion (as commonly exhibited by overhead scans)
+    """
+    Removes perspective distortion (as commonly exhibited by overhead scans)
     from an 1bpp input image.
     
     Args:
@@ -110,7 +112,8 @@ def dewarp(doc, method=u'dewarp'):
 
 @app.task(name=u'deskew')
 def deskew(doc, method=u'deskew'):
-    """Removes skew (rotational distortion) from an 1bpp input image.
+    """
+    Removes skew (rotational distortion) from an 1bpp input image.
     
     Args:
         doc (unicode): The filename of the input document.
@@ -126,7 +129,8 @@ def deskew(doc, method=u'deskew'):
 
 @app.task(name=u'blend_hocr')
 def blend_hocr(docs, language=u'',  method=u'blend_hocr'):
-    """Blends multiple hOCR files using the algorithm from Bruce Robertsons
+    """
+    Blends multiple hOCR files using the algorithm from Bruce Robertsons
     rigaudon. It requires a working spell checking for the input document's
     language; otherwise all matched bboxes will be bunched together without any
     scoring.
@@ -149,7 +153,8 @@ def blend_hocr(docs, language=u'',  method=u'blend_hocr'):
 
 @app.task(name=u'ocr_tesseract')
 def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None):
-    """Runs tesseract on an input document.
+    """
+    Runs tesseract on an input document.
     
     Args:
         doc (unicode): The filename of the input document.
@@ -166,7 +171,8 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None):
 
 @app.task(name=u'ocr_ocropus')
 def ocr_ocropus(doc, method=u'ocr_ocropus', model=None):
-    """Runs ocropus on the input documents set."""
+    """
+    Runs ocropus on the input documents set."""
     input_path = storage.get_abs_path(*doc)
     output_path = storage.insert_suffix(input_path, method, model)
     model = storage.get_abs_path(*irisconfig.OCROPUS_MODELS[model])
@@ -175,7 +181,8 @@ def ocr_ocropus(doc, method=u'ocr_ocropus', model=None):
 # dummy task to work around celery brokenness
 @app.task(name=u'sync')
 def sync(arg):
-    """Takes ones argument and returns it. Used to synchronized stuff as
+    """
+    Takes ones argument and returns it. Used to synchronized stuff as
     chaining groups is not possible with the current celery version."""
     return arg
 
