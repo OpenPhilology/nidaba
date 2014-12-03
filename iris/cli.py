@@ -75,8 +75,10 @@ def batch(args):
             conversions.append({u'method': u'ocr_tesseract', u'languages': params.split(u',')})
         elif engine == u'ocropus':
             for model in params.split(u','):
-                m = irisconfig.OCROPUS_MODELS[model]
-                conversions.append({u'method': u'ocr_ocropus', u'model': m})
+                if model not in irisconfig.OCROPUS_MODELS:
+                    print('WARNING: ocropus model ' + model.encode('utf-8') + ' not known.')
+                else:
+                    conversions.append({u'method': u'ocr_ocropus', u'model': model})
         else:
             print('WARNING: OCR engine ' + engine.encode('utf-8') + ' not known.')
     batch_def[0].append(conversions)

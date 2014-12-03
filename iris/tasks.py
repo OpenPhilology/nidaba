@@ -22,6 +22,7 @@ import gzip
 import zipfile
 import requests
 import os
+import re
 
 from celery import Celery
 from celery import group
@@ -79,7 +80,8 @@ def binarize(doc, method=u'binarize', algorithm=u'sauvola', thresh=10,
     input_path = storage.get_abs_path(*doc)
     if algorithm == u'sauvola':
         output_path = storage.insert_suffix(input_path, method, algorithm,
-                                            unicode(thresh), unicode(factor))
+                                            unicode(thresh),
+                                            re.sub(ur'[^0-9]', u'', unicode(factor)))
         return storage.get_storage_path(leper.sauvola_binarize(input_path,
             output_path, thresh, factor))
     elif algorithm == u'otsu':
@@ -174,7 +176,7 @@ def ocr_ocropus(doc, method=u'ocr_ocropus', model=None):
     """
     Runs ocropus on the input documents set."""
     input_path = storage.get_abs_path(*doc)
-    output_path = storage.insert_suffix(input_path, method, model)
+    output_path = os.path.splitext(storage.insert_suffix(input_path, method, model))[0] + '.html'
     model = storage.get_abs_path(*irisconfig.OCROPUS_MODELS[model])
     return storage.get_storage_path(ocropus.ocr(input_path, output_path, model))
 

@@ -109,5 +109,5 @@ def get_results(batch_id):
             if type(ch.result[0]) == list:
                 outfiles.extend([tuple(x) for x in ch.result])
             else:
-                outfiles.append(tuple(x))
+                outfiles.append(tuple(ch.result))
     return outfiles
