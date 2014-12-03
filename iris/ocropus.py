@@ -27,17 +27,19 @@ def ocr(imagepath, outputfilepath, modelpath):
     shutil.copyfile(imagepath, fglob + '.bin.png')
     imagepath = fglob + '.bin.png'
     # page layout analysis
-    p = subprocess.Popen(['ocropus-gpageseg', imagepath.encode('utf-8')],
+    p = subprocess.Popen(['ocropus-gpageseg', '-n', imagepath.encode('utf-8')],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode:
         raise IrisOcropusException(err)
 
     # text line recognition
-    p = subprocess.Popen(['ocropus-rpred', '-m' , modelpath.encode('utf-8'),
-        (fglob + u'/*.bin.png').encode('utf-8')], stdout=subprocess.PIPE,
+    p = subprocess.Popen(['ocropus-rpred', '-q', '-m' , modelpath.encode('utf-8')] + glob.glob(fglob + u'/*.bin.png'),
+        stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
     out, err = p.communicate()
+    print(out)
+    print(err)
     if p.returncode:
         raise IrisOcropusException(err)
 
