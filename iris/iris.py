@@ -27,24 +27,21 @@ def batch(config):
 
             * input_files: A list of image paths
             * batch_id: A globally unique identifier for this batch
-            * actions: A list of lists (containing dicts) defining
-            transformations run on input_files. Each sublist is taken as
+            * actions: A list of list of lists (containing dicts) defining
+            transformations run on input_files. Each middle sublist is taken as
             commands that should be run in parallel. The output of each of
-            these commands is fed into the next sublist. For example [[{'a'},
-            {'b'}], [{'c'}], [{'d'}, {'e'}]] is expanded to the following (parallel)
-            execution chains:
+            these commands is fed into the next sublist. The outermost list
+            contain sublists which are supposed to run sequentially, i.e. each
+            sublist is run after all tasks of the previous sublist have been
+            executed. 
+            For example [[[{'a'}, {'b'}], [{'c'}], [{'d'}, {'e'}]][[{'f'}]]] is
+            expanded to the following (parallel) execution chains:
                 ('a' -> 'c' -> 'd')
                 ('a' -> 'c' -> 'e')
                 ('b' -> 'c' -> 'd')
                 ('b' -> 'c' -> 'e')
 
-            The following actions are possible:
-                * rgb_to_gray
-                * binarize
-                * dewarp
-                * deskew
-                * ocr_tesseract
-                * ocr_ocropus
+            After these are run their output is aggregated an 'f' is run.
 
             Refer to the documentation of the ```tasks``` submodule for further
             information.
