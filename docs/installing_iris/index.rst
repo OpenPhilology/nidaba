@@ -12,3 +12,4 @@ machines and using :ref:`building_iris` to build and install Iris.
 .. toctree::
 
     building_iris
+    configuring_iris
