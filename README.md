@@ -24,13 +24,6 @@ As it is designed to use a common storage medium on network attached storage
 and the [celery](http://celeryproject.org) distributed task queue it scales
 nicely to multi-machine clusters.
 
-Installation/Quick Start
-========================
-
-First edit iris/celeryconfig.py and iris/irisconfig.py to fit your needs.
-Running a distributed cluster requires a shared storage medium (e.g. NFS) on
-all nodes.
-
 Build
 =====
 
@@ -72,6 +65,10 @@ files and an installed ocropus suite.
 
 Running
 =======
+
+First edit (the installed) iris.yaml and celery.yaml to fit your needs. Have a
+look at the [docs](https:///ogl-iris.rtfd.org/) if you haven't set up a
+celery-based application before.
 
 Then start up the celery daemon with something like:
 
