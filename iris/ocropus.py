@@ -2,7 +2,6 @@
 import errno
 import subprocess
 import glob
-import irisconfig
 import re
 import shutil
 
@@ -38,8 +37,6 @@ def ocr(imagepath, outputfilepath, modelpath):
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
     out, err = p.communicate()
-    print(out)
-    print(err)
     if p.returncode:
         raise IrisOcropusException(err)
 

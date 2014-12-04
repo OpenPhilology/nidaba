@@ -24,3 +24,4 @@ redis==2.10.3
 requests==2.4.3
 six==1.8.0
 wsgiref==0.1.2
+PyYAML==3.11

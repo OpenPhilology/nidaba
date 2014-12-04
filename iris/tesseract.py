@@ -3,10 +3,9 @@ import os
 import errno
 import subprocess
 import glob
-import irisconfig
 
-from irisexceptions import IrisTesseractException
-
+from .irisexceptions import IrisTesseractException
+from .config import iris_cfg
 
 #More readable aliases for tesseract's language abbreviations.
 greek = 'grc'
@@ -25,7 +24,7 @@ def ocr(imagepath, outputfilepath, languages):
     abs_out = os.path.abspath(os.path.expanduser(outputfilepath))
     p = subprocess.Popen(['tesseract', '-l', '+'.join(languages), abs_in,
         abs_out, 'hocr'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if irisconfig.OLD_TESSERACT:
+    if iris_cfg['old_tesseract']:
         resultpath = abs_out + '.html'
     else:
         resultpath = abs_out + '.hocr'

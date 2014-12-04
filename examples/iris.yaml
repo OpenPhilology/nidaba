@@ -1,0 +1,26 @@
+# The home directory for Iris to store files created by OCR jobs. For example,
+# tifs, jp2s, meta.xml, and abbyy file downloaded from archive.org are stored
+# here. Each new job is automatically placed in a uniquely named directory.
+storage_path: ~/OCR
+
+# Spell check configuration. Dictionaries are kept on the common medium (i.e.
+# at STORAGE_PATH/tuple[0]/tuple[1]).
+lang_dicts:
+  polytonic_greek: [dicts, greek.dic]
+  lojban: [dicts, lojban.dic]
+  german: [dicts, german.dic]
+
+# Old tesseract versions create hOCR files ending in .html, current ones .hocr
+old_tesseract: n
+# Old ocropus versions don't have some command line switches which are required
+# for operation with more recent ones. If you're not running ocropus from
+# github.com/tmbdev or ocropus-gpageseg does not have a --nocheck option set
+# this to yes.
+old_ocropus: n
+
+# Ocropus model
+ocropus_models:
+  greek: [models, greek.pyrnn.gz]
+  atlantean: [models, atlantean.pyrnn.gz]
+  fraktur: [models, fraktur.pyrnn.gz]
+  fancy_ligatures: [models, ligatures.pyrnn.gz]

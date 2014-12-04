@@ -4,14 +4,13 @@
 # point-of-failure indentification for debugging purposes, or to easily identify
 # bad OCR data.
 
-from . import celeryconfig
-from . import irisconfig
 from . import algorithms
 from . import tesseract
 from . import ocropus
 from . import storage
 from . import leper
 from . import merge_hocr
+from .config import iris_cfg, celery_cfg
 from .irisexceptions import IrisNoSuchAlgorithmException
 
 import uuid
@@ -25,13 +24,9 @@ import os
 import re
 
 from celery import Celery
-from celery import group
-from celery import chord
-from celery.task.sets import TaskSet
-from celery.utils.log import get_task_logger
 
-app = Celery(main='tasks', broker=celeryconfig.BROKER_URL)
-app.config_from_object(celeryconfig)
+app = Celery(main='tasks', broker=celery_cfg['BROKER_URL'])
+app.config_from_object(celery_cfg)
 
 # Application tasks
 # In general they should be sorted in the order of execution, e.g. an image
@@ -177,7 +172,7 @@ def ocr_ocropus(doc, method=u'ocr_ocropus', model=None):
     Runs ocropus on the input documents set."""
     input_path = storage.get_abs_path(*doc)
     output_path = os.path.splitext(storage.insert_suffix(input_path, method, model))[0] + '.html'
-    model = storage.get_abs_path(*irisconfig.OCROPUS_MODELS[model])
+    model = storage.get_abs_path(*(iris_cfg['ocropus_models'][model]))
     return storage.get_storage_path(ocropus.ocr(input_path, output_path, model))
 
 # dummy task to work around celery brokenness

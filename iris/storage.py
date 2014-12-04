@@ -2,7 +2,7 @@
 # This module contains all file handling/storage management/ID mapping methods
 
 from lock import lock
-from . import irisconfig
+from .config import iris_cfg
 from .irisexceptions import IrisStorageViolationException, IrisNoSuchStorageBin
 
 import os
@@ -30,13 +30,13 @@ def get_abs_path(jobID, *path):
     if len(path) < 1:
         raise IrisStorageViolationException('Path not beneath STORAGE_PATH')
     # Run twice to ensure resulting path is beneath jobID.
-    return _sanitize_path(_sanitize_path(irisconfig.STORAGE_PATH, jobID), *path)
+    return _sanitize_path(_sanitize_path(iris_cfg['storage_path'], jobID), *path)
 
 def get_storage_path(path):
     """
     Converts an absolute path to a storage tuple of the form (id, path).
     """
-    base_path = _sanitize_path(irisconfig.STORAGE_PATH, u'')
+    base_path = _sanitize_path(iris_cfg['storage_path'], u'')
     if os.path.commonprefix([os.path.normpath(base_path),
             os.path.normpath(path)]) != base_path:
         raise IrisStorageViolationException('Path not beneath STORAGE_PATH')
@@ -61,7 +61,7 @@ def is_valid_job(jobID):
     """
     Checks if filestore has been prepared for a job.
     """
-    return os.path.isdir(_sanitize_path(irisconfig.STORAGE_PATH, jobID))
+    return os.path.isdir(_sanitize_path(iris_cfg['storage_path'], jobID))
 
 
 def prepare_filestore(jobID):
@@ -72,7 +72,7 @@ def prepare_filestore(jobID):
     if is_valid_job(jobID):
         return None
     try:
-        jobPath = _sanitize_path(irisconfig.STORAGE_PATH, jobID)
+        jobPath = _sanitize_path(iris_cfg['storage_path'], jobID)
         os.mkdir(jobPath)
         return jobID
     except Exception as err:
@@ -86,7 +86,7 @@ def list_content(jobID, pattern=u'*'):
     if not is_valid_job(jobID):
         return None
     flist = []
-    jpath = _sanitize_path(irisconfig.STORAGE_PATH, jobID)
+    jpath = _sanitize_path(iris_cfg['storage_path'], jobID)
     for root, dirs, files in os.walk(jpath):
         flist.extend([os.path.relpath(os.path.join(root, s), jpath) for s in files])
     return fnmatch.filter(flist, pattern)
@@ -103,7 +103,7 @@ def retrieve_content(jobID, documents=None):
         if isinstance(documents, basestring):
             documents = [documents]
         fdict = {}
-        dpath = _sanitize_path(irisconfig.STORAGE_PATH, jobID)
+        dpath = _sanitize_path(iris_cfg['storage_path'], jobID)
         locks = [lock(_sanitize_path(dpath, doc)) for doc in documents]
         # will wait indefinitely until a lock can be acquired.
         map(lambda x: x.acquire(), locks)
@@ -131,7 +131,7 @@ def write_content(jobID, dest, data):
     if not isinstance(data, basestring):
         return None
     try:
-        with open(_sanitize_path(irisconfig.STORAGE_PATH,
+        with open(_sanitize_path(iris_cfg['storage_path'],
                                  os.path.join(jobID, dest)), 'wb') as f:
             l = lock(f.name)
             l.acquire()

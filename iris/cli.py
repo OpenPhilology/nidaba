@@ -3,8 +3,8 @@
 # This modul contains all entry points to the various components of iris.
 
 from . import iris
-from . import irisconfig
 from . import storage
+from .config import iris_cfg
 
 from pprint import pprint
 
@@ -42,7 +42,8 @@ def main():
                         format engine:language1,language2 engine:model1, model2\
                         where engine is either tesseract or ocropus and\
                         language* is a tesseract language model and model1 is\
-                        a ocropus model defined in irisconfig.', nargs='+', default=[u'tesseract:eng'])
+                        a ocropus model defined in the iris config.',
+                        nargs='+', default=[u'tesseract:eng'])
     batchparser.add_argument('--willitblend', help=u'Blends all output files into a\
                              single hOCR document.', action='store_true', default=False)
     batchparser.add_argument('--grayscale', help=u'Input file are already 8bpp\
@@ -75,7 +76,7 @@ def batch(args):
             conversions.append({u'method': u'ocr_tesseract', u'languages': params.split(u',')})
         elif engine == u'ocropus':
             for model in params.split(u','):
-                if model not in irisconfig.OCROPUS_MODELS:
+                if model not in iris_cfg['ocropus_models']:
                     print('WARNING: ocropus model ' + model.encode('utf-8') + ' not known.')
                 else:
                     conversions.append({u'method': u'ocr_ocropus', u'model': model})
@@ -105,10 +106,7 @@ def batch(args):
     print(s)
 
 def config(args):
-    for field in dir(irisconfig):
-        if not field.startswith('__'):
-            print('* ' + field.encode('utf-8'))
-            pprint(getattr(irisconfig, field))
+    pprint(iris_cfg)
 
 def status(args):
     state = iris.get_state(args.jobid)

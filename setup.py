@@ -45,6 +45,7 @@ setup(
     packages = find_packages(exclude=['tests']),
     ext_modules = [Extension("iris.leper", sources=["exts/leper.c"], libraries=["lept"], extra_compile_args=["-std=c99"])],
     include_package_data=True,
+    data_files=[('etc/iris', ['examples/iris.yaml', 'examples/celery.yaml'])],
     test_suite="nose.collector",
     tests_require="nose",
     install_requires=reqs,
