@@ -5,7 +5,8 @@ import glob
 import re
 import shutil
 
-from irisexceptions import IrisOcropusException
+from .config import iris_cfg 
+from .irisexceptions import IrisOcropusException
 
 def _allsplitext(path):
     """Split all the pathname extensions, so that "a/b.c.d" -> "a/b", ".c.d" """
@@ -26,16 +27,20 @@ def ocr(imagepath, outputfilepath, modelpath):
     shutil.copyfile(imagepath, fglob + '.bin.png')
     imagepath = fglob + '.bin.png'
     # page layout analysis
-    p = subprocess.Popen(['ocropus-gpageseg', '-n', imagepath.encode('utf-8')],
+    if iris_cfg['legacy_ocropus']:
+        flag = ''
+    else:
+        flag = '-n'
+    p = subprocess.Popen(['ocropus-gpageseg', flag, imagepath.encode('utf-8')],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode:
         raise IrisOcropusException(err)
 
     # text line recognition
-    p = subprocess.Popen(['ocropus-rpred', '-q', '-m' , modelpath.encode('utf-8')] + glob.glob(fglob + u'/*.bin.png'),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
+    p = subprocess.Popen(['ocropus-rpred', '-q', '-m' ,
+        modelpath.encode('utf-8')] + glob.glob(fglob + u'/*.bin.png'),
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode:
         raise IrisOcropusException(err)

@@ -11,12 +11,12 @@ lang_dicts:
   german: [dicts, german.dic]
 
 # Old tesseract versions create hOCR files ending in .html, current ones .hocr
-old_tesseract: n
+legacy_tesseract: false
 # Old ocropus versions don't have some command line switches which are required
 # for operation with more recent ones. If you're not running ocropus from
 # github.com/tmbdev or ocropus-gpageseg does not have a --nocheck option set
 # this to yes.
-old_ocropus: n
+legacy_ocropus: false
 
 # Ocropus model
 ocropus_models:
