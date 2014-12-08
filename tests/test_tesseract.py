@@ -19,6 +19,7 @@ class TesseractTests(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self.tempdir)
+        pass
 
     def test_file_output_png(self):
         """
@@ -27,12 +28,14 @@ class TesseractTests(unittest.TestCase):
         pngpath = os.path.join(resources, 'image.png')
         outpath = os.path.join(self.tempdir, 'output')
         ocr = tesseract.ocr(pngpath, outpath, ['grc'])
-        expected = outpath + '.html'
-        self.assertEqual(ocr, expected)
-        self.assertTrue(os.path.isfile(expected),
+        if os.path.isfile(outpath + '.html'):
+            output = outpath + '.html'
+        else:
+            outpath = outpath + '.hocr'
+        self.assertTrue(os.path.isfile(outpath), 
                         msg='Tesseract did not output a file!')
         try:
-            etree.parse(expected)
+            etree.parse(outpath)
         except etree.XMLSyntaxError, e:
             self.fail(msg='The output was not valid html/xml!')
 
@@ -43,12 +46,15 @@ class TesseractTests(unittest.TestCase):
         """
         tiffpath = os.path.join(resources, 'image.tiff')
         outpath = os.path.join(self.tempdir, 'output')
-        expected = outpath + '.html'
         ocr = tesseract.ocr(tiffpath, outpath, ['grc'])
-        self.assertTrue(os.path.isfile(expected),
+        if os.path.isfile(outpath + '.html'):
+            output = outpath + '.html'
+        else:
+            outpath = outpath + '.hocr'
+        self.assertTrue(os.path.isfile(outpath), 
                         msg='Tesseract did not output a file!')
         try:
-            etree.parse(expected)
+            etree.parse(outpath)
         except etree.XMLSyntaxError, e:
             self.fail(msg='The output was not valid html/xml!')
 
@@ -59,13 +65,15 @@ class TesseractTests(unittest.TestCase):
         """
         jpgpath = os.path.join(resources, 'image.jpg')
         outpath = os.path.join(self.tempdir, 'output')
-        expected = outpath + '.html'
-
         tesseract.ocr(jpgpath, outpath, ['grc'])
-        ocr = self.assertTrue(os.path.isfile(expected),
+        if os.path.isfile(outpath + '.html'):
+            output = outpath + '.html'
+        else:
+            outpath = outpath + '.hocr'
+        self.assertTrue(os.path.isfile(outpath), 
                         msg='Tesseract did not output a file!')
         try:
-            etree.parse(expected)
+            etree.parse(outpath)
         except etree.XMLSyntaxError, e:
             self.fail(msg='The output was not valid html/xml!')
 
