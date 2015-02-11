@@ -4,12 +4,13 @@ import os
 import urllib2
 import urlparse
 import shutil
+import uuid
 from pip.req import parse_requirements
 from setuptools import setup, find_packages, Extension
 from distutils.core import setup, Extension, Command
 from distutils.command.install_data import install_data
 # All hail the pip-ian way of doing things
-install_reqs = parse_requirements('requirements.txt')
+install_reqs = parse_requirements('requirements.txt', session=uuid.uuid1())
 reqs = [str(ir.req) for ir in install_reqs]
 
 manifest_url = "http://l.unchti.me/iris/MANIFEST"
