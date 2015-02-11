@@ -2,10 +2,11 @@
 # This module contains an NFS-safe locking method that is hopefully
 # interoperable with anything anybody is going to encounter out there.
 
+from __future__ import absolute_import
+
 import os
 import time
 import random
-
 
 class lock:
     def __init__(self, locked_file):

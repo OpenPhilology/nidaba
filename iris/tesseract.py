@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
+
+from __future__ import absolute_import
+
 import os
 import errno
 import subprocess
 import glob
 
-from .irisexceptions import IrisTesseractException
-from .config import iris_cfg
+from iris.irisexceptions import IrisTesseractException
+from iris.config import iris_cfg
 
 #More readable aliases for tesseract's language abbreviations.
 greek = 'grc'

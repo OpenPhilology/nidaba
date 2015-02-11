@@ -1,10 +1,13 @@
 #!/usr/bin/python
+
+from __future__ import absolute_import
+
 import sys
 import codecs
 import os
 from lxml import etree
 from operator import itemgetter, attrgetter
-from . import storage
+from iris import storage
 
 class Rect:
     """Native python replacement for gameras C++ Rect object."""

@@ -4,14 +4,17 @@
 # point-of-failure indentification for debugging purposes, or to easily identify
 # bad OCR data.
 
-from . import algorithms
-from . import tesseract
-from . import ocropus
-from . import storage
-from . import leper
-from . import merge_hocr
-from .config import iris_cfg, celery_cfg
-from .irisexceptions import IrisNoSuchAlgorithmException
+from __future__ import absolute_import
+
+from iris import algorithms
+from iris import tesseract
+from iris import ocropus
+from iris import storage
+from iris import leper
+from iris import merge_hocr
+from iris.config import iris_cfg
+from iris.celery import app
+from iris.irisexceptions import IrisNoSuchAlgorithmException
 
 import uuid
 import logging
@@ -22,11 +25,6 @@ import zipfile
 import requests
 import os
 import re
-
-from celery import Celery
-
-app = Celery(main='tasks', broker=celery_cfg['BROKER_URL'])
-app.config_from_object(celery_cfg)
 
 # Application tasks
 # In general they should be sorted in the order of execution, e.g. an image

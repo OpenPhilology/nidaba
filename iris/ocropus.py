@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
+
+from __future__ import absolute_import
+
 import errno
 import subprocess
 import glob
 import re
 import shutil
 
-from .config import iris_cfg 
-from .irisexceptions import IrisOcropusException
+from iris.config import iris_cfg 
+from iris.irisexceptions import IrisOcropusException
 
 def _allsplitext(path):
     """Split all the pathname extensions, so that "a/b.c.d" -> "a/b", ".c.d" """

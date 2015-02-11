@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import os
 import re
-import algorithms
+from iris import algorithms
 from lxml import etree
 from kitchen.text.converters import to_unicode, to_bytes
 from PIL import Image, ImageDraw

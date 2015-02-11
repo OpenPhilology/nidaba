@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 # This module contains all file handling/storage management/ID mapping methods
 
-from lock import lock
-from .config import iris_cfg
-from .irisexceptions import IrisStorageViolationException, IrisNoSuchStorageBin
+from __future__ import absolute_import
+
+from iris.lock import lock
+from iris.config import iris_cfg
+from iris.irisexceptions import IrisStorageViolationException, IrisNoSuchStorageBin
 
 import os
 import fnmatch

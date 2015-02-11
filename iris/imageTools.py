@@ -1,5 +1,6 @@
 # This module contains tools for working with images. Any component of Iris which needs to work with images should do so through this module.
 # For the sake of speed and memory, all methods which take an image as a parameter will assume that the image has been validated (rather than loading and checking redundantly. This should be done through imageFromFile(file).
+from __future__ import absolute_import
 
 from PIL import Image
 import logging

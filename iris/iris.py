@@ -1,11 +1,12 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# This modul contains all entry points to the various components of iris.
 
-from . import tasks
-from . import storage
+from __future__ import absolute_import
 
-from irisexceptions import IrisInputException
+from iris import tasks
+from iris import storage
+
+from iris.irisexceptions import IrisInputException
 from itertools import product
 from celery import chain
 from celery import group
@@ -87,6 +88,7 @@ def batch(config):
 def get_state(batch_id):
     if not storage.is_valid_job(batch_id):
         return 'UNKNOWN'
+    
     subtasks = storage.retrieve_content(batch_id, u'.subtasks')[u'.subtasks']
     st = state(SUCCESS)
     for id in subtasks.split('\n'):

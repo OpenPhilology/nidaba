@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 # This modul contains all entry points to the various components of iris.
 
-from . import iris
-from . import storage
-from .config import iris_cfg
+from __future__ import absolute_import
+
+from iris import iris 
+from iris import storage
+from iris.config import iris_cfg
 
 from pprint import pprint
 

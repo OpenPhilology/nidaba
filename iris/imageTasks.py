@@ -1,5 +1,6 @@
 # This module contains celery tasks for working with images.
 # For the sake of speed and memory, all methods which take an image as a parameter will assume that the image has been validated, rather than loading and checking redundantly. This should be done through imageFromFile(file).
+from __future__ import absolute_import
 
 from PIL import Image
 from celery import Celery

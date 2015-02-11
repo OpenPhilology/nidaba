@@ -3,10 +3,12 @@
 # such as extracting words from texts, normalizing encodings, building
 # symmetric deletion dictionaries, etc.
 
+from __future__ import absolute_import
+
 import os
 import codecs
 import glob
-import algorithms as alg
+import iris.algorithms as alg
 from collections import Counter
 
 @alg.unibarrier
