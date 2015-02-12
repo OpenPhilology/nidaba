@@ -25,6 +25,9 @@ def _sanitize_path(base_path, *paths):
     else:
         raise IrisStorageViolationException('Path not beneath STORAGE_PATH')
 
+def is_file(jobID, path):
+    return os.path.isfile(get_abs_path(jobID, path))
+
 def get_abs_path(jobID, *path):
     """
     Returns the absolute path of a file.
