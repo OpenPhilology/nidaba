@@ -9,7 +9,7 @@ from lxml import etree
 from operator import itemgetter, attrgetter
 from iris import storage
 
-class Rect:
+class Rect(object):
     """Native python replacement for gameras C++ Rect object."""
     def __init__(self, ul=(0,0), lr=(0,0)):
         self.ul = ul
@@ -23,10 +23,10 @@ class Rect:
         self.ur_x = lr[0]
         self.ur_y = ul[1]
 
-class hocrWord():
+class hocrWord(object):
     """associates word text with bbox"""
 
-class hocrLine():
+class hocrLine(object):
     """Associates lines, words with their text and bboxes"""
 
 def parse_bbox(prop_str):

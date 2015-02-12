@@ -8,7 +8,7 @@ import os
 import time
 import random
 
-class lock:
+class lock(object):
     def __init__(self, locked_file):
         self._locked_file = locked_file + u'.lock'
         self._lock_file = unicode(os.uname()[1]) + u'.' + \
