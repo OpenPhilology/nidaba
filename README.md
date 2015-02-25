@@ -79,7 +79,7 @@ $ celery -A iris.tasks worker
 Next jobs can be added to the pipeline using the iris executable:
 
 ```
-$ iris batch --binarize sauvola:10,20,30,40 --ocr tesseract:eng -- ./input.tiff
+$ iris batch --binarize "sauvola:whsize=10;whsize=20;whsize=30;whsize=40,factor=0.6" --ocr tesseract:eng -- ./input.tiff
 35be45e9-9d6d-47c7-8942-2717f00f84cb
 ```
 

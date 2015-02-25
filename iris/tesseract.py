@@ -20,7 +20,7 @@ def ocr(imagepath, outputfilepath, languages):
     """
     Scan a single image with tesseract using the specified language,
     and writing output to the specified file. Returns a 3 tuple of the
-    format (absolute path to output, tesseract's stdout, tesseract's 
+    format (absolute path to output, tesseract's stdout, tesseract's
     stderr).
     """
     abs_in = os.path.abspath(os.path.expanduser(imagepath))
@@ -63,6 +63,6 @@ def ocrdir(dirpath, outputdir, language):
 
     return results
 
-    
+
 if __name__ == '__main__':
     pass

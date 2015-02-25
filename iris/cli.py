@@ -1,13 +1,13 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# This modul contains all entry points to the various components of iris.
+"""
+This module encapsulates all shell callable functions of iris.
+"""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function, unicode_literals
 
-from iris import iris 
-from iris import storage
+from iris import Batch, storage
 from iris.config import iris_cfg
-
 from pprint import pprint
 
 import argparse
@@ -56,68 +56,82 @@ def main():
     args = parser.parse_args()
     args.func(args)
 
+def int_float_or_str(s):
+    try:
+        return int(s)
+    except ValueError:
+        try:
+            return float(s)
+        except ValueError:
+            return s
+
 def batch(args):
 
-    print 'Building actions array...',
-    # build actions array
-    batch_def = [[]]
-    if not args.grayscale:
-        batch_def[0].append([{u'method': u'rgb_to_gray'}])
-    binarizations = []
-    # build binarization(s)
-    for bin in args.binarize:
-        (alg, _, threshs) = bin.partition(u':')
-        for t in threshs.split(u','):
-            binarizations.append({u'method': u'binarize', u'algorithm': alg, u'thresh': int(t)})
-    batch_def[0].append(binarizations)
-    # build ocr conversions
-    conversions = []
-    for ocr in args.ocr:
-        (engine, _, params) = ocr.partition(u':')
-        if engine == u'tesseract':
-            conversions.append({u'method': u'ocr_tesseract', u'languages': params.split(u',')})
-        elif engine == u'ocropus':
-            for model in params.split(u','):
-                if model not in iris_cfg['ocropus_models']:
-                    print('WARNING: ocropus model ' + model.encode('utf-8') + ' not known.')
-                else:
-                    conversions.append({u'method': u'ocr_ocropus', u'model': model})
-        else:
-            print('WARNING: OCR engine ' + engine.encode('utf-8') + ' not known.')
-    batch_def[0].append(conversions)
-    if args.willitblend:
-        batch_def.append([[{u'method': u'blend_hocr'}]])
-    print('done.')
     id = unicode(uuid.uuid4())
-    print 'Preparing filestore...',
+    batch = Batch(id)
+    print('Preparing filestore....', end=''),
     if storage.prepare_filestore(id) == None:
         print('failed.')
         exit()
-    else:
-        print('done.')
-    input = []
-    print 'Copying files to store...',
     for doc in args.files:
         shutil.copy2(doc, storage.get_abs_path(id, os.path.basename(doc)))
-        input.append(os.path.basename(doc))
-    s = iris.batch({ u'batch_id': id,
-        u'input_files': input,
-        u'actions': batch_def
-    })
+        batch.add_document((id, os.path.basename(doc)))
     print('done.')
-    print(s)
+    print('Building batch...', end='')
+
+    batch.add_step()
+    if not args.grayscale:
+        batch.add_tick()
+        batch.add_task('img.rgb_to_gray')
+    if args.binarize:
+        batch.add_tick()
+        for bin in args.binarize:
+            (alg, _, params) = bin.partition(u':')
+            for c in params.split(u';'):
+                kwargs = {kwarg.split('=') for kwarg in c.split(",")}
+                kwargs = {key:int_float_or_str(val) for key,val in kwargs.items()}
+                batch.add_task('binarize.' + alg, **kwargs)
+    if args.ocr:
+        batch.add_tick()
+        for ocr in args.ocr:
+            (engine, _, params) = ocr.partition(u':')
+            if engine == u'tesseract':
+                batch.add_task('ocr.tesseract', languages=params.split(u','))
+            elif engine == u'ocropus':
+                for model in params.split(u','):
+                    if model not in iris_cfg['ocropus_models']:
+                        print('WARNING: ocropus model ' + model.encode('utf-8') + ' not known.')
+                    else:
+                        batch.add_task('ocr.ocropus', model=model)
+            else:
+                print('WARNING: OCR engine ' + engine.encode('utf-8') + ' not known.')
+    if args.willitblend:
+        batch.add_step()
+        batch.add_tick()
+        batch.add_task('util.merge_hocr')
+    batch.run()
+    print('done.')
+    print(id)
 
 def config(args):
     pprint(iris_cfg)
 
 def status(args):
-    state = iris.get_state(args.jobid)
+    batch = Batch(args.jobid)
+    state = batch.get_state()
     print(state)
     if state == 'SUCCESS':
-        ret = iris.get_results(args.jobid)
+        ret = batch.get_results()
         if ret == None:
             print('Something somewhere went wrong.')
             print('Please contact your friendly iris support technician.')
         else:
             for doc in ret:
                 print('\t' + storage.get_abs_path(*doc).encode('utf-8'))
+    elif state == 'FAILURE':
+        ret = batch.get_errors()
+        if ret == None:
+            print('Something somewhere went wrong.')
+        else:
+            for fun in ret:
+                print(fun[1]['method'].encode('utf-8') + u': ' + fun[2].encode('utf-8'))
