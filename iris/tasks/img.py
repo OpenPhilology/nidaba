@@ -12,8 +12,10 @@ from __future__ import absolute_import, unicode_literals
 
 from iris import storage
 from iris import leper
+from iris import image
 from iris.celery import app
 from iris.tasks.helper import IrisTask
+
 
 @app.task(base=IrisTask, name=u'iris.img.rgb_to_gray')
 def rgb_to_gray(doc, id, method=u'rgb_to_gray'):
@@ -31,7 +33,7 @@ def rgb_to_gray(doc, id, method=u'rgb_to_gray'):
     """
     input_path = storage.get_abs_path(*doc)
     output_path = storage.insert_suffix(input_path, method)
-    return storage.get_storage_path(leper.rgb_to_gray(input_path, output_path))
+    return storage.get_storage_path(image.rgb_to_gray(input_path, output_path))
 
 @app.task(base=IrisTask, name=u'iris.img.dewarp')
 def dewarp(doc, id, method=u'dewarp'):
