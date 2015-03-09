@@ -4,7 +4,7 @@ import os
 import shutil
 import tempfile
 from lxml import etree
-from iris import ocropus
+from nidaba import ocropus
 
 thisfile = os.path.abspath(os.path.dirname(__file__))
 resources = os.path.abspath(os.path.join(thisfile, 'resources/ocropus'))

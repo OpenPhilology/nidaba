@@ -3,7 +3,7 @@ import unittest
 import re
 import tempfile
 
-from iris import hocr
+from nidaba import hocr
 
 class HocrTests(unittest.TestCase):
     """

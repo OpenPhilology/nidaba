@@ -9,8 +9,8 @@ from setuptools import setup, find_packages, Extension
 from distutils.core import setup, Extension, Command
 from distutils.command.install_data import install_data
 
-manifest_url = "http://l.unchti.me/iris/MANIFEST"
-download_prefix = "http://l.unchti.me/iris/"
+manifest_url = "http://l.unchti.me/nidaba/MANIFEST"
+download_prefix = "http://l.unchti.me/nidaba/"
 
 class DownloadCommand(Command):
     description = "Download misc. data files (dictionaries, sample inputs and models for tests etc.)"
@@ -37,7 +37,7 @@ class DownloadCommand(Command):
                 shutil.copyfileobj(r, fp)
 
 setup(
-    ext_modules = [Extension("iris.leper", sources=["exts/leper.c"], libraries=["lept"], extra_compile_args=["-std=c99"])],
+    ext_modules = [Extension("nidaba.leper", sources=["exts/leper.c"], libraries=["lept"], extra_compile_args=["-std=c99"])],
     include_package_data=True,
     test_suite="nose.collector",
     tests_require="nose",

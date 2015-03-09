@@ -3,7 +3,7 @@ import unittest
 import os
 import tempfile
 import shutil
-from iris import lex
+from nidaba import lex
 
 class DictTests(unittest.TestCase):
     """

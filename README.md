@@ -1,10 +1,10 @@
 Overview
 ========
 
-Iris is the central controller for the entire OGL OCR pipeline. It oversees and
+Nidaba is the central controller for the entire OGL OCR pipeline. It oversees and
 automates the process of converting raw images into citable collections of
-digitized texts. Images can be uploaded directly via Iris' RESTful web portal,
-or can be selected from preexisting images located on Iris' image repository.
+digitized texts. Images can be uploaded directly via Nidaba' RESTful web portal,
+or can be selected from preexisting images located on Nidaba' image repository.
 
 It offers the following functionality:
 
@@ -27,7 +27,7 @@ nicely to multi-machine clusters.
 Build
 =====
 
-To build Iris run
+To build Nidaba run
 
 ```
 $ pip install .
@@ -66,27 +66,27 @@ files and an installed ocropus suite.
 Running
 =======
 
-First edit (the installed) iris.yaml and celery.yaml to fit your needs. Have a
-look at the [docs](https:///ogl-iris.rtfd.org/) if you haven't set up a
+First edit (the installed) nidaba.yaml and celery.yaml to fit your needs. Have
+a look at the [docs](https:///nidaba.rtfd.org/) if you haven't set up a
 celery-based application before.
 
 Then start up the celery daemon with something like:
 
 ```
-$ celery -A iris.tasks worker
+$ celery -A nidaba worker
 ```
 
-Next jobs can be added to the pipeline using the iris executable:
+Next jobs can be added to the pipeline using the nidaba executable:
 
 ```
-$ iris batch --binarize "sauvola:whsize=10;whsize=20;whsize=30;whsize=40,factor=0.6" --ocr tesseract:eng -- ./input.tiff
+$ nidaba batch --binarize "sauvola:whsize=10;whsize=20;whsize=30;whsize=40,factor=0.6" --ocr tesseract:eng -- ./input.tiff
 35be45e9-9d6d-47c7-8942-2717f00f84cb
 ```
 
 Using the return code the current state of the job can be retrieved:
 
 ```
-$ iris status 35be45e9-9d6d-47c7-8942-2717f00f84cb
+$ nidaba status 35be45e9-9d6d-47c7-8942-2717f00f84cb
 PENDING
 ```
 
@@ -94,7 +94,7 @@ When the job has been processed the status command will return a list of paths
 containing the final output:
 
 ```
-$ iris status 35be45e9-9d6d-47c7-8942-2717f00f84cb
+$ nidaba status 35be45e9-9d6d-47c7-8942-2717f00f84cb
 SUCCESS
         /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_10_0.3_ocr_tesseract_eng.tiff.hocr
         /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_20_0.3_ocr_tesseract_eng.tiff.hocr
@@ -106,5 +106,5 @@ SUCCESS
 Documentation
 =============
 
-Want to learn more? [Read the Docs](https:///ogl-iris.readthedocs.org/)
+Want to learn more? [Read the Docs](https:///ogl-nidaba.readthedocs.org/)
 
