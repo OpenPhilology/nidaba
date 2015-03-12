@@ -33,9 +33,11 @@ To build Nidaba run
 $ pip install .
 ```
 
-in the root directory. pip is required to extract the dependencies for
-setuptools from the requirements file, so there is no reason the run setup.py
-directly.
+in the root directory or install using pypi:
+
+```
+$ pip install nibada
+```
 
 The image processing C extension requires the leptonica image processing
 library (>=1.70, available from Debian Jessie):
@@ -58,7 +60,7 @@ Tests
 $ python setup.py test
 ```
 
-As mentioned above pip and the models have to be installed.
+As mentioned above the models have to be installed.
 
 Running the tests requires a working tesseract with ancient greek language
 files and an installed ocropus suite.
@@ -106,5 +108,5 @@ SUCCESS
 Documentation
 =============
 
-Want to learn more? [Read the Docs](https:///ogl-nidaba.readthedocs.org/)
+Want to learn more? [Read the Docs](https:///nidaba.readthedocs.org/)
 
