@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+nidaba.tesseract
+~~~~~~~~~~~~~~~~
 
+Wrappers around the tesseract OCR engine.
+"""
 from __future__ import absolute_import
 
 import os
@@ -20,9 +25,21 @@ fileformats = ('png', 'tiff', 'jpg')
 def ocr(imagepath, outputfilepath, languages):
     """
     Scan a single image with tesseract using the specified language,
-    and writing output to the specified file. Returns a 3 tuple of the
-    format (absolute path to output, tesseract's stdout, tesseract's
-    stderr).
+    and writing output to the specified file.
+
+    Args:
+        imagepath (unicode): Path to the image file
+        outputfilepath (unicode): Path to the output file. Tesseract will
+                                  independently append either .html or .hocr to
+                                  this path.
+        languages (list): A list of strings containing valid tesseract language
+                          descriptions.
+    Returns:
+        unicode: Path of the output file.
+
+    Raise:
+        NidabaTesseractException: Tesseract quit with a return code other than
+                                  0.
     """
     abs_in = os.path.abspath(os.path.expanduser(imagepath))
     abs_out = os.path.abspath(os.path.expanduser(outputfilepath))
@@ -39,12 +56,24 @@ def ocr(imagepath, outputfilepath, languages):
     return resultpath
 
 
-def ocrdir(dirpath, outputdir, language):
+def ocrdir(dirpath, outputdir, languages):
     """
-    Scan a directory of images with tesseract using the specified
-    language, and writing to the specified directory. The directory
-    will be created if it does not exist. Returns the path of the dir
-    containing the results.
+    Scans all documents deemed to be image files in a directory (recursively).
+
+    Args:
+        dir (unicode): Path to the directory containing the image files.
+        outputdir (unicode): Path to the output directory. It will be created
+                             if it doesn't exist.
+        languages (list): A list of strings containing valid tesseract language
+                          descriptions.
+    Returns:
+        list: Paths of the output files.
+
+    Raise:
+        NidabaTesseractException: Tesseract quit with a return code other than
+                                  0.
+        OSError: The output directory couldn't be created.
+        Exception: The input directory does not exist.
     """
 
     if not os.path.isdir(dirpath):
@@ -60,11 +89,7 @@ def ocrdir(dirpath, outputdir, language):
         for imgpath in glob.glob(os.path.join(dirpath, '*.%s' % ext)):
             filename = os.path.basename(os.path.normpath(imgpath))
             outfile = os.path.join(outputdir, filename)
-            ocr(imgpath, outfile, language)
+            ocr(imgpath, outfile, languages)
             results.append(outfile)
 
     return results
-
-
-if __name__ == '__main__':
-    pass

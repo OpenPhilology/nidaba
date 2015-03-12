@@ -8,8 +8,9 @@ from nidaba import storage
 
 
 class Rect(object):
-
-    """Native python replacement for gameras C++ Rect object."""
+    """
+    Native python replacement for gameras C++ Rect object.
+    """
 
     def __init__(self, ul=(0, 0), lr=(0, 0)):
         self.ul = ul
@@ -25,17 +26,31 @@ class Rect(object):
 
 
 class hocrWord(object):
-
-    """associates word text with bbox"""
+    """
+    Dummy class associating word text with a bbox.
+    """
 
 
 class hocrLine(object):
-
-    """Associates lines, words with their text and bboxes"""
+    """
+    Dummy class associating lines, words with their text and bboxes.
+    """
 
 
 def parse_bbox(prop_str):
-    """Parses the property string in the title field."""
+    """
+    Parses the microformat property string in the hOCR title field.
+
+    Args:
+        prop_str (unicode): The verbatim property string
+
+    Returns:
+        Rect: A rectangular area described in a bbox field
+
+    Raises:
+        ValueError: The property string either did not contain a bbox
+        definition or this definition was malformed.
+    """
     for prop in prop_str.split(';'):
         p = prop.split()
         if p[0] == 'bbox':
@@ -54,8 +69,6 @@ def get_hocr_lines_for_tree(treeIn):
     lines_out = []
     all_words = []
     for hocr_line_element in hocr_line_elements:
-        # print "line: ", line_counter,
-        # parse_bbox(hocr_line_element.get('title'))
         line_counter += 1
         words = hocr_line_element.xpath(".//html:span[@class='ocr_word'] |\
                                         .//span[@class='ocr_word'] ",
@@ -86,16 +99,28 @@ def get_hocr_lines_for_tree(treeIn):
     return lines_out, all_words
 
 
-def close_enough(bbox1, bbox2):
-    """Matches two bboxes roughly using a fudge factor (0.1)."""
+def close_enough(bbox1, bbox2, fudge=0.1):
+    """
+    Roughly matches two bboxes roughly using a fudge factor.
+
+    Args:
+        bbox1 (Rect): Rect object of a bounding box.
+        bbox2 (Rect): Rect object of a bounding box.
+        fudge (float): Fudge factor to account for slight variations in word
+                       boundary detection between segmentation engines.
+
+    Returns:
+        bool: True if the bounding boxes are sufficiently aligned, False
+        otherwise.
+    """
     total_circum1 = (bbox1.lr_x - bbox1.ul_x) * 2 + \
         (bbox1.lr_y - bbox1.ul_y) * 2
     total_circum2 = (bbox1.lr_x - bbox1.ul_x) * 2 + \
         (bbox1.lr_y - bbox1.ul_y) * 2
-    fudge = (total_circum1 + total_circum2) * 0.1
+    f = (total_circum1 + total_circum2) * fudge
     total_diff = (abs(bbox1.lr_x - bbox2.lr_x) + abs(bbox1.lr_y - bbox2.lr_y) +
                   abs(bbox1.ul_x - bbox2.ul_x) + abs(bbox1.ul_y - bbox2.ul_y))
-    if total_diff < fudge:
+    if total_diff < f:
         return True
     else:
         return False
@@ -103,8 +128,15 @@ def close_enough(bbox1, bbox2):
 
 def sort_words_bbox(words):
     """
-    Sorts word bboxes of a document in reading order. (upper left to lower
-    right)
+    Sorts word bboxes of a document in European reading order (upper left to
+    lower right). The list is sorted in place.
+
+    Args:
+        words (list): List of hocrWord object containing Rects in the field
+                      bbox and the recognized text in the text field.
+
+    Returns:
+        list: The sorted word list.
     """
     words.sort(key=attrgetter('bbox.lr_y'))
     words.sort(key=attrgetter('bbox.lr_x'))
@@ -122,8 +154,8 @@ def score_word(lang, word):
         word (unicode): Input token to score
 
     Returns:
-        An integer representing the input tokens score. Higher values are
-        closer to native language words.
+        int: Value representing the input tokens score. Higher values are
+             closer to native language words.
     """
     # IN_DICT_SCORE = 1000
     # IN_DICT_LOWER_SCORE = 100
@@ -147,10 +179,24 @@ def score_word(lang, word):
 
 def merge(docs, lang, output):
     """
-    Merges multiple hOCR documents into a single one. First bboxes from all
-    documents are roughly matched, then all matching bboxes are scored using a
-    spell checker. If no spell checker is available all matches will be merged
-    without ranking.
+    Merges multiple hOCR documents into a single one.
+
+    First bboxes from all documents are roughly matched, then all matching
+    bboxes are scored using a spell checker. If no spell checker is available
+    all matches will be merged without ranking.
+
+    The matching is naive, i.e. we just grab the first input document and
+    assume that all other documents have similar segmentation results. Issues
+    like high variance in segmentation, especially word boundaries are not
+    accounted for.
+
+    Args:
+        docs (iterable): A list of storage tuples of input documents
+        lang (unicode): A language identifier for the spell checker
+        output (tuple): Storage tuple for the result
+
+    Returns:
+        tuple: The output storage tuple. Should be the same as ```output```.
     """
     tree1 = etree.parse(storage.get_abs_path(docs[0][0], docs[0][1]))
     lines_1, words_1 = get_hocr_lines_for_tree(tree1)
@@ -215,6 +261,6 @@ def merge(docs, lang, output):
             for word in positional_list:
                 print word.bbox, word.text
 
-    storage.write_text(
-        *output, text=etree.tostring(tree1.getroot(), encoding='unicode'))
+    storage.write_text(*output, text=etree.tostring(tree1.getroot(),
+                                                    encoding='unicode'))
     return output

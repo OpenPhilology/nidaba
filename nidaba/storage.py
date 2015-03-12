@@ -24,12 +24,14 @@ def _sanitize_path(base_path, *paths):
         checked if they are beneath base_path.
 
     Returns:
-        A unicode string of the absolute path of the concatenations of *paths.
+        (unicode): A string of the absolute path of the concatenations of
+                   *paths.
 
     Raises:
         NidabaStorageViolationException: The absolute path of *paths is not
-        beneath base_path. And whatever the python standard library decides to
-        raise this week.
+                                         beneath base_path. And whatever the
+                                         python standard library decides to
+                                         raise this week.
     """
 
     if len(paths) < 1:
@@ -53,11 +55,11 @@ def is_file(jobID, path):
         path (unicode): A path of a file beneath jobID.
 
     Returns:
-        Either True or False depending on the existence of the file.
+        bool: Either True or False depending on the existence of the file.
 
     Raises:
-        Who the fuck knows. The python standard library doesn't document such
-        paltry information as exceptions.
+        Exception: Who the fuck knows. The python standard library doesn't
+                   document such paltry information as exceptions.
     """
     return os.path.isfile(get_abs_path(jobID, path))
 
@@ -75,12 +77,13 @@ def get_abs_path(jobID, *path):
         calculate the absolute path.
 
     Returns:
-        A unicode string containing the absolute path of the storage tuple.
+        (unicode): A string containing the absolute path of the storage tuple.
 
     Raises:
-        NidabaStorageViolationException if the resulting absolute path is
-        either not in the storage_path of the nidaba configuration or not in
-        its job directory.
+        NidabaStorageViolationException: The resulting absolute path is
+                                         either not in the storage_path of the
+                                         nidaba configuration or not in its job
+                                         directory.
     """
     if len(path) < 1:
         raise NidabaStorageViolationException('Path not beneath STORAGE_PATH')
@@ -97,12 +100,12 @@ def get_storage_path(path):
         path (unicode): A unicode string of the absolute path.
 
     Returns:
-        A tuple of the form (id, path)
+        tuple: (id, path)
 
     Raises:
-        NidabaStorageViolationException if the given path can not be converted
-        into a storage tuple.
-        NidabaNoSuchStorageBin if the given path is not beneath a valid job ID.
+        NidabaStorageViolationException: The given path can not be converted
+                                         into a storage tuple.
+        NidabaNoSuchStorageBin: The given path is not beneath a valid job ID.
     """
     base_path = _sanitize_path(nidaba_cfg['storage_path'], u'')
     if os.path.commonprefix([os.path.normpath(base_path),
@@ -136,7 +139,7 @@ def is_valid_job(jobID):
         jobID (unicode): An identifier of a job.
 
     Returns:
-        True or False.
+        bool: True if job is already in the system, False otherwise.
 
     Raises:
         Standard python library caveats apply.
@@ -152,7 +155,8 @@ def prepare_filestore(jobID):
         jobID (unicode): Identifier of the bin to be created.
 
     Returns:
-        Either None on failure or the job ID on success.
+        None: Failure
+        (unicode): String containing the job ID
     """
     if is_valid_job(jobID):
         return None
@@ -173,7 +177,7 @@ def list_content(jobID, pattern=u'*'):
         pattern (unicode): glob-like filter to match files
 
     Returns:
-        A list of unicode strings of the matching files.
+        list: A list of unicode strings of the matching files.
     """
     if not is_valid_job(jobID):
         return None
@@ -189,6 +193,14 @@ def retrieve_content(jobID, documents=None):
     """
     Retrieves data from a single or a list of documents. Returns binary data,
     for retrieving unicode text use retrieve_text().
+
+    Args:
+        jobID (unicode): Identifier of the bin
+        documents (tuple or list of tuples): Documents to read in
+
+    Returns:
+        None: Failure
+        Dictionary: A dictionary mapping file identifiers to their contents.
     """
     if not is_valid_job(jobID):
         return None
@@ -198,7 +210,6 @@ def retrieve_content(jobID, documents=None):
         fdict = {}
         dpath = _sanitize_path(nidaba_cfg['storage_path'], jobID)
         locks = [lock(_sanitize_path(dpath, doc)) for doc in documents]
-        # will wait indefinitely until a lock can be acquired.
         map(lambda x: x.acquire(), locks)
         for doc in documents:
             with open(_sanitize_path(dpath, doc), 'rb') as f:
@@ -210,6 +221,14 @@ def retrieve_content(jobID, documents=None):
 def retrieve_text(jobID, documents=None):
     """
     Retrieves UTF-8 encoded text from a single or a list of documents.
+
+    Args:
+        jobID (unicode): Identifier of the bin
+        documents (tuple or list of tuples): Documents to read in
+
+    Returns:
+        None: Failure
+        Dictionary: A dictionary mapping file identifiers to their contents.
     """
     res = retrieve_content(jobID, documents)
     return {t: res[t].decode('utf-8') for t in res}
@@ -219,6 +238,15 @@ def write_content(jobID, dest, data):
     """
     Writes data to a document at a destination beneath a jobID. Writes bytes,
     does not accept unicode objects; use write_text() for that.
+
+    Args:
+        jobID (unicode): Identifier of the bin.
+        dest (tuple): Documents to write to.
+        data (str): Data to write.
+
+    Returns:
+        int: Length of data written
+        None: Failure
     """
     if not is_valid_job(jobID):
         return None
@@ -239,5 +267,13 @@ def write_content(jobID, dest, data):
 def write_text(jobID, dest, text):
     """
     Writes text data encoded as UTF-8 to a file beneath a jobID.
+
+    Args:
+        jobID (unicode): Identifier of the bin.
+        dest (tuple): Documents to write to.
+        text (unicode): Data to write.
+
+    Returns:
+        int: Length of data written
     """
     return write_content(jobID, dest, text.encode('utf-8'))

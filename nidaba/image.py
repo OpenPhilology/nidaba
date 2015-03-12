@@ -1,21 +1,12 @@
 """
 nidaba.image
-~~~~~~~~~~
+~~~~~~~~~~~~
 
 Common image processing functions encapsulating the PIL or pythonica image
 interface to absolute file paths.
 """
 
 from PIL import Image
-
-
-def imageFromFile(file):
-    try:
-        image = Image.open(file)
-        image.load()
-        return image
-    except Exception:
-        return None
 
 
 def rgb_to_gray(imagepath, resultpath):
@@ -27,9 +18,9 @@ def rgb_to_gray(imagepath, resultpath):
         resultpath: Path of the output image
 
     Returns:
-        resultpath: Path of the actual output file
+        unicode: Path of the actual output file
     """
 
-    img = imageFromFile(imagepath)
+    img = Image.open(imagepath)
     img.convert('L').save(resultpath)
     return resultpath

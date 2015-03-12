@@ -17,6 +17,10 @@ import os.path
 
 
 def main():
+    """
+    Main function called by the hook installed by setuptools.
+    """
+
     parser = argparse.ArgumentParser(description=u'Sends jobs to nidaba and\
                                     retrieves their status.',
                                      epilog=u'This nidaba may or may not have\
@@ -71,16 +75,37 @@ def main():
 
 
 def int_float_or_str(s):
+    """
+    A small helper function intended to coerce an input string to types in the
+    order int -> float -> unicode -> input.
+
+    Args:
+        s (unicode):
+
+    Returns:
+        int or float or unicode or original input type: Input variable coerced
+        to the highest data type in the ordering.
+    """
+
     try:
         return int(s)
     except ValueError:
         try:
             return float(s)
         except ValueError:
-            return s
+            try:
+                return unicode(s)
+            except UnicodeDecodeError:
+                return s
 
 
 def batch(args):
+    """
+    Implements the batch subcommand of the nidaba binary.
+
+    Args:
+        args (argparse.Namespace): Parsed input object from argparse
+    """
 
     id = unicode(uuid.uuid4())
     batch = Batch(id)
@@ -133,10 +158,21 @@ def batch(args):
 
 
 def config(args):
+    """
+    Implements the config display subcommand.
+    """
+
     pprint(nidaba_cfg)
 
 
 def status(args):
+    """
+    Implements the status subcommand.
+
+    Args:
+        args (argparse.Namespace): Parsed input object from argparse
+    """
+
     batch = Batch(args.jobid)
     state = batch.get_state()
     print(state)
@@ -154,5 +190,5 @@ def status(args):
             print('Something somewhere went wrong.')
         else:
             for fun in ret:
-                print(fun[1]['method'].encode(
-                    'utf-8') + u': ' + fun[2].encode('utf-8'))
+                print(fun[1]['method'].encode('utf-8') + u': ' +
+                      fun[2].encode('utf-8'))

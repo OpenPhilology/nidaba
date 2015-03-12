@@ -1,5 +1,11 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+nidaba.nidaba
+~~~~~~~~~~~~~
+
+The public API of nidaba. External applications should exclusively use the
+objects and methods defined here.
+"""
 
 from __future__ import absolute_import
 
@@ -93,36 +99,35 @@ class Batch(object):
         """Retrieves the current state of a batch.
 
         Returns:
-            A string containing one of the following states:
+            (unicode): A string containing one of the following states:
 
                 NONE: The batch ID is not registered in the backend.
                 FAILURE: Batch execution has failed.
                 PENDING: The batch is currently running.
-                SUCCESS: The batch has completed succesfully.
+                SUCCESS: The batch has completed successfully.
         """
         batch = celery.app.backend.get(self.id)
         try:
             batch = json.loads(batch)
         except Exception:
-            return 'NONE'
+            return u'NONE'
         if len(batch['errors']) > 0:
-            return 'FAILURE'
+            return u'FAILURE'
 
         st = state('SUCCESS')
         for id in batch['task_ids']:
             if AsyncResult(id).state < st:
                 st = AsyncResult(id).state
-        return str(st)
+        return unicode(st)
 
     def get_errors(self):
-        """Retrieves all errors of the batch.
+        """
+        Retrieves all errors of the batch.
 
         Returns:
-            A list of tuples containing:
+            list: A list of tuples containing
 
-                args
-                kwargs
-                exception_message
+                args kwargs exception_message
 
             of the failing task or None if there are no errors.
         """
@@ -137,12 +142,11 @@ class Batch(object):
         return None
 
     def get_results(self):
-        """Retrieves the results of a successful batch.
-
+        """
         Retrieves the storage tuples of a successful batch or None.
 
         Returns:
-            A list of storage tuples or None if no results are available.
+            list: A list of storage tuples or None if no results are available.
         """
         batch = celery.app.backend.get(self.id)
         try:
@@ -169,7 +173,7 @@ class Batch(object):
         Adds a document tuple to the batch and checks if it exists.
 
         Args:
-            doc: A standard document tuple.
+            doc (tuple): A standard document tuple.
 
         Raises:
             NidabaInputException: The document tuple does not refer to a file.
@@ -187,7 +191,7 @@ class Batch(object):
         Multiple jobs are run in parallel.
 
         Args:
-            method: A task identifier
+            method (unicode): A task identifier
             **kwargs: Arguments to the task
 
         Raises:
@@ -237,7 +241,7 @@ class Batch(object):
         the celery result backend.
 
         Returns:
-            The batch identifier.
+            (unicode): Batch identifier.
         """
         if self.cur_tick:
             self.cur_step.append(self.cur_tick)

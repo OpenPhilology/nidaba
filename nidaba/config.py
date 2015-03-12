@@ -9,6 +9,11 @@ from os import path
 
 
 def reload_config():
+    """
+    Triggers a global reloading of the configuration files.
+
+    As of now configuration files are only read from sys.prefix/etc/nidaba/.
+    """
     global nidaba_cfg, celery_cfg
     ipath = path.join(sys.prefix, 'etc', 'nidaba', 'nidaba.yaml')
     with open(ipath, 'rb') as fp:
