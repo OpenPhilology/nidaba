@@ -3,7 +3,9 @@ import unittest
 
 from nidaba import nidaba
 
+
 class BatchTest(unittest.TestCase):
+
     """Tests the functionality of the Batch class."""
 
     def test_no_tick(self):

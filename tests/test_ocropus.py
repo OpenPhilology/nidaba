@@ -9,7 +9,9 @@ from nidaba import ocropus
 thisfile = os.path.abspath(os.path.dirname(__file__))
 resources = os.path.abspath(os.path.join(thisfile, 'resources/ocropus'))
 
+
 class OcropusTests(unittest.TestCase):
+
     """
     Tests for python ocropus bindings.
     """
@@ -17,13 +19,13 @@ class OcropusTests(unittest.TestCase):
     def setUp(self):
         self.otempdir = unicode(tempfile.mkdtemp())
         # copytree fails if the target directory already exists. Unfortunately
-        # not creating the temporary directory using mkstemp() is race-conditiony.
+        # not creating the temporary directory using mkstemp() is
+        # race-conditiony.
         self.tempdir = os.path.join(self.otempdir, u'stupid')
         shutil.copytree(resources, self.tempdir)
 
     def tearDown(self):
         shutil.rmtree(self.otempdir)
-        pass
 
     def test_file_outpath_png(self):
         """
@@ -38,9 +40,8 @@ class OcropusTests(unittest.TestCase):
                         msg='Ocropus did not outpath a file!')
         try:
             etree.parse(outpath)
-        except etree.XMLSyntaxError, e:
+        except etree.XMLSyntaxError:
             self.fail(msg='The outpath was not valid html/xml!')
-
 
     def test_file_outpath_tiff(self):
         """
@@ -55,9 +56,8 @@ class OcropusTests(unittest.TestCase):
                         msg='Ocropus did not outpath a file!')
         try:
             etree.parse(outpath)
-        except etree.XMLSyntaxError, e:
+        except etree.XMLSyntaxError:
             self.fail(msg='The outpath was not valid html/xml!')
-
 
     def test_file_outpath_jpg(self):
         """
@@ -72,7 +72,7 @@ class OcropusTests(unittest.TestCase):
                         msg='Ocropus did not outpath a file!')
         try:
             etree.parse(outpath)
-        except etree.XMLSyntaxError, e:
+        except etree.XMLSyntaxError:
             self.fail(msg='The outpath was not valid html/xml!')
 
 
