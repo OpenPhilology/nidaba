@@ -1,20 +1,39 @@
-.. iris documentation master file, created by
-   sphinx-quickstart on Tue Nov  4 18:48:48 2014.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+======
+nidaba
+======
 
-Welcome
-=======
+`nidaba` is an open source distributed optical character recognition pipeline
+that makes it easy to preprocess and OCR scans of text documents in a multitude
+of ways.
 
-Iris is an open source distributed optical character recognition pipeline that
-makes it easy to preprocess and OCR scans of text documents in a multitude of
-ways. Iris builds upon the celery distributed task queue to provide a
-lightweight task queue that performs reasonably well across a wide spectrum of
-use cases.
+`nidaba` is a powerful tool allowing you to mix and combine some of the most
+advanced free image processing and character recognition software and
+distribute the execution of this software to multiple machines. While the
+learning curve may be high at first, you'll be able in no time to process your
+own scanned documents.
 
-To get started with iris, first read :ref:`The Iris Architecture
-<understanding_iris>` then use :ref:`Installing Iris <installing_iris>` to
-start provisioning your pipeline. :ref:`Using Iris <using_iris>` describes
-different ways to use the pipeline.
+What It Does
+============
 
-The full documentation tree can be seen :ref:`here <toctree>`.
+nidaba does a bunch of things for you:
+
+        * **Grayscale Conversion**
+        * **Binarization**
+        * **Deskewing**
+        * **Dewarping**
+        * **OCR**
+        * **Output merging**
+
+
+.. toctree::
+   :maxdepth: 2
+
+   user-guide/index
+   tech-reference/index
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
