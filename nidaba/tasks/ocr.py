@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 nidaba.tasks.ocr
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 Tasks running optical character recognition on a binarized image. As of now
 this encapsulates page segmentation, recognition, and in the case of Tesseract

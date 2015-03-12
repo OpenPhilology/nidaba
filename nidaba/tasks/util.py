@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 nidaba.tasks.util
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 Various utility tasks that either can't be classified by purpose or are one of
 a kind.

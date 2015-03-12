@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 nidaba.tasks.binarize
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 Tasks for segmentation of color images into binary images. More often than not
 these will operate on grayscale input.

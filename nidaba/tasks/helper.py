@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 nidaba.tasks.helper
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 A helper class that all nidaba tasks should inherit from to ensure accurate
 logging of errors.

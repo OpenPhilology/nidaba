@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 nidaba.tasks.img
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 Some general image processing tasks that are outside the scope of more specific
 packages (e.g. binarization).
