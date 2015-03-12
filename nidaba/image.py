@@ -1,5 +1,5 @@
 """
-nibada.image
+nidaba.image
 ~~~~~~~~~~
 
 Common image processing functions encapsulating the PIL or pythonica image
@@ -8,13 +8,15 @@ interface to absolute file paths.
 
 from PIL import Image
 
+
 def imageFromFile(file):
     try:
         image = Image.open(file)
         image.load()
         return image
-    except Exception as err:
+    except Exception:
         return None
+
 
 def rgb_to_gray(imagepath, resultpath):
     """
@@ -31,5 +33,3 @@ def rgb_to_gray(imagepath, resultpath):
     img = imageFromFile(imagepath)
     img.convert('L').save(resultpath)
     return resultpath
-
-

@@ -3,21 +3,24 @@
 
 from __future__ import absolute_import
 
-from nibada import tasks
-from nibada import celery
-from nibada import storage
-from nibada.nibadaexceptions import NibadaInputException, NibadaNoSuchAlgorithmException, NibadaTickException
+from nidaba import tasks
+from nidaba import celery
+from nidaba import storage
+from nidaba.nidabaexceptions import (NidabaInputException,
+                                     NidabaNoSuchAlgorithmException,
+                                     NidabaTickException, NidabaStepException)
 
 from itertools import product
 from celery import chain
 from celery import group
-from celery.result import AsyncResult, GroupResult
-from celery.states import state, PENDING, SUCCESS, FAILURE
+from celery.result import AsyncResult
+from celery.states import state
 
-import sys
 import json
 
+
 class Batch(object):
+
     """
     Creates a series of celery tasks OCRing a set of documents (among other
     things).
@@ -37,8 +40,8 @@ class Batch(object):
             tick b: task 2, task 3
             tick c: task 4, task 5
 
-    The pipeline expands this example to the following sequences run in parallel
-    (dot product of all ticks):
+    The pipeline expands this example to the following sequences run in
+    parallel (dot product of all ticks):
 
         task 1 -> task 2 -> task 4
         task 1 -> task 2 -> task 5
@@ -48,19 +51,19 @@ class Batch(object):
     It is not garantueed that any particular task in another sequence has
     executed successfully before a task in a sequence is run, i.e. it is not
     ensured that all task 1's have finished before task 2 of the first sequence
-    is executed, except the task(s) further up the sequence. 
+    is executed, except the task(s) further up the sequence.
 
     Steps on the other hand ensure that all tasks of the previous step have
     finished successfully. The output(s) of the expanded ticks is aggregated
     into a single list and used as the input of the first tick of the step.
     Expanding on the example the following step is added:
-        
+
         step 2:
             tick d: task 6
 
-    After the 4 sequence are finished their output is aggregated into a list [d1,
-    d2, d3, d4] and used as the input of task 6. The final output of task 6 is
-    the output of the pipeline.
+    After the 4 sequence are finished their output is aggregated into a list
+    [d1, d2, d3, d4] and used as the input of task 6. The final output of task
+    6 is the output of the pipeline.
 
     The call order to create this example is:
 
@@ -100,17 +103,17 @@ class Batch(object):
         batch = celery.app.backend.get(self.id)
         try:
             batch = json.loads(batch)
-        except Exception as e:
+        except Exception:
             return 'NONE'
         if len(batch['errors']) > 0:
             return 'FAILURE'
-    
+
         st = state('SUCCESS')
         for id in batch['task_ids']:
             if AsyncResult(id).state < st:
                 st = AsyncResult(id).state
         return str(st)
-    
+
     def get_errors(self):
         """Retrieves all errors of the batch.
 
@@ -126,13 +129,13 @@ class Batch(object):
         batch = celery.app.backend.get(self.id)
         try:
             batch = json.loads(batch)
-        except Exception as e:
+        except Exception:
             return None
         if len(batch['errors']) > 0:
             return batch['errors']
 
         return None
-       
+
     def get_results(self):
         """Retrieves the results of a successful batch.
 
@@ -144,7 +147,7 @@ class Batch(object):
         batch = celery.app.backend.get(self.id)
         try:
             batch = json.loads(batch)
-        except Exception as e:
+        except Exception:
             return None
 
         if self.get_state() != 'SUCCESS':
@@ -154,7 +157,7 @@ class Batch(object):
         for id in batch['task_ids']:
             ch = AsyncResult(id)
             if ch.successful():
-                if type(ch.result[0]) == list:
+                if isinstance(ch.result[0], list):
                     outfiles.extend([tuple(x) for x in ch.result])
                 else:
                     outfiles.append(tuple(ch.result))
@@ -169,11 +172,11 @@ class Batch(object):
             doc: A standard document tuple.
 
         Raises:
-            NibadaInputException: The document tuple does not refer to a file.
+            NidabaInputException: The document tuple does not refer to a file.
         """
 
         if not storage.is_file(*doc):
-            raise NibadaInputException('Input document is not a file.')
+            raise NidabaInputException('Input document is not a file.')
         self.docs.append(doc)
 
     def add_task(self, method, **kwargs):
@@ -188,13 +191,13 @@ class Batch(object):
             **kwargs: Arguments to the task
 
         Raises:
-            NibadaTickException: There is no tick to add a task to.
-            NibadaNoSuchAlgorithmException: Invalid method given.
+            NidabaTickException: There is no tick to add a task to.
+            NidabaNoSuchAlgorithmException: Invalid method given.
         """
-        if self.cur_tick == None:
-            raise NibadaTickException('No tick to add task to.')
-        if u'nibada.' + method not in celery.app.tasks:
-            raise NibadaNoSuchAlgorithmException('No such task in registry')
+        if self.cur_tick is None:
+            raise NidabaTickException('No tick to add task to.')
+        if u'nidaba.' + method not in celery.app.tasks:
+            raise NidabaNoSuchAlgorithmException('No such task in registry')
         kwargs[u'method'] = method
         kwargs[u'id'] = self.id
         self.cur_tick.append(kwargs)
@@ -203,13 +206,13 @@ class Batch(object):
         """Add a new tick to the current step.
 
         Adds a ``tick``, a set of tasks running in parallel and sharing common
-        input documents to the current step. 
+        input documents to the current step.
 
         Raises:
-            NibadaStepException: There is no step to add a tick to.
+            NidabaStepException: There is no step to add a tick to.
         """
-        if self.cur_step == None:
-            raise NibadaStepException('No step to add tick to.')
+        if self.cur_step is None:
+            raise NidabaStepException('No step to add tick to.')
         if self.cur_tick:
             self.cur_step.append(self.cur_tick)
         self.cur_tick = []
@@ -249,10 +252,11 @@ class Batch(object):
             groups.append(tasks.util.sync.s())
             for tset in self.batch_def[1:]:
                 for sequence in product(*tset):
-                    method = celery.app.tasks['nibada.' + sequence[0]['method']]
+                    method = celery.app.tasks[
+                        'nidaba.' + sequence[0]['method']]
                     ch = chain(method.s(**(sequence[0])))
                     for seq in sequence[1:]:
-                        method = celery.app.tasks['nibada.' + seq['method']]
+                        method = celery.app.tasks['nidaba.' + seq['method']]
                         ch |= method.s(**seq)
                     tick.append(ch)
                 groups.append(group(tick))
@@ -265,14 +269,15 @@ class Batch(object):
             # the first step is handled differently as the input document has
             # to be added explicitely.
             for sequence in product([doc], *self.batch_def[0]):
-                method = celery.app.tasks['nibada.' + sequence[1]['method']]
-                ch = chain(method.s(doc = sequence[0], **(sequence[1])))
+                method = celery.app.tasks['nidaba.' + sequence[1]['method']]
+                ch = chain(method.s(doc=sequence[0], **(sequence[1])))
                 for seq in sequence[2:]:
-                    method = celery.app.tasks['nibada.' + seq['method']]
+                    method = celery.app.tasks['nidaba.' + seq['method']]
                     ch |= method.s(**seq)
                 tick.append(ch)
-            rets.append(chain([group(tick)] + [tasks.util.sync.s()] + groups[:-1]).apply_async().id)
-        celery.app.backend.set(self.id, json.dumps({'errors': [], 'task_ids': rets}))
+            rets.append(
+                chain([group(tick)] + [tasks.util.sync.s()] +
+                      groups[:-1]).apply_async().id)
+        celery.app.backend.set(
+            self.id, json.dumps({'errors': [], 'task_ids': rets}))
         return self.id
-
-

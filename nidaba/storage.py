@@ -3,55 +3,120 @@
 
 from __future__ import absolute_import
 
-from nibada.lock import lock
-from nibada.config import nibada_cfg
-from nibada.nibadaexceptions import NibadaStorageViolationException, NibadaNoSuchStorageBin
+from nidaba.lock import lock
+from nidaba.config import nidaba_cfg
+from nidaba.nidabaexceptions import (NidabaStorageViolationException,
+                                     NidabaNoSuchStorageBin)
 
 import os
 import fnmatch
 import re
 
-# Sanitizes a given path with respect to a base os.path. Returns an absolute path
-# garantueed to be beneath base_os.path.
+
 def _sanitize_path(base_path, *paths):
+    """
+    Sanitizes a given path with respect to a base path.
+
+    Args:
+        base_path (unicode): A base path beneath the concatenation of *paths is
+        garantueed to be in.
+        *paths (unicode): A list of subpaths which are concatenated and then
+        checked if they are beneath base_path.
+
+    Returns:
+        A unicode string of the absolute path of the concatenations of *paths.
+
+    Raises:
+        NidabaStorageViolationException: The absolute path of *paths is not
+        beneath base_path. And whatever the python standard library decides to
+        raise this week.
+    """
+
     if len(paths) < 1:
-        raise NibadaStorageViolationException('Path not beneath STORAGE_PATH')
+        raise NidabaStorageViolationException('Path not beneath STORAGE_PATH')
     base_path = os.path.expanduser(base_path)
     base_path = os.path.abspath(base_path)
     rel_path = os.path.abspath(os.path.join(base_path, *paths))
     if os.path.commonprefix([os.path.normpath(rel_path),
-                          os.path.normpath(base_path)]) == base_path:
+                             os.path.normpath(base_path)]) == base_path:
         return rel_path
     else:
-        raise NibadaStorageViolationException('Path not beneath STORAGE_PATH')
+        raise NidabaStorageViolationException('Path not beneath STORAGE_PATH')
+
 
 def is_file(jobID, path):
+    """
+    Checks if a storage tuple is a regular file.
+
+    Args:
+        jobID (unicode): An unique ID associated with a particular job.
+        path (unicode): A path of a file beneath jobID.
+
+    Returns:
+        Either True or False depending on the existence of the file.
+
+    Raises:
+        Who the fuck knows. The python standard library doesn't document such
+        paltry information as exceptions.
+    """
     return os.path.isfile(get_abs_path(jobID, path))
+
 
 def get_abs_path(jobID, *path):
     """
     Returns the absolute path of a file.
+
+    Takes a job ID and a sequence of path components and checks if their
+    absolute path is in the directory of that particular job ID.
+
+    Args:
+        jobID (unicode): A unique job ID
+        *path (unicode): A list of path components that are concatenated to
+        calculate the absolute path.
+
+    Returns:
+        A unicode string containing the absolute path of the storage tuple.
+
+    Raises:
+        NidabaStorageViolationException if the resulting absolute path is
+        either not in the storage_path of the nidaba configuration or not in
+        its job directory.
     """
     if len(path) < 1:
-        raise NibadaStorageViolationException('Path not beneath STORAGE_PATH')
+        raise NidabaStorageViolationException('Path not beneath STORAGE_PATH')
     # Run twice to ensure resulting path is beneath jobID.
-    return _sanitize_path(_sanitize_path(nibada_cfg['storage_path'], jobID), *path)
+    return _sanitize_path(_sanitize_path(nidaba_cfg['storage_path'], jobID),
+                          *path)
+
 
 def get_storage_path(path):
     """
     Converts an absolute path to a storage tuple of the form (id, path).
+
+    Args:
+        path (unicode): A unicode string of the absolute path.
+
+    Returns:
+        A tuple of the form (id, path)
+
+    Raises:
+        NidabaStorageViolationException if the given path can not be converted
+        into a storage tuple.
+        NidabaNoSuchStorageBin if the given path is not beneath a valid job ID.
     """
-    base_path = _sanitize_path(nibada_cfg['storage_path'], u'')
+    base_path = _sanitize_path(nidaba_cfg['storage_path'], u'')
     if os.path.commonprefix([os.path.normpath(base_path),
-            os.path.normpath(path)]) != base_path:
-        raise NibadaStorageViolationException('Path not beneath STORAGE_PATH')
+                             os.path.normpath(path)]) != base_path:
+        raise NidabaStorageViolationException('Path not beneath STORAGE_PATH')
     path = path.replace(base_path, u'', 1)
     m = re.match('^(?P<id>.+?)\/(?P<p>.+)', path)
     id = os.path.split(m.groupdict()['id'])[1]
     if is_valid_job(id):
         return (id, m.groups()[1])
     else:
-        raise NibadaNoSuchStorageBin('ID ' + m.groupdict()['id'] + ' not known.')
+        raise NidabaNoSuchStorageBin('ID ' + m.groupdict()['id'] + ' not\
+                                     known.')
+
 
 def insert_suffix(orig_path, *suffix):
     """
@@ -62,38 +127,61 @@ def insert_suffix(orig_path, *suffix):
         pathname += u'_' + i
     return pathname + extension
 
+
 def is_valid_job(jobID):
     """
     Checks if filestore has been prepared for a job.
+
+    Args:
+        jobID (unicode): An identifier of a job.
+
+    Returns:
+        True or False.
+
+    Raises:
+        Standard python library caveats apply.
     """
-    return os.path.isdir(_sanitize_path(nibada_cfg['storage_path'], jobID))
+    return os.path.isdir(_sanitize_path(nidaba_cfg['storage_path'], jobID))
 
 
 def prepare_filestore(jobID):
     """
-    Prepares the default filestore to accept files for a job. Returns 'None' on
-    failure, job ID on success.
+    Prepares the default filestore to accept files for a job.
+
+    Args:
+        jobID (unicode): Identifier of the bin to be created.
+
+    Returns:
+        Either None on failure or the job ID on success.
     """
     if is_valid_job(jobID):
         return None
     try:
-        jobPath = _sanitize_path(nibada_cfg['storage_path'], jobID)
+        jobPath = _sanitize_path(nidaba_cfg['storage_path'], jobID)
         os.mkdir(jobPath)
         return jobID
-    except Exception as err:
+    except Exception:
         return None
 
 
 def list_content(jobID, pattern=u'*'):
     """
     Lists all files to a job ID, optionally applying a glob-like filter.
+
+    Args:
+        jobID (unicode): Identifier of the bin
+        pattern (unicode): glob-like filter to match files
+
+    Returns:
+        A list of unicode strings of the matching files.
     """
     if not is_valid_job(jobID):
         return None
     flist = []
-    jpath = _sanitize_path(nibada_cfg['storage_path'], jobID)
+    jpath = _sanitize_path(nidaba_cfg['storage_path'], jobID)
     for root, dirs, files in os.walk(jpath):
-        flist.extend([os.path.relpath(os.path.join(root, s), jpath) for s in files])
+        flist.extend([os.path.relpath(os.path.join(root, s), jpath)
+                      for s in files])
     return fnmatch.filter(flist, pattern)
 
 
@@ -108,7 +196,7 @@ def retrieve_content(jobID, documents=None):
         if isinstance(documents, basestring):
             documents = [documents]
         fdict = {}
-        dpath = _sanitize_path(nibada_cfg['storage_path'], jobID)
+        dpath = _sanitize_path(nidaba_cfg['storage_path'], jobID)
         locks = [lock(_sanitize_path(dpath, doc)) for doc in documents]
         # will wait indefinitely until a lock can be acquired.
         map(lambda x: x.acquire(), locks)
@@ -117,6 +205,7 @@ def retrieve_content(jobID, documents=None):
                 fdict[doc] = f.read()
         map(lambda x: x.release(), locks)
         return fdict
+
 
 def retrieve_text(jobID, documents=None):
     """
@@ -136,7 +225,7 @@ def write_content(jobID, dest, data):
     if not isinstance(data, basestring):
         return None
     try:
-        with open(_sanitize_path(nibada_cfg['storage_path'],
+        with open(_sanitize_path(nidaba_cfg['storage_path'],
                                  os.path.join(jobID, dest)), 'wb') as f:
             l = lock(f.name)
             l.acquire()

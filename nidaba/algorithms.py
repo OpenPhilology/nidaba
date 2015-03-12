@@ -1,61 +1,44 @@
 # -*- coding: utf-8 -*-
+"""
+
+"""
+
 from __future__ import division, absolute_import
 
-import os
-import re
-import numpy
 import codecs
+import numpy
 import operator
-import time
 import unicodedata
 import itertools
-import codecs
-import string
 import mmap
-import linecache
-import timeit
-import subprocess
 import math
-import tempfile
-from lxml import etree
 
-
-# ----------------------------------------------------------------------
-# Exceptions -----------------------------------------------------------
-# ----------------------------------------------------------------------
-
-class UnibarrierException(Exception):
-    """
-    An exception for the unibarrier decorator function.
-    """
-    def __init__(self, message=None):
-        Exception.__init__(self, message)
-
-class AlgorithmException(Exception):
-    """
-    A simple exception for algorithm specific errors.
-    """
-    def __init__(self, message=None):
-        Exception.__init__(self, message)
+from nidaba.nidabaexceptions import (NidabaUnibarrierException,
+                                     NidabaAlgorithmException)
 
 # ----------------------------------------------------------------------
 # String and alignment algorithms --------------------------------------
 # ----------------------------------------------------------------------
+
 
 def unibarrier(func):
     """
     A decorator function; used to ensure that no str objects can be
     passed as either args or kwargs.
     """
+
     def unishielded(*args, **kwargs):
         for arg in args:
-            if type(arg) == type(str('')):
-                raise UnibarrierException(message='%s was a string!' % arg)
+            if isinstance(arg, str):
+                raise NidabaUnibarrierException(message='%s was a string!' %
+                                                arg)
         for key, val in kwargs.iteritems():
-            if type(val) == type(str('')):
-                raise UnibarrierException(message='%s was a string!' % val)
+            if isinstance(val, str):
+                raise NidabaUnibarrierException(message='%s was a string!' %
+                                                val)
         return func(*args, **kwargs)
     return unishielded
+
 
 def sanitize(string, encoding=u'utf-8', normalization=u'NFD'):
     """
@@ -63,10 +46,11 @@ def sanitize(string, encoding=u'utf-8', normalization=u'NFD'):
     string is a str rather than an unicode, decode it with the specified
     encoding.
     """
-    if type(string) == type(''):
+    if isinstance(string, str):
         string = string.decode(encoding)
 
     return unicodedata.normalize(normalization, string.strip())
+
 
 @unibarrier
 def strings_by_deletion(unistr, dels):
@@ -77,34 +61,40 @@ def strings_by_deletion(unistr, dels):
     """
     new_words = set()
     for comb in itertools.combinations(range(len(unistr)), dels):
-        new_words.add(u''.join((c for i, c in enumerate(unistr) if i not in comb)))
+        new_words.add(u''.join((c for i, c in enumerate(unistr) if i not in
+                                comb)))
     return sorted(list(new_words))
+
 
 @unibarrier
 def sym_suggest(ustr, dic, delete_dic, depth, ret_count=0):
     """
-    Return a list of "spelling" corrections using a symmetric deletion
-    search. Dic is a set of correct words. Delete_dic is of the form
-    {edit_term:[(candidate1, edit_distance), (candidate2, edit_distance), ...]}.
+    Return a list of "spelling" corrections using a symmetric deletion search.
+    Dic is a set of correct words. Delete_dic is of the form
+    {edit_term:[(candidate1, edit_distance), (candidate2, edit_distance),
+    ...]}.
     """
     suggestions = set()
     dels = strings_by_deletion(ustr, depth)
     if ustr in dic:
         suggestions.add(ustr)
 
-    if ustr in delete_dic: # ustr is missing characters.
+    if ustr in delete_dic:  # ustr is missing characters.
         suggestions = suggestions.union(set(delete_dic[ustr]))
     for s in dels:
         if s in dic:    # ustr has extra characters.
             suggestions.add(s)
-        if s in delete_dic: #ustr has substitutions of twiddles
+        if s in delete_dic:  # ustr has substitutions of twiddles
             suggestions = suggestions.union(set(delete_dic[s]))
 
     return list(suggestions if ret_count <= 0 else suggestions[:ret_count])
 
+
 @unibarrier
 def parse_del_dict_entry(entry):
-    return [] if entry is None else [word.strip() for word in entry.split(u' ')]
+    return [] if entry is None else [word.strip()
+                                     for word in entry.split(u' ')]
+
 
 @unibarrier
 def suggestions(ustr, sugs, freq=None):
@@ -114,12 +104,14 @@ def suggestions(ustr, sugs, freq=None):
     simply sort repeatedly, from least important aspect to
     most important.
     """
-    sugs = sorted(sugs) #Alphabetic sort
+    sugs = sorted(sugs)  # Alphabetic sort
     if freq is not None:
-        sugs = sorted(sorted(sugs), key=lambda x: freq[x]) # By frequency
-    sugs = sorted(sugs, key=lambda x: edit_distance(ustr, x)) # By edit distance
-    
+        sugs = sorted(sorted(sugs), key=lambda x: freq[x])  # By frequency
+    # By edit distance
+    sugs = sorted(sugs, key=lambda x: edit_distance(ustr, x))
+
     return sugs
+
 
 @unibarrier
 def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
@@ -138,15 +130,17 @@ def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
     ustr_entry = mmap_bin_search(ustr, del_dic_path)
     word_for_ustr = parse_del_dict_entry(ustr_entry)
     if word_for_ustr is not None:
-        inserts = set(w for w in word_for_ustr)  # get the words reachable by adding to ustr.
+        # get the words reachable by adding to ustr.
+        inserts = set(w for w in word_for_ustr)
     for s in dels:
         if s in dic:
-            deletes.add(s) # Add a word reachable by deleting from ustr.
+            deletes.add(s)  # Add a word reachable by deleting from ustr.
 
         line_for_s = parse_del_dict_entry(mmap_bin_search(s, del_dic_path))
         if line_for_s is not None:
-            # Get the words reachable by deleting from originals, adding to them.
-            # Note that this is NOT the same as 'Levenshtein' substitution.
+            # Get the words reachable by deleting from originals, adding to
+            # them. Note that this is NOT the same as 'Levenshtein'
+            # substitution.
             for sug in line_for_s:
                 distance = edit_distance(sug, ustr)
                 if distance == depth:
@@ -154,7 +148,9 @@ def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
                 elif distance > depth:
                     int_and_dels.add(sug)
 
-    return {u'dels':deletes, u'ins':inserts, u'subs':subs, u'ins+dels':int_and_dels}
+    return {u'dels': deletes, u'ins': inserts,
+            u'subs': subs, u'ins+dels': int_and_dels}
+
 
 def prev_newline(mm, line_buffer_size=100):
     """
@@ -165,6 +161,7 @@ def prev_newline(mm, line_buffer_size=100):
     # TODO this fails on a line greater than line_buffer_size in length
     return mm.rfind(u'\n', mm.tell() - line_buffer_size, mm.tell()) + 1
 
+
 @unibarrier
 def compare_strings(u1, u2):
     if u1 == u2:
@@ -173,6 +170,7 @@ def compare_strings(u1, u2):
         return 1
     else:
         return -1
+
 
 @unibarrier
 def todec(ustr):
@@ -190,6 +188,7 @@ def truestring(unicode):
 # ----------------------------------------------------------------------
 # Binary search dictionary entry parsers -------------------------------
 # ----------------------------------------------------------------------
+
 
 @unibarrier
 def key_for_del_dict_entry(entry):
@@ -212,11 +211,15 @@ def key_for_single_word(entry):
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
- 
+
+
 # TODO Implement doubling-length backward search to make line_buffer_size
 # irrelevant.
+
 @unibarrier
-def mmap_bin_search(ustr, dictionary_path, entryparser_fn=key_for_del_dict_entry, line_buffer_size=200):
+def mmap_bin_search(ustr, dictionary_path,
+                    entryparser_fn=key_for_del_dict_entry,
+                    line_buffer_size=200):
     """
     Perform a binary search on a memory mapped dictionary file, and
     return the parsed entry, or None if the specified entry cannot be
@@ -245,7 +248,7 @@ def mmap_bin_search(ustr, dictionary_path, entryparser_fn=key_for_del_dict_entry
         imax = mm.size()
         count = 0
         while True:
-            mid = imin + int(math.floor((imax - imin)/2))
+            mid = imin + int(math.floor((imax - imin) / 2))
             mm.seek(mid)
             mm.seek(prev_newline(mm))
             key, entry = current_entry(mm)
@@ -266,38 +269,45 @@ def mmap_bin_search(ustr, dictionary_path, entryparser_fn=key_for_del_dict_entry
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 
+
 def initmatrix(rows, columns, defaultval=0):
     """Initializes a 2d list to the desired dimensions."""
     return [[defaultval for j in xrange(columns)] for i in xrange(rows)]
 
+
 def mr(matrix):
     """Returns a string rep of a 2d list as a matrix. Useful for
     debugging."""
-    if matrix == []: return '[]'
+    if matrix == []:
+        return '[]'
     string = '['
     count = 0
     for row in matrix:
-        if count >= 1: string += ' '
+        if count >= 1:
+            string += ' '
         string += str(row) + '\n'
         count += 1
     string = string[:-1]
     string += ']'
     return string
 
+
 def native_backtrace(matrix, start=None):
     """Trace edit steps backward to find an edit sequence for an
     alignment. Starts at the provided 'start' index, or in the i,j'th
     index if none is provided. The backtrace always ends
     at the index 0,0."""
-    i,j = start if start is not None else (len(matrix)-1, len(matrix[0])-1)
-    key = {'i':(0,-1), 'd':(-1,0), 'm':(-1,-1), 's':(-1, -1)}
+    i, j = start if start is not None else (
+        len(matrix) - 1, len(matrix[0]) - 1)
+    key = {'i': (0, -1), 'd': (-1, 0), 'm': (-1, -1), 's': (-1, -1)}
     path = []
 
     while matrix[i][j] != '':
         path.insert(0, matrix[i][j])
-        i,j = tuple(map(operator.add, (i,j), key[matrix[i][j]]))
+        i, j = tuple(map(operator.add, (i, j), key[matrix[i][j]]))
 
     return path
+
 
 def native_align(str1, str2, substitutionscore=1, insertscore=1, deletescore=1,
                  charmatrix={}):
@@ -310,10 +320,12 @@ def native_align(str1, str2, substitutionscore=1, insertscore=1, deletescore=1,
                                               charmatrix=charmatrix)
     return native_backtrace(steps)
 
+
 def native_semi_global_align(shortseq, longseq, substitutionscore=1,
                              insertscore=1, deletescore=1, charmatrix={}):
     if len(shortseq) > len(longseq):
-        raise AlgorithmException('shortseq must be <= longseq in length!')
+        raise NidabaAlgorithmException('shortseq must be <= longseq in\
+                                       length!')
 
     matrix, steps = native_full_edit_distance(shortseq, longseq,
                                               substitutionscore=substitutionscore,
@@ -321,55 +333,59 @@ def native_semi_global_align(shortseq, longseq, substitutionscore=1,
                                               deletescore=deletescore,
                                               charmatrix=charmatrix,
                                               alignment_type='semi-global')
-    return native_backtrace(steps, start=(len(matrix)-1, matrix[-1].index(min(matrix[-1]))))
-
+    return native_backtrace(
+        steps, start=(len(matrix) - 1, matrix[-1].index(min(matrix[-1]))))
 
 
 def native_global_matrix(str1, str2, substitutionscore, insertscore,
                          deletescore, charmatrix):
     """An initial matrix for a global sequence alignment."""
-    matrix = initmatrix(len(str1)+1, len(str2)+1)
+    matrix = initmatrix(len(str1) + 1, len(str2) + 1)
     for i in xrange(1, len(matrix)):
-        matrix[i][0] = i*charmatrix.get(('', str1[i-1]), deletescore)
+        matrix[i][0] = i * charmatrix.get(('', str1[i - 1]), deletescore)
     for j in xrange(1, len(matrix[0])):
-        matrix[0][j] = j*charmatrix.get((str2[j-1], ''), insertscore)
+        matrix[0][j] = j * charmatrix.get((str2[j - 1], ''), insertscore)
     return matrix
+
 
 def native_semi_global_matrix(str1, str2, substitutionscore, insertscore,
                               deletescore, charmatrix):
-    matrix = initmatrix(len(str1)+1, len(str2)+1)
+    matrix = initmatrix(len(str1) + 1, len(str2) + 1)
     for i in xrange(1, len(matrix)):
-        matrix[i][0] = i*charmatrix.get(('', str1[i-1]), deletescore)
+        matrix[i][0] = i * charmatrix.get(('', str1[i - 1]), deletescore)
     return matrix
 
 
 def native_full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
                               deletescore=1, charmatrix={},
                               alignment_type='global'):
-    
-    matrix, steps = full_edit_distance(str1, str2, substitutionscore=substitutionscore,
-                       insertscore=insertscore, deletescore=deletescore,
-                       charmatrix=charmatrix, alignment_type=alignment_type)
+
+    matrix, steps = full_edit_distance(str1, str2,
+                                       substitutionscore=substitutionscore,
+                                       insertscore=insertscore,
+                                       deletescore=deletescore,
+                                       charmatrix=charmatrix,
+                                       alignment_type=alignment_type)
     return matrix, steps
 
+
 def edit_distance(str1, str2, substitutionscore=1, insertscore=1,
-                         deletescore=1, charmatrix={},
-                         alignment_type='global'):
+                  deletescore=1, charmatrix={},
+                  alignment_type='global'):
     m = native_full_edit_distance(str1, str2,
                                   substitutionscore=substitutionscore,
                                   insertscore=insertscore,
                                   deletescore=deletescore,
                                   charmatrix=charmatrix,
                                   alignment_type=alignment_type)[0]
-    return m[-1][ -1]
-
-
+    return m[-1][-1]
 
 
 def full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
-                              deletescore=1, ins_func=None, iargs=[], ikwargs={},
-                              del_func=None, dargs=[], dkwargs={}, sub_func=None, sargs=[],
-                              skwargs={}, charmatrix={}, alignment_type='global'):
+                       deletescore=1, ins_func=None, iargs=[], ikwargs={},
+                       del_func=None, dargs=[], dkwargs={}, sub_func=None,
+                       sargs=[], skwargs={}, charmatrix={},
+                       alignment_type='global'):
     """
     A version of the modified Wagner-Fischer algorithm that accepts user
     defined scoreing functions. These functions should be of the form
@@ -392,23 +408,27 @@ def full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
         sargs = [substitutionscore]
 
     types = {'global': native_global_matrix,
-             'semi-global':native_semi_global_matrix}
+             'semi-global': native_semi_global_matrix}
     matrix = types[alignment_type](str1, str2, substitutionscore, insertscore,
                                    deletescore, charmatrix)
 
-    steps = initmatrix(len(str1)+1, len(str2)+1, defaultval='')
-    steps[0][1:] = list('i'*(len(str2)))
-    for idx in xrange(1, len(matrix)): steps[idx][0] = 'd'
+    steps = initmatrix(len(str1) + 1, len(str2) + 1, defaultval='')
+    steps[0][1:] = list('i' * (len(str2)))
+    for idx in xrange(1, len(matrix)):
+        steps[idx][0] = 'd'
     for i in xrange(1, len(matrix)):
         for j in xrange(1, len(matrix[0])):
-            c1 = str1[i-1]
-            c2 = str2[j-1]
+            c1 = str1[i - 1]
+            c2 = str2[j - 1]
 
-            scores = (('s', matrix[i-1][j-1] + sub_func(c1, c2, *sargs, **skwargs)),
-                      ('i', matrix[i][j-1] + ins_func(c1, c2, *iargs, **ikwargs)),
-                      ('d', matrix[i-1][j] + del_func(c1, c2, *dargs, **dkwargs)))
-            if str1[i-1] == str2[j-1]:
-                matrix[i][j] = matrix[i-1][j-1]
+            scores = (('s', matrix[i - 1][j - 1] + sub_func(c1, c2, *sargs,
+                                                            **skwargs)),
+                      ('i', matrix[i][j - 1] + ins_func(c1, c2, *iargs,
+                                                        **ikwargs)),
+                      ('d', matrix[i - 1][j] + del_func(c1, c2, *dargs,
+                                                        **dkwargs)))
+            if str1[i - 1] == str2[j - 1]:
+                matrix[i][j] = matrix[i - 1][j - 1]
                 steps[i][j] = 'm'
             else:
                 bestoption = min(scores, key=lambda x: x[1])
@@ -421,76 +441,82 @@ def full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
 # String and alignment algorithms (numpy versions) ---------------------
 # ----------------------------------------------------------------------
 
+
 def np_backtrace(matrix, start=None):
     """Trace edit steps backward to find an edit sequence for an
     alignment. Starts at the provided 'start' index, or in the i,j'th
     index if none is provided. The backtrace always ends
     at the index 0,0."""
 
-    i,j = start if start is not None else (matrix.shape[0]-1, matrix.shape[1]-1)
-    key = {'i':(0,-1), 'd':(-1,0), 'm':(-1,-1), 's':(-1, -1)}
+    i, j = start if start is not None else (
+        matrix.shape[0] - 1, matrix.shape[1] - 1)
+    key = {'i': (0, -1), 'd': (-1, 0), 'm': (-1, -1), 's': (-1, -1)}
     path = []
 
-    while matrix[i,j] != '':
-        path.insert(0, matrix[i,j])
-        i,j = tuple(map(operator.add, (i,j), key[matrix[i,j]]))
+    while matrix[i, j] != '':
+        path.insert(0, matrix[i, j])
+        i, j = tuple(map(operator.add, (i, j), key[matrix[i, j]]))
 
     return path
 
+
 def np_align(str1, str2, substitutionscore=1, insertscore=1, deletescore=1,
-          charmatrix={}):
+             charmatrix={}):
     """Calculate the edit distance of two strings, then backtrace to
     find a valid edit sequence."""
     matrix, steps = np_full_edit_distance(str1, str2,
-                                       substitutionscore=substitutionscore,
-                                       insertscore=insertscore,
-                                       deletescore=deletescore,
-                                       charmatrix=charmatrix)
+                                          substitutionscore=substitutionscore,
+                                          insertscore=insertscore,
+                                          deletescore=deletescore,
+                                          charmatrix=charmatrix)
     return np_backtrace(steps)
 
+
 def np_semi_global_align(shortseq, longseq, substitutionscore=1, insertscore=1,
-                      deletescore=1, charmatrix={}):
+                         deletescore=1, charmatrix={}):
     """Find a semi-global alignment between two strings."""
     if len(shortseq) > len(longseq):
-        raise AlgorithmException('shortseq must be <= longseq in length!')
+        raise NidabaAlgorithmException('shortseq must be <= longseq in\
+                                       length!')
 
     matrix, steps = np_full_edit_distance(shortseq, longseq,
-                                       substitutionscore=substitutionscore,
-                                       insertscore=insertscore,
-                                       deletescore=deletescore,
-                                       charmatrix=charmatrix,
-                                       alignment_type='semi-global')
-    back = np_backtrace(steps, start=(matrix.shape[0]-1,
-                                   numpy.argmin(matrix[-1:])))
+                                          substitutionscore=substitutionscore,
+                                          insertscore=insertscore,
+                                          deletescore=deletescore,
+                                          charmatrix=charmatrix,
+                                          alignment_type='semi-global')
+    back = np_backtrace(steps, start=(matrix.shape[0] - 1,
+                                      numpy.argmin(matrix[-1:])))
     return back
 
+
 def np_global_matrix(str1, str2, substitutionscore, insertscore, deletescore,
-                  charmatrix):
+                     charmatrix):
     """An initial matrix for a global sequence alignment."""
-    matrix = numpy.empty(shape=(str1.size+1, str2.size+1))
-    matrix[0,0] = 0
+    matrix = numpy.empty(shape=(str1.size + 1, str2.size + 1))
+    matrix[0, 0] = 0
     for i in xrange(1, matrix.shape[0]):
-        matrix[i,0] = i*charmatrix.get(('', str1[i-1]), deletescore)
+        matrix[i, 0] = i * charmatrix.get(('', str1[i - 1]), deletescore)
     for j in xrange(1, matrix.shape[1]):
-        matrix[0,j] = j*charmatrix.get((str2[j-1], ''), insertscore)
+        matrix[0, j] = j * charmatrix.get((str2[j - 1], ''), insertscore)
     return matrix
 
-def np_semi_global_matrix(str1, str2, substitutionscore, insertscore, deletescore,
-                       charmatrix):
+
+def np_semi_global_matrix(str1, str2, substitutionscore, insertscore,
+                          deletescore, charmatrix):
     """An initial matrix for a semi-global sequence alignment."""
-    matrix = numpy.zeros(shape=(str1.size+1, str2.size+1))
+    matrix = numpy.zeros(shape=(str1.size + 1, str2.size + 1))
 
     # We assume that str1 >= str2.
     # This is guaranteed by the semi_global_align function.
     for i in xrange(1, matrix.shape[0]):
-        matrix[i,0] = i*charmatrix.get(('', str1[i-1]), deletescore)
+        matrix[i, 0] = i * charmatrix.get(('', str1[i - 1]), deletescore)
     return matrix
 
 
-
-
 def np_full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
-                       deletescore=1, charmatrix={}, alignment_type='global'):
+                          deletescore=1, charmatrix={},
+                          alignment_type='global'):
     """A modified implenmentation of the Wagner-Fischer algorithm using
     numpy. Unlike the minimal and optimized version in the
     "edit_distance" function, this returns the entire scoring matrix,
@@ -501,29 +527,33 @@ def np_full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
     str1 = numpy.array(tuple(str1))
     str2 = numpy.array(tuple(str2))
 
-    types = {'global': np_global_matrix, 'semi-global':np_semi_global_matrix}
+    types = {'global': np_global_matrix, 'semi-global': np_semi_global_matrix}
     matrix = types[alignment_type](str1, str2, substitutionscore,
-        insertscore, deletescore, charmatrix)
+                                   insertscore, deletescore, charmatrix)
 
-    steps = numpy.empty(shape=(str1.size+1, str2.size+1), dtype=numpy.object)
-    steps[1:,0] = 'd'
-    steps[0,1:] = 'i'
-    steps[0,0] = ''
+    steps = numpy.empty(
+        shape=(str1.size + 1, str2.size + 1), dtype=numpy.object)
+    steps[1:, 0] = 'd'
+    steps[0, 1:] = 'i'
+    steps[0, 0] = ''
     for i in xrange(1, matrix.shape[0]):
         for j in xrange(1, matrix.shape[1]):
-            c1 = str1[i-1]
-            c2 = str2[j-1]
+            c1 = str1[i - 1]
+            c2 = str2[j - 1]
 
-            scores = (('s', matrix[i-1, j-1] + charmatrix.get((c1, c2), substitutionscore)),
-                      ('i', matrix[i, j-1] + charmatrix.get((c1, c2), insertscore)),
-                      ('d', matrix[i-1, j] + charmatrix.get((c1, c2), deletescore)))
-            if str1[i-1] == str2[j-1]:
-                matrix[i, j] = matrix[i-1, j-1]
-                steps[i,j] = 'm'
+            scores = (('s', matrix[i - 1, j - 1] + charmatrix.get((c1, c2),
+                                                                  substitutionscore)),
+                      ('i', matrix[i, j - 1] + charmatrix.get((c1, c2),
+                                                              insertscore)),
+                      ('d', matrix[i - 1, j] + charmatrix.get((c1, c2),
+                                                              deletescore)))
+            if str1[i - 1] == str2[j - 1]:
+                matrix[i, j] = matrix[i - 1, j - 1]
+                steps[i, j] = 'm'
             else:
                 bestoption = min(scores, key=lambda x: x[1])
-                matrix[i,j] = bestoption[1]
-                steps[i,j] = bestoption[0]
+                matrix[i, j] = bestoption[1]
+                steps[i, j] = bestoption[0]
 
     return matrix, steps
 
@@ -535,7 +565,8 @@ def np_full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
 ascii_range = (u'Ascii', unichr(0), unichr(127))
 greek_coptic_range = (u'Greek Coptic', u'\u0370', u'\u03FF')
 extended_greek_range = (u'Extended Greek', u'\u1F00', u'\u1FFF')
-combining_diacritical_mark_range = (u'Combining Diacritical', u'\u0300', u'\u036f')
+combining_diacritical_mark_range = (
+    u'Combining Diacritical', u'\u0300', u'\u036f')
 
 # This is a list of all tone mark code points not in the combining
 # diacritial block. They are from the "Greek and Coptic" and "Extended
@@ -546,14 +577,16 @@ extended_greek_diacritics = [u'\u1fbd', u'\u1fbe', u'\u1fbf', u'\u1fc0',
                              u'\u1fdd', u'\u1fde', u'\u1fdf', u'\u1fed',
                              u'\u1fee', u'\u1fef', u'\u1ffd', u'\u1ffe']
 
+
 def uniblock(start, stop):
     """
     Return a list containing all the characters in the unicode table
     starting with 'start' (inclusive) and ending with end (inclusive).
     """
-    ints = range(ord(start), ord(stop)+1)
+    ints = range(ord(start), ord(stop) + 1)
 
     return map(unichr, ints)
+
 
 def inblock(c, bounds):
     """
@@ -561,6 +594,7 @@ def inblock(c, bounds):
     characters in the unicode table.
     """
     return ord(c) >= ord(bounds[0]) and ord(c) <= ord(bounds[1])
+
 
 @unibarrier
 def identify(string, unicode_blocks):
@@ -572,13 +606,14 @@ def identify(string, unicode_blocks):
     (<name of block>, <first unichar in block>, <last unichar in the
     block>).
     """
-    result = {b[0]:0 for b in unicode_blocks}
+    result = {b[0]: 0 for b in unicode_blocks}
     for c in string:
         for r in unicode_blocks:
             if inblock(c, (r[1], r[2])):
                 result[r[0]] += 1
 
     return result
+
 
 @unibarrier
 def islang(unistr, unicode_blocks, threshold=1.0):
@@ -597,19 +632,14 @@ def islang(unistr, unicode_blocks, threshold=1.0):
     for block in unicode_blocks:
         inlang += res[block[0]]
 
-    return inlang/len(unistr) >= threshold
+    return inlang / len(unistr) >= threshold
+
 
 @unibarrier
 def isgreek(ustr):
-    return islang(ustr, [greek_coptic_range,extended_greek_diacritics,
+    return islang(ustr, [greek_coptic_range, extended_greek_diacritics,
                          greek_and_coptic_diacritics])
 
-def unifilter(string, rangelist):
-    filterset = []
-    for block in rangelist:
-        for i in unirange(block):
-            filterset.append(unichar(i))
-    return filter(filterset.__contains__, string)
 
 def greek_chars():
     """
@@ -619,8 +649,10 @@ def greek_chars():
 
     chars = uniblock(greek_coptic_range[1], greek_coptic_range[2])
     chars += uniblock(extended_greek_range[1], extended_greek_range[2])
-    chars += uniblock(combining_diacritical_mark_range[1], combining_diacritical_mark_range[2])
+    chars += uniblock(combining_diacritical_mark_range[1],
+                      combining_diacritical_mark_range[2])
     return chars
+
 
 @unibarrier
 def greek_filter(string):
@@ -628,6 +660,7 @@ def greek_filter(string):
     Remove all non-Greek characters from a string.
     """
     return filter(greek_chars().__contains__, string)
+
 
 @unibarrier
 def strip_diacritics(ustr):
@@ -640,6 +673,7 @@ def strip_diacritics(ustr):
     diacritics += greek_and_coptic_diacritics + extended_greek_diacritics
     return u''.join(c for c in ustr if c not in diacritics)
 
+
 def list_to_uni(l, encoding=u'utf-8'):
     """
     Return a human readable string representation of a list of unicode
@@ -648,6 +682,7 @@ def list_to_uni(l, encoding=u'utf-8'):
     result = u'['
     for i in xrange(0, len(l)):
         result += l[i]
-        if i != len(l) - 1: result += u', '
+        if i != len(l) - 1:
+            result += u', '
     result += u']'
     return result.encode(encoding)

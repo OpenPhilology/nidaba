@@ -7,13 +7,14 @@ import sys
 
 from os import path
 
-def reload_config():
-    global nibada_cfg, celery_cfg
-    ipath = path.join(sys.prefix, 'etc', 'nibada', 'nibada.yaml')
-    with open(ipath, 'rb') as fp:
-        nibada_cfg = yaml.safe_load(fp)
 
-    cpath = path.join(sys.prefix, 'etc', 'nibada', 'celery.yaml')
+def reload_config():
+    global nidaba_cfg, celery_cfg
+    ipath = path.join(sys.prefix, 'etc', 'nidaba', 'nidaba.yaml')
+    with open(ipath, 'rb') as fp:
+        nidaba_cfg = yaml.safe_load(fp)
+
+    cpath = path.join(sys.prefix, 'etc', 'nidaba', 'celery.yaml')
     with open(cpath, 'rb') as fp:
         celery_cfg = yaml.safe_load(fp)
 

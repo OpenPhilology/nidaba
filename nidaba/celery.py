@@ -1,10 +1,10 @@
 from __future__ import absolute_import
 
 from celery import Celery
-from nibada.config import celery_cfg
+from nidaba.config import celery_cfg
 
-app = Celery('nibada',
-                include=['nibada.tasks'])
+app = Celery('nidaba',
+             include=['nidaba.tasks'])
 app.config_from_object(celery_cfg)
 
 if __name__ == '__main__':

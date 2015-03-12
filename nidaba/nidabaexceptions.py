@@ -1,52 +1,90 @@
-#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+nidaba.nidabaexceptions
+~~~~~~~~~~~~~~~~~~~~~~~
+
+All custom exceptions raised by various nidaba modules and packages. Packages
+should always define their exceptions here.
+"""
 
 
-class NibadaTaskException(Exception):
+class NidabaUnibarrierException(Exception):
+
+    def __init__(self, message=None):
+        Exception.__init__(self, message)
+
+
+class NidabaAlgorithmException(Exception):
+
+    def __init__(self, message=None):
+        Exception.__init__(self, message)
+
+
+class NidabaTaskException(Exception):
+
     def __init__(self, status_code):
         self.status_code = status_code
         Exception.__init__(self, status_code)
 
-class NibadaTickException(Exception):
+
+class NidabaTickException(Exception):
+
     def __init__(self, status_code):
         self.status_code = status_code
         Exception.__init__(self, status_code)
 
-class NibadaStepException(Exception):
+
+class NidabaStepException(Exception):
+
     def __init__(self, status_code):
         self.status_code = status_code
         Exception.__init__(self, status_code)
 
-class NibadaInputException(Exception):
+
+class NidabaInputException(Exception):
+
     def __init__(self, status_code):
         self.status_code = status_code
         Exception.__init__(self, status_code)
 
-class NibadaNoSuchAlgorithmException(Exception):
+
+class NidabaNoSuchAlgorithmException(Exception):
+
     def __init__(self, status_code):
         self.status_code = status_code
         Exception.__init__(self, status_code)
 
-class NibadaInvalidParameterException(Exception):
+
+class NidabaInvalidParameterException(Exception):
+
     def __init__(self, status_code):
         self.status_code = status_code
         Exception.__init__(self, status_code)
 
-class NibadaTesseractException(Exception):
+
+class NidabaTesseractException(Exception):
+
     def __init__(self, status_code):
         self.status_code = status_code
         Exception.__init__(self, status_code)
 
-class NibadaOcropusException(Exception):
+
+class NidabaOcropusException(Exception):
+
     def __init__(self, status_code):
         self.status_code = status_code
         Exception.__init__(self, status_code)
 
-class NibadaStorageViolationException(Exception):
+
+class NidabaStorageViolationException(Exception):
+
     def __init__(self, status_code):
         self.status_code = status_code
         Exception.__init__(self, status_code)
 
-class NibadaNoSuchStorageBin(Exception):
+
+class NidabaNoSuchStorageBin(Exception):
+
     def __init__(self, status_code):
         self.status_code = status_code
         Exception.__init__(self, status_code)

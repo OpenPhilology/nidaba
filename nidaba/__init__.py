@@ -1,1 +1,1 @@
-from nibada import Batch
+from nidaba import Batch

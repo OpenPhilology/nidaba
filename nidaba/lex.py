@@ -8,8 +8,9 @@ from __future__ import absolute_import
 import os
 import codecs
 import glob
-import nibada.algorithms as alg
+import nidaba.algorithms as alg
 from collections import Counter
+
 
 @alg.unibarrier
 def cleanlines(path, encoding=u'utf-8', normalization=u'NFD'):
@@ -22,6 +23,7 @@ def cleanlines(path, encoding=u'utf-8', normalization=u'NFD'):
         for line in lines:
             words.append(alg.sanitize(line, normalization=normalization))
     return words
+
 
 @alg.unibarrier
 def cleanwords(path, encoding=u'utf-8', normalization=u'NFD'):
@@ -38,6 +40,7 @@ def cleanwords(path, encoding=u'utf-8', normalization=u'NFD'):
                     words.append(clean)
     return words
 
+
 @alg.unibarrier
 def uniquewords_with_freq(path, encoding=u'utf-8', normalization=u'NFD'):
     """
@@ -48,7 +51,8 @@ def uniquewords_with_freq(path, encoding=u'utf-8', normalization=u'NFD'):
     words = cleanwords(path, encoding=encoding, normalization=normalization)
     freq = Counter(words)
     return freq
-        
+
+
 @alg.unibarrier
 def cleanuniquewords(path, encoding=u'utf-8', normalization=u'NFD'):
     """
@@ -56,47 +60,52 @@ def cleanuniquewords(path, encoding=u'utf-8', normalization=u'NFD'):
     convert them to the specified normalization, andreturn a list
     of all unique words.
     """
-    return set(cleanwords(path, encoding=encoding, normalization=normalization))
+    return set(
+        cleanwords(path, encoding=encoding, normalization=normalization))
 
 
 @alg.unibarrier
 def words_from_files(dirpath, encoding=u'utf-8', normalization=u'NFD'):
     """
     Create a dictionary from a directory of text files.
-	All file in the given directory will be parsed.
+        All file in the given directory will be parsed.
     """
     words = []
     for filename in filter(os.path.isfile, glob.glob(dirpath + '/*')):
-        words += cleanwords(filename, encoding=encoding, normalization=normalization)
+        words += cleanwords(filename, encoding=encoding,
+                            normalization=normalization)
     return words
 
 
 @alg.unibarrier
 def unique_words_from_files(dirpath, encoding=u'utf-8', normalization=u'NFD'):
-	"""
-	Create a set of unique words from a directory of text files.
-	All file in the given directory will be parsed.
-	"""
-	return set(words_from_files(dirpath, encoding=encoding, normalization=normalization))
+    """
+    Create a set of unique words from a directory of text files.
+    All file in the given directory will be parsed.
+    """
+    return set(
+        words_from_files(dirpath, encoding=encoding,
+                         normalization=normalization))
 
 
 @alg.unibarrier
 def make_dict(outpath, iterable, encoding=u'utf-8'):
-	"""
-	Create a file at outpath and write evrey object in iterable to its
-	own line.
-	"""
-	with codecs.open(outpath, u'w+', encoding=encoding) as f:
-		for s in iterable:
-			f.write(s + u'\n')
+    """
+    Create a file at outpath and write evrey object in iterable to its
+    own line.
+    """
+    with codecs.open(outpath, u'w+', encoding=encoding) as f:
+        for s in iterable:
+            f.write(s + u'\n')
+
 
 @alg.unibarrier
 def make_deldict(outpath, words, depth):
     """
     Creates a symmetric deletion dictionary from the specified word list.
-    WARNING! This is a naive approach, which requires all the variants to be stored in
-    memory. For large dictionaries at higher depth, this can easily use all
-    available memory on most machines.
+    WARNING! This is a naive approach, which requires all the variants to be
+    stored in memory. For large dictionaries at higher depth, this can easily
+    use all available memory on most machines.
     """
     variant_dict = {}
     for word in words:

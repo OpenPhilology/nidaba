@@ -3,9 +3,7 @@
 
 import sys
 import codecs
-import cPickle
-from time import sleep
-from nidaba.algorithms import strings_by_deletion,sanitize 
+from nidaba.algorithms import strings_by_deletion, sanitize
 
 
 def file_len(fname):
@@ -28,7 +26,7 @@ if __name__ == '__main__':
     input_file_path = sys.argv[1]
     output_file_path = sys.argv[2]
     edit_distance = int(sys.argv[3])
-    
+
     fl = file_len(input_file_path)
 
     with open(input_file_path) as infile:
@@ -38,7 +36,7 @@ if __name__ == '__main__':
             word = sanitize(word)
             variants = strings_by_deletion(word, edit_distance)
             i += 1
-            sys.stdout.write("Words generated:%d/%i   \r" % (i, fl) )
+            sys.stdout.write("Words generated:%d/%i   \r" % (i, fl))
             sys.stdout.flush()
 
             for v in variants:
@@ -47,15 +45,14 @@ if __name__ == '__main__':
                 dic[v].append(word)
 
     print 'sorting...'
-    ordered = dic.keys()
-    ordered.sort()
+    ordered = sorted(dic.keys())
 
     print '\n'
-    print 'writing file' 
+    print 'writing file'
     with codecs.open(output_file_path, u'w+', encoding='utf-8') as outfile:
         i = 0
         for k in ordered:
-            sys.stdout.write("Entries written:%d/%i   \r" % (i, len(dic)-1) )
+            sys.stdout.write("Entries written:%d/%i   \r" % (i, len(dic) - 1))
             if i != fl - 1:
                 sys.stdout.flush()
 

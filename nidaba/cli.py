@@ -1,13 +1,13 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-This module encapsulates all shell callable functions of nibada.
+This module encapsulates all shell callable functions of nidaba.
 """
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-from nibada import Batch, storage
-from nibada.config import nibada_cfg
+from nidaba import Batch, storage
+from nidaba.config import nidaba_cfg
 from pprint import pprint
 
 import argparse
@@ -15,46 +15,60 @@ import uuid
 import shutil
 import os.path
 
+
 def main():
-    parser = argparse.ArgumentParser(description=u'Sends jobs to nibada and\
+    parser = argparse.ArgumentParser(description=u'Sends jobs to nidaba and\
                                     retrieves their status.',
-                                    epilog=u'This nibada may or may not have\
+                                     epilog=u'This nidaba may or may not have\
                                     Super Cow Powers.')
     subparsers = parser.add_subparsers()
 
     # Command line parameters for querying a job ID
-    statusparser = subparsers.add_parser('status', help='Displays the status of a job')
-    statusparser.add_argument('jobid', help='The unique job ID returned by batch.')
+    statusparser = subparsers.add_parser(
+        'status', help='Displays the status of a job')
+    statusparser.add_argument(
+        'jobid', help='The unique job ID returned by batch.')
     statusparser.set_defaults(func=status)
 
     # Command line parameters for configuration file display
-    configparser = subparsers.add_parser('config', help='Show the current nibada configuration.')
+    configparser = subparsers.add_parser(
+        'config', help='Show the current nidaba configuration.')
     configparser.set_defaults(func=config)
 
     # Command line parameters for a new job
-    batchparser = subparsers.add_parser('batch', help='Put a new batch into the pipeline.')
+    batchparser = subparsers.add_parser(
+        'batch', help='Put a new batch into the pipeline.')
     batchparser.add_argument('files', help=u'A list of input files to be converted\
                               using the pipeline. They will be copied into a\
                               directory beneath STORAGE_PATH.', nargs='+')
     batchparser.add_argument('--binarize', help=u'A list of binarization options in\
-                        the format algorithm:t1 algorithm2:t1,t2,... where\
-                        algorithm is either otsu or sauvola and t1,.. are\
-                        integer thresholds.', nargs='+', default=[u'sauvola:40'])
-    batchparser.add_argument('--ocr', help=u'A list of OCR engine options in the\
-                        format engine:language1,language2 engine:model1, model2\
-                        where engine is either tesseract or ocropus and\
-                        language* is a tesseract language model and model1 is\
-                        a ocropus model defined in the nibada config.',
-                        nargs='+', default=[u'tesseract:eng'])
+                             the format\
+                             algorithm:whsize=10;whsize=20,factor=0.7\
+                             algorithm2:t1,... where algorithm is either otsu\
+                             or sauvola and the parameters are a list of\
+                             particular configuration of the algorithm where\
+                             each configuration is a sequence of algorithmic\
+                             parameters divided by ,.', nargs='+',
+                             default=[u'sauvola:whsize=40'])
+    batchparser.add_argument('--ocr', help=u'A list of OCR engine options in\
+                             the format engine:language1,language2\
+                             engine:model1, model2 where engine is either\
+                             tesseract or ocropus and language* is a tesseract\
+                             language model and model1 is a ocropus model\
+                             defined in the nidaba config.', nargs='+',
+                             default=[u'tesseract:eng'])
     batchparser.add_argument('--willitblend', help=u'Blends all output files into a\
-                             single hOCR document.', action='store_true', default=False)
+                             single hOCR document.', action='store_true',
+                             default=False)
     batchparser.add_argument('--grayscale', help=u'Input file are already 8bpp\
-                             RGB grayscale.', action='store_true', default=False)
+                             RGB grayscale.', action='store_true',
+                             default=False)
 
     batchparser.set_defaults(func=batch)
 
     args = parser.parse_args()
     args.func(args)
+
 
 def int_float_or_str(s):
     try:
@@ -65,12 +79,13 @@ def int_float_or_str(s):
         except ValueError:
             return s
 
+
 def batch(args):
 
     id = unicode(uuid.uuid4())
     batch = Batch(id)
     print('Preparing filestore....', end=''),
-    if storage.prepare_filestore(id) == None:
+    if storage.prepare_filestore(id) is None:
         print('failed.')
         exit()
     for doc in args.files:
@@ -89,7 +104,8 @@ def batch(args):
             (alg, _, params) = bin.partition(u':')
             for c in params.split(u';'):
                 kwargs = dict(kwarg.split('=') for kwarg in c.split(","))
-                kwargs = {key:int_float_or_str(val) for key,val in kwargs.items()}
+                kwargs = {key: int_float_or_str(val)
+                          for key, val in kwargs.items()}
                 batch.add_task('binarize.' + alg, **kwargs)
     if args.ocr:
         batch.add_tick()
@@ -99,12 +115,14 @@ def batch(args):
                 batch.add_task('ocr.tesseract', languages=params.split(u','))
             elif engine == u'ocropus':
                 for model in params.split(u','):
-                    if model not in nibada_cfg['ocropus_models']:
-                        print('WARNING: ocropus model ' + model.encode('utf-8') + ' not known.')
+                    if model not in nidaba_cfg['ocropus_models']:
+                        print('WARNING: ocropus model ' +
+                              model.encode('utf-8') + ' not known.')
                     else:
                         batch.add_task('ocr.ocropus', model=model)
             else:
-                print('WARNING: OCR engine ' + engine.encode('utf-8') + ' not known.')
+                print('WARNING: OCR engine ' + engine.encode('utf-8') + ' not\
+                      known.')
     if args.willitblend:
         batch.add_step()
         batch.add_tick()
@@ -113,8 +131,10 @@ def batch(args):
     print('done.')
     print(id)
 
+
 def config(args):
-    pprint(nibada_cfg)
+    pprint(nidaba_cfg)
+
 
 def status(args):
     batch = Batch(args.jobid)
@@ -122,16 +142,17 @@ def status(args):
     print(state)
     if state == 'SUCCESS':
         ret = batch.get_results()
-        if ret == None:
+        if ret is None:
             print('Something somewhere went wrong.')
-            print('Please contact your friendly nibada support technician.')
+            print('Please contact your friendly nidaba support technician.')
         else:
             for doc in ret:
                 print('\t' + storage.get_abs_path(*doc).encode('utf-8'))
     elif state == 'FAILURE':
         ret = batch.get_errors()
-        if ret == None:
+        if ret is None:
             print('Something somewhere went wrong.')
         else:
             for fun in ret:
-                print(fun[1]['method'].encode('utf-8') + u': ' + fun[2].encode('utf-8'))
+                print(fun[1]['method'].encode(
+                    'utf-8') + u': ' + fun[2].encode('utf-8'))
