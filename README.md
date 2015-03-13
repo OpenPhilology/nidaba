@@ -3,8 +3,7 @@ Overview
 
 Nidaba is the central controller for the entire OGL OCR pipeline. It oversees and
 automates the process of converting raw images into citable collections of
-digitized texts. Images can be uploaded directly via Nidaba' RESTful web portal,
-or can be selected from preexisting images located on Nidaba' image repository.
+digitized texts.
 
 It offers the following functionality:
 
@@ -16,8 +15,8 @@ It offers the following functionality:
   background normalization
 * Deskewing
 * Dewarping
-* Integration of [tesseract](http://code.google.com/p/tesseract-ocr/) and ocropus OCR
-  engines
+* Integration of [tesseract](http://code.google.com/p/tesseract-ocr/) and
+  ocropus OCR engines
 * Merging multiple hOCR documents using scoring
 
 As it is designed to use a common storage medium on network attached storage
@@ -47,7 +46,7 @@ $ apt-get install libleptonica-dev
 ```
 
 Per default no dictionaries and OCR models (including data necessary to run
-tests) are installed. To download the necessary files run:
+some tests) are installed. To download the necessary files run:
 
 ```
 $ python setup.py download
@@ -60,10 +59,8 @@ Tests
 $ python setup.py test
 ```
 
-As mentioned above the models have to be installed.
-
-Running the tests requires a working tesseract with ancient greek language
-files and an installed ocropus suite.
+Tests for modules that call external programs, at the time only tesseract and
+ocropus, will be skipped if these aren't installed.
 
 Running
 =======
