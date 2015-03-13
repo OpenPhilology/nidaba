@@ -3,7 +3,10 @@ import unittest
 import os
 import shutil
 import tempfile
+
 from lxml import etree
+from distutils import spawn
+from nose.plugins.skip import SkipTest
 from nidaba import ocropus
 
 thisfile = os.path.abspath(os.path.dirname(__file__))
@@ -17,6 +20,11 @@ class OcropusTests(unittest.TestCase):
     """
 
     def setUp(self):
+        if None in [spawn.find_executable('ocropus-rpred'),
+                    spawn.find_executable('ocropus-gpageseg'),
+                    spawn.find_executable('ocropus-hocr')]:
+            raise SkipTest
+
         self.otempdir = unicode(tempfile.mkdtemp())
         # copytree fails if the target directory already exists. Unfortunately
         # not creating the temporary directory using mkstemp() is

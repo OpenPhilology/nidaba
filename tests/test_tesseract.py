@@ -3,8 +3,12 @@ import unittest
 import os
 import shutil
 import tempfile
+import subprocess
+
 from lxml import etree
 from nidaba import tesseract
+from distutils import spawn
+from nose.plugins.skip import SkipTest
 
 thisfile = os.path.abspath(os.path.dirname(__file__))
 resources = os.path.abspath(os.path.join(thisfile, 'resources/tesseract'))
@@ -17,6 +21,15 @@ class TesseractTests(unittest.TestCase):
     """
 
     def setUp(self):
+        if not spawn.find_executable('tesseract'):
+            raise SkipTest
+
+        r = subprocess.Popen(['tesseract', '--list-langs'],
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        _, langs = r.communicate()
+        if 'grc' not in langs.split():
+            raise SkipTest
         self.tempdir = tempfile.mkdtemp()
 
     def tearDown(self):
