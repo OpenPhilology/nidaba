@@ -893,15 +893,15 @@ class LanguageTests(unittest.TestCase):
         def dummyfunction(*args, **kwargs):
             pass
 
-        self.assertRaises(NidabaUnibarrierException, 
+        self.assertRaises(NidabaUnibarrierException,
                           dummyfunction, str('a string'))
 
-        self.assertRaises(NidabaUnibarrierException, 
-                          dummyfunction, 
-                          str('a string'), 
+        self.assertRaises(NidabaUnibarrierException,
+                          dummyfunction,
+                          str('a string'),
                           str('another string'))
 
-        self.assertRaises(NidabaUnibarrierException, 
+        self.assertRaises(NidabaUnibarrierException,
                           dummyfunction,
                           str('100 of me!') * 100, u'I donn\'t matter')
 
