@@ -54,8 +54,8 @@ clean:
 
 gh_pages:
 	git checkout gh-pages
-	make clean
 	git checkout master $(GH_PAGES_SOURCES)
+	make clean
 	git reset HEAD
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) ../
 	rm -rf $(GH_PAGES_SOURCES) $(BUILDDIR)

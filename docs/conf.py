@@ -9,8 +9,8 @@ import os.path
 sys.path.append(os.path.abspath('../'))
 
 extensions = [
-#    'sphinx.ext.autodoc',
-#    'sphinx.ext.napoleon',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
 #    'sphinxcontrib.autoprogram',
 ]
 
