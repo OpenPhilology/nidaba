@@ -1,0 +1,340 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation &mdash; nidaba 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="nidaba 0.1 documentation" href="../index.html" />
+    <link rel="next" title="&lt;no title&gt;" href="../tech-reference/index.html" />
+    <link rel="prev" title="nidaba" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../tech-reference/index.html" title="&lt;no title&gt;"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="nidaba"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="installation">
+<span id="installing-nidaba"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>At least for testing purposes it is recommended to install nidaba into a virtualenv.</p>
+<div class="section" id="installing-external-dependencies">
+<span id="external-dependencies"></span><h2>Installing External Dependencies<a class="headerlink" href="#installing-external-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>While nidaba itself is mostly written in python there are some external
+dependencies. The first set is required in all use cases, while the second one
+can be adapted for particular requirements.</p>
+<p>First are the required packages for building various python packages as numpy
+and lxml and the leptonica C wrapper.</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">#</span> apt-get install python python-dev build-essential libxml2-dev libxslt1-dev libleptonica-dev
+</pre></div>
+</div>
+<p>leptonica&#8217;s API is not stable across versions, for the current version of
+leper, the leptonica wrapper, to compile a version &gt;=1.70 is required.</p>
+<p>Next we&#8217;ll have to install some actual OCR engines and language models. To
+run the unit tests at least the ancient greek language model is required:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">#</span> apt-get install tesseract-ocr tesseract-ocr-grc
+</pre></div>
+</div>
+<p>Further ocropus may be installed; the process varies by distribution.</p>
+</div>
+<div class="section" id="installing-from-pypi">
+<h2>Installing from PyPi<a class="headerlink" href="#installing-from-pypi" title="Permalink to this headline">¶</a></h2>
+<p>Execute:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> pip install nidaba
+</pre></div>
+</div>
+<p>and you&#8217;re done.</p>
+</div>
+<div class="section" id="installing-from-source">
+<h2>Installing from Source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline">¶</a></h2>
+<p>If you want to install from source, ensure you have <a class="reference external" href="https://pip.pypa.io/en/latest/">pip</a> installed and run:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> pip install .
+</pre></div>
+</div>
+<p>There are some miscellaneous models and dictionaries not packaged with the
+source code. To download these run:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> python setup.py download
+</pre></div>
+</div>
+<p>Afterwards the test suite can be run:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> python setup.py <span class="nb">test</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="configuration">
+<span id="configuring-nidaba"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>There are currently two configuration files, one used by the celery framework
+and one containing the actual nidaba configuration. Both are written in <a class="reference external" href="http://www.yaml.org">YAML</a> so indentation and whitespace is important. They are
+installed automatically into sys.prefix/etc/nidaba/{celery,nidaba}.yaml; usually
+into the root of the virtualenv containing nidaba or /usr/etc/nidaba/.</p>
+<p>The former resembles a <a class="reference external" href="http://celery.readthedocs.org/en/latest/configuration.html">celery configuration object</a> and may contain
+all available options. The example file looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre>BROKER_URL: &#39;redis://127.0.0.1:6379&#39;
+CELERY_RESULT_BACKEND: &#39;redis://127.0.0.1:6379&#39;
+CELERY_TASK_SERIALIZER: &#39;json&#39;
+CELERY_RESULT_SERIALIZER: &#39;json&#39;
+</pre></div>
+</div>
+<p>The later contains essential configuration for several subtasks and the overall
+framework:</p>
+<div class="highlight-python"><div class="highlight"><pre>storage_path: ~/OCR
+lang_dicts:
+  polytonic_greek: [dicts, greek.dic]
+  lojban: [dicts, lojban.dic]
+  german: [dicts, german.dic]
+old_tesseract: n
+old_ocropus: n
+ocropus_models:
+  greek: [models, greek.pyrnn.gz]
+  atlantean: [models, atlantean.pyrnn.gz]
+  fraktur: [models, fraktur.pyrnn.gz]
+  fancy_ligatures: [models, ligatures.pyrnn.gz]
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>storage_path</dt>
+<dd>The home directory for nidaba to store files created by OCR jobs, i.e.
+the location of the shared storage medium. This may differ on
+different machines in the cluster.</dd>
+<dt>lang_dicts</dt>
+<dd>A list of mappings from unique identifiers to storage tupels where a
+tupel is of the format [directory, path] resulting in the absolute path
+storage_path/directory/path. Each mapping defines a dictionary that can
+be utilized by the spell checker and other tasks utilizing dictionaries.</dd>
+<dt>old_tesseract</dt>
+<dd>A switch for the tesseract hOCR output format. Set to True if your
+tesseract produces hOCR output with an .html extension.</dd>
+<dt>old_ocropus</dt>
+<dd>Legacy ocropus versions don&#8217;t have some command line switches which are
+required for operation with more recent ones. If you&#8217;re not running ocropus
+from github.com/tmbdev or ocropus-gpageseg does not have a &#8211;nocheck option set
+this to yes.</dd>
+<dt>ocropus_models</dt>
+<dd>A list of mappings from unique identifiers to storage tupels where a
+tupel is of the format [directory, path] resulting in the absolute path
+storage_path/directory/path. Each mapping defines a single neuronal
+network available to the ocropus OCR task. These have to exist on all
+machines running nidaba and therefore have to be on the common storage medium
+beneath storage_path.</dd>
+</dl>
+</div>
+<div class="section" id="quick-start">
+<span id="installing-nidaba-intro"></span><h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="running-the-celery-worker-server">
+<span id="preparing-celery"></span><h2>Running the celery worker server<a class="headerlink" href="#running-the-celery-worker-server" title="Permalink to this headline">¶</a></h2>
+<p>Starting the celery worker server is quite simple and the only requirement is
+that it is NOT run inside the nidaba directory and the message broker is up and
+running:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> celery -A nidaba.tasks worker
+</pre></div>
+</div>
+<p>For further worker server options have a look at <a class="reference external" href="https://celery.readthedocs.org/en/latest/">celery</a>.</p>
+</div>
+<div class="section" id="the-command-line-interface">
+<span id="using-cli"></span><h2>The Command Line Interface<a class="headerlink" href="#the-command-line-interface" title="Permalink to this headline">¶</a></h2>
+<p>The simplest way to put jobs into the pipeline is using the nidaba command line
+utility. It is automatically installed during the installation procedure.</p>
+<div class="section" id="nidaba-config">
+<span id="cli-config"></span><h3>nidaba config<a class="headerlink" href="#nidaba-config" title="Permalink to this headline">¶</a></h3>
+<p>The <em>config</em> subcommand is used to inspect the current nidabaconfig.py:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba config
+<span class="go">* LANG_DICTS</span>
+<span class="go">{u&#39;german&#39;: (u&#39;dicts&#39;, u&#39;test/german.txt&#39;),</span>
+<span class="go"> u&#39;lojban&#39;: (u&#39;dicts&#39;, u&#39;test/lojban.txt&#39;),</span>
+<span class="go"> u&#39;polytonic_greek&#39;: (u&#39;dicts&#39;, u&#39;greek.dic&#39;)}</span>
+<span class="go">* OCROPUS_MODELS</span>
+<span class="go">{u&#39;atlantean&#39;: (u&#39;models&#39;, u&#39;atlantean.pyrnn.gz&#39;),</span>
+<span class="go"> u&#39;fraktur&#39;: (u&#39;models&#39;, u&#39;fraktur.pyrnn.gz&#39;),</span>
+<span class="go"> u&#39;greek&#39;: (u&#39;models&#39;, u&#39;greek.pyrnn.gz&#39;)}</span>
+<span class="go">* OLD_TESSERACT</span>
+<span class="go">False</span>
+<span class="go">* STORAGE_PATH</span>
+<span class="go">u&#39;~/OCR&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="nidaba-batch">
+<span id="cli-batch"></span><h3>nidaba batch<a class="headerlink" href="#nidaba-batch" title="Permalink to this headline">¶</a></h3>
+<p>The <em>batch</em> subcommand is used to create a job for the pipeline. A rather
+minimal invocation looks like this:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch --binarize <span class="s2">&quot;sauvola:whsize=10;whsize=20;whsize=30;whsize=40,factor=0.6&quot;</span> --ocr tesseract:eng -- ./input.tiff
+<span class="go">35be45e9-9d6d-47c7-8942-2717f00f84cb</span>
+</pre></div>
+</div>
+<p>It converts the input file <em>input.tiff</em> to grayscale, binarizes it using the
+Sauvola algorithm with 4 different window sizes, and finally runs it through
+tesseract with the English language model.</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--binarize</span></kbd></td>
+<td>Defines the binarization parameters. It consists of a list of terms in
+the format algorithm1:t1,t2,t3 algorithm2:t1,t2,... where algorithm is
+either <em>otsu</em> or <em>sauvola</em> and t1 etc. are thresholding and window size
+parameters respectively.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--ocr</span></kbd></td>
+<td>A list of OCR engine options in the format engine:lang1,lang2,lang3
+engine2:model... where engine is either <em>tesseract</em> or <em>ocropus</em> and
+lang is a tesseract language model and model is an ocropus model
+previously defined in nidabaconfig.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--willitblend</span></kbd></td>
+<td>Blends all output hOCR files into a single hOCR document using the
+dummy scoring algorithm.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--grayscale</span></kbd></td>
+<td>A switch to indicate that input files are already 8bpp grayscale and
+conversion to grayscale is unnecessary.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="nidaba-status">
+<span id="cli-status"></span><h3>nidaba status<a class="headerlink" href="#nidaba-status" title="Permalink to this headline">¶</a></h3>
+<p>The <em>status</em> subcommand is used to check the status of a job. It requires the
+return value of the <em>nidaba batch</em> command.</p>
+<p>A currently running job will return PENDING:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba status 35be45e9-9d6d-47c7-8942-2717f00f84cb
+<span class="go">PENDING</span>
+</pre></div>
+</div>
+<p>When the job has been processed the status command will return a list of paths
+containing the final output:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba status 35be45e9-9d6d-47c7-8942-2717f00f84cb
+<span class="go">SUCCESS</span>
+<span class="go">        /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_10_0.3_ocr_tesseract_eng.tiff.hocr</span>
+<span class="go">        /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_20_0.3_ocr_tesseract_eng.tiff.hocr</span>
+<span class="go">        /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_30_0.3_ocr_tesseract_eng.tiff.hocr</span>
+<span class="go">        /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_40_0.3_ocr_tesseract_eng.tiff.hocr</span>
+</pre></div>
+</div>
+<p>On failure the subtasks that failed and their error message will be printed:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba status 35be45e9-9d6d-47c7-8942-2717f00f84cb
+<span class="go">FAILURE</span>
+<span class="go">        rgb_to_gray: Color blindness not found</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="the-web-interface">
+<span id="using-webfrontend"></span><h2>The Web Interface<a class="headerlink" href="#the-web-interface" title="Permalink to this headline">¶</a></h2>
+<p>Not implemented yet.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#installing-external-dependencies">Installing External Dependencies</a></li>
+<li><a class="reference internal" href="#installing-from-pypi">Installing from PyPi</a></li>
+<li><a class="reference internal" href="#installing-from-source">Installing from Source</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a><ul>
+<li><a class="reference internal" href="#running-the-celery-worker-server">Running the celery worker server</a></li>
+<li><a class="reference internal" href="#the-command-line-interface">The Command Line Interface</a><ul>
+<li><a class="reference internal" href="#nidaba-config">nidaba config</a></li>
+<li><a class="reference internal" href="#nidaba-batch">nidaba batch</a></li>
+<li><a class="reference internal" href="#nidaba-status">nidaba status</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-web-interface">The Web Interface</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../index.html"
+                        title="previous chapter">nidaba</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../tech-reference/index.html"
+                        title="next chapter">&lt;no title&gt;</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/user-guide/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2014, Open Greek and Latin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.2</a>
+      
+      |
+      <a href="../_sources/user-guide/index.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,7 +1,7 @@
 # Makefile for Sphinx documentation
 #
 
-GH_PAGES_SOURCE = Makefile index.rst tech-reference user-guide
+GH_PAGES_SOURCE = Makefile index.rst tech-reference user-guide conf.py
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
@@ -54,12 +54,12 @@ clean:
 
 gh_pages:
 	git checkout gh-pages
-	rm -rf _build _sources _static
+	make clean
 	git checkout master $(GH_PAGES_SOURCES)
 	git reset HEAD
 	make html
-	mv -fv _build/html/* ../
-	rm -rf $(GH_PAGES_SOURCES) _build
+	mv -fv $(BUILDDIR)/html/* ../
+	rm -rf $(GH_PAGES_SOURCES) $(BUILDDIR)
 	git add -A
 	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
 
