@@ -1,11 +1,13 @@
 # Makefile for Sphinx documentation
 #
 
+
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = _build
+GH_PAGES_SOURCES = Makefile index.rst tech-reference user-guide conf.py
 
 # User-friendly check for sphinx-build
 ifeq ($(shell which $(SPHINXBUILD) >/dev/null 2>&1; echo $$?), 1)
@@ -45,9 +47,20 @@ help:
 	@echo "  pseudoxml  to make pseudoxml-XML files for display purposes"
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
+	@echo "  gh_pages   to make standalone HTML files and upload them to github"
 
 clean:
 	rm -rf $(BUILDDIR)/*
+
+gh_pages:
+	git checkout gh-pages
+	make clean
+	git checkout master $(GH_PAGES_SOURCES)
+	git reset HEAD
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) ../
+	rm -rf $(GH_PAGES_SOURCES) $(BUILDDIR)
+	git add -A
+	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
