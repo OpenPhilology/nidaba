@@ -66,8 +66,8 @@ Running
 =======
 
 First edit (the installed) nidaba.yaml and celery.yaml to fit your needs. Have
-a look at the [docs](https:///nidaba.rtfd.org/) if you haven't set up a
-celery-based application before.
+a look at the [docs](https:///mittagessen.github.io/nidaba) if you haven't set
+up a celery-based application before.
 
 Then start up the celery daemon with something like:
 
@@ -105,5 +105,4 @@ SUCCESS
 Documentation
 =============
 
-Want to learn more? [Read the Docs](https:///nidaba.readthedocs.org/)
-
+Want to learn more? [Read the Docs](https:///mittagessen.github.io/nidaba/)
