@@ -36,6 +36,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -50,23 +53,68 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="nidaba-tasks-binarize-module">
-<h2>nidaba.tasks.binarize module<a class="headerlink" href="#nidaba-tasks-binarize-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-nidaba.tasks.binarize">
+<span id="nidaba-tasks-binarize-module"></span><h2>nidaba.tasks.binarize module<a class="headerlink" href="#module-nidaba.tasks.binarize" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-tasks-binarize">
+<h3>nidaba.tasks.binarize<a class="headerlink" href="#nidaba-tasks-binarize" title="Permalink to this headline">¶</a></h3>
+<p>Tasks for segmentation of color images into binary images. More often than not
+these will operate on grayscale input.</p>
 </div>
-<div class="section" id="nidaba-tasks-helper-module">
-<h2>nidaba.tasks.helper module<a class="headerlink" href="#nidaba-tasks-helper-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="nidaba-tasks-img-module">
-<h2>nidaba.tasks.img module<a class="headerlink" href="#nidaba-tasks-img-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-nidaba.tasks.helper">
+<span id="nidaba-tasks-helper-module"></span><h2>nidaba.tasks.helper module<a class="headerlink" href="#module-nidaba.tasks.helper" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-tasks-helper">
+<h3>nidaba.tasks.helper<a class="headerlink" href="#nidaba-tasks-helper" title="Permalink to this headline">¶</a></h3>
+<p>A helper class that all nidaba tasks should inherit from to ensure accurate
+logging of errors.</p>
+<dl class="class">
+<dt id="nidaba.tasks.helper.NidabaTask">
+<em class="property">class </em><code class="descclassname">nidaba.tasks.helper.</code><code class="descname">NidabaTask</code><a class="headerlink" href="#nidaba.tasks.helper.NidabaTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">celery.app.task.Task</span></code></p>
+<p>An abstract class defining a custom on_failure handler for nidaba tasks.</p>
+<dl class="method">
+<dt id="nidaba.tasks.helper.NidabaTask.on_failure">
+<code class="descname">on_failure</code><span class="sig-paren">(</span><em>exc</em>, <em>task_id</em>, <em>args</em>, <em>kwargs</em>, <em>einfo</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.helper.NidabaTask.on_failure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="nidaba-tasks-ocr-module">
-<h2>nidaba.tasks.ocr module<a class="headerlink" href="#nidaba-tasks-ocr-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="nidaba-tasks-util-module">
-<h2>nidaba.tasks.util module<a class="headerlink" href="#nidaba-tasks-util-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-nidaba.tasks.img">
+<span id="nidaba-tasks-img-module"></span><h2>nidaba.tasks.img module<a class="headerlink" href="#module-nidaba.tasks.img" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-tasks-img">
+<h3>nidaba.tasks.img<a class="headerlink" href="#nidaba-tasks-img" title="Permalink to this headline">¶</a></h3>
+<p>Some general image processing tasks that are outside the scope of more specific
+packages (e.g. binarization).</p>
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-nidaba.tasks.ocr">
+<span id="nidaba-tasks-ocr-module"></span><h2>nidaba.tasks.ocr module<a class="headerlink" href="#module-nidaba.tasks.ocr" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-tasks-ocr">
+<h3>nidaba.tasks.ocr<a class="headerlink" href="#nidaba-tasks-ocr" title="Permalink to this headline">¶</a></h3>
+<p>Tasks running optical character recognition on a binarized image. As of now
+this encapsulates page segmentation, recognition, and in the case of Tesseract
+language model application in a single task.</p>
+</div>
+</div>
+<div class="section" id="module-nidaba.tasks.util">
+<span id="nidaba-tasks-util-module"></span><h2>nidaba.tasks.util module<a class="headerlink" href="#module-nidaba.tasks.util" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-tasks-util">
+<h3>nidaba.tasks.util<a class="headerlink" href="#nidaba-tasks-util" title="Permalink to this headline">¶</a></h3>
+<p>Various utility tasks that either can&#8217;t be classified by purpose or are one of
+a kind.</p>
+</div>
+</div>
+<div class="section" id="module-nidaba.tasks">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-nidaba.tasks" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-tasks">
+<h3>nidaba.tasks<a class="headerlink" href="#nidaba-tasks" title="Permalink to this headline">¶</a></h3>
+<p>The tasks package contains all celery tasks used by nidaba. Tasks should not
+contain any actual implementations but import them as separate packages and
+just shim around them doing some initial setup, most commonly conversion
+between storage module tuples and absolute paths.</p>
+</div>
 </div>
 </div>
 
@@ -80,12 +128,30 @@
   <ul>
 <li><a class="reference internal" href="#">nidaba.tasks package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#nidaba-tasks-binarize-module">nidaba.tasks.binarize module</a></li>
-<li><a class="reference internal" href="#nidaba-tasks-helper-module">nidaba.tasks.helper module</a></li>
-<li><a class="reference internal" href="#nidaba-tasks-img-module">nidaba.tasks.img module</a></li>
-<li><a class="reference internal" href="#nidaba-tasks-ocr-module">nidaba.tasks.ocr module</a></li>
-<li><a class="reference internal" href="#nidaba-tasks-util-module">nidaba.tasks.util module</a></li>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li><a class="reference internal" href="#module-nidaba.tasks.binarize">nidaba.tasks.binarize module</a><ul>
+<li><a class="reference internal" href="#nidaba-tasks-binarize">nidaba.tasks.binarize</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-nidaba.tasks.helper">nidaba.tasks.helper module</a><ul>
+<li><a class="reference internal" href="#nidaba-tasks-helper">nidaba.tasks.helper</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-nidaba.tasks.img">nidaba.tasks.img module</a><ul>
+<li><a class="reference internal" href="#nidaba-tasks-img">nidaba.tasks.img</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-nidaba.tasks.ocr">nidaba.tasks.ocr module</a><ul>
+<li><a class="reference internal" href="#nidaba-tasks-ocr">nidaba.tasks.ocr</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-nidaba.tasks.util">nidaba.tasks.util module</a><ul>
+<li><a class="reference internal" href="#nidaba-tasks-util">nidaba.tasks.util</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-nidaba.tasks">Module contents</a><ul>
+<li><a class="reference internal" href="#nidaba-tasks">nidaba.tasks</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

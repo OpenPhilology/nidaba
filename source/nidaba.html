@@ -36,6 +36,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,12 +56,30 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="nidaba.tasks.html">nidaba.tasks package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-binarize-module">nidaba.tasks.binarize module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-helper-module">nidaba.tasks.helper module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-img-module">nidaba.tasks.img module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-ocr-module">nidaba.tasks.ocr module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-util-module">nidaba.tasks.util module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.binarize">nidaba.tasks.binarize module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-binarize">nidaba.tasks.binarize</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.helper">nidaba.tasks.helper module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-helper">nidaba.tasks.helper</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.img">nidaba.tasks.img module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-img">nidaba.tasks.img</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.ocr">nidaba.tasks.ocr module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-ocr">nidaba.tasks.ocr</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.util">nidaba.tasks.util module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-util">nidaba.tasks.util</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks">nidaba.tasks</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -67,47 +88,1270 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="nidaba-algorithms-module">
-<h2>nidaba.algorithms module<a class="headerlink" href="#nidaba-algorithms-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-nidaba.algorithms">
+<span id="nidaba-algorithms-module"></span><h2>nidaba.algorithms module<a class="headerlink" href="#module-nidaba.algorithms" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="nidaba.algorithms.compare_strings">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">compare_strings</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.compare_strings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.edit_distance">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em>, <em>alignment_type='global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.edit_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.full_edit_distance">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">full_edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>ins_func=None</em>, <em>iargs=[]</em>, <em>ikwargs={}</em>, <em>del_func=None</em>, <em>dargs=[]</em>, <em>dkwargs={}</em>, <em>sub_func=None</em>, <em>sargs=[]</em>, <em>skwargs={}</em>, <em>charmatrix={}</em>, <em>alignment_type='global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.full_edit_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>A version of the modified Wagner-Fischer algorithm that accepts user
+defined scoreing functions. These functions should be of the form
+fname(token1, token2, args*, kwargs**) and return an integer
+&gt;= 0. A return value of 0 indicates an optimality. The larger, the
+integer, the worse the score. Charmatrix is here only used to
+calulate default delete and insert scores for the initial matrix.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.greek_chars">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">greek_chars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.greek_chars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list containing all the characters from the Greek and
+Coptic, Extended Greek, and Combined Diacritical unicode blocks.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.greek_filter">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">greek_filter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.greek_filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.identify">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">identify</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.identify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.inblock">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">inblock</code><span class="sig-paren">(</span><em>c</em>, <em>bounds</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.inblock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the character c is equal to or between the two bounding
+characters in the unicode table.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.initmatrix">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">initmatrix</code><span class="sig-paren">(</span><em>rows</em>, <em>columns</em>, <em>defaultval=0</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.initmatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a 2d list to the desired dimensions.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.isgreek">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">isgreek</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.isgreek" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.islang">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">islang</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.islang" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.key_for_del_dict_entry">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">key_for_del_dict_entry</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.key_for_del_dict_entry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.key_for_single_word">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">key_for_single_word</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.key_for_single_word" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.list_to_uni">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">list_to_uni</code><span class="sig-paren">(</span><em>l</em>, <em>encoding=u'utf-8'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.list_to_uni" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a human readable string representation of a list of unicode
+strings using the specified encoding.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.mapped_sym_suggest">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">mapped_sym_suggest</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.mapped_sym_suggest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.mmap_bin_search">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">mmap_bin_search</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.mmap_bin_search" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.mr">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">mr</code><span class="sig-paren">(</span><em>matrix</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.mr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a string rep of a 2d list as a matrix. Useful for
+debugging.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.native_align">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">native_align</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.native_align" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the edit distance of two strings, then backtrace to
+find a valid edit sequence.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.native_backtrace">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">native_backtrace</code><span class="sig-paren">(</span><em>matrix</em>, <em>start=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.native_backtrace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trace edit steps backward to find an edit sequence for an
+alignment. Starts at the provided &#8216;start&#8217; index, or in the i,j&#8217;th
+index if none is provided. The backtrace always ends
+at the index 0,0.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.native_full_edit_distance">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">native_full_edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em>, <em>alignment_type='global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.native_full_edit_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.native_global_matrix">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">native_global_matrix</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore</em>, <em>insertscore</em>, <em>deletescore</em>, <em>charmatrix</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.native_global_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>An initial matrix for a global sequence alignment.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.native_semi_global_align">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">native_semi_global_align</code><span class="sig-paren">(</span><em>shortseq</em>, <em>longseq</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.native_semi_global_align" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.native_semi_global_matrix">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">native_semi_global_matrix</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore</em>, <em>insertscore</em>, <em>deletescore</em>, <em>charmatrix</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.native_semi_global_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.np_align">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">np_align</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.np_align" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the edit distance of two strings, then backtrace to
+find a valid edit sequence.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.np_backtrace">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">np_backtrace</code><span class="sig-paren">(</span><em>matrix</em>, <em>start=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.np_backtrace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trace edit steps backward to find an edit sequence for an
+alignment. Starts at the provided &#8216;start&#8217; index, or in the i,j&#8217;th
+index if none is provided. The backtrace always ends
+at the index 0,0.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.np_full_edit_distance">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">np_full_edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em>, <em>alignment_type='global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.np_full_edit_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>A modified implenmentation of the Wagner-Fischer algorithm using
+numpy. Unlike the minimal and optimized version in the
+&#8220;edit_distance&#8221; function, this returns the entire scoring matrix,
+and an operation matrix for backtracing and reconstructing the
+edit operations. This should be used when an alignment is desired,
+not only the edit distance.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.np_global_matrix">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">np_global_matrix</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore</em>, <em>insertscore</em>, <em>deletescore</em>, <em>charmatrix</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.np_global_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>An initial matrix for a global sequence alignment.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.np_semi_global_align">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">np_semi_global_align</code><span class="sig-paren">(</span><em>shortseq</em>, <em>longseq</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.np_semi_global_align" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find a semi-global alignment between two strings.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.np_semi_global_matrix">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">np_semi_global_matrix</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore</em>, <em>insertscore</em>, <em>deletescore</em>, <em>charmatrix</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.np_semi_global_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>An initial matrix for a semi-global sequence alignment.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.parse_del_dict_entry">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">parse_del_dict_entry</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.parse_del_dict_entry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.prev_newline">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">prev_newline</code><span class="sig-paren">(</span><em>mm</em>, <em>line_buffer_size=100</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.prev_newline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the pointer position immediately after the closest left hand
+newline, or to the beginning of the file if no such newlines exist.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.sanitize">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">sanitize</code><span class="sig-paren">(</span><em>string</em>, <em>encoding=u'utf-8'</em>, <em>normalization=u'NFD'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.sanitize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Strip leading and trailing whitespace, convert to NFD. If the passed
+string is a str rather than an unicode, decode it with the specified
+encoding.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.strings_by_deletion">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">strings_by_deletion</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.strings_by_deletion" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.strip_diacritics">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">strip_diacritics</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.strip_diacritics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.suggestions">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">suggestions</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.suggestions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.sym_suggest">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">sym_suggest</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.sym_suggest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.todec">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">todec</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.todec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.truestring">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">truestring</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.truestring" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.unibarrier">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">unibarrier</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.unibarrier" title="Permalink to this definition">¶</a></dt>
+<dd><p>A decorator function; used to ensure that no str objects can be
+passed as either args or kwargs.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.algorithms.uniblock">
+<code class="descclassname">nidaba.algorithms.</code><code class="descname">uniblock</code><span class="sig-paren">(</span><em>start</em>, <em>stop</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.uniblock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list containing all the characters in the unicode table
+starting with &#8216;start&#8217; (inclusive) and ending with end (inclusive).</p>
+</dd></dl>
+
 </div>
-<div class="section" id="nidaba-celery-module">
-<h2>nidaba.celery module<a class="headerlink" href="#nidaba-celery-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-nidaba.celery">
+<span id="nidaba-celery-module"></span><h2>nidaba.celery module<a class="headerlink" href="#module-nidaba.celery" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="nidaba-cli-module">
-<h2>nidaba.cli module<a class="headerlink" href="#nidaba-cli-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-nidaba.cli">
+<span id="nidaba-cli-module"></span><h2>nidaba.cli module<a class="headerlink" href="#module-nidaba.cli" title="Permalink to this headline">¶</a></h2>
+<p>This module encapsulates all shell callable functions of nidaba.</p>
+<dl class="function">
+<dt id="nidaba.cli.batch">
+<code class="descclassname">nidaba.cli.</code><code class="descname">batch</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the batch subcommand of the nidaba binary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>argparse.Namespace</em>) &#8211; Parsed input object from argparse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.cli.config">
+<code class="descclassname">nidaba.cli.</code><code class="descname">config</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the config display subcommand.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.cli.int_float_or_str">
+<code class="descclassname">nidaba.cli.</code><code class="descname">int_float_or_str</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.int_float_or_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>A small helper function intended to coerce an input string to types in the
+order int -&gt; float -&gt; unicode -&gt; input.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>s</strong> (<em>unicode</em>) &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Input variable coerced
+to the highest data type in the ordering.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int or float or unicode or original input type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.cli.main">
+<code class="descclassname">nidaba.cli.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function called by the hook installed by setuptools.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.cli.status">
+<code class="descclassname">nidaba.cli.</code><code class="descname">status</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the status subcommand.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>argparse.Namespace</em>) &#8211; Parsed input object from argparse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
-<div class="section" id="nidaba-config-module">
-<h2>nidaba.config module<a class="headerlink" href="#nidaba-config-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-nidaba.config">
+<span id="nidaba-config-module"></span><h2>nidaba.config module<a class="headerlink" href="#module-nidaba.config" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="nidaba.config.reload_config">
+<code class="descclassname">nidaba.config.</code><code class="descname">reload_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.config.reload_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Triggers a global reloading of the configuration files.</p>
+<p>As of now configuration files are only read from sys.prefix/etc/nidaba/.</p>
+</dd></dl>
+
 </div>
-<div class="section" id="nidaba-image-module">
-<h2>nidaba.image module<a class="headerlink" href="#nidaba-image-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-nidaba.image">
+<span id="nidaba-image-module"></span><h2>nidaba.image module<a class="headerlink" href="#module-nidaba.image" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-image">
+<h3>nidaba.image<a class="headerlink" href="#nidaba-image" title="Permalink to this headline">¶</a></h3>
+<p>Common image processing functions encapsulating the PIL or pythonica image
+interface to absolute file paths.</p>
+<dl class="function">
+<dt id="nidaba.image.rgb_to_gray">
+<code class="descclassname">nidaba.image.</code><code class="descname">rgb_to_gray</code><span class="sig-paren">(</span><em>imagepath</em>, <em>resultpath</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.image.rgb_to_gray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts an RGB or CMYK image into a 8bpp grayscale image.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>imagepath</strong> &#8211; Path of the input image</li>
+<li><strong>resultpath</strong> &#8211; Path of the output image</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Path of the actual output file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">unicode</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
-<div class="section" id="nidaba-lex-module">
-<h2>nidaba.lex module<a class="headerlink" href="#nidaba-lex-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="nidaba-lock-module">
-<h2>nidaba.lock module<a class="headerlink" href="#nidaba-lock-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-nidaba.lex">
+<span id="nidaba-lex-module"></span><h2>nidaba.lex module<a class="headerlink" href="#module-nidaba.lex" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-lex">
+<h3>nidaba.lex<a class="headerlink" href="#nidaba-lex" title="Permalink to this headline">¶</a></h3>
+<p>This module contains functions for dealing with words and dictionaries, such as
+extracting words from texts, normalizing encodings, building symmetric deletion
+dictionaries, etc.</p>
 </div>
-<div class="section" id="nidaba-merge-hocr-module">
-<h2>nidaba.merge_hocr module<a class="headerlink" href="#nidaba-merge-hocr-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="nidaba-nidaba-module">
-<h2>nidaba.nidaba module<a class="headerlink" href="#nidaba-nidaba-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-nidaba.lock">
+<span id="nidaba-lock-module"></span><h2>nidaba.lock module<a class="headerlink" href="#module-nidaba.lock" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-lock">
+<h3>nidaba.lock<a class="headerlink" href="#nidaba-lock" title="Permalink to this headline">¶</a></h3>
+<p>This module contains an NFS-safe locking method that is hopefully interoperable
+with anything anybody is going to encounter out there.</p>
+<dl class="class">
+<dt id="nidaba.lock.lock">
+<em class="property">class </em><code class="descclassname">nidaba.lock.</code><code class="descname">lock</code><span class="sig-paren">(</span><em>locked_file</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lock.lock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A global lock implementation for files on the common storage medium. It is
+intended to be mainly used on NFS although it should work on any network
+file system.</p>
+<dl class="method">
+<dt id="nidaba.lock.lock.acquire">
+<code class="descname">acquire</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lock.lock.acquire" title="Permalink to this definition">¶</a></dt>
+<dd><p>Acquires a lock on the selected file. Waits until the lock can be
+acquired.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.lock.lock.release">
+<code class="descname">release</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lock.lock.release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Releases the lock on the selected file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the lock has been releases, False otherwise</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="nidaba-nidabaexceptions-module">
-<h2>nidaba.nidabaexceptions module<a class="headerlink" href="#nidaba-nidabaexceptions-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="nidaba-ocropus-module">
-<h2>nidaba.ocropus module<a class="headerlink" href="#nidaba-ocropus-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-nidaba.merge_hocr">
+<span id="nidaba-merge-hocr-module"></span><h2>nidaba.merge_hocr module<a class="headerlink" href="#module-nidaba.merge_hocr" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nidaba.merge_hocr.Rect">
+<em class="property">class </em><code class="descclassname">nidaba.merge_hocr.</code><code class="descname">Rect</code><span class="sig-paren">(</span><em>ul=(0</em>, <em>0)</em>, <em>lr=(0</em>, <em>0)</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.merge_hocr.Rect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Native python replacement for gameras C++ Rect object.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.merge_hocr.close_enough">
+<code class="descclassname">nidaba.merge_hocr.</code><code class="descname">close_enough</code><span class="sig-paren">(</span><em>bbox1</em>, <em>bbox2</em>, <em>fudge=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.merge_hocr.close_enough" title="Permalink to this definition">¶</a></dt>
+<dd><p>Roughly matches two bboxes roughly using a fudge factor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>bbox1</strong> (<a class="reference internal" href="#nidaba.merge_hocr.Rect" title="nidaba.merge_hocr.Rect"><em>Rect</em></a>) &#8211; Rect object of a bounding box.</li>
+<li><strong>bbox2</strong> (<a class="reference internal" href="#nidaba.merge_hocr.Rect" title="nidaba.merge_hocr.Rect"><em>Rect</em></a>) &#8211; Rect object of a bounding box.</li>
+<li><strong>fudge</strong> (<em>float</em>) &#8211; Fudge factor to account for slight variations in word
+boundary detection between segmentation engines.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the bounding boxes are sufficiently aligned, False
+otherwise.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.merge_hocr.get_hocr_lines_for_tree">
+<code class="descclassname">nidaba.merge_hocr.</code><code class="descname">get_hocr_lines_for_tree</code><span class="sig-paren">(</span><em>treeIn</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.merge_hocr.get_hocr_lines_for_tree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="nidaba.merge_hocr.hocrLine">
+<em class="property">class </em><code class="descclassname">nidaba.merge_hocr.</code><code class="descname">hocrLine</code><a class="headerlink" href="#nidaba.merge_hocr.hocrLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Dummy class associating lines, words with their text and bboxes.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nidaba.merge_hocr.hocrWord">
+<em class="property">class </em><code class="descclassname">nidaba.merge_hocr.</code><code class="descname">hocrWord</code><a class="headerlink" href="#nidaba.merge_hocr.hocrWord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Dummy class associating word text with a bbox.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.merge_hocr.merge">
+<code class="descclassname">nidaba.merge_hocr.</code><code class="descname">merge</code><span class="sig-paren">(</span><em>docs</em>, <em>lang</em>, <em>output</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.merge_hocr.merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merges multiple hOCR documents into a single one.</p>
+<p>First bboxes from all documents are roughly matched, then all matching
+bboxes are scored using a spell checker. If no spell checker is available
+all matches will be merged without ranking.</p>
+<p>The matching is naive, i.e. we just grab the first input document and
+assume that all other documents have similar segmentation results. Issues
+like high variance in segmentation, especially word boundaries are not
+accounted for.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>docs</strong> (<em>iterable</em>) &#8211; A list of storage tuples of input documents</li>
+<li><strong>lang</strong> (<em>unicode</em>) &#8211; A language identifier for the spell checker</li>
+<li><strong>output</strong> (<em>tuple</em>) &#8211; Storage tuple for the result</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The output storage tuple. Should be the same as <code class="docutils literal"><span class="pre">`output`</span></code>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.merge_hocr.parse_bbox">
+<code class="descclassname">nidaba.merge_hocr.</code><code class="descname">parse_bbox</code><span class="sig-paren">(</span><em>prop_str</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.merge_hocr.parse_bbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the microformat property string in the hOCR title field.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>prop_str</strong> (<em>unicode</em>) &#8211; The verbatim property string</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A rectangular area described in a bbox field</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="#nidaba.merge_hocr.Rect" title="nidaba.merge_hocr.Rect">Rect</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211;
+The property string either did not contain a bbox</li>
+<li><strong>definition or this definition was malformed.</strong> &#8211;</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.merge_hocr.score_word">
+<code class="descclassname">nidaba.merge_hocr.</code><code class="descname">score_word</code><span class="sig-paren">(</span><em>lang</em>, <em>word</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.merge_hocr.score_word" title="Permalink to this definition">¶</a></dt>
+<dd><p>A simple token scoring function similar to the one used in Bruce Robertsons
+rigaudon. FIXME: Actually score input tokens.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lang</strong> (<em>unicode</em>) &#8211; Language to use for scoring.</li>
+<li><strong>word</strong> (<em>unicode</em>) &#8211; Input token to score</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Value representing the input tokens score. Higher values are
+closer to native language words.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.merge_hocr.sort_words_bbox">
+<code class="descclassname">nidaba.merge_hocr.</code><code class="descname">sort_words_bbox</code><span class="sig-paren">(</span><em>words</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.merge_hocr.sort_words_bbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sorts word bboxes of a document in European reading order (upper left to
+lower right). The list is sorted in place.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>words</strong> (<em>list</em>) &#8211; List of hocrWord object containing Rects in the field
+bbox and the recognized text in the text field.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The sorted word list.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
-<div class="section" id="nidaba-storage-module">
-<h2>nidaba.storage module<a class="headerlink" href="#nidaba-storage-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-nidaba.nidaba">
+<span id="nidaba-nidaba-module"></span><h2>nidaba.nidaba module<a class="headerlink" href="#module-nidaba.nidaba" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-nidaba">
+<h3>nidaba.nidaba<a class="headerlink" href="#nidaba-nidaba" title="Permalink to this headline">¶</a></h3>
+<p>The public API of nidaba. External applications should exclusively use the
+objects and methods defined here.</p>
+<dl class="class">
+<dt id="nidaba.nidaba.Batch">
+<em class="property">class </em><code class="descclassname">nidaba.nidaba.</code><code class="descname">Batch</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Creates a series of celery tasks OCRing a set of documents (among other
+things).</p>
+<p>A batch contains three level of definitions: tasks, ticks, and steps. A
+task is a singular operation on an input document, creating a single output
+document, e.g. binarization using a particular configuration of an
+algorithm or OCR using a particular engine. Multiple tasks executing in
+parallel are grouped into a tick and multiple ticks (running sequentially)
+are grouped into steps which again are executed sequentially.</p>
+<p>The need for steps and ticks arises from two different execution orders
+required by a pipeline. Take the following example:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>step 1:</dt>
+<dd>tick a: task 1
+tick b: task 2, task 3
+tick c: task 4, task 5</dd>
+</dl>
+</div></blockquote>
+<p>The pipeline expands this example to the following sequences run in
+parallel (dot product of all ticks):</p>
+<blockquote>
+<div>task 1 -&gt; task 2 -&gt; task 4
+task 1 -&gt; task 2 -&gt; task 5
+task 1 -&gt; task 3 -&gt; task 4
+task 1 -&gt; task 3 -&gt; task 5</div></blockquote>
+<p>It is not garantueed that any particular task in another sequence has
+executed successfully before a task in a sequence is run, i.e. it is not
+ensured that all task 1&#8217;s have finished before task 2 of the first sequence
+is executed, except the task(s) further up the sequence.</p>
+<p>Steps on the other hand ensure that all tasks of the previous step have
+finished successfully. The output(s) of the expanded ticks is aggregated
+into a single list and used as the input of the first tick of the step.
+Expanding on the example the following step is added:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>step 2:</dt>
+<dd>tick d: task 6</dd>
+</dl>
+</div></blockquote>
+<p>After the 4 sequence are finished their output is aggregated into a list
+[d1, d2, d3, d4] and used as the input of task 6. The final output of task
+6 is the output of the pipeline.</p>
+<p>The call order to create this example is:</p>
+<blockquote>
+<div>Batch.add_step()
+Batch.add_tick()
+Batch.add_task(task_1)
+Batch.add_tick()
+Batch.add_task(task_2)
+Batch.add_task(task_3)
+Batch.add_tick()
+Batch.add_task(task_4)
+Batch.add_task(task_5)
+Batch.add_step()
+Batch.add_tick()
+Batch.add_task(task_6)</div></blockquote>
+<dl class="method">
+<dt id="nidaba.nidaba.Batch.add_document">
+<code class="descname">add_document</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.add_document" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a document to the batch.</p>
+<p>Adds a document tuple to the batch and checks if it exists.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>doc</strong> (<em>tuple</em>) &#8211; A standard document tuple.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">NidabaInputException</span></code> &#8211;
+The document tuple does not refer to a file.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.nidaba.Batch.add_step">
+<code class="descname">add_step</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.add_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new step to the batch definition.</p>
+<p>Adds a <code class="docutils literal"><span class="pre">step</span></code>, a list of sequentially run ticks to the batch
+definition. The output(s) of the last tick of a step is aggregated into
+a single list and used as the input of the first tick of the following
+step.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.nidaba.Batch.add_task">
+<code class="descname">add_task</code><span class="sig-paren">(</span><em>method</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.add_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a task to the current tick.</p>
+<p>Adds a <code class="docutils literal"><span class="pre">task</span></code>, a single executable task gathering one or more input
+documents and returning a single output document, to the current tick.
+Multiple jobs are run in parallel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>method</strong> (<em>unicode</em>) &#8211; A task identifier</li>
+<li><strong>**kwargs</strong> &#8211; Arguments to the task</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">NidabaTickException</span></code> &#8211;
+There is no tick to add a task to.</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">NidabaNoSuchAlgorithmException</span></code> &#8211;
+Invalid method given.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.nidaba.Batch.add_tick">
+<code class="descname">add_tick</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.add_tick" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new tick to the current step.</p>
+<p>Adds a <code class="docutils literal"><span class="pre">tick</span></code>, a set of tasks running in parallel and sharing common
+input documents to the current step.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">NidabaStepException</span></code> &#8211;
+There is no step to add a tick to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.nidaba.Batch.get_errors">
+<code class="descname">get_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.get_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves all errors of the batch.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of tuples containing<blockquote>
+<div>args kwargs exception_message</div></blockquote>
+<p>of the failing task or None if there are no errors.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.nidaba.Batch.get_results">
+<code class="descname">get_results</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.get_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the storage tuples of a successful batch or None.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of storage tuples or None if no results are available.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.nidaba.Batch.get_state">
+<code class="descname">get_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.get_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the current state of a batch.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A string containing one of the following states:<p>NONE: The batch ID is not registered in the backend.
+FAILURE: Batch execution has failed.
+PENDING: The batch is currently running.
+SUCCESS: The batch has completed successfully.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">(unicode)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.nidaba.Batch.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the current batch definition.</p>
+<p>Expands the current batch definition to a series of celery chords and
+executes them asynchronously. Additionally a batch record is written to
+the celery result backend.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Batch identifier.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">(unicode)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="nidaba-tesseract-module">
-<h2>nidaba.tesseract module<a class="headerlink" href="#nidaba-tesseract-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-nidaba.nidabaexceptions">
+<span id="nidaba-nidabaexceptions-module"></span><h2>nidaba.nidabaexceptions module<a class="headerlink" href="#module-nidaba.nidabaexceptions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-nidabaexceptions">
+<h3>nidaba.nidabaexceptions<a class="headerlink" href="#nidaba-nidabaexceptions" title="Permalink to this headline">¶</a></h3>
+<p>All custom exceptions raised by various nidaba modules and packages. Packages
+should always define their exceptions here.</p>
+<dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaAlgorithmException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaAlgorithmException</code><span class="sig-paren">(</span><em>message=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaAlgorithmException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaInputException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaInputException</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaInputException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaInvalidParameterException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaInvalidParameterException</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaInvalidParameterException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaNoSuchAlgorithmException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaNoSuchAlgorithmException</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaNoSuchAlgorithmException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaNoSuchStorageBin">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaNoSuchStorageBin</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaNoSuchStorageBin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaOcropusException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaOcropusException</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaOcropusException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaStepException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaStepException</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaStepException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaStorageViolationException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaStorageViolationException</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaStorageViolationException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaTaskException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaTaskException</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaTaskException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaTesseractException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaTesseractException</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaTesseractException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaTickException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaTickException</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaTickException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaUnibarrierException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaUnibarrierException</code><span class="sig-paren">(</span><em>message=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaUnibarrierException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-nidaba.ocropus">
+<span id="nidaba-ocropus-module"></span><h2>nidaba.ocropus module<a class="headerlink" href="#module-nidaba.ocropus" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-ocropus">
+<h3>nidaba.ocropus<a class="headerlink" href="#nidaba-ocropus" title="Permalink to this headline">¶</a></h3>
+<p>Wrappers around the ocropus OCR engine.</p>
+<dl class="function">
+<dt id="nidaba.ocropus.ocr">
+<code class="descclassname">nidaba.ocropus.</code><code class="descname">ocr</code><span class="sig-paren">(</span><em>imagepath</em>, <em>outputfilepath</em>, <em>modelpath</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.ocropus.ocr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scan a single image with ocropus.</p>
+<p>Reads a single image file from <code class="docutils literal"><span class="pre">`imagepath`</span></code> and writes the recognized
+text as in hOCR format into outputfilepath. Ocropus&#8217;s superfluous
+intermediate output remains in the directory imagepath is located in.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>imagepath</strong> (<em>unicode</em>) &#8211; Path of the input file</li>
+<li><strong>outputfilepath</strong> (<em>unicode</em>) &#8211; Path of the output file</li>
+<li><strong>modelpath</strong> (<em>unicode</em>) &#8211; Path of the recognition model. Must be a pyrnn.gz
+pickle dump interoperable with ocropus-rpred.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string of the output file that is actually written. As
+Ocropus rewrites output file paths without notice it may be
+different from the <code class="docutils literal"><span class="pre">`outputfilepath`</span></code> argument.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(unicode)</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NidabaOcropusException</span></code> &#8211;
+Ocropus somehow failed. The error output is
+contained in the message but as it is de facto
+unusable as a library it&#8217;s impossible to make
+deduct the nature of the problem.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-nidaba.storage">
+<span id="nidaba-storage-module"></span><h2>nidaba.storage module<a class="headerlink" href="#module-nidaba.storage" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="nidaba.storage.get_abs_path">
+<code class="descclassname">nidaba.storage.</code><code class="descname">get_abs_path</code><span class="sig-paren">(</span><em>jobID</em>, <em>*path</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.get_abs_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the absolute path of a file.</p>
+<p>Takes a job ID and a sequence of path components and checks if their
+absolute path is in the directory of that particular job ID.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>jobID</strong> (<em>unicode</em>) &#8211; A unique job ID</li>
+<li><strong>*path</strong> (<em>unicode</em>) &#8211; A list of path components that are concatenated to</li>
+<li><strong>the absolute path.</strong> (<em>calculate</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string containing the absolute path of the storage tuple.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(unicode)</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NidabaStorageViolationException</span></code> &#8211;
+The resulting absolute path is
+either not in the storage_path of the
+nidaba configuration or not in its job
+directory.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.storage.get_storage_path">
+<code class="descclassname">nidaba.storage.</code><code class="descname">get_storage_path</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.get_storage_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts an absolute path to a storage tuple of the form (id, path).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>path</strong> (<em>unicode</em>) &#8211; A unicode string of the absolute path.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">(id, path)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">tuple</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">NidabaStorageViolationException</span></code> &#8211;
+The given path can not be converted
+into a storage tuple.</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">NidabaNoSuchStorageBin</span></code> &#8211;
+The given path is not beneath a valid job ID.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.storage.insert_suffix">
+<code class="descclassname">nidaba.storage.</code><code class="descname">insert_suffix</code><span class="sig-paren">(</span><em>orig_path</em>, <em>*suffix</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.insert_suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts one or more suffixes just before the file extension.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.storage.is_file">
+<code class="descclassname">nidaba.storage.</code><code class="descname">is_file</code><span class="sig-paren">(</span><em>jobID</em>, <em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.is_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if a storage tuple is a regular file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>jobID</strong> (<em>unicode</em>) &#8211; An unique ID associated with a particular job.</li>
+<li><strong>path</strong> (<em>unicode</em>) &#8211; A path of a file beneath jobID.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Either True or False depending on the existence of the file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">bool</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">Exception</span></code> &#8211;
+Who the fuck knows. The python standard library doesn&#8217;t
+document such paltry information as exceptions.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.storage.is_valid_job">
+<code class="descclassname">nidaba.storage.</code><code class="descname">is_valid_job</code><span class="sig-paren">(</span><em>jobID</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.is_valid_job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if filestore has been prepared for a job.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>jobID</strong> (<em>unicode</em>) &#8211; An identifier of a job.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if job is already in the system, False otherwise.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>Standard python library caveats apply.</strong> &#8211;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.storage.list_content">
+<code class="descclassname">nidaba.storage.</code><code class="descname">list_content</code><span class="sig-paren">(</span><em>jobID</em>, <em>pattern=u'*'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.list_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lists all files to a job ID, optionally applying a glob-like filter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>jobID</strong> (<em>unicode</em>) &#8211; Identifier of the bin</li>
+<li><strong>pattern</strong> (<em>unicode</em>) &#8211; glob-like filter to match files</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list of unicode strings of the matching files.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.storage.prepare_filestore">
+<code class="descclassname">nidaba.storage.</code><code class="descname">prepare_filestore</code><span class="sig-paren">(</span><em>jobID</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.prepare_filestore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares the default filestore to accept files for a job.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>jobID</strong> (<em>unicode</em>) &#8211; Identifier of the bin to be created.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Failure
+(unicode): String containing the job ID</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.storage.retrieve_content">
+<code class="descclassname">nidaba.storage.</code><code class="descname">retrieve_content</code><span class="sig-paren">(</span><em>jobID</em>, <em>documents=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.retrieve_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves data from a single or a list of documents. Returns binary data,
+for retrieving unicode text use retrieve_text().</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>jobID</strong> (<em>unicode</em>) &#8211; Identifier of the bin</li>
+<li><strong>documents</strong> (<em>tuple or list of tuples</em>) &#8211; Documents to read in</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Failure
+Dictionary: A dictionary mapping file identifiers to their contents.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.storage.retrieve_text">
+<code class="descclassname">nidaba.storage.</code><code class="descname">retrieve_text</code><span class="sig-paren">(</span><em>jobID</em>, <em>documents=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.retrieve_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves UTF-8 encoded text from a single or a list of documents.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>jobID</strong> (<em>unicode</em>) &#8211; Identifier of the bin</li>
+<li><strong>documents</strong> (<em>tuple or list of tuples</em>) &#8211; Documents to read in</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Failure
+Dictionary: A dictionary mapping file identifiers to their contents.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.storage.write_content">
+<code class="descclassname">nidaba.storage.</code><code class="descname">write_content</code><span class="sig-paren">(</span><em>jobID</em>, <em>dest</em>, <em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.write_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes data to a document at a destination beneath a jobID. Writes bytes,
+does not accept unicode objects; use write_text() for that.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>jobID</strong> (<em>unicode</em>) &#8211; Identifier of the bin.</li>
+<li><strong>dest</strong> (<em>tuple</em>) &#8211; Documents to write to.</li>
+<li><strong>data</strong> (<em>str</em>) &#8211; Data to write.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Length of data written
+None: Failure</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.storage.write_text">
+<code class="descclassname">nidaba.storage.</code><code class="descname">write_text</code><span class="sig-paren">(</span><em>jobID</em>, <em>dest</em>, <em>text</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.write_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes text data encoded as UTF-8 to a file beneath a jobID.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>jobID</strong> (<em>unicode</em>) &#8211; Identifier of the bin.</li>
+<li><strong>dest</strong> (<em>tuple</em>) &#8211; Documents to write to.</li>
+<li><strong>text</strong> (<em>unicode</em>) &#8211; Data to write.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Length of data written</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-nidaba.tesseract">
+<span id="nidaba-tesseract-module"></span><h2>nidaba.tesseract module<a class="headerlink" href="#module-nidaba.tesseract" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-tesseract">
+<h3>nidaba.tesseract<a class="headerlink" href="#nidaba-tesseract" title="Permalink to this headline">¶</a></h3>
+<p>Wrappers around the tesseract OCR engine.</p>
+<dl class="function">
+<dt id="nidaba.tesseract.ocr">
+<code class="descclassname">nidaba.tesseract.</code><code class="descname">ocr</code><span class="sig-paren">(</span><em>imagepath</em>, <em>outputfilepath</em>, <em>languages</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tesseract.ocr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scan a single image with tesseract using the specified language,
+and writing output to the specified file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>imagepath</strong> (<em>unicode</em>) &#8211; Path to the image file</li>
+<li><strong>outputfilepath</strong> (<em>unicode</em>) &#8211; Path to the output file. Tesseract will
+independently append either .html or .hocr to
+this path.</li>
+<li><strong>languages</strong> (<em>list</em>) &#8211; A list of strings containing valid tesseract language
+descriptions.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Path of the output file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">unicode</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Raise:</dt>
+<dd><dl class="first last docutils">
+<dt>NidabaTesseractException: Tesseract quit with a return code other than</dt>
+<dd><ol class="first last arabic simple" start="0">
+<li></li>
+</ol>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.tesseract.ocrdir">
+<code class="descclassname">nidaba.tesseract.</code><code class="descname">ocrdir</code><span class="sig-paren">(</span><em>dirpath</em>, <em>outputdir</em>, <em>languages</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tesseract.ocrdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scans all documents deemed to be image files in a directory (recursively).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dir</strong> (<em>unicode</em>) &#8211; Path to the directory containing the image files.</li>
+<li><strong>outputdir</strong> (<em>unicode</em>) &#8211; Path to the output directory. It will be created
+if it doesn&#8217;t exist.</li>
+<li><strong>languages</strong> (<em>list</em>) &#8211; A list of strings containing valid tesseract language
+descriptions.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Paths of the output files.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Raise:</dt>
+<dd><dl class="first docutils">
+<dt>NidabaTesseractException: Tesseract quit with a return code other than</dt>
+<dd><ol class="first last arabic simple" start="0">
+<li></li>
+</ol>
+</dd>
+</dl>
+<p class="last">OSError: The output directory couldn&#8217;t be created.
+Exception: The input directory does not exist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-nidaba">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-nidaba" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -122,20 +1366,41 @@
 <li><a class="reference internal" href="#">nidaba package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#nidaba-algorithms-module">nidaba.algorithms module</a></li>
-<li><a class="reference internal" href="#nidaba-celery-module">nidaba.celery module</a></li>
-<li><a class="reference internal" href="#nidaba-cli-module">nidaba.cli module</a></li>
-<li><a class="reference internal" href="#nidaba-config-module">nidaba.config module</a></li>
-<li><a class="reference internal" href="#nidaba-image-module">nidaba.image module</a></li>
-<li><a class="reference internal" href="#nidaba-lex-module">nidaba.lex module</a></li>
-<li><a class="reference internal" href="#nidaba-lock-module">nidaba.lock module</a></li>
-<li><a class="reference internal" href="#nidaba-merge-hocr-module">nidaba.merge_hocr module</a></li>
-<li><a class="reference internal" href="#nidaba-nidaba-module">nidaba.nidaba module</a></li>
-<li><a class="reference internal" href="#nidaba-nidabaexceptions-module">nidaba.nidabaexceptions module</a></li>
-<li><a class="reference internal" href="#nidaba-ocropus-module">nidaba.ocropus module</a></li>
-<li><a class="reference internal" href="#nidaba-storage-module">nidaba.storage module</a></li>
-<li><a class="reference internal" href="#nidaba-tesseract-module">nidaba.tesseract module</a></li>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li><a class="reference internal" href="#module-nidaba.algorithms">nidaba.algorithms module</a></li>
+<li><a class="reference internal" href="#module-nidaba.celery">nidaba.celery module</a></li>
+<li><a class="reference internal" href="#module-nidaba.cli">nidaba.cli module</a></li>
+<li><a class="reference internal" href="#module-nidaba.config">nidaba.config module</a></li>
+<li><a class="reference internal" href="#module-nidaba.image">nidaba.image module</a><ul>
+<li><a class="reference internal" href="#nidaba-image">nidaba.image</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-nidaba.lex">nidaba.lex module</a><ul>
+<li><a class="reference internal" href="#nidaba-lex">nidaba.lex</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-nidaba.lock">nidaba.lock module</a><ul>
+<li><a class="reference internal" href="#nidaba-lock">nidaba.lock</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-nidaba.merge_hocr">nidaba.merge_hocr module</a></li>
+<li><a class="reference internal" href="#module-nidaba.nidaba">nidaba.nidaba module</a><ul>
+<li><a class="reference internal" href="#nidaba-nidaba">nidaba.nidaba</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-nidaba.nidabaexceptions">nidaba.nidabaexceptions module</a><ul>
+<li><a class="reference internal" href="#nidaba-nidabaexceptions">nidaba.nidabaexceptions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-nidaba.ocropus">nidaba.ocropus module</a><ul>
+<li><a class="reference internal" href="#nidaba-ocropus">nidaba.ocropus</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-nidaba.storage">nidaba.storage module</a></li>
+<li><a class="reference internal" href="#module-nidaba.tesseract">nidaba.tesseract module</a><ul>
+<li><a class="reference internal" href="#nidaba-tesseract">nidaba.tesseract</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-nidaba">Module contents</a></li>
 </ul>
 </li>
 </ul>
