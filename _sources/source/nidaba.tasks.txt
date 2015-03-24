@@ -12,6 +12,9 @@ nidaba.tasks.binarize module
     :undoc-members:
     :show-inheritance:
 
+    .. autofunction:: otsu(doc, id, method, thresh, mincount, bgval, smoothx, smoothy)
+    .. autofunction:: sauvola(doc, id, method, whsize, factor)
+
 nidaba.tasks.helper module
 --------------------------
 
