@@ -31,6 +31,10 @@ nidaba.tasks.img module
     :undoc-members:
     :show-inheritance:
 
+    .. autofunction:: rgb_to_gray(doc, id method)
+    .. autofunction:: dewarp(doc, id, method)
+    .. autofunction:: deskew(doc, id, method)
+
 nidaba.tasks.ocr module
 -----------------------
 
@@ -38,6 +42,9 @@ nidaba.tasks.ocr module
     :members:
     :undoc-members:
     :show-inheritance:
+
+    .. autofunction:: ocr_tesseract(doc, id, method, languages)
+    .. autofunction:: ocr_ocropus(doc, id, method, model)
 
 nidaba.tasks.util module
 ------------------------
@@ -47,6 +54,8 @@ nidaba.tasks.util module
     :undoc-members:
     :show-inheritance:
 
+    .. autofunction:: blend_hocr(docs, id, language, method)
+    .. autofunction:: sync(arg)
 
 Module contents
 ---------------
