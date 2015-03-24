@@ -28,8 +28,8 @@ def blend_hocr(docs, id, language=u'', method=u'blend_hocr'):
         docs [(id, path), ...]: A list of storage module tupels that will be
         merged into a single output document.
         id (unicode): The nidaba batch identifier this task is a part of
-        language (unicode): Language used for spell-checking based scoring. If
-        not defined no scoring will be used.
+                      language (unicode): Language used for spell-checking
+                      based scoring. If not defined no scoring will be used.
         method (unicode): The suffix string appended to the output file.
 
     Returns:
@@ -49,7 +49,7 @@ def sync(arg):
     chaining groups is not possible with the current celery version.
 
     Args:
-       arg: An arbitrary input argument
+        arg: An arbitrary input argument
 
     Returns:
         The input argument unaltered

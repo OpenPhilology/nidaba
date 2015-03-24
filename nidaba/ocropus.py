@@ -57,8 +57,8 @@ def ocr(imagepath, outputfilepath, modelpath):
     Raises:
         NidabaOcropusException: Ocropus somehow failed. The error output is
                                 contained in the message but as it is de facto
-                                unusable as a library it's impossible to make
-                                deduct the nature of the problem.
+                                unusable as a library it's impossible to deduct
+                                the nature of the problem.
     """
 
     fglob = _allsplitext(imagepath)[0]

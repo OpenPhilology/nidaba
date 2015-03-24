@@ -30,8 +30,8 @@ def ocr_tesseract(doc, id, method=u'ocr_tesseract', languages=None):
         doc (unicode, unicode): The input document tuple
         id (unicode): The nidaba batch identifier this task is a part of
         method (unicode): The suffix string appended to all output files
-        languages (list of unicode): A list of languages for the tesseract
-        language model
+                          languages (list of unicode): A list of languages for
+                          the tesseract language model
 
     Returns:
         (unicode, unicode): Storage tuple for the output file

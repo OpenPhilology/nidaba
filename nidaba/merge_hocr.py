@@ -49,7 +49,7 @@ def parse_bbox(prop_str):
 
     Raises:
         ValueError: The property string either did not contain a bbox
-        definition or this definition was malformed.
+                    definition or this definition was malformed.
     """
     for prop in prop_str.split(';'):
         p = prop.split()

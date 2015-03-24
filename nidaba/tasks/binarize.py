@@ -34,14 +34,14 @@ def otsu(doc, id, method=u'binarize', thresh=100, mincount=50, bgval=255,
         bgval (int): Target background value. Typically 255. Valid >0.
         smoothx (int): Half-width of block convolution kernel width. Valid >= 0
         smoothy (int):  Half-width of block convolution kernel height. Valid >=
-        0
+                        0
 
     Returns:
         (unicode, unicode): Storage tuple of the output file
 
     Raises:
         NidabaInvalidParameterException: Input parameters are outside the valid
-        range.
+                                         range.
 
     """
     input_path = storage.get_abs_path(*doc)
@@ -75,16 +75,17 @@ def sauvola(doc, id, method=u'sauvola', whsize=10, factor=0.35):
         id (unicode): The nidaba batch identifier this task is a part of
         method (unicode): The suffix string appended to all output files
         whsize (int): The window width and height that local statistics are
-        calculated on are twice the value of whsize. The minimal value is 2.
+                      calculated on are twice the value of whsize. The minimal
+                      value is 2.
         factor (float): The threshold reduction factor due to variance. 0 =<
-        factor < 1.
+                        factor < 1.
 
     Returns:
         (unicode, unicode): Storage tuple of the output file
 
     Raises:
         NidabaInvalidParameterException: Input parameters are outside the valid
-        range.
+                                         range.
     """
     input_path = storage.get_abs_path(*doc)
     if whsize < 2 or factor >= 1.0 or factor < 0:
