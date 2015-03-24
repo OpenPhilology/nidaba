@@ -11,6 +11,7 @@ sys.path.append(os.path.abspath('../'))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
+    'celery.contrib.sphinx',
 #    'sphinxcontrib.autoprogram',
 ]
 

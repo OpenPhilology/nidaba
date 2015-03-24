@@ -210,9 +210,11 @@ tesseract with the English language model.
 
 --binarize
         Defines the binarization parameters. It consists of a list of terms in
-        the format algorithm1:t1,t2,t3 algorithm2:t1,t2,... where algorithm is
-        either *otsu* or *sauvola* and t1 etc. are thresholding and window size
-        parameters respectively.
+        the format algorithm1:arg1=a,arg2=b;arg1=n algorithm2:arg1=1;arg1=2;...
+        where algorithm is one of the algorithms implemented and args are their
+        configuration parameters. Have a look at :mod:`nidaba.tasks.binarize`
+        for possible values.
+
 --ocr
         A list of OCR engine options in the format engine:lang1,lang2,lang3
         engine2:model... where engine is either *tesseract* or *ocropus* and
