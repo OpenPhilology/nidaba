@@ -1,0 +1,246 @@
+CHANGES
+=======
+
+0.2.0
+-----
+
+* Fix makefile to run more than once successfully
+* Update README to link to new docs pages
+* Add gh_pages target to sphinx makefile
+* Update README.md to note test skipping
+* remove trailing spaces
+* Skip tests for ocropus or tesseract of if not installed
+* Fix length of subheading ~s
+* Fancy shmancy documentation
+* New contributing file
+* Fix link in README
+* docstrings, so many docstrings
+* Remove ununsed imports from setup.py and PEP8ify
+* Remove tests for obsolete hocr module
+* PEP8ify tests and fix some errors in the algorithm test module
+* Annoying commit containing: * PEP8ify * Exception refactoring * Start of docstring work
+* Clean up sphinx configuration
+* Rename iris to nidaba
+* Start to replace leper
+* Remove unused files
+* Update requirements
+* Use pbr for setuptool magic
+* Minor bugfix making cli usable
+* One large commit that unfortunately can't be split into multiple smaller ones:
+* Remove obsolete/nonfunctioning web stuff
+* new style classes
+* Add is_file function to storage module
+* Make custom exceptions pickleable
+* switch over to absolute imports so tasks are more easily modularized
+* Fix install using pip version >=6.0
+* Fix tesseracts tests to run clenaly independent of version
+* Rename old_* switches to legacy_* Make legacy_ocropus actually do something
+* Update README with new stuff
+* New configuration format documentation
+* new global configuration files in sys.prefix + '/etc/iris/'
+* batch documentation
+* Hotfix for ocropus
+* Fix ocropus task
+* Comment cleanup in tasks.py
+* Remove useless variable
+* Sorted suggestions for spell checking
+* Complete spell checking/dictionary tools
+* Remove ununsed manifest
+* Don't segfault on nonexisting job id in get_state
+* Some minor documentation updates
+* sphinx replaced the wiki
+* Allow multiple input documents in iris.batch()
+* Add sphinx documentation tree with incomplete documentation
+* We are reusing code from Bruce Robertson, who's licensed his code under GPL2 forcing us to do the same. Add a license file to reflect this
+* Remove superfluous stuff in the README
+* Flesh out iris command line interface
+* status/configuration command for iris
+* Remove flower and its dependency tornado from requirements.txt
+* Updated requirements
+* Add note about new download command
+* Add download command and remove downloaded files
+* Ocropus task
+* ocropus tests
+* Rudimentary support for the Ocropus OCR framework
+* get_progress is obsolete, use get_state
+* Allow arbitrary depth images for grayscale conversion
+* Fix leper build failure
+* Ocropus binarization parameter
+* Fix configuration file for dictionaries
+* Fix threshold values in documentation (float -> int)
+* Add more information to explain my job entry data structure worthy of institutionalisation
+* Working inter-subtree synchronization and result retrieval
+* Remove useless load_del_dict function
+* Updated build instructions in README
+* Fixed test_file_output_png in test_tesseract to accomodate the new/old tesseract file output switch
+* Nonfunctional synchronization thingy
+* tesseract-grc required for tests
+* Add configuration switch for tesseract hocr output format
+* Changed iris/__init__.py back the having convenient imports
+* Updated requirements to latest versions. Added nosetests to requirements
+* Remove fs from requirements.txt
+* Rebased tasks onto master; fixed __init__.py so tests would clear; backed up old __init__.py to __init__.py.bak
+* Slightly less experimental hocr document merging
+* Fix typo
+* Install a non-functional iris executable
+* Experimental untested hOCR document merging
+* Add sane default binarization values from rigaudon
+* Update readme with our new and fancy status and result checking functions
+* Use storage module style path globally
+* leper NULL pointer handling
+* get_storage_path from absolute path function
+* Note that leptonica builds without image format support
+* Remove double parametrization of output file paths
+* Complete documentation of tasks
+* New status reporting function
+* Fix tesseract exception handling
+* Commit everything next time so group creation actually works
+* Tesseract should throw an exception if stderr is not empty
+* Removed superfluous comment
+* Fixed typo
+* Major cleanup of the spellchecker; added proper tests for the spellchecker
+* Cleanup of old comments
+* Cleaned garbage whitespace in test_algorithms.py
+* Cleaned garbage whitespace and a typo in algorithms.py
+* Replaced the WORDS xpath with WORDS and XWORDS to accomodate more hocr markup
+* Cleaned whitespace in hocr and tests; remove extraneous code in iris/__init__.py
+* Renamed scripts to contrib; created testrun stub
+* Removed extraneous code from __init__.py; removed useless test
+* Removed task tests
+* Fixed incorrect naming of Tesseract output files
+* Commented out code that uses leper
+* Removed __init__.py from project root; commented out leper import
+* Removed biopython from requirements.txt because it got added accidentally
+* Make pipeline usable
+* Apparently relative imports are the new hot thing right now and py3k deprecated absolute ones
+* Use absolute imports
+* Fix minor issues from merging
+* Added stub tesseract task; changed celeryconfig imports in task.py to match new module name
+* Moved tests to root
+* Commented out some stubs/incomplete functions
+* Make leper more digestible for celery Implement correct unicode support
+* Removed old/never used taskManager and testLauncher modules
+* Updated requirements.txt
+* PEP8ified celeryconfig's filename
+* Added symmetric delete spell check search with on-disk binary searching. Update basic script for generating deletion dictionaries
+* test
+* test :
+* test commit
+* Add get_abs_path to storage module
+* Task skeleton
+* Added function for binary search of a memory mapped symmetric delete dictionary file with tests
+* Check for model creation failure in dewarpSinglePage
+* Revert "Kitchen is broken" because it is not broken
+* Kitchen is broken
+* Don't need python-fs any more
+* leper does more than deskewing now
+* Ensure correct color depth for output by making it the responsibility of the user
+* Add handlers for incorrect input color depth
+* Add page-wise dewarping function
+* Squashed commit of the following:
+* tesseract produces hocr files with ending .hocr not .html
+* Fix conversion tests
+* Remove obsolete launch script
+* Mention dependencies for the c extension
+* Add deskew c extension
+* Update readme to reflect reality
+* Use setuptools
+* Move tests for setuptoolization
+* Added dictionary of Greek words with invariant diacritics
+* Added diacritic stripping fuctions with tests. Modified the uniblock function to make it work/useful
+* Implemented proper symmetric delete based spellcheck with tests
+* Removed old abbyy conversion module; will re-implement with hocr tools
+* Added a script for generating symmetric deletion dictionaries
+* Added single delete Greek symmetric spell check dictionary (compressed)
+* new and fancier mkdict building the revised dictionaries for sym_suggest
+* Rewrite sym_suggest to run in somewhat constant time
+* Add dictionary creation script
+* s/set([])/set()
+* s/NFD/NFC
+* Strip trailing newlines from dictionaries
+* Rewrite spell checker to use a simple ngram similarity measure as hunspell is too intelligent for the hocrinfoaggregator algorithm
+* Fix stray return
+* s/DICT_URL/DICT_PATH
+* Encapsulate spell checker into class to speed up recurring tasks
+* Spell check postprocessing
+* Add spell checking function. It works but there are wonky encoding issues brought over from hunspell
+* Added symmetric deletion based suggestion algorithms with tests
+* Added a normalization parameter (with tests) to the sanitize function
+* Added the strings_by_deletion function with tests. Rearranged the unibarrier and sanitize functions
+* Modified algorithms.sanitize() to accept strings and convert to unicode. Added appropriate tests for said changes. Fixed doc comment in algorithms.sanitize()
+* Added the sanitize method with tests
+* Added the extract_words function
+* Added the hocr parser context manager HocrContext
+* Refactored hocr bbox extraction methods to use the new xpath-based extract_bbox methods. Updated tests accordingly
+* Added the islang function in algorithms.py with tests
+* Remove the 'test' dir; all tests now in 'tests'
+* Renamed tests for autodiscovery
+* Removed useless/accidentally committed files and dirs 'extras', 'gr.txt', and 'holder.html'
+* Fixed incorrect bound in the comining diacritical mark unicode range
+* HOCR specification .pdf in /docs was unreadable/corrupted; fixed
+* Added extract_bboxes_by_class function in hocr, with tests
+* PEP8ify tests
+* Reformat test file name scheme to allow test autodiscovery
+* Add Lock tests
+* Rename config option as it isn't an URL anymore
+* PEP8-ify
+* Added a copy of the hocr specification doc to /docs
+* Removed useless print statement in hocr.py
+* Added bbox preview algorithm to hocr.py. Removed unused import from tests/hocrtests.py
+* Moved hocr related algorithms (extract_hocr_tokens and extract_bboxes) to the now hocr.py file. Moved tests for said functions to the now hocrtests.py
+* Bugfix in extract_bboxes which could cause regex mismatch
+* Added function for bbox extraction with tests. Added unibarrier decorator function with tests. Added unicode block identification function with tests. Misc formatting and docstring/line length cleanup
+* The empty shell that the locking tests are right now
+* Finish storage unit tests
+* Use new file locking thingy
+* Add own implementation of symlink based file locking
+* Some half-broken tests. Acquiring locks for multiple files doesn't seem to work correctly
+* New storage module utilizing locking
+* Fixed docstring comments in algorithmtests.py
+* Actually changed 'test' to 'tests' (not fixed in previous commit). Modified tesseract.py to accept lists of tesseract training data
+* Renamed 'test' to 'tests'; improved tesseract.py and added tests for same
+* Created tesseract.py for tesseract bindings. Created tests for tesseract bindings. Renamed 'test' dir to 'tests'. Added tests/resources/tesseract for tesseract tests
+* Make sure retrieve_content works with single document retrieval
+* Removed redundant updateall.sh script from /iris
+* Created native python version of all alignment algorithms with tests. Refactored numpy versions. Updated requirements.txt Pep8-ified algorithms.py
+* Add some storage backend unit tests
+* Remove test celery tasks
+* Rudimentary external storage module
+* Reformat irisconfig to 80 characters width
+* Add gitignore
+* Use opener.opendir() method to allow more generalized storage backend specification
+* Commented out/removed old FTP code it tasks/tests. Added Greek dictionary file
+* Removed experimental ftp related code and tests. (For conversion to an NFS based system) Commented out related code in tasks.py (most of it :) )
+* Added link to the hocr standard in the dev guide
+* Extracted initial matrix generation for alignment algorithms to their own methods. Renamed "BacktraceTests" to the correct "SemiGlobalAlignmentTests"
+* Modified full_edit_distance to support semi-global alignments. Extracted edit distance backtracing to its own function. Added a semi-global alignment methed with tests
+* Fixed typos
+* Added whole word/list alignment tests. Fixed bug in test_all_empty test in algorithms.py Updated requirements file
+* Implemented full edit distance and alignment algorithms. Implemended full unit test suite for the abovementioned algorithms. Deleted old or unnecessary files
+* More typo fixes
+* Updated/fixed typos in the dev guide, added a TODO file
+* Ok, this is a much larger commit thas is normally good practice, but things have some clear structure now. Main changes include: 1. Added useful tasks to tasks.py, along with unit tests (tasktests.py). 2. Created the algorithms module, along with unit tests (algorithmtests.py). 3. Converted python modules to use UTF-8. 4. Created unit tests for the FTP-based cluster file store. 5. Added a bash script for updating dependencies via pip (updateall.sh). 6. Updated requirements.txt
+* Fixed typo: "platform dependent" is now "platform independent"
+* Fixed an incorrect comment in abbyyToOCR.py Made abbyyToOCR.py and its test pep8 compliant
+* Created a complete, deployment-ready version of the abbyy to hocr converter, along with unit testing. Added the Iris developer's guide, devguide.md
+* Updated jQuery filedrop dependency to remove Chrome 22 console warning
+* More code for jQuery drag-n-drop file upload
+* Reorganization of installation guide, SASS details
+* Created installation instructions in docs/readme.md. So far, includes instructions for configuring Apache. Also included the Apache configuration file for Iris
+* Moved everything from Iris/iris/static into templates directory so it would be accessible by the templates. Added a couple missing files into the bootstrap directory. Fixed references in OCR tutorial
+* Static content added to repo (css, fonts, js)
+* Initial commit of web UI
+* Updated .gitignore to ignore sass-cache
+* Added redis and its prereqs to the requirements. Created a stub taskManager class
+* Completely debugged and refactored imagePreview.py into imageTools.py. Added a field in the batch stub template for images; cleaned up views.py
+* Template folder not correctly added in previous commit; fixed
+* Created a module for working with images; added image format validation. Moved the templates folder to /iris
+* Moved the test run script to the /iris dir to simplify importations; modified views.py to support basic file uploading at the /batch endpoint
+* Certain changes to .gitignore, requirements.txt, and several test HTML sub templates were not properly tracked in previous commits; thises have now been updated
+* Removed redundant schematic copies; updated requirements to include PIL (Python imaging library)
+* Stopped tracking of .pyc files; updated requirements to include Celery 3.0.22
+* Updated README, removed old schematic files from the root dir
+* Restructred folders and Python packages; added a basic inital version of the views.py module for displaying the web frontend; updated the README file
+* Added a pipeline schematic and an xml file for updating the schematic with draw.io
+* Added .gitignore, and the requirements list
+* Initial commit; repo empty

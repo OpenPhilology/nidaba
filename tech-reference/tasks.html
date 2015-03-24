@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Tech Reference &mdash; nidaba 0.1 documentation</title>
+    <title>Tasks &mdash; nidaba 0.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,8 +24,8 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="nidaba 0.1 documentation" href="../index.html" />
-    <link rel="next" title="Storage" href="storage.html" />
-    <link rel="prev" title="Installation" href="../user-guide/index.html" />
+    <link rel="up" title="Tech Reference" href="index.html" />
+    <link rel="prev" title="Storage" href="storage.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -43,11 +43,9 @@
              >modules</a> |</li>
         <li class="right" >
           <a href="storage.html" title="Storage"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="../user-guide/index.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.1 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Tech Reference</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -56,18 +54,20 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="tech-reference">
-<h1>Tech Reference<a class="headerlink" href="#tech-reference" title="Permalink to this headline">¶</a></h1>
-<p>This part of the documentation is intended to support developers and system
-administrators in understanding and extending the internal structure of nidaba.
-Its scope is higher level than the internal API documentation but beneath the
-command line interface.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="storage.html">Storage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tasks.html">Tasks</a></li>
-</ul>
-</div>
+  <div class="section" id="tasks">
+<h1>Tasks<a class="headerlink" href="#tasks" title="Permalink to this headline">¶</a></h1>
+<p>Adding additional tasks is a relatively straightforward process although there
+are a few pitfalls to mind. First add the implementation of your algorithm to
+the nidaba source directory and ensure that you have written tests that
+thoroughly cover your new module. It is of utmost importance to not break any
+other functionality.</p>
+<p>Next find the module in the tasks package that is most fitting for the problem
+your extension solves. If your code introduces a whole new step in the
+pipeline, for example a new kind of post-processing, create a new module so the
+command line util is able to utilize it. Write the wrapper functions
+encapsulating your new code in tasks, i.e. function that accept and return
+storage tupels.</p>
+<p>Finally add parameters to the cli parsers and document your addition in the docs.</p>
 </div>
 
 
@@ -77,15 +77,12 @@ command line interface.</p>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="../user-guide/index.html"
-                        title="previous chapter">Installation</a></p>
-  <h4>Next topic</h4>
   <p class="topless"><a href="storage.html"
-                        title="next chapter">Storage</a></p>
+                        title="previous chapter">Storage</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/tech-reference/index.txt"
+      <li><a href="../_sources/tech-reference/tasks.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -114,7 +111,7 @@ command line interface.</p>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.2</a>
       
       |
-      <a href="../_sources/tech-reference/index.txt"
+      <a href="../_sources/tech-reference/tasks.txt"
           rel="nofollow">Page source</a></li>
     </div>
 
