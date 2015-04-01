@@ -167,7 +167,7 @@ beneath storage_path.</dd>
 <p>Starting the celery worker server is quite simple and the only requirement is
 that it is NOT run inside the nidaba directory and the message broker is up and
 running:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> celery -A nidaba.tasks worker
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> celery -A nidaba worker
 </pre></div>
 </div>
 <p>For further worker server options have a look at <a class="reference external" href="https://celery.readthedocs.org/en/latest/">celery</a>.</p>
@@ -180,18 +180,16 @@ utility. It is automatically installed during the installation procedure.</p>
 <span id="cli-config"></span><h3>nidaba config<a class="headerlink" href="#nidaba-config" title="Permalink to this headline">¶</a></h3>
 <p>The <em>config</em> subcommand is used to inspect the current nidabaconfig.py:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba config
-<span class="go">* LANG_DICTS</span>
-<span class="go">{u&#39;german&#39;: (u&#39;dicts&#39;, u&#39;test/german.txt&#39;),</span>
-<span class="go"> u&#39;lojban&#39;: (u&#39;dicts&#39;, u&#39;test/lojban.txt&#39;),</span>
-<span class="go"> u&#39;polytonic_greek&#39;: (u&#39;dicts&#39;, u&#39;greek.dic&#39;)}</span>
-<span class="go">* OCROPUS_MODELS</span>
-<span class="go">{u&#39;atlantean&#39;: (u&#39;models&#39;, u&#39;atlantean.pyrnn.gz&#39;),</span>
-<span class="go"> u&#39;fraktur&#39;: (u&#39;models&#39;, u&#39;fraktur.pyrnn.gz&#39;),</span>
-<span class="go"> u&#39;greek&#39;: (u&#39;models&#39;, u&#39;greek.pyrnn.gz&#39;)}</span>
-<span class="go">* OLD_TESSERACT</span>
-<span class="go">False</span>
-<span class="go">* STORAGE_PATH</span>
-<span class="go">u&#39;~/OCR&#39;</span>
+<span class="go">{&#39;lang_dicts&#39;: {&#39;german&#39;: [&#39;dicts&#39;, &#39;german.dic&#39;],</span>
+<span class="go">                &#39;lojban&#39;: [&#39;dicts&#39;, &#39;lojban.dic&#39;],</span>
+<span class="go">                &#39;polytonic_greek&#39;: [&#39;dicts&#39;, &#39;greek.dic&#39;]},</span>
+<span class="go"> &#39;legacy_ocropus&#39;: False,</span>
+<span class="go"> &#39;legacy_tesseract&#39;: False,</span>
+<span class="go"> &#39;ocropus_models&#39;: {&#39;atlantean&#39;: [&#39;models&#39;, &#39;atlantean.pyrnn.gz&#39;],</span>
+<span class="go">                    &#39;fancy_ligatures&#39;: [&#39;models&#39;, &#39;ligatures.pyrnn.gz&#39;],</span>
+<span class="go">                    &#39;fraktur&#39;: [&#39;models&#39;, &#39;fraktur.pyrnn.gz&#39;],</span>
+<span class="go">                    &#39;greek&#39;: [&#39;models&#39;, &#39;greek.pyrnn.gz&#39;]},</span>
+<span class="go"> &#39;storage_path&#39;: &#39;~/OCR&#39;}</span>
 </pre></div>
 </div>
 </div>
@@ -330,7 +328,7 @@ containing the final output:</p>
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.2</a>
       
       |
       <a href="../_sources/user-guide/index.txt"

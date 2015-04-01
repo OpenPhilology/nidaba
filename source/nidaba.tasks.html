@@ -76,8 +76,8 @@ incorporating a background normalization as a preprocessing step.</p>
 <li><strong>mincount</strong> (<em>int</em>) &#8211; Min threshold on background counts in a tile.</li>
 <li><strong>bgval</strong> (<em>int</em>) &#8211; Target background value. Typically 255. Valid &gt;0.</li>
 <li><strong>smoothx</strong> (<em>int</em>) &#8211; Half-width of block convolution kernel width. Valid &gt;= 0</li>
-<li><strong>smoothy</strong> (<em>int</em>) &#8211; Half-width of block convolution kernel height. Valid &gt;=
-0</li>
+<li><strong>smoothy</strong> (<em>int</em>) &#8211; Half-width of block convolution kernel height. Valid &gt;=</li>
+<li><strong>0</strong> &#8211; </li>
 </ul>
 </td>
 </tr>
@@ -87,9 +87,11 @@ incorporating a background normalization as a preprocessing step.</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(unicode, unicode)</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NidabaInvalidParameterException</span></code> &#8211;
-Input parameters are outside the valid
-range.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">NidabaInvalidParameterException</span></code> &#8211;
+Input parameters are outside the valid</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">range.</span></code> &#8211;</li>
+</ul>
 </td>
 </tr>
 </tbody>
@@ -111,11 +113,10 @@ binarization.&#8221; Pattern recognition 33.2 (2000): 225-236.</p>
 <li><strong>doc</strong> (<em>unicode</em>) &#8211; The input document tuple.</li>
 <li><strong>id</strong> (<em>unicode</em>) &#8211; The nidaba batch identifier this task is a part of</li>
 <li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files</li>
-<li><strong>whsize</strong> (<em>int</em>) &#8211; The window width and height that local statistics are
-calculated on are twice the value of whsize. The minimal
-value is 2.</li>
-<li><strong>factor</strong> (<em>float</em>) &#8211; The threshold reduction factor due to variance. 0 =&lt;
-factor &lt; 1.</li>
+<li><strong>whsize</strong> (<em>int</em>) &#8211; The window width and height that local statistics are</li>
+<li><strong>on are twice the value of whsize. The minimal value is 2.</strong> (<em>calculated</em>) &#8211; </li>
+<li><strong>factor</strong> (<em>float</em>) &#8211; The threshold reduction factor due to variance. 0 =&lt;</li>
+<li><strong>&lt; 1.</strong> (<em>factor</em>) &#8211; </li>
 </ul>
 </td>
 </tr>
@@ -125,9 +126,11 @@ factor &lt; 1.</li>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(unicode, unicode)</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NidabaInvalidParameterException</span></code> &#8211;
-Input parameters are outside the valid
-range.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">NidabaInvalidParameterException</span></code> &#8211;
+Input parameters are outside the valid</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">range.</span></code> &#8211;</li>
+</ul>
 </td>
 </tr>
 </tbody>
@@ -259,9 +262,9 @@ language model application in a single task.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple</li>
 <li><strong>id</strong> (<em>unicode</em>) &#8211; The nidaba batch identifier this task is a part of</li>
-<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files
-languages (list of unicode): A list of languages for
-the tesseract language model</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files</li>
+<li><strong>languages</strong> (<em>list of unicode</em>) &#8211; A list of languages for the tesseract</li>
+<li><strong>model</strong> (<em>language</em>) &#8211; </li>
 </ul>
 </td>
 </tr>
@@ -323,9 +326,9 @@ scoring.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>[(id, path), ...]</strong> (<em>docs</em>) &#8211; A list of storage module tupels that will be</li>
 <li><strong>into a single output document.</strong> (<em>merged</em>) &#8211; </li>
-<li><strong>id</strong> (<em>unicode</em>) &#8211; The nidaba batch identifier this task is a part of
-language (unicode): Language used for spell-checking
-based scoring. If not defined no scoring will be used.</li>
+<li><strong>id</strong> (<em>unicode</em>) &#8211; The nidaba batch identifier this task is a part of</li>
+<li><strong>language</strong> (<em>unicode</em>) &#8211; Language used for spell-checking based scoring. If</li>
+<li><strong>defined no scoring will be used.</strong> (<em>not</em>) &#8211; </li>
 <li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to the output file.</li>
 </ul>
 </td>
@@ -438,7 +441,7 @@ between storage module tuples and absolute paths.</p>
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.2</a>
       
       |
       <a href="../_sources/source/nidaba.tasks.txt"
