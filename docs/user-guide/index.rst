@@ -154,7 +154,7 @@ running:
 
 .. code-block:: console
 
-	$ celery -A nidaba.tasks worker
+	$ celery -A nidaba worker
 
 For further worker server options have a look at `celery`_.
 
@@ -178,18 +178,17 @@ The *config* subcommand is used to inspect the current nidabaconfig.py:
 .. code-block:: console
 
         $ nidaba config
-        * LANG_DICTS
-        {u'german': (u'dicts', u'test/german.txt'),
-         u'lojban': (u'dicts', u'test/lojban.txt'),
-         u'polytonic_greek': (u'dicts', u'greek.dic')}
-        * OCROPUS_MODELS
-        {u'atlantean': (u'models', u'atlantean.pyrnn.gz'),
-         u'fraktur': (u'models', u'fraktur.pyrnn.gz'),
-         u'greek': (u'models', u'greek.pyrnn.gz')}
-        * OLD_TESSERACT
-        False
-        * STORAGE_PATH
-        u'~/OCR'
+        {'lang_dicts': {'german': ['dicts', 'german.dic'],
+                        'lojban': ['dicts', 'lojban.dic'],
+                        'polytonic_greek': ['dicts', 'greek.dic']},
+         'legacy_ocropus': False,
+         'legacy_tesseract': False,
+         'ocropus_models': {'atlantean': ['models', 'atlantean.pyrnn.gz'],
+                            'fancy_ligatures': ['models', 'ligatures.pyrnn.gz'],
+                            'fraktur': ['models', 'fraktur.pyrnn.gz'],
+                            'greek': ['models', 'greek.pyrnn.gz']},
+         'storage_path': '~/OCR'}
+
 
 .. _cli_batch:
 
