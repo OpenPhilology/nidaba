@@ -151,7 +151,7 @@ def batch(args):
     if args.willitblend:
         batch.add_step()
         batch.add_tick()
-        batch.add_task('util.merge_hocr')
+        batch.add_task('util.blend_hocr')
     batch.run()
     print('done.')
     print(id)
