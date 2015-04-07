@@ -229,6 +229,9 @@ class Batch(object):
         a single list and used as the input of the first tick of the following
         step.
         """
+        if self.cur_tick:
+            self.cur_step.append(self.cur_tick)
+            self.cur_tick = []
         if self.cur_step:
             self.batch_def.append(self.cur_step)
         self.cur_step = []
@@ -243,10 +246,9 @@ class Batch(object):
         Returns:
             (unicode): Batch identifier.
         """
-        if self.cur_tick:
-            self.cur_step.append(self.cur_tick)
-        if self.cur_step:
-            self.batch_def.append(self.cur_step)
+        # flush most recent tick/step onto the batch definition
+        self.add_tick()
+        self.add_step()
 
         groups = []
         tick = []
