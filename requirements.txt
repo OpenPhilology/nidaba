@@ -10,3 +10,4 @@ Pillow==2.7.0
 pytz==2014.10
 PyYAML==3.11
 redis==2.10.3
+kraken>=0.2.2

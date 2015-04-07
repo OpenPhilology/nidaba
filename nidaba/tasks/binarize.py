@@ -11,15 +11,59 @@ from __future__ import absolute_import, unicode_literals
 
 from nidaba import storage
 from nidaba import leper
+from nidaba import kraken
 from nidaba.nidabaexceptions import NidabaInvalidParameterException
 from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
 
 import re
 
+@app.task(base=NidabaTask, name=u'nidaba.binarize.nlbin')
+def nlbin(doc, id, method=u'nlbin', threshold=0.5, zoom=0.5, escale=1.0,
+          border=0.1, perc=80, range=20, low=5, high=90):
+    """
+    Binarizes an input document utilizing ocropus'/kraken's nlbin algorithm.
+
+    Args:
+        doc (unicode, unicode): The input document tuple.
+        id (unicode): The nidaba batch identifier this task is a part of
+        method (unicode): The suffix string appended to all output files.
+        threshold (float):
+        zoom (float):
+        escale (float):
+        border (float)
+        perc (int):
+        range (int):
+        low (int):
+        high (int):
+
+    Returns:
+        (unicode, unicode): Storage tuple of the output file
+
+    Raises:
+        NidabaInvalidParameterException: Input parameters are outside the valid
+                                         range.
+
+    """
+    input_path = storage.get_abs_path(*doc)
+    output_path = storage.insert_suffix(input_path, method, unicode(threshold),
+                                        unicode(zoom), unicode(escale),
+                                        unicode(border), unicode(perc),
+                                        unicode(range), unicode(low),
+                                        unicode(high))
+    if (1 > perc > 100) or (1 > low > 100) or (1 > high > 100):
+        raise NidabaInvalidParameterException('Parameters (' + unicode(perc) +
+                                              ',' + unicode(low) + ',' +
+                                              unicode(high) + ',' +
+                                              'outside of valid range')
+    print(output_path)
+    return storage.get_storage_path(kraken.nlbin(input_path, output_path,
+                                                 threshold, zoom, escale,
+                                                 border, perc, range, low,
+                                                 high))
 
 @app.task(base=NidabaTask, name=u'nidaba.binarize.otsu')
-def otsu(doc, id, method=u'binarize', thresh=100, mincount=50, bgval=255,
+def otsu(doc, id, method=u'otsu', thresh=100, mincount=50, bgval=255,
          smoothx=2, smoothy=2):
     """
     Binarizes an input document utilizing leptonicas modified Otsu thresholding
