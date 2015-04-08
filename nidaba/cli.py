@@ -128,7 +128,8 @@ def batch(args):
         for bin in args.binarize:
             (alg, _, params) = bin.partition(u':')
             for c in params.split(u';'):
-                kwargs = dict(kwarg.split('=') for kwarg in c.split(","))
+                kwargs = dict(kwarg.split('=') for kwarg in c.split(",") if len(kwarg.split('=')) == 2)
+                print(kwargs)
                 kwargs = {key: int_float_or_str(val)
                           for key, val in kwargs.items()}
                 batch.add_task('binarize.' + alg, **kwargs)
