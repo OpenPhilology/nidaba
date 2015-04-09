@@ -59,8 +59,7 @@ def main():
                              engine:model1, model2 where engine is either\
                              tesseract or ocropus and language* is a tesseract\
                              language model and model1 is a ocropus model\
-                             defined in the nidaba config.', nargs='+',
-                             default=[u'tesseract:eng'])
+                             defined in the nidaba config.', nargs='+')
     batchparser.add_argument('--willitblend', help=u'Blends all output files into a\
                              single hOCR document.', action='store_true',
                              default=False)

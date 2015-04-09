@@ -283,7 +283,7 @@ class Batch(object):
                 tick.append(ch)
             rets.append(
                 chain([group(tick)] + [tasks.util.sync.s()] +
-                      groups[:-1]).apply_async().id)
+                      groups[:-1]).apply_async(kwargs={'root': doc}).id)
         celery.app.backend.set(
             self.id, json.dumps({'errors': [], 'task_ids': rets}))
         return self.id
