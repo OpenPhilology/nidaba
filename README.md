@@ -105,4 +105,4 @@ SUCCESS
 Documentation
 =============
 
-Want to learn more? [Read the Docs](https:///mittagessen.github.io/nidaba/)
+Want to learn more? [Read the Docs](https:///openphilology.github.io/nidaba/)
