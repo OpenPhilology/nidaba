@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+nidaba.algorithms.string
+~~~~~~~~~~~~~~~~~~~~~~~~
 
+Implementation of various algorithms operating on strings and unicode objects,
+e.g. alignment, edit distances, and symmetric deletion searches.
 """
 
 from __future__ import division, absolute_import
