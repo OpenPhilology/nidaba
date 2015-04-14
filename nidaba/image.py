@@ -6,8 +6,27 @@ Common image processing functions encapsulating the PIL or pythonica image
 interface to absolute file paths.
 """
 
+from __future__ import absolute_import
+
 from PIL import Image
 
+from nidaba.algorithms.otsu import otsu
+
+def otsu(imagepath, resultpath):
+    """
+    Binarizes an grayscale image using Otsu's algorithm.
+
+    Arguments:
+        imagepath: Path of the input image
+        resultpath: Path of the output image
+
+    Returns:
+        unicode: Path of the actual output file
+    """
+
+    img = Image.open(imagepath)
+    otsu(im).save(resultpath)
+    return resultpath
 
 def rgb_to_gray(imagepath, resultpath):
     """
