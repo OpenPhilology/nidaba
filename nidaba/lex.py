@@ -13,7 +13,7 @@ from __future__ import absolute_import
 import os
 import codecs
 import glob
-import nidaba.algorithms as alg
+import nidaba.algorithms.string as alg
 from collections import Counter
 
 
