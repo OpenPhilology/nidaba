@@ -17,7 +17,7 @@ from nidaba import merge_hocr
 
 
 @app.task(base=NidabaTask, name=u'nidaba.util.blend_hocr')
-def blend_hocr(docs, id, language=u'', method=u'blend_hocr'):
+def blend_hocr(docs, method=u'blend_hocr', language=u''):
     """
     Blends multiple hOCR files using the algorithm from Bruce Robertsons
     rigaudon. It requires a working spell checking for the input document's
@@ -43,15 +43,15 @@ def blend_hocr(docs, id, language=u'', method=u'blend_hocr'):
 
 
 @app.task(base=NidabaTask, name=u'nidaba.util.sync')
-def sync(arg):
+def sync(doc):
     """
     Takes ones argument and returns it. Used to synchronized stuff as
     chaining groups is not possible with the current celery version.
 
     Args:
-        arg: An arbitrary input argument
+        doc: An arbitrary input argument
 
     Returns:
         The input argument unaltered
     """
-    return arg
+    return doc 

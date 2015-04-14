@@ -18,7 +18,7 @@ from nidaba.tasks.helper import NidabaTask
 
 
 @app.task(base=NidabaTask, name=u'nidaba.img.rgb_to_gray')
-def rgb_to_gray(doc, id, method=u'rgb_to_gray'):
+def rgb_to_gray(doc, method=u'rgb_to_gray'):
     """
     Converts an arbitrary bit depth image to grayscale and writes it back
     appending a suffix.
@@ -37,7 +37,7 @@ def rgb_to_gray(doc, id, method=u'rgb_to_gray'):
 
 
 @app.task(base=NidabaTask, name=u'nidaba.img.dewarp')
-def dewarp(doc, id, method=u'dewarp'):
+def dewarp(doc, method=u'dewarp'):
     """
     Removes perspective distortion (as commonly exhibited by overhead scans)
     from an 1bpp input image.
@@ -56,7 +56,7 @@ def dewarp(doc, id, method=u'dewarp'):
 
 
 @app.task(base=NidabaTask, name=u'nidaba.img.deskew')
-def deskew(doc, id, method=u'deskew'):
+def deskew(doc, method=u'deskew'):
     """
     Removes skew (rotational distortion) from an 1bpp input image.
 

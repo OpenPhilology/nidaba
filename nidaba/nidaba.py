@@ -125,16 +125,16 @@ class Batch(object):
         Retrieves all errors of the batch.
 
         Returns:
-            list: A list of tuples containing
-
-                args kwargs exception_message
-
-            of the failing task or None if there are no errors.
+            list: A list of tuples containing keyword arguments to the task, a
+            dictionary containing debug tracking information (i.e. variables
+            which are given to the tasks as keyword arguments but aren't
+            arguments to the underlying function), and the exception message of
+            the failure.
         """
         batch = celery.app.backend.get(self.id)
         try:
             batch = json.loads(batch)
-        except Exception:
+        except:
             return None
         if len(batch['errors']) > 0:
             return batch['errors']
@@ -146,7 +146,10 @@ class Batch(object):
         Retrieves the storage tuples of a successful batch or None.
 
         Returns:
-            list: A list of storage tuples or None if no results are available.
+            A list of dictionaries containing the output document name under
+            the key 'doc', the original document it is based upon under the key
+            'root', and all further tracking data that may be added during
+            execution.
         """
         batch = celery.app.backend.get(self.id)
         try:
@@ -161,10 +164,7 @@ class Batch(object):
         for id in batch['task_ids']:
             ch = AsyncResult(id)
             if ch.successful():
-                if isinstance(ch.result[0], list):
-                    outfiles.extend([tuple(x) for x in ch.result])
-                else:
-                    outfiles.append(tuple(ch.result))
+                outfiles.append(ch.result)
         return outfiles
 
     def add_document(self, doc):
@@ -276,14 +276,15 @@ class Batch(object):
             # to be added explicitely.
             for sequence in product([doc], *self.batch_def[0]):
                 method = celery.app.tasks['nidaba.' + sequence[1]['method']]
-                ch = chain(method.s(doc=sequence[0], **(sequence[1])))
+                ch = chain(method.s(doc=sequence[0], root=sequence[0],
+                                    **(sequence[1])))
                 for seq in sequence[2:]:
                     method = celery.app.tasks['nidaba.' + seq['method']]
                     ch |= method.s(**seq)
                 tick.append(ch)
             rets.append(
                 chain([group(tick)] + [tasks.util.sync.s()] +
-                      groups[:-1]).apply_async(kwargs={'root': doc}).id)
+                      groups[:-1]).apply_async().id)
         celery.app.backend.set(
             self.id, json.dumps({'errors': [], 'task_ids': rets}))
         return self.id

@@ -190,5 +190,8 @@ def status(args):
             print('Something somewhere went wrong.')
         else:
             for fun in ret:
-                print(fun[1]['method'].encode('utf-8') + u': ' +
-                      fun[2].encode('utf-8'))
+                print(fun[0]['method'].encode('utf-8'), 
+                      'failed while operating on',
+                      fun[0]['doc'][1].encode('utf-8'), 
+                      'which is based on',
+                      fun[1]['root'][1].encode('utf-8'))

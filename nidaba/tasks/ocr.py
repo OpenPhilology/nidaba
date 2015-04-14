@@ -22,7 +22,7 @@ import os
 
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.tesseract')
-def ocr_tesseract(doc, id, method=u'ocr_tesseract', languages=None):
+def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None):
     """
     Runs tesseract on an input document.
 
@@ -43,7 +43,7 @@ def ocr_tesseract(doc, id, method=u'ocr_tesseract', languages=None):
 
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.ocropus')
-def ocr_ocropus(doc, id, method=u'ocr_ocropus', model=None):
+def ocr_ocropus(doc, method=u'ocr_ocropus', model=None):
     """
     Runs ocropus on an input document.
 

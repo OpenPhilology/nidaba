@@ -12,6 +12,7 @@ from __future__ import absolute_import, unicode_literals
 from nidaba import storage
 from nidaba import leper
 from nidaba import kraken
+from nidaba import image
 from nidaba.nidabaexceptions import NidabaInvalidParameterException
 from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
@@ -19,7 +20,7 @@ from nidaba.tasks.helper import NidabaTask
 import re
 
 @app.task(base=NidabaTask, name=u'nidaba.binarize.nlbin')
-def nlbin(doc, id, method=u'nlbin', threshold=0.5, zoom=0.5, escale=1.0,
+def nlbin(doc, method=u'nlbin', threshold=0.5, zoom=0.5, escale=1.0,
           border=0.1, perc=80, range=20, low=5, high=90):
     """
     Binarizes an input document utilizing ocropus'/kraken's nlbin algorithm.
@@ -56,29 +57,22 @@ def nlbin(doc, id, method=u'nlbin', threshold=0.5, zoom=0.5, escale=1.0,
                                               ',' + unicode(low) + ',' +
                                               unicode(high) + ',' +
                                               'outside of valid range')
-    print(output_path)
     return storage.get_storage_path(kraken.nlbin(input_path, output_path,
                                                  threshold, zoom, escale,
                                                  border, perc, range, low,
                                                  high))
 
 @app.task(base=NidabaTask, name=u'nidaba.binarize.otsu')
-def otsu(doc, id, method=u'otsu', thresh=100, mincount=50, bgval=255,
+def otsu(doc, method=u'otsu', thresh=100, mincount=50, bgval=255,
          smoothx=2, smoothy=2):
     """
-    Binarizes an input document utilizing leptonicas modified Otsu thresholding
-    incorporating a background normalization as a preprocessing step.
+    Binarizes an input document utilizing a naive implementation of Otsu's
+    thresholding.
 
     Args:
         doc (unicode, unicode): The input document tuple.
         id (unicode): The nidaba batch identifier this task is a part of
         method (unicode): The suffix string appended to all output files.
-        thresh (int): Threshold for background normalization.
-        mincount (int): Min threshold on background counts in a tile.
-        bgval (int): Target background value. Typically 255. Valid >0.
-        smoothx (int): Half-width of block convolution kernel width. Valid >= 0
-        smoothy (int):  Half-width of block convolution kernel height. Valid >=
-                        0
 
     Returns:
         (unicode, unicode): Storage tuple of the output file
@@ -106,7 +100,7 @@ def otsu(doc, id, method=u'otsu', thresh=100, mincount=50, bgval=255,
 
 
 @app.task(base=NidabaTask, name=u'nidaba.binarize.sauvola')
-def sauvola(doc, id, method=u'sauvola', whsize=10, factor=0.35):
+def sauvola(doc, method=u'sauvola', whsize=10, factor=0.35):
     """
     Binarizes an input document utilizing Sauvola thresholding as described in
     [0]. Expects 8bpp grayscale images as input.
