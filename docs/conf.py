@@ -23,7 +23,7 @@ master_doc = 'index'
 project = u'nidaba'
 copyright = u'2014-2015, Open Greek and Latin'
 
-pipe = Popen('git describe --tags --always', stdout=PIPE, shell=True)
+pipe = Popen('git describe --tags --always master', stdout=PIPE, shell=True)
 version = pipe.stdout.read()
 
 exclude_patterns = ['_build']
