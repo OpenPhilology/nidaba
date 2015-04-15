@@ -3,10 +3,9 @@
 # nidaba documentation build configuration file, created by
 # sphinx-quickstart on Tue Nov  4 18:48:48 2014.
 
-import sys
-import os.path
+import os
 
-sys.path.append(os.path.abspath('../'))
+from subprocess import Popen, PIPE
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -22,10 +21,10 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 project = u'nidaba'
-copyright = u'2014, Open Greek and Latin'
+copyright = u'2014-2015, Open Greek and Latin'
 
-version = '0.1'
-release = '0.1'
+pipe = Popen('git describe --tags --always', stdout=PIPE, shell=True)
+version = pipe.stdout.read()
 
 exclude_patterns = ['_build']
 
