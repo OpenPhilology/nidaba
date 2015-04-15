@@ -25,7 +25,6 @@ def rgb_to_gray(doc, method=u'rgb_to_gray'):
 
     Args:
         doc (unicode, unicode): The input document tuple
-        id (unicode): The nidaba batch identifier this task is a part of
         method (unicode): The suffix string appended to all output files.
 
     Returns:
@@ -44,7 +43,6 @@ def dewarp(doc, method=u'dewarp'):
 
     Args:
         doc (unicode, unicode): The input document tuple.
-        id (unicode): The nidaba batch identifier this task is a part of
         method (unicode): The suffix string appended to all output files.
 
     Returns:
@@ -62,7 +60,6 @@ def deskew(doc, method=u'deskew'):
 
     Args:
         doc (unicode, unicode): The input document tuple.
-        id (unicode): The nidaba batch identifier this task is a part of
         method (unicode): The suffix string appended to all output files.
 
     Returns:

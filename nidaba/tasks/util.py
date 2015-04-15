@@ -27,9 +27,8 @@ def blend_hocr(doc, method=u'blend_hocr', language=u''):
     Args:
         doc [(id, path), ...]: A list of storage module tupels that will be
         merged into a single output document.
-        id (unicode): The nidaba batch identifier this task is a part of
-                      language (unicode): Language used for spell-checking
-                      based scoring. If not defined no scoring will be used.
+        language (unicode): Language used for spell-checking based scoring. If
+                            not defined no scoring will be used.
         method (unicode): The suffix string appended to the output file.
 
     Returns:

@@ -28,7 +28,6 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None):
 
     Args:
         doc (unicode, unicode): The input document tuple
-        id (unicode): The nidaba batch identifier this task is a part of
         method (unicode): The suffix string appended to all output files
                           languages (list of unicode): A list of languages for
                           the tesseract language model
@@ -49,7 +48,6 @@ def ocr_ocropus(doc, method=u'ocr_ocropus', model=None):
 
     Args:
         doc (unicode, unicode): The input document tuple
-        id (unicode): The nidaba batch identifier this task is a part of
         method (unicode): The suffix string appended to all output files
         model (unicode): Identifier for the font model to use
 

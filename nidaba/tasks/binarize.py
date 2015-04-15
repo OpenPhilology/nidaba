@@ -28,7 +28,6 @@ def nlbin(doc, method=u'nlbin', threshold=0.5, zoom=0.5, escale=1.0,
 
     Args:
         doc (unicode, unicode): The input document tuple.
-        id (unicode): The nidaba batch identifier this task is a part of
         method (unicode): The suffix string appended to all output files.
         threshold (float):
         zoom (float):
@@ -73,7 +72,6 @@ def otsu(doc, method=u'otsu', thresh=100, mincount=50, bgval=255,
 
     Args:
         doc (unicode, unicode): The input document tuple.
-        id (unicode): The nidaba batch identifier this task is a part of
         method (unicode): The suffix string appended to all output files.
 
     Returns:
@@ -112,7 +110,6 @@ def sauvola(doc, method=u'sauvola', whsize=10, factor=0.35):
 
     Args:
         doc (unicode): The input document tuple.
-        id (unicode): The nidaba batch identifier this task is a part of
         method (unicode): The suffix string appended to all output files
         whsize (int): The window width and height that local statistics are
                       calculated on are twice the value of whsize. The minimal
