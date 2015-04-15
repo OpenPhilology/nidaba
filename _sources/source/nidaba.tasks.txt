@@ -12,8 +12,9 @@ nidaba.tasks.binarize module
     :undoc-members:
     :show-inheritance:
 
-    .. autofunction:: otsu(doc, id, method, thresh, mincount, bgval, smoothx, smoothy)
-    .. autofunction:: sauvola(doc, id, method, whsize, factor)
+    .. autofunction:: nlbin(doc, method, threshold, zoom, escale, border, perc, range, low, high)
+    .. autofunction:: otsu(doc, method, thresh, mincount, bgval, smoothx, smoothy)
+    .. autofunction:: sauvola(doc, method, whsize, factor)
 
 nidaba.tasks.helper module
 --------------------------
@@ -31,9 +32,9 @@ nidaba.tasks.img module
     :undoc-members:
     :show-inheritance:
 
-    .. autofunction:: rgb_to_gray(doc, id method)
-    .. autofunction:: dewarp(doc, id, method)
-    .. autofunction:: deskew(doc, id, method)
+    .. autofunction:: rgb_to_gray(doc, method)
+    .. autofunction:: dewarp(doc, method)
+    .. autofunction:: deskew(doc, method)
 
 nidaba.tasks.ocr module
 -----------------------
@@ -43,8 +44,8 @@ nidaba.tasks.ocr module
     :undoc-members:
     :show-inheritance:
 
-    .. autofunction:: ocr_tesseract(doc, id, method, languages)
-    .. autofunction:: ocr_ocropus(doc, id, method, model)
+    .. autofunction:: ocr_tesseract(doc, method, languages)
+    .. autofunction:: ocr_ocropus(doc, method, model)
 
 nidaba.tasks.util module
 ------------------------
@@ -54,8 +55,8 @@ nidaba.tasks.util module
     :undoc-members:
     :show-inheritance:
 
-    .. autofunction:: blend_hocr(docs, id, language, method)
-    .. autofunction:: sync(arg)
+    .. autofunction:: blend_hocr(doc, language, method)
+    .. autofunction:: sync(doc)
 
 Module contents
 ---------------

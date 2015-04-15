@@ -60,8 +60,46 @@
 <p>Tasks for segmentation of color images into binary images. More often than not
 these will operate on grayscale input.</p>
 <dl class="function">
+<dt id="nidaba.tasks.binarize.nlbin">
+<code class="descclassname">nidaba.tasks.binarize.</code><code class="descname">nlbin</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>threshold</em>, <em>zoom</em>, <em>escale</em>, <em>border</em>, <em>perc</em>, <em>range</em>, <em>low</em>, <em>high</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.binarize.nlbin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binarizes an input document utilizing ocropus&#8217;/kraken&#8217;s nlbin algorithm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple.</li>
+<li><strong>id</strong> (<em>unicode</em>) &#8211; The nidaba batch identifier this task is a part of</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files.</li>
+<li><strong>threshold</strong> (<em>float</em>) &#8211; </li>
+<li><strong>zoom</strong> (<em>float</em>) &#8211; </li>
+<li><strong>escale</strong> (<em>float</em>) &#8211; </li>
+<li><strong>(float)</strong> (<em>border</em>) &#8211; </li>
+<li><strong>perc</strong> (<em>int</em>) &#8211; </li>
+<li><strong>range</strong> (<em>int</em>) &#8211; </li>
+<li><strong>low</strong> (<em>int</em>) &#8211; </li>
+<li><strong>high</strong> (<em>int</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(unicode, unicode)</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NidabaInvalidParameterException</span></code> &#8211;
+Input parameters are outside the valid
+range.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="nidaba.tasks.binarize.otsu">
-<code class="descclassname">nidaba.tasks.binarize.</code><code class="descname">otsu</code><span class="sig-paren">(</span><em>doc</em>, <em>id</em>, <em>method</em>, <em>thresh</em>, <em>mincount</em>, <em>bgval</em>, <em>smoothx</em>, <em>smoothy</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.binarize.otsu" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.tasks.binarize.</code><code class="descname">otsu</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>thresh</em>, <em>mincount</em>, <em>bgval</em>, <em>smoothx</em>, <em>smoothy</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.binarize.otsu" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binarizes an input document utilizing a naive implementation of Otsu&#8217;s
 thresholding.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -92,7 +130,7 @@ range.</p>
 
 <dl class="function">
 <dt id="nidaba.tasks.binarize.sauvola">
-<code class="descclassname">nidaba.tasks.binarize.</code><code class="descname">sauvola</code><span class="sig-paren">(</span><em>doc</em>, <em>id</em>, <em>method</em>, <em>whsize</em>, <em>factor</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.binarize.sauvola" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.tasks.binarize.</code><code class="descname">sauvola</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>whsize</em>, <em>factor</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.binarize.sauvola" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binarizes an input document utilizing Sauvola thresholding as described in
 [0]. Expects 8bpp grayscale images as input.</p>
 <p>[0] Sauvola, Jaakko, and Matti Pietikäinen. &#8220;Adaptive document image
@@ -161,7 +199,7 @@ retained through the whole chain.</p>
 packages (e.g. binarization).</p>
 <dl class="function">
 <dt id="nidaba.tasks.img.rgb_to_gray">
-<code class="descclassname">nidaba.tasks.img.</code><code class="descname">rgb_to_gray</code><span class="sig-paren">(</span><em>doc</em>, <em>id method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.img.rgb_to_gray" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.tasks.img.</code><code class="descname">rgb_to_gray</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.img.rgb_to_gray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts an arbitrary bit depth image to grayscale and writes it back
 appending a suffix.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -187,7 +225,7 @@ appending a suffix.</p>
 
 <dl class="function">
 <dt id="nidaba.tasks.img.dewarp">
-<code class="descclassname">nidaba.tasks.img.</code><code class="descname">dewarp</code><span class="sig-paren">(</span><em>doc</em>, <em>id</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.img.dewarp" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.tasks.img.</code><code class="descname">dewarp</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.img.dewarp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes perspective distortion (as commonly exhibited by overhead scans)
 from an 1bpp input image.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -213,7 +251,7 @@ from an 1bpp input image.</p>
 
 <dl class="function">
 <dt id="nidaba.tasks.img.deskew">
-<code class="descclassname">nidaba.tasks.img.</code><code class="descname">deskew</code><span class="sig-paren">(</span><em>doc</em>, <em>id</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.img.deskew" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.tasks.img.</code><code class="descname">deskew</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.img.deskew" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes skew (rotational distortion) from an 1bpp input image.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -247,7 +285,7 @@ this encapsulates page segmentation, recognition, and in the case of Tesseract
 language model application in a single task.</p>
 <dl class="function">
 <dt id="nidaba.tasks.ocr.ocr_tesseract">
-<code class="descclassname">nidaba.tasks.ocr.</code><code class="descname">ocr_tesseract</code><span class="sig-paren">(</span><em>doc</em>, <em>id</em>, <em>method</em>, <em>languages</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.ocr.ocr_tesseract" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.tasks.ocr.</code><code class="descname">ocr_tesseract</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>languages</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.ocr.ocr_tesseract" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs tesseract on an input document.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -274,7 +312,7 @@ the tesseract language model</li>
 
 <dl class="function">
 <dt id="nidaba.tasks.ocr.ocr_ocropus">
-<code class="descclassname">nidaba.tasks.ocr.</code><code class="descname">ocr_ocropus</code><span class="sig-paren">(</span><em>doc</em>, <em>id</em>, <em>method</em>, <em>model</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.ocr.ocr_ocropus" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.tasks.ocr.</code><code class="descname">ocr_ocropus</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>model</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.ocr.ocr_ocropus" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs ocropus on an input document.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -308,7 +346,7 @@ the tesseract language model</li>
 a kind.</p>
 <dl class="function">
 <dt id="nidaba.tasks.util.blend_hocr">
-<code class="descclassname">nidaba.tasks.util.</code><code class="descname">blend_hocr</code><span class="sig-paren">(</span><em>docs</em>, <em>id</em>, <em>language</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.util.blend_hocr" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.tasks.util.</code><code class="descname">blend_hocr</code><span class="sig-paren">(</span><em>doc</em>, <em>language</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.util.blend_hocr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Blends multiple hOCR files using the algorithm from Bruce Robertsons
 rigaudon. It requires a working spell checking for the input document&#8217;s
 language; otherwise all matched bboxes will be bunched together without any
@@ -339,7 +377,7 @@ based scoring. If not defined no scoring will be used.</li>
 
 <dl class="function">
 <dt id="nidaba.tasks.util.sync">
-<code class="descclassname">nidaba.tasks.util.</code><code class="descname">sync</code><span class="sig-paren">(</span><em>arg</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.util.sync" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.tasks.util.</code><code class="descname">sync</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.util.sync" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes ones argument and returns it. Used to synchronized stuff as
 chaining groups is not possible with the current celery version.</p>
 <table class="docutils field-list" frame="void" rules="none">
