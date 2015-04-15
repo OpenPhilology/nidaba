@@ -164,7 +164,10 @@ class Batch(object):
         for id in batch['task_ids']:
             ch = AsyncResult(id)
             if ch.successful():
-                outfiles.append(ch.result)
+                if type(ch.result['doc'][0]) == dict:
+                    outfiles.extend([x for x in ch.result['doc']])
+                else:
+                    outfiles.append(ch.result)
         return outfiles
 
     def add_document(self, doc):

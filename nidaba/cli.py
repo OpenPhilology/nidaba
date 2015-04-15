@@ -183,7 +183,8 @@ def status(args):
             print('Please contact your friendly nidaba support technician.')
         else:
             for doc in ret:
-                print('\t' + storage.get_abs_path(*doc).encode('utf-8'))
+                print(doc['root'][1].encode('utf-8'), '->',
+                      storage.get_abs_path(*doc['doc']).encode('utf-8'))
     elif state == 'FAILURE':
         ret = batch.get_errors()
         if ret is None:

@@ -19,6 +19,7 @@ from nidaba.tasks.helper import NidabaTask
 
 import re
 
+
 @app.task(base=NidabaTask, name=u'nidaba.binarize.nlbin')
 def nlbin(doc, method=u'nlbin', threshold=0.5, zoom=0.5, escale=1.0,
           border=0.1, perc=80, range=20, low=5, high=90):
@@ -61,6 +62,7 @@ def nlbin(doc, method=u'nlbin', threshold=0.5, zoom=0.5, escale=1.0,
                                                  threshold, zoom, escale,
                                                  border, perc, range, low,
                                                  high))
+
 
 @app.task(base=NidabaTask, name=u'nidaba.binarize.otsu')
 def otsu(doc, method=u'otsu', thresh=100, mincount=50, bgval=255,
