@@ -62,8 +62,8 @@ these will operate on grayscale input.</p>
 <dl class="function">
 <dt id="nidaba.tasks.binarize.otsu">
 <code class="descclassname">nidaba.tasks.binarize.</code><code class="descname">otsu</code><span class="sig-paren">(</span><em>doc</em>, <em>id</em>, <em>method</em>, <em>thresh</em>, <em>mincount</em>, <em>bgval</em>, <em>smoothx</em>, <em>smoothy</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.binarize.otsu" title="Permalink to this definition">¶</a></dt>
-<dd><p>Binarizes an input document utilizing leptonicas modified Otsu thresholding
-incorporating a background normalization as a preprocessing step.</p>
+<dd><p>Binarizes an input document utilizing a naive implementation of Otsu&#8217;s
+thresholding.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -72,12 +72,6 @@ incorporating a background normalization as a preprocessing step.</p>
 <li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple.</li>
 <li><strong>id</strong> (<em>unicode</em>) &#8211; The nidaba batch identifier this task is a part of</li>
 <li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files.</li>
-<li><strong>thresh</strong> (<em>int</em>) &#8211; Threshold for background normalization.</li>
-<li><strong>mincount</strong> (<em>int</em>) &#8211; Min threshold on background counts in a tile.</li>
-<li><strong>bgval</strong> (<em>int</em>) &#8211; Target background value. Typically 255. Valid &gt;0.</li>
-<li><strong>smoothx</strong> (<em>int</em>) &#8211; Half-width of block convolution kernel width. Valid &gt;= 0</li>
-<li><strong>smoothy</strong> (<em>int</em>) &#8211; Half-width of block convolution kernel height. Valid &gt;=</li>
-<li><strong>0</strong> &#8211; </li>
 </ul>
 </td>
 </tr>
@@ -87,11 +81,9 @@ incorporating a background normalization as a preprocessing step.</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(unicode, unicode)</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><code class="xref py py-exc docutils literal"><span class="pre">NidabaInvalidParameterException</span></code> &#8211;
-Input parameters are outside the valid</li>
-<li><code class="xref py py-exc docutils literal"><span class="pre">range.</span></code> &#8211;</li>
-</ul>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NidabaInvalidParameterException</span></code> &#8211;
+Input parameters are outside the valid
+range.</p>
 </td>
 </tr>
 </tbody>
@@ -113,10 +105,11 @@ binarization.&#8221; Pattern recognition 33.2 (2000): 225-236.</p>
 <li><strong>doc</strong> (<em>unicode</em>) &#8211; The input document tuple.</li>
 <li><strong>id</strong> (<em>unicode</em>) &#8211; The nidaba batch identifier this task is a part of</li>
 <li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files</li>
-<li><strong>whsize</strong> (<em>int</em>) &#8211; The window width and height that local statistics are</li>
-<li><strong>on are twice the value of whsize. The minimal value is 2.</strong> (<em>calculated</em>) &#8211; </li>
-<li><strong>factor</strong> (<em>float</em>) &#8211; The threshold reduction factor due to variance. 0 =&lt;</li>
-<li><strong>&lt; 1.</strong> (<em>factor</em>) &#8211; </li>
+<li><strong>whsize</strong> (<em>int</em>) &#8211; The window width and height that local statistics are
+calculated on are twice the value of whsize. The minimal
+value is 2.</li>
+<li><strong>factor</strong> (<em>float</em>) &#8211; The threshold reduction factor due to variance. 0 =&lt;
+factor &lt; 1.</li>
 </ul>
 </td>
 </tr>
@@ -126,11 +119,9 @@ binarization.&#8221; Pattern recognition 33.2 (2000): 225-236.</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(unicode, unicode)</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><code class="xref py py-exc docutils literal"><span class="pre">NidabaInvalidParameterException</span></code> &#8211;
-Input parameters are outside the valid</li>
-<li><code class="xref py py-exc docutils literal"><span class="pre">range.</span></code> &#8211;</li>
-</ul>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NidabaInvalidParameterException</span></code> &#8211;
+Input parameters are outside the valid
+range.</p>
 </td>
 </tr>
 </tbody>
@@ -149,10 +140,13 @@ logging of errors.</p>
 <dt id="nidaba.tasks.helper.NidabaTask">
 <em class="property">class </em><code class="descclassname">nidaba.tasks.helper.</code><code class="descname">NidabaTask</code><a class="headerlink" href="#nidaba.tasks.helper.NidabaTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">celery.app.task.Task</span></code></p>
-<p>An abstract class defining a custom on_failure handler for nidaba tasks.</p>
-<dl class="method">
-<dt id="nidaba.tasks.helper.NidabaTask.on_failure">
-<code class="descname">on_failure</code><span class="sig-paren">(</span><em>exc</em>, <em>task_id</em>, <em>args</em>, <em>kwargs</em>, <em>einfo</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.helper.NidabaTask.on_failure" title="Permalink to this definition">¶</a></dt>
+<p>An abstract class propagating unused function arguments through the
+execution chain. This means that no task should accept arbitrary (<a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs)
+arguments as they won&#8217;t be forwarded to the actual function and will be
+retained through the whole chain.</p>
+<dl class="attribute">
+<dt id="nidaba.tasks.helper.NidabaTask.acks_late">
+<code class="descname">acks_late</code><em class="property"> = True</em><a class="headerlink" href="#nidaba.tasks.helper.NidabaTask.acks_late" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -262,9 +256,9 @@ language model application in a single task.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple</li>
 <li><strong>id</strong> (<em>unicode</em>) &#8211; The nidaba batch identifier this task is a part of</li>
-<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files</li>
-<li><strong>languages</strong> (<em>list of unicode</em>) &#8211; A list of languages for the tesseract</li>
-<li><strong>model</strong> (<em>language</em>) &#8211; </li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files
+languages (list of unicode): A list of languages for
+the tesseract language model</li>
 </ul>
 </td>
 </tr>
@@ -324,11 +318,11 @@ scoring.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>[(id, path), ...]</strong> (<em>docs</em>) &#8211; A list of storage module tupels that will be</li>
+<li><strong>[(id, path), ...]</strong> (<em>doc</em>) &#8211; A list of storage module tupels that will be</li>
 <li><strong>into a single output document.</strong> (<em>merged</em>) &#8211; </li>
-<li><strong>id</strong> (<em>unicode</em>) &#8211; The nidaba batch identifier this task is a part of</li>
-<li><strong>language</strong> (<em>unicode</em>) &#8211; Language used for spell-checking based scoring. If</li>
-<li><strong>defined no scoring will be used.</strong> (<em>not</em>) &#8211; </li>
+<li><strong>id</strong> (<em>unicode</em>) &#8211; The nidaba batch identifier this task is a part of
+language (unicode): Language used for spell-checking
+based scoring. If not defined no scoring will be used.</li>
 <li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to the output file.</li>
 </ul>
 </td>
@@ -352,7 +346,7 @@ chaining groups is not possible with the current celery version.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>arg</strong> &#8211; An arbitrary input argument</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>doc</strong> &#8211; An arbitrary input argument</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The input argument unaltered</td>
 </tr>
@@ -441,7 +435,7 @@ between storage module tuples and absolute paths.</p>
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
       
       |
       <a href="../_sources/source/nidaba.tasks.txt"

@@ -90,247 +90,6 @@
 </div>
 <div class="section" id="module-nidaba.algorithms">
 <span id="nidaba-algorithms-module"></span><h2>nidaba.algorithms module<a class="headerlink" href="#module-nidaba.algorithms" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="nidaba.algorithms.compare_strings">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">compare_strings</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.compare_strings" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.edit_distance">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em>, <em>alignment_type='global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.edit_distance" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.full_edit_distance">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">full_edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>ins_func=None</em>, <em>iargs=[]</em>, <em>ikwargs={}</em>, <em>del_func=None</em>, <em>dargs=[]</em>, <em>dkwargs={}</em>, <em>sub_func=None</em>, <em>sargs=[]</em>, <em>skwargs={}</em>, <em>charmatrix={}</em>, <em>alignment_type='global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.full_edit_distance" title="Permalink to this definition">¶</a></dt>
-<dd><p>A version of the modified Wagner-Fischer algorithm that accepts user
-defined scoreing functions. These functions should be of the form
-fname(token1, token2, args*, kwargs**) and return an integer
-&gt;= 0. A return value of 0 indicates an optimality. The larger, the
-integer, the worse the score. Charmatrix is here only used to
-calulate default delete and insert scores for the initial matrix.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.greek_chars">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">greek_chars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.greek_chars" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list containing all the characters from the Greek and
-Coptic, Extended Greek, and Combined Diacritical unicode blocks.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.greek_filter">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">greek_filter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.greek_filter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.identify">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">identify</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.identify" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.inblock">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">inblock</code><span class="sig-paren">(</span><em>c</em>, <em>bounds</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.inblock" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check that the character c is equal to or between the two bounding
-characters in the unicode table.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.initmatrix">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">initmatrix</code><span class="sig-paren">(</span><em>rows</em>, <em>columns</em>, <em>defaultval=0</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.initmatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes a 2d list to the desired dimensions.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.isgreek">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">isgreek</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.isgreek" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.islang">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">islang</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.islang" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.key_for_del_dict_entry">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">key_for_del_dict_entry</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.key_for_del_dict_entry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.key_for_single_word">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">key_for_single_word</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.key_for_single_word" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.list_to_uni">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">list_to_uni</code><span class="sig-paren">(</span><em>l</em>, <em>encoding=u'utf-8'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.list_to_uni" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a human readable string representation of a list of unicode
-strings using the specified encoding.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.mapped_sym_suggest">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">mapped_sym_suggest</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.mapped_sym_suggest" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.mmap_bin_search">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">mmap_bin_search</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.mmap_bin_search" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.mr">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">mr</code><span class="sig-paren">(</span><em>matrix</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.mr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a string rep of a 2d list as a matrix. Useful for
-debugging.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.native_align">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">native_align</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.native_align" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate the edit distance of two strings, then backtrace to
-find a valid edit sequence.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.native_backtrace">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">native_backtrace</code><span class="sig-paren">(</span><em>matrix</em>, <em>start=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.native_backtrace" title="Permalink to this definition">¶</a></dt>
-<dd><p>Trace edit steps backward to find an edit sequence for an
-alignment. Starts at the provided &#8216;start&#8217; index, or in the i,j&#8217;th
-index if none is provided. The backtrace always ends
-at the index 0,0.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.native_full_edit_distance">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">native_full_edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em>, <em>alignment_type='global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.native_full_edit_distance" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.native_global_matrix">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">native_global_matrix</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore</em>, <em>insertscore</em>, <em>deletescore</em>, <em>charmatrix</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.native_global_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>An initial matrix for a global sequence alignment.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.native_semi_global_align">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">native_semi_global_align</code><span class="sig-paren">(</span><em>shortseq</em>, <em>longseq</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.native_semi_global_align" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.native_semi_global_matrix">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">native_semi_global_matrix</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore</em>, <em>insertscore</em>, <em>deletescore</em>, <em>charmatrix</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.native_semi_global_matrix" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.np_align">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">np_align</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.np_align" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate the edit distance of two strings, then backtrace to
-find a valid edit sequence.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.np_backtrace">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">np_backtrace</code><span class="sig-paren">(</span><em>matrix</em>, <em>start=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.np_backtrace" title="Permalink to this definition">¶</a></dt>
-<dd><p>Trace edit steps backward to find an edit sequence for an
-alignment. Starts at the provided &#8216;start&#8217; index, or in the i,j&#8217;th
-index if none is provided. The backtrace always ends
-at the index 0,0.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.np_full_edit_distance">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">np_full_edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em>, <em>alignment_type='global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.np_full_edit_distance" title="Permalink to this definition">¶</a></dt>
-<dd><p>A modified implenmentation of the Wagner-Fischer algorithm using
-numpy. Unlike the minimal and optimized version in the
-&#8220;edit_distance&#8221; function, this returns the entire scoring matrix,
-and an operation matrix for backtracing and reconstructing the
-edit operations. This should be used when an alignment is desired,
-not only the edit distance.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.np_global_matrix">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">np_global_matrix</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore</em>, <em>insertscore</em>, <em>deletescore</em>, <em>charmatrix</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.np_global_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>An initial matrix for a global sequence alignment.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.np_semi_global_align">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">np_semi_global_align</code><span class="sig-paren">(</span><em>shortseq</em>, <em>longseq</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.np_semi_global_align" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find a semi-global alignment between two strings.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.np_semi_global_matrix">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">np_semi_global_matrix</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore</em>, <em>insertscore</em>, <em>deletescore</em>, <em>charmatrix</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.np_semi_global_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>An initial matrix for a semi-global sequence alignment.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.parse_del_dict_entry">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">parse_del_dict_entry</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.parse_del_dict_entry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.prev_newline">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">prev_newline</code><span class="sig-paren">(</span><em>mm</em>, <em>line_buffer_size=100</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.prev_newline" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the pointer position immediately after the closest left hand
-newline, or to the beginning of the file if no such newlines exist.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.sanitize">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">sanitize</code><span class="sig-paren">(</span><em>string</em>, <em>encoding=u'utf-8'</em>, <em>normalization=u'NFD'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.sanitize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Strip leading and trailing whitespace, convert to NFD. If the passed
-string is a str rather than an unicode, decode it with the specified
-encoding.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.strings_by_deletion">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">strings_by_deletion</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.strings_by_deletion" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.strip_diacritics">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">strip_diacritics</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.strip_diacritics" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.suggestions">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">suggestions</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.suggestions" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.sym_suggest">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">sym_suggest</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.sym_suggest" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.todec">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">todec</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.todec" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.truestring">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">truestring</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.truestring" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.unibarrier">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">unibarrier</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.unibarrier" title="Permalink to this definition">¶</a></dt>
-<dd><p>A decorator function; used to ensure that no str objects can be
-passed as either args or kwargs.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.uniblock">
-<code class="descclassname">nidaba.algorithms.</code><code class="descname">uniblock</code><span class="sig-paren">(</span><em>start</em>, <em>stop</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.uniblock" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list containing all the characters in the unicode table
-starting with &#8216;start&#8217; (inclusive) and ending with end (inclusive).</p>
-</dd></dl>
-
 </div>
 <div class="section" id="module-nidaba.celery">
 <span id="nidaba-celery-module"></span><h2>nidaba.celery module<a class="headerlink" href="#module-nidaba.celery" title="Permalink to this headline">¶</a></h2>
@@ -416,6 +175,30 @@ to the highest data type in the ordering.</td>
 <p>Common image processing functions encapsulating the PIL or pythonica image
 interface to absolute file paths.</p>
 <dl class="function">
+<dt id="nidaba.image.otsu">
+<code class="descclassname">nidaba.image.</code><code class="descname">otsu</code><span class="sig-paren">(</span><em>imagepath</em>, <em>resultpath</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.image.otsu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binarizes an grayscale image using Otsu&#8217;s algorithm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>imagepath</strong> &#8211; Path of the input image</li>
+<li><strong>resultpath</strong> &#8211; Path of the output image</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Path of the actual output file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">unicode</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="nidaba.image.rgb_to_gray">
 <code class="descclassname">nidaba.image.</code><code class="descname">rgb_to_gray</code><span class="sig-paren">(</span><em>imagepath</em>, <em>resultpath</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.image.rgb_to_gray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts an RGB or CMYK image into a 8bpp grayscale image.</p>
@@ -441,14 +224,8 @@ interface to absolute file paths.</p>
 
 </div>
 </div>
-<div class="section" id="module-nidaba.lex">
-<span id="nidaba-lex-module"></span><h2>nidaba.lex module<a class="headerlink" href="#module-nidaba.lex" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="nidaba-lex">
-<h3>nidaba.lex<a class="headerlink" href="#nidaba-lex" title="Permalink to this headline">¶</a></h3>
-<p>This module contains functions for dealing with words and dictionaries, such as
-extracting words from texts, normalizing encodings, building symmetric deletion
-dictionaries, etc.</p>
-</div>
+<div class="section" id="nidaba-lex-module">
+<h2>nidaba.lex module<a class="headerlink" href="#nidaba-lex-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-nidaba.lock">
 <span id="nidaba-lock-module"></span><h2>nidaba.lock module<a class="headerlink" href="#module-nidaba.lock" title="Permalink to this headline">¶</a></h2>
@@ -585,21 +362,15 @@ accounted for.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>prop_str</strong> (<em>unicode</em>) &#8211; The verbatim property string</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>prop_str</strong> (<em>unicode</em>) &#8211; The verbatim property string</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A rectangular area described in a bbox field</p>
-</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A rectangular area described in a bbox field</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="#nidaba.merge_hocr.Rect" title="nidaba.merge_hocr.Rect">Rect</a></p>
-</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#nidaba.merge_hocr.Rect" title="nidaba.merge_hocr.Rect">Rect</a></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211;
-The property string either did not contain a bbox</li>
-<li><strong>definition or this definition was malformed.</strong> &#8211;</li>
-</ul>
-</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211;
+The property string either did not contain a bbox
+definition or this definition was malformed.</td>
 </tr>
 </tbody>
 </table>
@@ -800,10 +571,11 @@ There is no step to add a tick to.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of tuples containing<blockquote>
-<div>args kwargs exception_message</div></blockquote>
-<p>of the failing task or None if there are no errors.</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of tuples containing keyword arguments to the task, a
+dictionary containing debug tracking information (i.e. variables
+which are given to the tasks as keyword arguments but aren&#8217;t
+arguments to the underlying function), and the exception message of
+the failure.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
 </tr>
@@ -819,9 +591,10 @@ There is no step to add a tick to.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of storage tuples or None if no results are available.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of dictionaries containing the output document name under
+the key &#8216;doc&#8217;, the original document it is based upon under the key
+&#8216;root&#8217;, and all further tracking data that may be added during
+execution.</td>
 </tr>
 </tbody>
 </table>
@@ -985,8 +758,8 @@ different from the <code class="docutils literal"><span class="pre">`outputfilep
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NidabaOcropusException</span></code> &#8211;
 Ocropus somehow failed. The error output is
 contained in the message but as it is de facto
-unusable as a library it&#8217;s impossible to make
-deduct the nature of the problem.</p>
+unusable as a library it&#8217;s impossible to deduct
+the nature of the problem.</p>
 </td>
 </tr>
 </tbody>
@@ -1374,10 +1147,7 @@ Exception: The input directory does not exist.</p>
 <li><a class="reference internal" href="#nidaba-image">nidaba.image</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-nidaba.lex">nidaba.lex module</a><ul>
-<li><a class="reference internal" href="#nidaba-lex">nidaba.lex</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#nidaba-lex-module">nidaba.lex module</a></li>
 <li><a class="reference internal" href="#module-nidaba.lock">nidaba.lock module</a><ul>
 <li><a class="reference internal" href="#nidaba-lock">nidaba.lock</a></li>
 </ul>
@@ -1434,7 +1204,7 @@ Exception: The input directory does not exist.</p>
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
       
       |
       <a href="../_sources/source/nidaba.txt"
