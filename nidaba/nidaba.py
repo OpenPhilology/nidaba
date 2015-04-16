@@ -10,6 +10,7 @@ objects and methods defined here.
 from __future__ import absolute_import
 
 from nidaba import tasks
+from nidaba import plugins
 from nidaba import celery
 from nidaba import storage
 from nidaba.nidabaexceptions import (NidabaInputException,

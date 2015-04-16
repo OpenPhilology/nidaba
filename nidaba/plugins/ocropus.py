@@ -1,20 +1,49 @@
 # -*- coding: utf-8 -*-
 """
-nidaba.ocropus
-~~~~~~~~~~~~~~
+nidaba.plugins.ocropus
+~~~~~~~~~~~~~~~~~~~~~~
 
-Wrappers around the ocropus OCR engine.
+Plugin implementing an interface to ocropus
 """
 
 from __future__ import absolute_import
 
 import subprocess
 import glob
+import os
 import re
 import shutil
 
+from nidaba import storage
 from nidaba.config import nidaba_cfg
+from nidaba.celery import app
+from nidaba.tasks.helper import NidabaTask
 from nidaba.nidabaexceptions import NidabaOcropusException
+
+
+def setup(*args, **kwargs):
+    pass
+
+
+@app.task(base=NidabaTask, name=u'nidaba.ocr.ocropus')
+def ocr_ocropus(doc, method=u'ocr_ocropus', model=None):
+    """
+    Runs ocropus on an input document.
+
+    Args:
+        doc (unicode, unicode): The input document tuple
+        method (unicode): The suffix string appended to all output files
+        model (unicode): Identifier for the font model to use
+
+    Returns:
+        (unicode, unicode): Storage tuple for the output file
+
+    """
+    input_path = storage.get_abs_path(*doc)
+    output_path = os.path.splitext(storage.insert_suffix(input_path, method,
+                                                         model))[0] + '.html'
+    model = storage.get_abs_path(*(nidaba_cfg['ocropus_models'][model]))
+    return storage.get_storage_path(ocr(input_path, output_path, model))
 
 
 def _allsplitext(path):
