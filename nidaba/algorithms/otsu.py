@@ -8,6 +8,7 @@ Module implementing variants of Otsu's method.
 
 import numpy as np
 
+
 def otsu(im):
     """
     A naive native python implementation of Otsu thresholding (or at least the
@@ -30,7 +31,7 @@ def otsu(im):
 
     thresh = -1
     mvar = 0.0
-    for i in range(0,len(hist)):
+    for i in range(0, len(hist)):
         wb += hist[i]
         if wb == 0:
             continue
@@ -40,10 +41,9 @@ def otsu(im):
         sb += i * hist[i]
         mb = sb / wb
         mf = (st - sb)/wf
-        bcv = wb * wf * (mb-mf)**2 
+        bcv = wb * wf * (mb-mf)**2
         if bcv > mvar:
             mvar = bcv
             thresh = i
 
     return im.point(lambda p: p > thresh and 255, mode='1')
-

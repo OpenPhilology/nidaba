@@ -127,8 +127,8 @@ def batch(args):
         for bin in args.binarize:
             (alg, _, params) = bin.partition(u':')
             for c in params.split(u';'):
-                kwargs = dict(kwarg.split('=') for kwarg in c.split(",") if len(kwarg.split('=')) == 2)
-                print(kwargs)
+                kwargs = dict(kwarg.split('=') for kwarg in c.split(",") if
+                              len(kwarg.split('=')) == 2)
                 kwargs = {key: int_float_or_str(val)
                           for key, val in kwargs.items()}
                 batch.add_task('binarize.' + alg, **kwargs)
@@ -191,8 +191,8 @@ def status(args):
             print('Something somewhere went wrong.')
         else:
             for fun in ret:
-                print(fun[0]['method'].encode('utf-8'), 
+                print(fun[0]['method'].encode('utf-8'),
                       'failed while operating on',
-                      fun[0]['doc'][1].encode('utf-8'), 
+                      fun[0]['doc'][1].encode('utf-8'),
                       'which is based on',
                       fun[1]['root'][1].encode('utf-8'))
