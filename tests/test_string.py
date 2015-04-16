@@ -5,7 +5,7 @@ import tempfile
 import numpy
 import mmap
 
-from nidaba import algorithms
+from nidaba.algorithm import string
 from nidaba.nidabaexceptions import (NidabaUnibarrierException,
                                      NidabaAlgorithmException)
 
@@ -26,38 +26,38 @@ class LevenshteinTests(unittest.TestCase):
         Test the edit distance of identical strings
         """
         self.assertEqual(
-            0, algorithms.edit_distance('test_string', 'test_string'))
+            0, string.edit_distance('test_string', 'test_string'))
 
     def test_single_insert(self):
         """
         Test with strings requiring one insert
         """
-        self.assertEqual(1, algorithms.edit_distance('', 'a'))
+        self.assertEqual(1, string.edit_distance('', 'a'))
 
     def test_tenfold_insert(self):
         """
         Test with strings requiring ten inserts
         """
-        self.assertEqual(10, algorithms.edit_distance('', 'aaaaaaaaaa'))
+        self.assertEqual(10, string.edit_distance('', 'aaaaaaaaaa'))
 
     def test_single_delete(self):
         """
         Test with strings requiring one delete
         """
-        self.assertEqual(1, algorithms.edit_distance('a', ''))
+        self.assertEqual(1, string.edit_distance('a', ''))
 
     def test_tenfold_delete(self):
         """
         Test with strings requiring ten deletes
         """
-        self.assertEqual(10, algorithms.edit_distance('aaaaaaaaaa', ''))
+        self.assertEqual(10, string.edit_distance('aaaaaaaaaa', ''))
 
     def test_singledelete_singleadd(self):
         """
         Test with strings requiring a single non-trivial insert.
         """
         # Should delete the a and insert the final b.
-        self.assertEqual(2, algorithms.edit_distance('abbb', 'bbbbb'))
+        self.assertEqual(2, string.edit_distance('abbb', 'bbbbb'))
 
     def test_singleadd_singledelete(self):
         """
@@ -65,7 +65,7 @@ class LevenshteinTests(unittest.TestCase):
         """
 
         # Should delete the a and add the final b.
-        self.assertEqual(2, algorithms.edit_distance('bbbbb', 'abbb'))
+        self.assertEqual(2, string.edit_distance('bbbbb', 'abbb'))
 
     # -------------------------------------------------------------------
     # Score matrix tests ------------------------------------------------
@@ -78,7 +78,7 @@ class LevenshteinTests(unittest.TestCase):
         """
         expected = [[0, 1, 2], [1, 0, 1]]
         self.assertEqual(expected,
-                         algorithms.native_full_edit_distance('a', 'ab')[0])
+                         string.native_full_edit_distance('a', 'ab')[0])
 
     def test_match_insert_matrix(self):
         """
@@ -86,7 +86,7 @@ class LevenshteinTests(unittest.TestCase):
         """
         expected = [[0, 1], [1, 0], [2, 1]]
         self.assertEqual(
-            expected, algorithms.native_full_edit_distance('ab', 'a')[0])
+            expected, string.native_full_edit_distance('ab', 'a')[0])
 
     def test_all_match_matrix(self):
         """
@@ -100,7 +100,7 @@ class LevenshteinTests(unittest.TestCase):
                     [4, 3, 2, 1, 0, 1],
                     [5, 4, 3, 2, 1, 0]]
         self.assertEqual(expected,
-                         algorithms.native_full_edit_distance('aaaaa',
+                         string.native_full_edit_distance('aaaaa',
                                                               'aaaaa')[0])
 
     def test_all_subtitute_matrix(self):
@@ -115,7 +115,7 @@ class LevenshteinTests(unittest.TestCase):
                     [4, 4, 4, 4, 4, 5],
                     [5, 5, 5, 5, 5, 5]]
         self.assertEqual(expected,
-                         algorithms.native_full_edit_distance('aaaaa',
+                         string.native_full_edit_distance('aaaaa',
                                                               'bbbbb')[0])
 
     def test_all_insert(self):
@@ -125,7 +125,7 @@ class LevenshteinTests(unittest.TestCase):
         """
         expected = [[0, 1, 2, 3, 4, 5]]
         self.assertEqual(expected,
-                         algorithms.native_full_edit_distance('', 'abcde')[0])
+                         string.native_full_edit_distance('', 'abcde')[0])
 
     def test_all_delete(self):
         """
@@ -138,7 +138,7 @@ class LevenshteinTests(unittest.TestCase):
                     [4],
                     [5]]
         self.assertEqual(expected,
-                         algorithms.native_full_edit_distance('abcde', '')[0])
+                         string.native_full_edit_distance('abcde', '')[0])
 
     def test_all_empty(self):
         """
@@ -146,7 +146,7 @@ class LevenshteinTests(unittest.TestCase):
         """
         expected = [[0]]
         self.assertEqual(expected,
-                         algorithms.native_full_edit_distance('', '')[0])
+                         string.native_full_edit_distance('', '')[0])
 
     # -------------------------------------------------------------------
     # Parameter tests ---------------------------------------------------
@@ -156,12 +156,12 @@ class LevenshteinTests(unittest.TestCase):
         """
         Test the functionality of the substitution score parameter.
         """
-        default = algorithms.edit_distance('a', 'b')
-        same_as_default = algorithms.edit_distance(
+        default = string.edit_distance('a', 'b')
+        same_as_default = string.edit_distance(
             'a', 'b', substitutionscore=1)
-        with_parameter = algorithms.edit_distance(
+        with_parameter = string.edit_distance(
             'a', 'b', substitutionscore=-7)
-        with_parameter_and_max = algorithms.edit_distance(
+        with_parameter_and_max = string.edit_distance(
             'a', 'b', substitutionscore=7)
         self.assertEqual(1, default)
         self.assertEqual(1, same_as_default)
@@ -171,9 +171,9 @@ class LevenshteinTests(unittest.TestCase):
         """
         Test the functionality of the delete score parameter.
         """
-        default = algorithms.edit_distance('a', '')
-        same_as_default = algorithms.edit_distance('a', '', deletescore=1)
-        with_parameter = algorithms.edit_distance('a', '', deletescore=-7)
+        default = string.edit_distance('a', '')
+        same_as_default = string.edit_distance('a', '', deletescore=1)
+        with_parameter = string.edit_distance('a', '', deletescore=-7)
 
         self.assertEqual(1, default)
         self.assertEqual(1, same_as_default)
@@ -183,9 +183,9 @@ class LevenshteinTests(unittest.TestCase):
         """
         Test the functionality of the insert score parameter.
         """
-        default = algorithms.edit_distance('', 'a')
-        same_as_default = algorithms.edit_distance('', 'a', insertscore=1)
-        with_parameter = algorithms.edit_distance('', 'a', insertscore=-7)
+        default = string.edit_distance('', 'a')
+        same_as_default = string.edit_distance('', 'a', insertscore=1)
+        with_parameter = string.edit_distance('', 'a', insertscore=-7)
 
         self.assertEqual(1, default)
         self.assertEqual(1, same_as_default)
@@ -199,7 +199,7 @@ class LevenshteinTests(unittest.TestCase):
         charmatrix = {('a', 'b'): 0}
         expected = [[0, 1],
                     [1, 0]]
-        self.assertEqual(expected, algorithms.native_full_edit_distance('a',
+        self.assertEqual(expected, string.native_full_edit_distance('a',
                                                                         'b',
                                                                         charmatrix=charmatrix)[0])
 
@@ -211,7 +211,7 @@ class LevenshteinTests(unittest.TestCase):
         charmatrix = {('a', 'b'): 5}
         expected = [[0, 1],
                     [1, 5]]
-        self.assertEqual(expected, algorithms.native_full_edit_distance(
+        self.assertEqual(expected, string.native_full_edit_distance(
             'a', 'b', charmatrix=charmatrix)[0])
 
     def test_charmatrix_one_character_substitution_default(self):
@@ -222,7 +222,7 @@ class LevenshteinTests(unittest.TestCase):
         charmatrix = {('a', 'b'): 1}
         expected = [[0, 1],
                     [1, 1]]
-        self.assertEqual(expected, algorithms.native_full_edit_distance(
+        self.assertEqual(expected, string.native_full_edit_distance(
             'a', 'b', charmatrix=charmatrix)[0])
 
     def test_charmatrix_default_delete(self):
@@ -235,7 +235,7 @@ class LevenshteinTests(unittest.TestCase):
                     [5],
                     [10],
                     [15]]
-        self.assertEqual(expected, algorithms.native_full_edit_distance(
+        self.assertEqual(expected, string.native_full_edit_distance(
             'aaa', '', charmatrix=charmatrix)[0])
 
     def test_charmatrix_default_insert(self):
@@ -245,42 +245,42 @@ class LevenshteinTests(unittest.TestCase):
         """
         charmatrix = {('a', ''): 5}
         expected = [[0, 5, 10, 15]]
-        self.assertEqual(expected, algorithms.native_full_edit_distance(
+        self.assertEqual(expected, string.native_full_edit_distance(
             '', 'aaa', charmatrix=charmatrix)[0])
     # -------------------------------------------------------------------
     # Word tests --------------------------------------------------------
     # -------------------------------------------------------------------
 
     def test_identical_word(self):
-        self.assertEqual(0, algorithms.edit_distance(['word'], ['word']))
+        self.assertEqual(0, string.edit_distance(['word'], ['word']))
 
     def test_word_substitution(self):
         self.assertEqual(
-            1, algorithms.edit_distance(['word'], ['different word']))
+            1, string.edit_distance(['word'], ['different word']))
 
     def test_word_insertion(self):
-        self.assertEqual(1, algorithms.edit_distance([], ['word']))
+        self.assertEqual(1, string.edit_distance([], ['word']))
 
     def test_word_deletion(self):
-        self.assertEqual(1, algorithms.edit_distance(['word'], []))
+        self.assertEqual(1, string.edit_distance(['word'], []))
 
     def test_word_multi_insert(self):
-        self.assertEqual(5, algorithms.edit_distance([], ['word', 'word',
+        self.assertEqual(5, string.edit_distance([], ['word', 'word',
                                                           'word', 'word',
                                                           'word']))
 
     def test_word_multi_delete(self):
-        self.assertEqual(5, algorithms.edit_distance(['word', 'word', 'word',
+        self.assertEqual(5, string.edit_distance(['word', 'word', 'word',
                                                       'word', 'word'], []))
 
     def test_word_multi_match(self):
-        self.assertEqual(0, algorithms.edit_distance(['word1', 'word2',
+        self.assertEqual(0, string.edit_distance(['word1', 'word2',
                                                       'word3'], ['word1',
                                                                  'word2',
                                                                  'word3']))
 
     def test_word_multi_substitute(self):
-        self.assertEqual(3, algorithms.edit_distance(['word1', 'word2',
+        self.assertEqual(3, string.edit_distance(['word1', 'word2',
                                                       'word3'], ['otherword1',
                                                                  'otherword2',
                                                                  'otherword3']))
@@ -292,35 +292,35 @@ class AlignmentTests(unittest.TestCase):
         """
         Tests the edit steps between two empty strings.
         """
-        self.assertEqual([], algorithms.native_align('', ''))
+        self.assertEqual([], string.native_align('', ''))
 
     def test_insertions(self):
         """
         Test the edit steps when only inserts are needed.
         """
         self.assertEqual(['i', 'i', 'i', 'i', 'i'],
-                         algorithms.native_align('', 'abcde'))
+                         string.native_align('', 'abcde'))
 
     def test_deletions(self):
         """
         Test the edit steps when only deletes are needed.
         """
         self.assertEqual(['d', 'd', 'd', 'd', 'd'],
-                         algorithms.native_align('abcde', ''))
+                         string.native_align('abcde', ''))
 
     def test_matches(self):
         """
         Test the edit steps when only matches are needed.
         """
         self.assertEqual(['m', 'm', 'm', 'm', 'm'],
-                         algorithms.native_align('abcde', 'abcde'))
+                         string.native_align('abcde', 'abcde'))
 
     def test_matches_1(self):  # TODO
         """
         Test the edit steps when only substitutions are needed.
         """
         self.assertEqual(['s', 's', 's', 's', 's'],
-                         algorithms.native_align('abcde', 'vwxyz'))
+                         string.native_align('abcde', 'vwxyz'))
 
     def test_wikipedia_example_1(self):
         """
@@ -328,7 +328,7 @@ class AlignmentTests(unittest.TestCase):
         http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm
         """
         self.assertEqual(['s', 'm', 'm', 'm', 's', 'm', 'd'],
-                         algorithms.native_align('sitting', 'kitten'))
+                         string.native_align('sitting', 'kitten'))
 
     def test_wikipedia_example_2(self):
         """
@@ -336,7 +336,7 @@ class AlignmentTests(unittest.TestCase):
         http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm
         """
         self.assertEqual(['m', 'i', 'i', 'm', 's', 'm', 'm', 'm'],
-                         algorithms.native_align('sunday', 'saturday'))
+                         string.native_align('sunday', 'saturday'))
 
 
 class SemiGlobalAlignmentTests(unittest.TestCase):
@@ -350,13 +350,13 @@ class SemiGlobalAlignmentTests(unittest.TestCase):
         Test that an exception is thrown if the first sequence is > the second.
         """
         self.assertRaises(NidabaAlgorithmException,
-                          algorithms.native_semi_global_align, 'abcdefghi', '')
+                          string.native_semi_global_align, 'abcdefghi', '')
         self.assertRaises(NidabaAlgorithmException,
-                          algorithms.native_semi_global_align, 'a', '')
+                          string.native_semi_global_align, 'a', '')
         self.assertRaises(NidabaAlgorithmException,
-                          algorithms.native_semi_global_align, ['word'], [])
+                          string.native_semi_global_align, ['word'], [])
         self.assertRaises(NidabaAlgorithmException,
-                          algorithms.native_semi_global_align, ['word1',
+                          string.native_semi_global_align, ['word1',
                                                                 'word2',
                                                                 'word3'],
                           ['word'])
@@ -367,9 +367,9 @@ class SemiGlobalAlignmentTests(unittest.TestCase):
         """
         expected = ['m']
         self.assertEqual(
-            expected, algorithms.native_semi_global_align('a', 'a'))
+            expected, string.native_semi_global_align('a', 'a'))
         self.assertEqual(
-            expected, algorithms.native_semi_global_align(['a'], ['a']))
+            expected, string.native_semi_global_align(['a'], ['a']))
 
     def test_identical_long(self):
         """
@@ -377,14 +377,14 @@ class SemiGlobalAlignmentTests(unittest.TestCase):
         """
         expected = ['m', 'm', 'm', 'm', 'm']
         self.assertEqual(
-            expected, algorithms.native_semi_global_align('abcde', 'abcde'))
+            expected, string.native_semi_global_align('abcde', 'abcde'))
 
     def test_identical_words(self):
         """
         Test with a series of of matching words.
         """
         expected = ['m', 'm', 'm', 'm', 'm']
-        self.assertEqual(expected, algorithms.native_semi_global_align(
+        self.assertEqual(expected, string.native_semi_global_align(
             ['word1', 'word2', 'word3', 'word4', 'word5'], ['word1', 'word2',
                                                             'word3', 'word4',
                                                             'word5']))
@@ -395,7 +395,7 @@ class SemiGlobalAlignmentTests(unittest.TestCase):
         """
         expected = ['i', 'i', 'i', 'i', 'm']
         self.assertEqual(
-            expected, algorithms.native_semi_global_align('b', 'aaaab'))
+            expected, string.native_semi_global_align('b', 'aaaab'))
 
     def test_prefix_with_trailer(self):
         """
@@ -403,14 +403,14 @@ class SemiGlobalAlignmentTests(unittest.TestCase):
         """
         expected = ['i', 'i', 'i', 'i', 'm']
         self.assertEqual(
-            expected, algorithms.native_semi_global_align('b', 'aaaabcccc'))
+            expected, string.native_semi_global_align('b', 'aaaabcccc'))
 
     def test_word_prefix(self):
         """
         Test a list of words with a prefix.
         """
         expected = ['i', 'i', 'm']
-        self.assertEqual(expected, algorithms.native_semi_global_align(
+        self.assertEqual(expected, string.native_semi_global_align(
             ['match'], ['w1', 'w2', 'match']))
 
 
@@ -428,21 +428,21 @@ class NumpyLevenshteinTests(unittest.TestCase):
         """
         Test the edit distance of identical strings
         """
-        self.assertEqual(0, algorithms.np_full_edit_distance(
+        self.assertEqual(0, string.np_full_edit_distance(
             'test_string', 'test_string')[0][-1, -1])
 
     def test_single_insert(self):
         """
         Test with strings requiring one insert
         """
-        self.assertEqual(1, algorithms.np_full_edit_distance('', 'a')[0][-1,
+        self.assertEqual(1, string.np_full_edit_distance('', 'a')[0][-1,
                                                                          -1])
 
     def test_tenfold_insert(self):
         """
         Test with strings requiring ten inserts
         """
-        self.assertEqual(10, algorithms.np_full_edit_distance(
+        self.assertEqual(10, string.np_full_edit_distance(
             '', 'aaaaaaaaaa')[0][-1, -1])  # A string with 10 a's.
 
     def test_single_delete(self):
@@ -450,20 +450,20 @@ class NumpyLevenshteinTests(unittest.TestCase):
         Test with strings requiring one delete
         """
         self.assertEqual(
-            1, algorithms.np_full_edit_distance('a', '')[0][-1, -1])
+            1, string.np_full_edit_distance('a', '')[0][-1, -1])
 
     def test_tenfold_delete(self):
         """
         Test with strings requiring ten deletes
         """
-        self.assertEqual(10, algorithms.np_full_edit_distance(
+        self.assertEqual(10, string.np_full_edit_distance(
             'aaaaaaaaaa', '')[0][-1, -1])  # A string with 10 a's.
 
     def test_singledelete_singleadd(self):
         """
         Test with strings requiring a single non-trivial insert.
         """
-        self.assertEqual(2, algorithms.np_full_edit_distance('abbb',
+        self.assertEqual(2, string.np_full_edit_distance('abbb',
                                                              'bbbbb')[0][-1,
                                                                          -1])
 
@@ -471,7 +471,7 @@ class NumpyLevenshteinTests(unittest.TestCase):
         """
         Test with strings requiring a single non-trivial delete.
         """
-        self.assertEqual(2, algorithms.np_full_edit_distance('bbbbb',
+        self.assertEqual(2, string.np_full_edit_distance('bbbbb',
                                                              'abbb')[0][-1,
                                                                         -1])
     # -------------------------------------------------------------------
@@ -485,7 +485,7 @@ class NumpyLevenshteinTests(unittest.TestCase):
         """
         expected = numpy.array([[0, 1, 2], [1, 0, 1]])
         self.assertTrue(numpy.array_equal(expected,
-                                          algorithms.np_full_edit_distance('a',
+                                          string.np_full_edit_distance('a',
                                                                            'ab')[0]))
 
     def test_match_insert_matrix(self):
@@ -494,7 +494,7 @@ class NumpyLevenshteinTests(unittest.TestCase):
         """
         expected = numpy.array([[0, 1], [1, 0], [2, 1]])
         self.assertTrue(numpy.array_equal(expected,
-                                          algorithms.np_full_edit_distance('ab',
+                                          string.np_full_edit_distance('ab',
                                                                            'a')[0]))
 
     def test_all_match_matrix(self):
@@ -509,7 +509,7 @@ class NumpyLevenshteinTests(unittest.TestCase):
                                 [4, 3, 2, 1, 0, 1],
                                 [5, 4, 3, 2, 1, 0]])
         self.assertTrue(numpy.array_equal(
-            expected, algorithms.np_full_edit_distance('aaaaa', 'aaaaa')[0]))
+            expected, string.np_full_edit_distance('aaaaa', 'aaaaa')[0]))
 
     def test_all_subtitute_matrix(self):
         """
@@ -523,7 +523,7 @@ class NumpyLevenshteinTests(unittest.TestCase):
                                 [4, 4, 4, 4, 4, 5],
                                 [5, 5, 5, 5, 5, 5]])
         self.assertTrue(numpy.array_equal(expected,
-                                          algorithms.np_full_edit_distance('aaaaa',
+                                          string.np_full_edit_distance('aaaaa',
                                                                            'bbbbb')[0]))
 
     def test_all_insert(self):
@@ -533,7 +533,7 @@ class NumpyLevenshteinTests(unittest.TestCase):
         """
         expected = numpy.array([[0, 1, 2, 3, 4, 5]])
         self.assertTrue(numpy.array_equal(expected,
-                                          algorithms.np_full_edit_distance('',
+                                          string.np_full_edit_distance('',
                                                                            'abcde')[0]))
 
     def test_all_delete(self):
@@ -547,7 +547,7 @@ class NumpyLevenshteinTests(unittest.TestCase):
                                 [4],
                                 [5]])
         self.assertTrue(numpy.array_equal(expected,
-                                          algorithms.np_full_edit_distance('abcde',
+                                          string.np_full_edit_distance('abcde',
                                                                            '')[0]))
 
     def test_all_empty(self):
@@ -556,7 +556,7 @@ class NumpyLevenshteinTests(unittest.TestCase):
         """
         expected = numpy.zeros(shape=(1, 1))
         self.assertTrue(numpy.array_equal(expected,
-                                          algorithms.np_full_edit_distance('',
+                                          string.np_full_edit_distance('',
                                                                            '')[0]))
     # -------------------------------------------------------------------
     # Parameter tests ---------------------------------------------------
@@ -566,12 +566,12 @@ class NumpyLevenshteinTests(unittest.TestCase):
         """
         Test the functionality of the substitution score parameter.
         """
-        default = algorithms.np_full_edit_distance('a', 'b')[0][-1, -1]
-        same_as_default = algorithms.np_full_edit_distance(
+        default = string.np_full_edit_distance('a', 'b')[0][-1, -1]
+        same_as_default = string.np_full_edit_distance(
             'a', 'b', substitutionscore=1)[0][-1, -1]
-        with_parameter = algorithms.np_full_edit_distance(
+        with_parameter = string.np_full_edit_distance(
             'a', 'b', substitutionscore=-7)[0][-1, -1]
-        with_parameter_and_max = algorithms.np_full_edit_distance(
+        with_parameter_and_max = string.np_full_edit_distance(
             'a', 'b', substitutionscore=7)[0][-1, -1]
         self.assertEqual(1, default)
         self.assertEqual(1, same_as_default)
@@ -581,10 +581,10 @@ class NumpyLevenshteinTests(unittest.TestCase):
         """
         Test the functionality of the delete score parameter.
         """
-        default = algorithms.np_full_edit_distance('a', '')[0][-1, -1]
-        same_as_default = algorithms.np_full_edit_distance(
+        default = string.np_full_edit_distance('a', '')[0][-1, -1]
+        same_as_default = string.np_full_edit_distance(
             'a', '', deletescore=1)[0][-1, -1]
-        with_parameter = algorithms.np_full_edit_distance(
+        with_parameter = string.np_full_edit_distance(
             'a', '', deletescore=-7)[0][-1, -1]
 
         self.assertEqual(1, default)
@@ -595,10 +595,10 @@ class NumpyLevenshteinTests(unittest.TestCase):
         """
         Test the functionality of the insert score parameter.
         """
-        default = algorithms.np_full_edit_distance('', 'a')[0][-1, -1]
-        same_as_default = algorithms.np_full_edit_distance(
+        default = string.np_full_edit_distance('', 'a')[0][-1, -1]
+        same_as_default = string.np_full_edit_distance(
             '', 'a', insertscore=1)[0][-1, -1]
-        with_parameter = algorithms.np_full_edit_distance(
+        with_parameter = string.np_full_edit_distance(
             '', 'a', insertscore=-7)[0][-1, -1]
 
         self.assertEqual(1, default)
@@ -614,7 +614,7 @@ class NumpyLevenshteinTests(unittest.TestCase):
         expected = numpy.array([[0, 1],
                                 [1, 0]])
         self.assertTrue(numpy.array_equal(expected,
-                                          algorithms.np_full_edit_distance('a',
+                                          string.np_full_edit_distance('a',
                                                                            'b',
                                                                            charmatrix=charmatrix)[0]))
 
@@ -627,7 +627,7 @@ class NumpyLevenshteinTests(unittest.TestCase):
         expected = numpy.array([[0, 1],
                                 [1, 5]])
         self.assertTrue(numpy.array_equal(expected,
-                                          algorithms.np_full_edit_distance('a',
+                                          string.np_full_edit_distance('a',
                                                                            'b',
                                                                            charmatrix=charmatrix)[0]))
 
@@ -640,7 +640,7 @@ class NumpyLevenshteinTests(unittest.TestCase):
         expected = numpy.array([[0, 1],
                                 [1, 1]])
         self.assertTrue(numpy.array_equal(expected,
-                                          algorithms.np_full_edit_distance('a',
+                                          string.np_full_edit_distance('a',
                                                                            'b',
                                                                            charmatrix=charmatrix)[0]))
 
@@ -655,7 +655,7 @@ class NumpyLevenshteinTests(unittest.TestCase):
                                 [10],
                                 [15]])
         self.assertTrue(numpy.array_equal(expected,
-                                          algorithms.np_full_edit_distance('aaa',
+                                          string.np_full_edit_distance('aaa',
                                                                            '',
                                                                            charmatrix=charmatrix)[0]))
 
@@ -667,7 +667,7 @@ class NumpyLevenshteinTests(unittest.TestCase):
         charmatrix = {('a', ''): 5}
         expected = numpy.array([[0, 5, 10, 15]])
         self.assertTrue(numpy.array_equal(expected,
-                                          algorithms.np_full_edit_distance('',
+                                          string.np_full_edit_distance('',
                                                                            'aaa',
                                                                            charmatrix=charmatrix)[0]))
     # -------------------------------------------------------------------
@@ -675,27 +675,27 @@ class NumpyLevenshteinTests(unittest.TestCase):
     # -------------------------------------------------------------------
 
     def test_identical_word(self):
-        self.assertEqual(0, algorithms.np_full_edit_distance(['word'],
+        self.assertEqual(0, string.np_full_edit_distance(['word'],
                                                              ['word'])[0][-1,
                                                                           -1])
 
     def test_word_substitution(self):
-        self.assertEqual(1, algorithms.np_full_edit_distance(['word'],
+        self.assertEqual(1, string.np_full_edit_distance(['word'],
                                                              ['different\
                                                               word'])[0][-1,
                                                                          -1])
 
     def test_word_insertion(self):
-        self.assertEqual(1, algorithms.np_full_edit_distance([],
+        self.assertEqual(1, string.np_full_edit_distance([],
                                                              ['word'])[0][-1,
                                                                           -1])
 
     def test_word_deletion(self):
-        self.assertEqual(1, algorithms.np_full_edit_distance(['word'],
+        self.assertEqual(1, string.np_full_edit_distance(['word'],
                                                              [])[0][-1, -1])
 
     def test_word_multi_insert(self):
-        self.assertEqual(5, algorithms.np_full_edit_distance([], ['word',
+        self.assertEqual(5, string.np_full_edit_distance([], ['word',
                                                                   'word',
                                                                   'word',
                                                                   'word',
@@ -703,15 +703,15 @@ class NumpyLevenshteinTests(unittest.TestCase):
                                                                               -1])
 
     def test_word_multi_delete(self):
-        self.assertEqual(5, algorithms.np_full_edit_distance(
+        self.assertEqual(5, string.np_full_edit_distance(
             ['word', 'word', 'word', 'word', 'word'], [])[0][-1, -1])
 
     def test_word_multi_match(self):
-        self.assertEqual(0, algorithms.np_full_edit_distance(
+        self.assertEqual(0, string.np_full_edit_distance(
             ['word1', 'word2', 'word3'], ['word1', 'word2', 'word3'])[0][-1, -1])
 
     def test_word_multi_substitute(self):
-        self.assertEqual(3, algorithms.np_full_edit_distance(
+        self.assertEqual(3, string.np_full_edit_distance(
             ['word1', 'word2', 'word3'], ['otherword1', 'otherword2', 'otherword3'])[0][-1, -1])
 
 
@@ -721,35 +721,35 @@ class NumpyAlignmentTests(unittest.TestCase):
         """
         Tests the edit steps between two empty strings.
         """
-        self.assertEqual([], algorithms.np_align('', ''))
+        self.assertEqual([], string.np_align('', ''))
 
     def test_insertions(self):
         """
         Test the edit steps when only inserts are needed.
         """
         self.assertEqual(['i', 'i', 'i', 'i', 'i'],
-                         algorithms.np_align('', 'abcde'))
+                         string.np_align('', 'abcde'))
 
     def test_deletions(self):
         """
         Test the edit steps when only deletes are needed.
         """
         self.assertEqual(['d', 'd', 'd', 'd', 'd'],
-                         algorithms.np_align('abcde', ''))
+                         string.np_align('abcde', ''))
 
     def test_matches(self):
         """
         Test the edit steps when only matches are needed.
         """
         self.assertEqual(['m', 'm', 'm', 'm', 'm'],
-                         algorithms.np_align('abcde', 'abcde'))
+                         string.np_align('abcde', 'abcde'))
 
     def test_matches_1(self):  # TODO
         """
         Test the edit steps when only substitutions are needed.
         """
         self.assertEqual(['s', 's', 's', 's', 's'],
-                         algorithms.np_align('abcde', 'vwxyz'))
+                         string.np_align('abcde', 'vwxyz'))
 
     def test_wikipedia_example_1(self):
         """
@@ -757,7 +757,7 @@ class NumpyAlignmentTests(unittest.TestCase):
         http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm
         """
         self.assertEqual(['s', 'm', 'm', 'm', 's', 'm', 'd'],
-                         algorithms.np_align('sitting', 'kitten'))
+                         string.np_align('sitting', 'kitten'))
 
     def test_wikipedia_example_2(self):
         """
@@ -765,7 +765,7 @@ class NumpyAlignmentTests(unittest.TestCase):
         http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm
         """
         self.assertEqual(['m', 'i', 'i', 'm', 's', 'm', 'm', 'm'],
-                         algorithms.np_align('sunday', 'saturday'))
+                         string.np_align('sunday', 'saturday'))
     # -------------------------------------------------------------------
     # Word Alignment Tests ----------------------------------------------
     # -------------------------------------------------------------------
@@ -774,27 +774,27 @@ class NumpyAlignmentTests(unittest.TestCase):
         """
         Tests the edit steps between two empty lists.
         """
-        self.assertEqual([], algorithms.np_align([], []))
+        self.assertEqual([], string.np_align([], []))
 
     def test_word_insertions(self):
         """
         Test the edit steps when only inserts are needed.
         """
-        self.assertEqual(['i', 'i', 'i', 'i', 'i'], algorithms.np_align(
+        self.assertEqual(['i', 'i', 'i', 'i', 'i'], string.np_align(
             [], ['word1', 'word2', 'word3', 'word4', 'word5']))
 
     def test_word_deletions(self):
         """
         Test the edit steps when only inserts are needed.
         """
-        self.assertEqual(['d', 'd', 'd', 'd', 'd'], algorithms.np_align(
+        self.assertEqual(['d', 'd', 'd', 'd', 'd'], string.np_align(
             ['word1', 'word2', 'word3', 'word4', 'word5'], []))
 
     def test_word_matches(self):
         """
         Test the edit steps when only matches are needed.
         """
-        self.assertEqual(['m', 'm', 'm', 'm', 'm'], algorithms.np_align(
+        self.assertEqual(['m', 'm', 'm', 'm', 'm'], string.np_align(
             ['word1', 'word2', 'word3', 'word4', 'word5'], ['word1', 'word2', 'word3', 'word4', 'word5']))
 
 
@@ -809,13 +809,13 @@ class NumpySemiGlobalAlignmentTests(unittest.TestCase):
         Test that an exception is thrown if the first sequence is > the second.
         """
         self.assertRaises(NidabaAlgorithmException,
-                          algorithms.np_semi_global_align, 'abcdefghi', '')
+                          string.np_semi_global_align, 'abcdefghi', '')
         self.assertRaises(NidabaAlgorithmException,
-                          algorithms.np_semi_global_align, 'a', '')
+                          string.np_semi_global_align, 'a', '')
         self.assertRaises(NidabaAlgorithmException,
-                          algorithms.np_semi_global_align, ['word'], [])
+                          string.np_semi_global_align, ['word'], [])
         self.assertRaises(NidabaAlgorithmException,
-                          algorithms.np_semi_global_align, ['word1', 'word2',
+                          string.np_semi_global_align, ['word1', 'word2',
                                                             'word3'], ['word'])
 
     def test_identical(self):
@@ -823,8 +823,8 @@ class NumpySemiGlobalAlignmentTests(unittest.TestCase):
         Test with strings and lists of equal length.
         """
         expected = ['m']
-        self.assertEqual(expected, algorithms.np_semi_global_align('a', 'a'))
-        self.assertEqual(expected, algorithms.np_semi_global_align(['a'],
+        self.assertEqual(expected, string.np_semi_global_align('a', 'a'))
+        self.assertEqual(expected, string.np_semi_global_align(['a'],
                                                                    ['a']))
 
     def test_identical_long(self):
@@ -832,7 +832,7 @@ class NumpySemiGlobalAlignmentTests(unittest.TestCase):
         Test with a longer series of matches.
         """
         expected = ['m', 'm', 'm', 'm', 'm']
-        self.assertEqual(expected, algorithms.np_semi_global_align('abcde',
+        self.assertEqual(expected, string.np_semi_global_align('abcde',
                                                                    'abcde'))
 
     def test_identical_words(self):
@@ -840,7 +840,7 @@ class NumpySemiGlobalAlignmentTests(unittest.TestCase):
         Test with a series of of matching words.
         """
         expected = ['m', 'm', 'm', 'm', 'm']
-        self.assertEqual(expected, algorithms.np_semi_global_align(['word1',
+        self.assertEqual(expected, string.np_semi_global_align(['word1',
                                                                     'word2',
                                                                     'word3',
                                                                     'word4',
@@ -856,7 +856,7 @@ class NumpySemiGlobalAlignmentTests(unittest.TestCase):
         Test with a single match and a skippable prefix.
         """
         expected = ['i', 'i', 'i', 'i', 'm']
-        self.assertEqual(expected, algorithms.np_semi_global_align('b',
+        self.assertEqual(expected, string.np_semi_global_align('b',
                                                                    'aaaab'))
 
     def test_prefix_with_trailer(self):
@@ -864,7 +864,7 @@ class NumpySemiGlobalAlignmentTests(unittest.TestCase):
         Test with a single match and a skippable prefix and trailer.
         """
         expected = ['i', 'i', 'i', 'i', 'm']
-        self.assertEqual(expected, algorithms.np_semi_global_align('b',
+        self.assertEqual(expected, string.np_semi_global_align('b',
                                                                    'aaaabcccc'))
 
     def test_word_prefix(self):
@@ -872,7 +872,7 @@ class NumpySemiGlobalAlignmentTests(unittest.TestCase):
         Test a list of words with a prefix.
         """
         expected = ['i', 'i', 'm']
-        self.assertEqual(expected, algorithms.np_semi_global_align(['match'],
+        self.assertEqual(expected, string.np_semi_global_align(['match'],
                                                                    ['w1', 'w2',
                                                                     'match']))
 
@@ -889,7 +889,7 @@ class LanguageTests(unittest.TestCase):
         is passed in.
         """
 
-        @algorithms.unibarrier
+        @string.unibarrier
         def dummyfunction(*args, **kwargs):
             pass
 
@@ -911,7 +911,7 @@ class LanguageTests(unittest.TestCase):
         is passed in.
         """
 
-        @algorithms.unibarrier
+        @string.unibarrier
         def dummyfunction(*args, **kwargs):
             pass
 
@@ -933,7 +933,7 @@ class LanguageTests(unittest.TestCase):
         exception to be raised.
         """
 
-        @algorithms.unibarrier
+        @string.unibarrier
         def dummyfunction(*args, **kwargs):
             pass
 
@@ -956,17 +956,17 @@ class LanguageTests(unittest.TestCase):
         asciistr = (u"""!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUV"""
                     """WXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~""")
         for c in asciistr:
-            self.assertTrue(algorithms.inblock(c, ('!', '~')))
+            self.assertTrue(string.inblock(c, ('!', '~')))
 
-        self.assertFalse(algorithms.inblock(unichr(ord('!') - 1), ('!', '~')))
-        self.assertFalse(algorithms.inblock(unichr(ord('~') + 1), ('!', '~')))
+        self.assertFalse(string.inblock(unichr(ord('!') - 1), ('!', '~')))
+        self.assertFalse(string.inblock(unichr(ord('~') + 1), ('!', '~')))
 
     def test_identify_all_ascii_simple(self):
         """
         Test the text identify method against the ascii unicode block.
         """
         asciistr = (u'ascii', unichr(0), unichr(127))
-        ex1 = algorithms.identify(u'this is a string of ascii', [asciistr])
+        ex1 = string.identify(u'this is a string of ascii', [asciistr])
         self.assertEqual(ex1, {u'ascii': 25})
 
     def test_identify_all_ascii(self):
@@ -977,7 +977,7 @@ class LanguageTests(unittest.TestCase):
 
         for i in xrange(0, 128):
             self.assertEqual(
-                {u'ascii': 1}, algorithms.identify(unichr(i), [asciistr]))
+                {u'ascii': 1}, string.identify(unichr(i), [asciistr]))
 
     def test_identify_greek_and_latin(self):
         """
@@ -987,18 +987,18 @@ class LanguageTests(unittest.TestCase):
         greek = (u'Greek Coptic', u'\u0370', u'\u03FF')
 
         self.assertEqual({greek[0]: len(u'Σωκράτης')},
-                         algorithms.identify(u'Σωκράτης', [greek]))
+                         string.identify(u'Σωκράτης', [greek]))
         self.assertEqual({greek[0]: len(u'Πλάτων')},
-                         algorithms.identify(u'Πλάτων', [greek]))
+                         string.identify(u'Πλάτων', [greek]))
 
     def test_is_lang_threshhold_check(self):
         """
         Test that an exception is raised if an invalid threshold value
         is entered.
         """
-        self.assertRaises(Exception, algorithms.islang, None, None, -0.00001)
-        self.assertRaises(Exception, algorithms.islang, None, None, 1.00001)
-        self.assertRaises(Exception, algorithms.islang, None, None, 0.0)
+        self.assertRaises(Exception, string.islang, None, None, -0.00001)
+        self.assertRaises(Exception, string.islang, None, None, 1.00001)
+        self.assertRaises(Exception, string.islang, None, None, 0.0)
 
     def test_is_lang_100percent_ascii(self):
         """
@@ -1006,7 +1006,7 @@ class LanguageTests(unittest.TestCase):
         """
         asciistr = (u"""!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUV
                      WXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~""")
-        self.assertTrue(algorithms.islang(asciistr, [algorithms.ascii_range]))
+        self.assertTrue(string.islang(asciistr, [string.ascii_range]))
 
     def test_is_lang_100percent_greek(self):
         """
@@ -1016,27 +1016,27 @@ class LanguageTests(unittest.TestCase):
         gk1 = u'Σωκράτης'
         gk2 = u'Πλάτων'
         self.assertTrue(
-            algorithms.islang(gk1, [algorithms.greek_coptic_range]))
+            string.islang(gk1, [string.greek_coptic_range]))
         self.assertTrue(
-            algorithms.islang(gk2, [algorithms.greek_coptic_range]))
+            string.islang(gk2, [string.greek_coptic_range]))
 
     def test_is_lang_50percent_greekascii(self):
         """
         Test with a string that is half ascii and half Greek and Coptic.
         """
         halfandhalf = u'Πλάτων_ascii'
-        self.assertTrue(algorithms.islang(halfandhalf,
-                                          [algorithms.ascii_range],
+        self.assertTrue(string.islang(halfandhalf,
+                                          [string.ascii_range],
                                           threshold=0.5))
-        self.assertTrue(algorithms.islang(halfandhalf,
-                                          [algorithms.greek_coptic_range],
+        self.assertTrue(string.islang(halfandhalf,
+                                          [string.greek_coptic_range],
                                           threshold=0.5))
 
-        self.assertFalse(algorithms.islang(halfandhalf,
-                                           [algorithms.greek_coptic_range],
+        self.assertFalse(string.islang(halfandhalf,
+                                           [string.greek_coptic_range],
                                            threshold=0.5000001))
-        self.assertFalse(algorithms.islang(halfandhalf,
-                                           [algorithms.greek_coptic_range],
+        self.assertFalse(string.islang(halfandhalf,
+                                           [string.greek_coptic_range],
                                            threshold=0.5000001))
 
     def test_isgreek(self):
@@ -1045,15 +1045,15 @@ class LanguageTests(unittest.TestCase):
         """
         gk1 = u'Σωκράτης'
         gk2 = u'Πλάτων'
-        self.assertTrue(algorithms.isgreek(gk1))
-        self.assertTrue(algorithms.isgreek(gk2))
+        self.assertTrue(string.isgreek(gk1))
+        self.assertTrue(string.isgreek(gk2))
 
     def test_sanitize_strip(self):
         """
         Test that sanitize correctly strips leading and trailing whitespace.
         """
         s = u'\n\t abcde \n\t fghij \n\t'
-        self.assertEqual(u'abcde \n\t fghij', algorithms.sanitize(s))
+        self.assertEqual(u'abcde \n\t fghij', string.sanitize(s))
 
     def test_sanitize_NFD_decompose(self):
         """
@@ -1061,30 +1061,30 @@ class LanguageTests(unittest.TestCase):
         """
         # Small alpha with a tone mark
         alpha = u'\u03AC'
-        self.assertNotEqual(alpha, algorithms.sanitize(alpha))
-        self.assertEqual(u'\u03B1' + u'\u0301', algorithms.sanitize(alpha))
+        self.assertNotEqual(alpha, string.sanitize(alpha))
+        self.assertEqual(u'\u03B1' + u'\u0301', string.sanitize(alpha))
 
         # Greek small letter upsilon with dialytika and tonos
         upsilon = u'\u03B0'
-        self.assertNotEqual(upsilon, algorithms.sanitize(upsilon))
+        self.assertNotEqual(upsilon, string.sanitize(upsilon))
         self.assertEqual(u'\u03C5' + u'\u0308' + u'\u0301',
-                         algorithms.sanitize(upsilon))
+                         string.sanitize(upsilon))
 
     def test_sanitize_NFC(self):
         """
         Test that sanitize correctly converts to NFC codepoints.
         """
         decomp_alpha = u'\u03B1' + u'\u0301'
-        self.assertNotEqual(decomp_alpha, algorithms.sanitize(decomp_alpha,
+        self.assertNotEqual(decomp_alpha, string.sanitize(decomp_alpha,
                                                               normalization=u'NFC'))
-        self.assertEqual(u'\u03AC', algorithms.sanitize(decomp_alpha,
+        self.assertEqual(u'\u03AC', string.sanitize(decomp_alpha,
                                                         normalization=u'NFC'))
 
         decomp_upsilon = u'\u03C5' + u'\u0308' + u'\u0301'
-        self.assertNotEqual(decomp_upsilon, algorithms.sanitize(decomp_upsilon,
+        self.assertNotEqual(decomp_upsilon, string.sanitize(decomp_upsilon,
                                                                 normalization=u'NFC'))
         self.assertEqual(
-            u'\u03B0', algorithms.sanitize(decomp_upsilon, normalization=u'NFC'))
+            u'\u03B0', string.sanitize(decomp_upsilon, normalization=u'NFC'))
 
     def test_sanitize_decode(self):
         """
@@ -1094,21 +1094,21 @@ class LanguageTests(unittest.TestCase):
         utf16 = u'I contain a non-ascii character: \u03B1'.encode(u'utf-16')
         utf32 = u'I contain a non-ascii character: \u03B1'.encode(u'utf-32')
         expected = u'I contain a non-ascii character: \u03B1'
-        self.assertEqual(expected, algorithms.sanitize(utf8))
+        self.assertEqual(expected, string.sanitize(utf8))
         self.assertEqual(
-            expected, algorithms.sanitize(utf16, encoding=u'utf-16'))
+            expected, string.sanitize(utf16, encoding=u'utf-16'))
         self.assertEqual(
-            expected, algorithms.sanitize(utf32, encoding=u'utf-32'))
+            expected, string.sanitize(utf32, encoding=u'utf-32'))
 
     def test_diacritic_strip_combining(self):
         """
         Tests the strip_diacritic fuction on the combining diacritics
         unicode block.
         """
-        cd = algorithms.combining_diacritical_mark_range
-        diacritics = algorithms.uniblock(cd[1], cd[2])
+        cd = string.combining_diacritical_mark_range
+        diacritics = string.uniblock(cd[1], cd[2])
         self.assertNotEqual(len(diacritics), 0)
-        self.assertEqual(u'', algorithms.strip_diacritics(diacritics))
+        self.assertEqual(u'', string.strip_diacritics(diacritics))
 
     def test_diacritic_strip_noncombining(self):
         """
@@ -1119,7 +1119,7 @@ class LanguageTests(unittest.TestCase):
         gx_diacritics = u'᾽ι᾿῀῁῍῎῏῝῟῞῭΅`´῾'
         diacritics = gc_diacritics + gx_diacritics
         self.assertNotEqual(len(diacritics), 0)
-        self.assertEqual(u'', algorithms.strip_diacritics(diacritics))
+        self.assertEqual(u'', string.strip_diacritics(diacritics))
 
 # ----------------------------------------------------------------------
 # Symmetric spell check tests ------------------------------------------
@@ -1133,21 +1133,21 @@ class SymSpellTests(unittest.TestCase):
         Test the strings_by_deletion function with one delete.
         """
         expected = [u'abcd', u'abce', u'abde', u'acde', u'bcde']
-        self.assertEqual(expected, algorithms.strings_by_deletion(u'abcde', 1))
+        self.assertEqual(expected, string.strings_by_deletion(u'abcde', 1))
 
     def test_strings_by_deletion_2(self):
         """
         Test the strings_by_deletion function with two deletes.
         """
         expected = [u'a', u'e', u'p']
-        self.assertEqual(expected, algorithms.strings_by_deletion(u'ape', 2))
+        self.assertEqual(expected, string.strings_by_deletion(u'ape', 2))
 
     def test_strings_bzy_deletion_exceed(self):
         """
         Test the strings_by_deletion function where the number of
         deletes exceeds characters in the string.
         """
-        self.assertEqual([], algorithms.strings_by_deletion(u'aaa', 10))
+        self.assertEqual([], string.strings_by_deletion(u'aaa', 10))
 
     def test_sym_suggest_already_word(self):
         """
@@ -1162,9 +1162,9 @@ class SymSpellTests(unittest.TestCase):
         #        u'tree':[u'ree', u'tee', u'tre']}
 
         self.assertEqual(
-            [u'word'], algorithms.sym_suggest(u'word', dic, delete_dic, 1))
+            [u'word'], string.sym_suggest(u'word', dic, delete_dic, 1))
         self.assertEqual(
-            [u'tree'], algorithms.sym_suggest(u'tree', dic, delete_dic, 1))
+            [u'tree'], string.sym_suggest(u'tree', dic, delete_dic, 1))
 
     def test_sym_suggest_single_delete(self):
         """
@@ -1177,13 +1177,13 @@ class SymSpellTests(unittest.TestCase):
         dic = {u'tree', u'word'}
 
         self.assertEqual(
-            [u'word'], algorithms.sym_suggest(u'ord', dic, delete_dic, 1))
+            [u'word'], string.sym_suggest(u'ord', dic, delete_dic, 1))
         self.assertEqual(
-            [u'word'], algorithms.sym_suggest(u'wod', dic, delete_dic, 1))
+            [u'word'], string.sym_suggest(u'wod', dic, delete_dic, 1))
         self.assertEqual(
-            [u'word'], algorithms.sym_suggest(u'wor', dic, delete_dic, 1))
+            [u'word'], string.sym_suggest(u'wor', dic, delete_dic, 1))
         self.assertEqual(
-            [u'word'], algorithms.sym_suggest(u'wrd', dic, delete_dic, 1))
+            [u'word'], string.sym_suggest(u'wrd', dic, delete_dic, 1))
 
     def test_sym_suggest_single_insert(self):
         """
@@ -1196,17 +1196,17 @@ class SymSpellTests(unittest.TestCase):
         dic = {u'tree', u'word'}
 
         self.assertEqual(
-            [u'word'], algorithms.sym_suggest(u'Xword', dic, delete_dic, 1))
+            [u'word'], string.sym_suggest(u'Xword', dic, delete_dic, 1))
         self.assertEqual(
-            [u'word'], algorithms.sym_suggest(u'wXord', dic, delete_dic, 1))
+            [u'word'], string.sym_suggest(u'wXord', dic, delete_dic, 1))
         self.assertEqual(
-            [u'word'], algorithms.sym_suggest(u'woXrd', dic, delete_dic, 1))
+            [u'word'], string.sym_suggest(u'woXrd', dic, delete_dic, 1))
         self.assertEqual(
-            [u'word'], algorithms.sym_suggest(u'worXd', dic, delete_dic, 1))
+            [u'word'], string.sym_suggest(u'worXd', dic, delete_dic, 1))
         self.assertEqual(
-            [u'word'], algorithms.sym_suggest(u'wordX', dic, delete_dic, 1))
+            [u'word'], string.sym_suggest(u'wordX', dic, delete_dic, 1))
         self.assertEqual(
-            [u'tree'], algorithms.sym_suggest(u'Xtree', dic, delete_dic, 1))
+            [u'tree'], string.sym_suggest(u'Xtree', dic, delete_dic, 1))
 
     def test_sym_suggest_single_substitution(self):
         """
@@ -1217,24 +1217,24 @@ class SymSpellTests(unittest.TestCase):
             u'word'], u'woRd': [u'word'], u'worD': [u'word']}
         dic = {u'word'}
 
-        self.assertEqual([u'word'], algorithms.sym_suggest(u'Word', dic,
+        self.assertEqual([u'word'], string.sym_suggest(u'Word', dic,
                                                            delete_dic, 1))
-        self.assertEqual([u'word'], algorithms.sym_suggest(u'wOrd', dic,
+        self.assertEqual([u'word'], string.sym_suggest(u'wOrd', dic,
                                                            delete_dic, 1))
-        self.assertEqual([u'word'], algorithms.sym_suggest(u'woRd', dic,
+        self.assertEqual([u'word'], string.sym_suggest(u'woRd', dic,
                                                            delete_dic, 1))
-        self.assertEqual([u'word'], algorithms.sym_suggest(u'worD', dic,
+        self.assertEqual([u'word'], string.sym_suggest(u'worD', dic,
                                                            delete_dic, 1))
 
     def test_string_compare(self):
         """
         Test the string comparison function.
         """
-        self.assertEqual(1, algorithms.compare_strings(u'a', u'b'))
-        self.assertEqual(-1, algorithms.compare_strings(u'b', u'a'))
-        self.assertEqual(0, algorithms.compare_strings(u'a', u'a'))
-        self.assertEqual(1, algorithms.compare_strings(u'a', u'aaaaa'))
-        self.assertEqual(-1, algorithms.compare_strings(u'aaaaa', u'a'))
+        self.assertEqual(1, string.compare_strings(u'a', u'b'))
+        self.assertEqual(-1, string.compare_strings(u'b', u'a'))
+        self.assertEqual(0, string.compare_strings(u'a', u'a'))
+        self.assertEqual(1, string.compare_strings(u'a', u'aaaaa'))
+        self.assertEqual(-1, string.compare_strings(u'aaaaa', u'a'))
 
     def test_previous_newline_no_newline(self):
         """
@@ -1246,7 +1246,7 @@ class SymSpellTests(unittest.TestCase):
         df.seek(0, 0)
         with open(os.path.abspath(df.name), 'r+b') as f:
             mm = mmap.mmap(f.fileno(), 0)
-            self.assertEqual(0, algorithms.prev_newline(mm, 50))
+            self.assertEqual(0, string.prev_newline(mm, 50))
         df.close()
 
     def test_previous_newline_single_overflow(self):
@@ -1260,23 +1260,23 @@ class SymSpellTests(unittest.TestCase):
             mm = mmap.mmap(f.fileno(), 0)
             # Test the points to the left of the newline character
             mm.seek(0)
-            self.assertEqual(0, algorithms.prev_newline(mm, 50))
+            self.assertEqual(0, string.prev_newline(mm, 50))
             mm.seek(1)
-            self.assertEqual(0, algorithms.prev_newline(mm, 50))
+            self.assertEqual(0, string.prev_newline(mm, 50))
             mm.seek(2)
-            self.assertEqual(0, algorithms.prev_newline(mm, 50))
+            self.assertEqual(0, string.prev_newline(mm, 50))
             mm.seek(3)
-            self.assertEqual(0, algorithms.prev_newline(mm, 50))
+            self.assertEqual(0, string.prev_newline(mm, 50))
 
             # Test the points to the right of the newline character
             mm.seek(4)
-            self.assertEqual(4, algorithms.prev_newline(mm, 50))
+            self.assertEqual(4, string.prev_newline(mm, 50))
             mm.seek(5)
-            self.assertEqual(4, algorithms.prev_newline(mm, 50))
+            self.assertEqual(4, string.prev_newline(mm, 50))
             mm.seek(6)
-            self.assertEqual(4, algorithms.prev_newline(mm, 50))
+            self.assertEqual(4, string.prev_newline(mm, 50))
             mm.seek(7)
-            self.assertEqual(4, algorithms.prev_newline(mm, 50))
+            self.assertEqual(4, string.prev_newline(mm, 50))
         df.close()
 
     def test_previous_newline_multiple_left(self):
@@ -1290,7 +1290,7 @@ class SymSpellTests(unittest.TestCase):
         with open(os.path.abspath(df.name), 'r+b') as f:
             mm = mmap.mmap(f.fileno(), 0)
             mm.seek(30)
-            self.assertEqual(26, algorithms.prev_newline(mm, 50))
+            self.assertEqual(26, string.prev_newline(mm, 50))
         df.close()
 
     def test_key_for_delete_dict_entry(self):
@@ -1300,9 +1300,9 @@ class SymSpellTests(unittest.TestCase):
         single_entry = u'key\tval1'
         multiple_entries = u'key\tval1 val2 val3'
         self.assertEqual((u'key', u'val1'),
-                         algorithms.key_for_del_dict_entry(single_entry))
+                         string.key_for_del_dict_entry(single_entry))
         self.assertEqual((u'key', u'val1 val2 val3'),
-                         algorithms.key_for_del_dict_entry(multiple_entries))
+                         string.key_for_del_dict_entry(multiple_entries))
 
     def test_key_for_single_word(self):
         """
@@ -1312,11 +1312,11 @@ class SymSpellTests(unittest.TestCase):
         w2 = u'word2'
         w3 = u'word3'
         self.assertEqual(
-            (u'word1', u'word1'), algorithms.key_for_single_word(w1))
+            (u'word1', u'word1'), string.key_for_single_word(w1))
         self.assertEqual(
-            (u'word2', u'word2'), algorithms.key_for_single_word(w2))
+            (u'word2', u'word2'), string.key_for_single_word(w2))
         self.assertEqual(
-            (u'word3', u'word3'), algorithms.key_for_single_word(w3))
+            (u'word3', u'word3'), string.key_for_single_word(w3))
 
     def test_mmap_bin_search_single(self):
         """
@@ -1331,7 +1331,7 @@ class SymSpellTests(unittest.TestCase):
             expected = u'some_value'
             dpath = os.path.abspath(df.name).decode(u'utf-8')
             self.assertEqual(expected,
-                             algorithms.mmap_bin_search(u'only_entry', dpath))
+                             string.mmap_bin_search(u'only_entry', dpath))
 
     def test_mmap_bin_search_double(self):
         """
@@ -1348,9 +1348,9 @@ class SymSpellTests(unittest.TestCase):
             expected_second = u'second_value'
             dpath = os.path.abspath(df.name).decode(u'utf-8')
             self.assertEqual(expected_first,
-                             algorithms.mmap_bin_search(u'first_key', dpath))
+                             string.mmap_bin_search(u'first_key', dpath))
             self.assertEqual(expected_second,
-                             algorithms.mmap_bin_search(u'second_key', dpath))
+                             string.mmap_bin_search(u'second_key', dpath))
 
     def test_mmap_bin_search_general(self):
         """
@@ -1371,13 +1371,13 @@ class SymSpellTests(unittest.TestCase):
         ex_d = u'dval'
         ex_e = u'eval'
         ex_f = u'fval'
-        self.assertEqual(ex_a, algorithms.mmap_bin_search(u'akey', dpath))
-        self.assertEqual(ex_b, algorithms.mmap_bin_search(u'bkey', dpath))
-        self.assertEqual(ex_c, algorithms.mmap_bin_search(u'ckey', dpath))
-        self.assertEqual(ex_d, algorithms.mmap_bin_search(u'dkey', dpath))
-        self.assertEqual(ex_e, algorithms.mmap_bin_search(u'ekey', dpath))
-        self.assertEqual(ex_f, algorithms.mmap_bin_search(u'fkey', dpath))
-        self.assertEqual(None, algorithms.mmap_bin_search(u'gkey', dpath))
+        self.assertEqual(ex_a, string.mmap_bin_search(u'akey', dpath))
+        self.assertEqual(ex_b, string.mmap_bin_search(u'bkey', dpath))
+        self.assertEqual(ex_c, string.mmap_bin_search(u'ckey', dpath))
+        self.assertEqual(ex_d, string.mmap_bin_search(u'dkey', dpath))
+        self.assertEqual(ex_e, string.mmap_bin_search(u'ekey', dpath))
+        self.assertEqual(ex_f, string.mmap_bin_search(u'fkey', dpath))
+        self.assertEqual(None, string.mmap_bin_search(u'gkey', dpath))
 
     def test_mmap_simple_single_word(self):
         """
@@ -1396,17 +1396,17 @@ class SymSpellTests(unittest.TestCase):
         ex_c = u'cval'
         ex_d = u'dval'
         self.assertEqual(ex_a,
-                         algorithms.mmap_bin_search(u'aval', dpath,
-                                                    entryparser_fn=algorithms.key_for_single_word))
+                         string.mmap_bin_search(u'aval', dpath,
+                                                    entryparser_fn=string.key_for_single_word))
         self.assertEqual(ex_b,
-                         algorithms.mmap_bin_search(u'bval', dpath,
-                                                    entryparser_fn=algorithms.key_for_single_word))
+                         string.mmap_bin_search(u'bval', dpath,
+                                                    entryparser_fn=string.key_for_single_word))
         self.assertEqual(ex_c,
-                         algorithms.mmap_bin_search(u'cval', dpath,
-                                                    entryparser_fn=algorithms.key_for_single_word))
+                         string.mmap_bin_search(u'cval', dpath,
+                                                    entryparser_fn=string.key_for_single_word))
         self.assertEqual(ex_d,
-                         algorithms.mmap_bin_search(u'dval', dpath,
-                                                    entryparser_fn=algorithms.key_for_single_word))
+                         string.mmap_bin_search(u'dval', dpath,
+                                                    entryparser_fn=string.key_for_single_word))
 
 
 class SpellCheckTests(unittest.TestCase):
@@ -1433,7 +1433,7 @@ class SpellCheckTests(unittest.TestCase):
         """
         Test the spelling suggestor with an empty input string
         """
-        result = algorithms.mapped_sym_suggest(u'',
+        result = string.mapped_sym_suggest(u'',
                                                self.temp.name.decode('utf-8'),
                                                self.dic, 1)
         self.assertEqual(len(result[u'ins']), 0)
@@ -1445,11 +1445,11 @@ class SpellCheckTests(unittest.TestCase):
         """
         Test the spellchecker in the case of a single insert.
         """
-        result_a = algorithms.mapped_sym_suggest(u'aaaa',
+        result_a = string.mapped_sym_suggest(u'aaaa',
                                                  self.temp.name.decode(
                                                      'utf-8'),
                                                  self.dic, 1)
-        result_b = algorithms.mapped_sym_suggest(u'bbbb',
+        result_b = string.mapped_sym_suggest(u'bbbb',
                                                  self.temp.name.decode(
                                                      'utf-8'),
                                                  self.dic, 1)
@@ -1466,11 +1466,11 @@ class SpellCheckTests(unittest.TestCase):
         """
         Test the spellchecker in the case of a single delete.
         """
-        result_a = algorithms.mapped_sym_suggest(u'aaXaaa',
+        result_a = string.mapped_sym_suggest(u'aaXaaa',
                                                  self.temp.name.decode(
                                                      'utf-8'),
                                                  self.dic, 1)
-        result_b = algorithms.mapped_sym_suggest(u'Xbbbbb',
+        result_b = string.mapped_sym_suggest(u'Xbbbbb',
                                                  self.temp.name.decode(
                                                      'utf-8'),
                                                  self.dic, 1)
@@ -1489,11 +1489,11 @@ class SpellCheckTests(unittest.TestCase):
         """
         Test the spellchecker in the case of a single substitution.
         """
-        result_a = algorithms.mapped_sym_suggest(u'aaXaa',
+        result_a = string.mapped_sym_suggest(u'aaXaa',
                                                  self.temp.name.decode(
                                                      'utf-8'),
                                                  self.dic, 1)
-        result_b = algorithms.mapped_sym_suggest(u'Xbbbb',
+        result_b = string.mapped_sym_suggest(u'Xbbbb',
                                                  self.temp.name.decode(
                                                      'utf-8'),
                                                  self.dic, 1)
@@ -1522,7 +1522,7 @@ class SpellCheckTests(unittest.TestCase):
         s4 = u'ccccc'  # edit distance 5
         # s4 inserted twice to increase frequency
         expected = [s0, s1, s1a, s2, s2a, s3, s4, s4]
-        self.assertEqual(expected, algorithms.suggestions(
+        self.assertEqual(expected, string.suggestions(
             orig, [s4, s4, s2, s2a, s0, s1, s1a, s3]))
 
 if __name__ == '__main__':
