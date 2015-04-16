@@ -5,7 +5,7 @@ import tempfile
 import numpy
 import mmap
 
-from nidaba.algorithm import string
+from nidaba.algorithms import string
 from nidaba.nidabaexceptions import (NidabaUnibarrierException,
                                      NidabaAlgorithmException)
 

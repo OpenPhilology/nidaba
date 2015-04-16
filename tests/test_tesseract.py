@@ -6,7 +6,7 @@ import tempfile
 import subprocess
 
 from lxml import etree
-from nidaba import tesseract
+from nidaba.plugins import tesseract
 from distutils import spawn
 from nose.plugins.skip import SkipTest
 

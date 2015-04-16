@@ -7,7 +7,7 @@ import tempfile
 from lxml import etree
 from distutils import spawn
 from nose.plugins.skip import SkipTest
-from nidaba import ocropus
+from nidaba.plugins import ocropus
 
 thisfile = os.path.abspath(os.path.dirname(__file__))
 resources = os.path.abspath(os.path.join(thisfile, 'resources/ocropus'))
