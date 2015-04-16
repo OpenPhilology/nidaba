@@ -10,7 +10,8 @@ from __future__ import absolute_import
 
 from PIL import Image
 
-from nidaba.algorithms.otsu import otsu
+import nidaba.algorithms.otsu
+
 
 def otsu(imagepath, resultpath):
     """
@@ -24,9 +25,10 @@ def otsu(imagepath, resultpath):
         unicode: Path of the actual output file
     """
 
-    img = Image.open(imagepath)
-    otsu(im).save(resultpath)
+    im = Image.open(imagepath)
+    nidaba.algorithms.otsu.otsu(im).save(resultpath)
     return resultpath
+
 
 def rgb_to_gray(imagepath, resultpath):
     """
