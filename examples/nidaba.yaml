@@ -10,17 +10,28 @@ lang_dicts:
   lojban: [dicts, lojban.dic]
   german: [dicts, german.dic]
 
-# Old tesseract versions create hOCR files ending in .html, current ones .hocr
-legacy_tesseract: false
-# Old ocropus versions don't have some command line switches which are required
-# for operation with more recent ones. If you're not running ocropus from
-# github.com/tmbdev or ocropus-gpageseg does not have a --nocheck option set
-# this to yes.
-legacy_ocropus: false
-
-# Ocropus model
+# Ocropus/kraken models
 ocropus_models:
   greek: [models, greek.pyrnn.gz]
   atlantean: [models, atlantean.pyrnn.gz]
   fraktur: [models, fraktur.pyrnn.gz]
   fancy_ligatures: [models, ligatures.pyrnn.gz]
+
+# An optional list of additional paths to load plugins from.
+# plugin_path: ['/usr/share/nidaba/']
+
+# List of plugins to load. If no plugins_load key is defined all available
+# plugins will be loaded. Additional fields in the associative array will be
+# handed over to the setup function of the plugin.
+# Be aware that plugins utilizing external components that aren't installed
+# will cause nidaba to abort. 
+plugins_load:
+  - {name: 'tesseract', implementation: capi} # set to either legacy (hOCR
+                                              # output in an *.html file),
+                                              # direct (hOCR output in an
+                                              # *.hocr file), or capi
+                                              # (tesseract version >= 3.02)
+  - {name: 'ocropus', legacy: false} # legacy ocropus-gpageseg does not have a
+                                     # --nocheck parameter
+  - {name: 'kraken'}
+  - {name: 'leptonica'}
