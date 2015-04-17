@@ -26,6 +26,9 @@ def setup(*args, **kwargs):
     except:
         raise
 
+def setup(*args, **kwargs):
+    pass
+
 
 @app.task(base=NidabaTask, name=u'nidaba.binarize.sauvola')
 def sauvola(doc, method=u'sauvola', whsize=10, factor=0.35):

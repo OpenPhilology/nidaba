@@ -14,11 +14,15 @@ from nidaba.config import nidaba_cfg
 
 
 plugin_base = PluginBase(package='nidaba.plugins')
-plugin_source = plugin_base.make_plugin_source(searchpath=[os.path.dirname(__file__)])
+sp = [os.path.dirname(__file__)]
+if 'plugin_path' in nidaba_cfg:
+    sp.extend(nidaba_cfg['plugin_path'])
+plugin_source = plugin_base.make_plugin_source(searchpath=sp)
 
 with plugin_source:
     if 'plugins_load' in nidaba_cfg:
-        plugin_list = [p['name'] for p in nidaba_cfg['plugins_load']]
+        for plugin in nidaba_cfg['plugins_load']:
+            pl = plugin_source.load_plugin(plugin)
+            pl.setup(**nidaba_cfg['plugins_load'][plugin])
     else:
-        plugin_list = plugin_source.list_plugins()
-    __import__('nidaba.plugins', globals(), locals(), plugin_list, -1)
+        __import__('nidaba.plugins', globals(), locals(), plugin_source.list_plugins(), -1)

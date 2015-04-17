@@ -20,9 +20,11 @@ from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
 from nidaba.nidabaexceptions import NidabaOcropusException
 
+legacy = False
 
 def setup(*args, **kwargs):
-    pass
+    if kwargs.get('legacy'):
+        legacy = True
 
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.ocropus')
@@ -96,7 +98,7 @@ def ocr(imagepath, outputfilepath, modelpath):
     shutil.copyfile(imagepath, fglob + '.bin.png')
     imagepath = fglob + '.bin.png'
     # page layout analysis
-    if nidaba_cfg['legacy_ocropus']:
+    if legacy:
         flag = ''
     else:
         flag = '-n'
