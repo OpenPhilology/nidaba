@@ -9,16 +9,25 @@ Plugin implementing an interface to tesseract
 from __future__ import absolute_import
 
 import subprocess
+import ctypes
+
+from PIL import Image
 
 from nidaba import storage
 from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
 from nidaba.nidabaexceptions import NidabaTesseractException
-from nidaba.config import nidaba_cfg
+
+
+implementation = u'capi'
+tessdata = u'/usr/share/tesseract-ocr/'
 
 
 def setup(*args, **kwargs):
-    pass
+    if kwargs.get(u'implementation'):
+        implementation = kwargs.get(u'implementation')
+    if kwargs.get(u'tessdata'):
+        tessdata = kwargs.get(u'tessdata')
 
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.tesseract')
@@ -35,38 +44,68 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None):
     Returns:
         (unicode, unicode): Storage tuple for the output file
     """
-    input_path = storage.get_abs_path(*doc)
-    output_path = storage.insert_suffix(input_path, method, *languages)
-    return storage.get_storage_path(ocr(input_path, output_path, languages))
+    image_path = storage.get_abs_path(*doc)
+    output_path = storage.insert_suffix(image_path, method, *languages)
+
+    if implementation == 'legacy':
+        result_path = output_path + '.html'
+        ocr_direct(image_path, output_path, languages)
+    elif implementation == 'direct':
+        result_path = output_path + '.hocr'
+        ocr_direct(image_path, output_path, languages)
+    elif implementation == 'capi':
+        result_path = output_path + '.hocr'
+        ocr_capi(image_path, result_path, languages)
+    else:
+        raise NidabaTesseractException('Invalid implementation selected',
+                                       implementation)
+    return storage.get_storage_path(result_path)
 
 
-def ocr(imagepath, outputfilepath, languages):
+def ocr_capi(image_path, output_path, languages):
     """
-    Scan a single image with tesseract using the specified language,
-    and writing output to the specified file.
+    OCRs an image using the C API provided by tesseract versions 3.02 and
+    higher. Images are read using pillow allowing a wider range of formats than
+    leptonica and results are written to a fixed output document.
 
     Args:
-        imagepath (unicode): Path to the image file
-        outputfilepath (unicode): Path to the output file. Tesseract will
-                                  independently append either .html or .hocr to
-                                  this path.
-        languages (list): A list of strings containing valid tesseract language
-                          descriptions.
-    Returns:
-        unicode: Path of the output file.
-
-    Raise:
-        NidabaTesseractException: Tesseract quit with a return code other than
-                                  0.
+        image_path (unicode): Path to the input image
+        output_path (unicode): Path to the hOCR output
+        languages (list): List of valid tesseract language identifiers
     """
-    p = subprocess.Popen(['tesseract', '-l', '+'.join(languages), imagepath,
-                         outputfilepath, 'hocr'], stdout=subprocess.PIPE,
+
+    img = Image.open(image_path)
+    w, h = img.size
+
+    assert img.mode == 'L' or img.mode == '1'
+    tesseract = ctypes.cdll.LoadLibrary('libtesseract.so.3')
+    api = tesseract.TessBaseAPICreate()
+    rc = tesseract.TessBaseAPIInit3(api, str(tessdata), str('+'.join(languages)))
+    if (rc):
+        tesseract.TessBaseAPIDelete(api)
+
+    tesseract.TessBaseAPISetImage(api, ctypes.c_char_p(img.tobytes()), w, h, 1, w)
+    with open(output_path, 'wb') as fp:
+        hocr = ctypes.string_at(tesseract.TessBaseAPIGetHOCRText(api))
+        fp.write(hocr)
+
+
+def ocr_direct(image_path, output_path, languages):
+    """
+    OCRs an image by calling the tesseract executable directly. Images are read
+    using the linked leptonica library and the given output_path WILL be
+    modified by tesseract.
+
+    Args:
+        image_path (unicode): Path to the input image
+        output_path (unicode): Path to the hOCR output
+        languages (list): List of valid tesseract language identifiers
+    """
+
+    p = subprocess.Popen(['tesseract', image_path, output_path, '-l',
+                          '+'.join(languages), '--tessdata-dir', tessdata,
+                          'hocr'], stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
-    if nidaba_cfg['legacy_tesseract']:
-        resultpath = outputfilepath + '.html'
-    else:
-        resultpath = outputfilepath + '.hocr'
     out, err = p.communicate()
     if p.returncode:
         raise NidabaTesseractException(err)
-    return resultpath

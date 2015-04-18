@@ -26,11 +26,12 @@ ocropus_models:
 # Be aware that plugins utilizing external components that aren't installed
 # will cause nidaba to abort. 
 plugins_load:
-  tesseract: {implementation: capi} # set to either legacy (hOCR
+  tesseract: {implementation: capi, # set to either legacy (hOCR
                                               # output in an *.html file),
                                               # direct (hOCR output in an
                                               # *.hocr file), or capi
                                               # (tesseract version >= 3.02)
+             tessdata: /usr/share/tesseract-ocr} # location of the tessdata path
   ocropus: {legacy: false} # legacy ocropus-gpageseg does not have a
                                      # --nocheck parameter
   kraken: {}

@@ -22,7 +22,7 @@ and lxml and the leptonica C wrapper.
 
 .. code-block:: console
 
-        # apt-get install python python-dev build-essential libxml2-dev libxslt1-dev libleptonica-dev 
+        # apt-get install python python-dev build-essential libxml2-dev libxslt1-dev libleptonica-dev libtiff5-dev
 
 leptonica's API is not stable across versions, for the current version of
 leper, the leptonica wrapper, to compile a version >=1.70 is required.
