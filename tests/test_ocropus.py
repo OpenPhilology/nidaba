@@ -41,7 +41,7 @@ class OcropusTests(unittest.TestCase):
         """
         pngpath = os.path.join(self.tempdir, u'image_png.png')
         outpath = os.path.join(self.tempdir, u'outpath_png.hocr')
-        modelpath = os.path.join(self.tempdir, u'atriale.pyrnn.gz')
+        modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
         ocr = ocropus.ocr(pngpath, outpath, modelpath)
         self.assertEqual(ocr, outpath)
         self.assertTrue(os.path.isfile(outpath),
@@ -57,7 +57,7 @@ class OcropusTests(unittest.TestCase):
         """
         tiffpath = os.path.join(self.tempdir, u'image_tiff.tiff')
         outpath = os.path.join(self.tempdir, u'outpath_tiff.hocr')
-        modelpath = os.path.join(self.tempdir, u'atriale.pyrnn.gz')
+        modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
         ocr = ocropus.ocr(tiffpath, outpath, modelpath)
         self.assertEqual(ocr, outpath)
         self.assertTrue(os.path.isfile(outpath),
@@ -73,7 +73,7 @@ class OcropusTests(unittest.TestCase):
         """
         jpgpath = os.path.join(self.tempdir, u'image_jpg.jpg')
         outpath = os.path.join(self.tempdir, u'outpath_jpg.hocr')
-        modelpath = os.path.join(self.tempdir, u'atriale.pyrnn.gz')
+        modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
         ocr = ocropus.ocr(jpgpath, outpath, modelpath)
         self.assertEqual(ocr, outpath)
         self.assertTrue(os.path.isfile(outpath),

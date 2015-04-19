@@ -11,7 +11,7 @@ from distutils import spawn
 from nose.plugins.skip import SkipTest
 
 thisfile = os.path.abspath(os.path.dirname(__file__))
-resources = os.path.abspath(os.path.join(thisfile, 'resources/tesseract'))
+resources = os.path.abspath(os.path.join(thisfile, 'resources'))
 
 
 class TesseractTests(unittest.TestCase):
