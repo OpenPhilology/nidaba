@@ -38,9 +38,6 @@ class DownloadCommand(Command):
                 shutil.copyfileobj(r, fp)
 
 setup(
-    ext_modules=[Extension("nidaba.leper", sources=["exts/leper.c"],
-                           libraries=["lept"],
-                           extra_compile_args=["-std=c99"])],
     include_package_data=True,
     test_suite="nose.collector",
     tests_require="nose",
