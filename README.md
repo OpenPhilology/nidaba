@@ -38,22 +38,21 @@ in the root directory or install using pypi:
 $ pip install nibada
 ```
 
-The image processing C extension requires the leptonica image processing
-library (>=1.70, available from Debian Jessie):
+Some useful tasks have external dependencies. A good start is:
 
 ```
-$ apt-get install libleptonica-dev
-```
+# apt-get install tesseract-ocr leptonica-progs
+````
 
-Per default no dictionaries and OCR models (including data necessary to run
-some tests) are installed. To download the necessary files run:
+Tests
+=====
+
+Per default no dictionaries and OCR models necessary to runs the tests are
+installed. To download the necessary files run:
 
 ```
 $ python setup.py download
 ```
-
-Tests
-=====
 
 ```
 $ python setup.py test
@@ -79,13 +78,15 @@ Next jobs can be added to the pipeline using the nidaba executable:
 
 ```
 $ nidaba batch --binarize "sauvola:whsize=10;whsize=20;whsize=30;whsize=40,factor=0.6" --ocr tesseract:eng -- ./input.tiff
-35be45e9-9d6d-47c7-8942-2717f00f84cb
+Preparing filestore....done.             
+Building batch...done.
+25d79a54-9d4a-4939-acb6-8e168d6dbc7c
 ```
 
 Using the return code the current state of the job can be retrieved:
 
 ```
-$ nidaba status 35be45e9-9d6d-47c7-8942-2717f00f84cb
+$ nidaba status 25d79a54-9d4a-4939-acb6-8e168d6dbc7c
 PENDING
 ```
 
@@ -93,12 +94,12 @@ When the job has been processed the status command will return a list of paths
 containing the final output:
 
 ```
-$ nidaba status 35be45e9-9d6d-47c7-8942-2717f00f84cb
+$ nidaba status 25d79a54-9d4a-4939-acb6-8e168d6dbc7c
 SUCCESS
-        /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_10_0.3_ocr_tesseract_eng.tiff.hocr
-        /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_20_0.3_ocr_tesseract_eng.tiff.hocr
-        /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_30_0.3_ocr_tesseract_eng.tiff.hocr
-        /home/mittagessen/OCR/01c00777-ea8e-46e1-bc68-95023c7d29a1/input_rgb_to_gray_binarize_sauvola_40_0.3_ocr_tesseract_eng.tiff.hocr
+input.tiff -> /home/mittagessen/OCR/97150c41-82a9-4935-8063-9295a2eb2a7f/input_img.rgb_to_gray_binarize.sauvola_10_0.35_ocr.tesseract_eng.tiff.hocr
+input.tiff -> /home/mittagessen/OCR/97150c41-82a9-4935-8063-9295a2eb2a7f/input_img.rgb_to_gray_binarize.sauvola_20_0.35_ocr.tesseract_eng.tiff.hocr
+input.tiff -> /home/mittagessen/OCR/97150c41-82a9-4935-8063-9295a2eb2a7f/input_img.rgb_to_gray_binarize.sauvola_30_0.35_ocr.tesseract_eng.tiff.hocr
+input.tiff -> /home/mittagessen/OCR/97150c41-82a9-4935-8063-9295a2eb2a7f/input_img.rgb_to_gray_binarize.sauvola_40_0.6_ocr.tesseract_eng.tiff.hocr
 ```
 
 
