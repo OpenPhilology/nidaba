@@ -37,7 +37,7 @@ class OcropusTests(unittest.TestCase):
 
     def test_file_outpath_png(self):
         """
-        Test that ocropus creates hocr outpath for pngs.
+        Test that ocropus creates hocr output for pngs.
         """
         pngpath = os.path.join(self.tempdir, u'image_png.png')
         outpath = os.path.join(self.tempdir, u'outpath_png.hocr')
@@ -53,7 +53,7 @@ class OcropusTests(unittest.TestCase):
 
     def test_file_outpath_tiff(self):
         """
-        Test that ocropus creates hocr outpath for tiffs.
+        Test that ocropus creates hocr output for tiffs.
         """
         tiffpath = os.path.join(self.tempdir, u'image_tiff.tiff')
         outpath = os.path.join(self.tempdir, u'outpath_tiff.hocr')
@@ -69,7 +69,7 @@ class OcropusTests(unittest.TestCase):
 
     def test_file_outpath_jpg(self):
         """
-        Test that ocropus creates hocr outpath for jpgs.
+        Test that ocropus creates hocr output for jpgs.
         """
         jpgpath = os.path.join(self.tempdir, u'image_jpg.jpg')
         outpath = os.path.join(self.tempdir, u'outpath_jpg.hocr')
