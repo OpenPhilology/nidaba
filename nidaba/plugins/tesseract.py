@@ -27,7 +27,10 @@ def setup(*args, **kwargs):
     if kwargs.get(u'implementation'):
         implementation = kwargs.get(u'implementation')
     if kwargs.get(u'tessdata'):
-        tessdata = kwargs.get(u'tessdata')
+        if isinstance(kwargs.get(u'tessdata'), list):
+            tessdata = storage.get_abs_path(*kwargs.get(u'tessdata'))
+        else:
+            tessdata = kwargs.get(u'tessdata')
 
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.tesseract')

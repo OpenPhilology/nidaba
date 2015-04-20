@@ -31,7 +31,9 @@ plugins_load:
                                               # direct (hOCR output in an
                                               # *.hocr file), or capi
                                               # (tesseract version >= 3.02)
-             tessdata: /usr/share/tesseract-ocr} # location of the tessdata path
+             tessdata: /usr/share/tesseract-ocr} # location of the tessdata
+                                                 # path. May also be a storage
+                                                 # tuple.
   ocropus: {legacy: false} # legacy ocropus-gpageseg does not have a
                                      # --nocheck parameter
   kraken: {}
