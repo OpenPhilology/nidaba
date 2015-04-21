@@ -81,11 +81,23 @@ def ocr_capi(image_path, output_path, languages):
     w, h = img.size
 
     assert img.mode == 'L' or img.mode == '1'
-    tesseract = ctypes.cdll.LoadLibrary('libtesseract.so.3')
+    try:
+        tesseract = ctypes.cdll.LoadLibrary('libtesseract.so.3')
+    except OSError as e:
+        raise NidabaTesseractException('Loading libtesseract failed: ' +
+                                       e.message)
+
+    # ensure we've loaded a tesseract object newer than 3.02
+    tesseract.TessVersion.restype = ctypes.c_char_p
+    ver = tesseract.TessVersion()
+    if int(ver.split('.')[0]) < 3 or int(ver.split('.')[1]) < 2:
+        raise NidabaTesseractException('libtesseract version is too old. Set'
+                                       'implementation to direct.')
     api = tesseract.TessBaseAPICreate()
     rc = tesseract.TessBaseAPIInit3(api, str(tessdata), str('+'.join(languages)))
     if (rc):
         tesseract.TessBaseAPIDelete(api)
+        raise NidabaTesseractException('Tesseract initialization failed.')
 
     tesseract.TessBaseAPISetImage(api, ctypes.c_char_p(img.tobytes()), w, h, 1, w)
     with open(output_path, 'wb') as fp:

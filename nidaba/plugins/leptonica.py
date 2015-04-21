@@ -88,7 +88,10 @@ def lept_sauvola(image_path, output_path, whsize=10, factor=0.35):
         raise NidabaInvalidParameterException('Parameters (' + unicode(whsize)
                                               + ',' + unicode(factor) +
                                               ') outside of valid range')
-    lept = ctypes.cdll.LoadLibrary(leptlib)
+    try:
+        lept = ctypes.cdll.LoadLibrary(leptlib)
+    except OSError as e:
+        raise NidabaLeptonicaException('Loading leptonica failed: ' + e.message)
     pix = ctypes.c_void_p(lept.pixRead(image_path.encode('utf-8')))
     opix = ctypes.c_void_p()
     if lept.pixGetDepth(pix) != 8:
@@ -137,8 +140,10 @@ def lept_dewarp(image_path, output_path):
     Raises:
         NidabaLeptonicaException if one of leptonica's functions failed.
     """
-
-    lept = ctypes.cdll.LoadLibrary(leptlib)
+    try:
+        lept = ctypes.cdll.LoadLibrary(leptlib)
+    except OSError as e:
+        raise NidabaLeptonicaException('Loading leptonica failed: ' + e.message)
     pix = ctypes.c_void_p(lept.pixRead(image_path.encode('utf-8')))
     opix = ctypes.c_void_p()
     ret = lept.dewarpSinglePage(pix, 0, 1, 1, ctypes.byref(opix), None, 0)
@@ -183,8 +188,10 @@ def lept_deskew(image_path, output_path):
     Raises:
         NidabaLeptonicaException if one of leptonica's functions failed.
     """
-
-    lept = ctypes.cdll.LoadLibrary(leptlib)
+    try:
+        lept = ctypes.cdll.LoadLibrary(leptlib)
+    except OSError as e:
+        raise NidabaLeptonicaException('Loading leptonica failed: ' + e.message)
     pix = ctypes.c_void_p(lept.pixRead(image_path.encode('utf-8')))
     opix = ctypes.c_void_p(lept.pixFindSkewAndDeskew(pix, 4, None, None))
     if opix is None:

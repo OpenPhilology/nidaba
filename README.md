@@ -41,7 +41,7 @@ $ pip install nibada
 Some useful tasks have external dependencies. A good start is:
 
 ```
-# apt-get install tesseract-ocr leptonica-progs
+# apt-get install tesseract-ocr-grc libtesseract3 libleptonica-dev
 ````
 
 Tests
