@@ -8,13 +8,14 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 from nidaba import Batch, storage
 from nidaba.config import nidaba_cfg
+from nidaba import celery
 from pprint import pprint
 
 import argparse
 import uuid
 import shutil
 import os.path
-
+import sys
 
 def main():
     """
@@ -38,6 +39,11 @@ def main():
     configparser = subparsers.add_parser(
         'config', help='Show the current nidaba configuration.')
     configparser.set_defaults(func=config)
+
+    # Command line parameters for celery workers
+    workerparser = subparsers.add_parser(
+        'worker', help='Run a non-forking celery worker.')
+    workerparser.set_defaults(func=worker)
 
     # Command line parameters for a new job
     batchparser = subparsers.add_parser(
@@ -155,6 +161,14 @@ def batch(args):
     batch.run()
     print('done.')
     print(id)
+
+
+def worker(args):
+    """
+    Implements the worker subcommand.
+    """
+    sys.argv.pop(-1)
+    celery.app.worker_main()
 
 
 def config(args):
