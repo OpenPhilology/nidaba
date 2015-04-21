@@ -4,6 +4,7 @@ import os
 import shutil
 import tempfile
 import subprocess
+import ctypes
 
 from lxml import etree
 from nidaba.plugins import tesseract
@@ -21,8 +22,6 @@ class TesseractTests(unittest.TestCase):
     """
 
     def setUp(self):
-        if not spawn.find_executable('tesseract'):
-            raise SkipTest
 
         self.tempdir = tempfile.mkdtemp()
 
@@ -33,6 +32,11 @@ class TesseractTests(unittest.TestCase):
         """
         Test that tesseract CAPI calls create hocr output for pngs.
         """
+        try:
+            ctypes.cdll.LoadLibrary('libtesseract.so.3')
+        except:
+            raise SkipTest
+
         pngpath = os.path.join(tessdata, 'image.png')
         outpath = os.path.join(self.tempdir, 'output')
         tesseract.setup({'tessdata': tessdata, 'implementation': 'capi'})
@@ -48,6 +52,11 @@ class TesseractTests(unittest.TestCase):
         """
         Test that tesseract CAPI calls create hocr output for tiffs.
         """
+        try:
+            ctypes.cdll.LoadLibrary('libtesseract.so.3')
+        except:
+            raise SkipTest
+
         tiffpath = os.path.join(tessdata, 'image.tiff')
         outpath = os.path.join(self.tempdir, 'output')
         tesseract.setup({'tessdata': tessdata, 'implementation': 'capi'})
@@ -63,6 +72,11 @@ class TesseractTests(unittest.TestCase):
         """
         Test that tesseract CAPI calls create hocr output for jpgs.
         """
+        try:
+            ctypes.cdll.LoadLibrary('libtesseract.so.3')
+        except:
+            raise SkipTest
+
         jpgpath = os.path.join(tessdata, 'image.jpg')
         outpath = os.path.join(self.tempdir, 'output')
         tesseract.setup({'tessdata': tessdata, 'implementation': 'capi'})
@@ -78,6 +92,9 @@ class TesseractTests(unittest.TestCase):
         """
         Test that direct tesseract calls create hocr output for pngs.
         """
+        if not spawn.find_executable('tesseract'):
+            raise SkipTest
+
         pngpath = os.path.join(tessdata, 'image.png')
         outpath = os.path.join(self.tempdir, 'output')
         tesseract.setup({'tessdata': tessdata, 'implementation': 'direct'})
@@ -97,6 +114,9 @@ class TesseractTests(unittest.TestCase):
         """
         Test that direct tesseract create hocr output for tiffs.
         """
+        if not spawn.find_executable('tesseract'):
+            raise SkipTest
+
         tiffpath = os.path.join(tessdata, 'image.tiff')
         outpath = os.path.join(self.tempdir, 'output')
         tesseract.setup({'tessdata': tessdata, 'implementation': 'direct'})
@@ -116,6 +136,9 @@ class TesseractTests(unittest.TestCase):
         """
         Test that direct tesseract calls create hocr output for jpgs.
         """
+        if not spawn.find_executable('tesseract'):
+            raise SkipTest
+
         jpgpath = os.path.join(tessdata, 'image.jpg')
         outpath = os.path.join(self.tempdir, 'output')
         tesseract.setup({'tessdata': tessdata, 'implementation': 'direct'})
