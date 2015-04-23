@@ -26,10 +26,29 @@ release = version
 
 exclude_patterns = ['_build']
 
-pygments_style = 'sphinx'
 html_theme = 'alabaster'
 html_static_path = ['_static']
 htmlhelp_basename = 'nidabadoc'
+
+html_theme_options = {
+    'description': "An expandable and scalable OCR pipeline",
+    'github_user': 'openphilology',
+    'github_repo': 'nidaba',
+    'link': '#3782BE',
+    'link_hover': '#3782BE',
+}
+
+
+html_sidebars = {
+    '**': [
+        'about.html',
+        'navigation.html',
+        'searchbox.html',
+        'donate.html',
+    ]
+}
+
+pygments_style = 'sphinx'
 latex_elements = {}
 latex_documents = [('index', 'nidaba.tex', u'nidaba Documentation', u'Open\
                      Greek and Latin', 'manual')]

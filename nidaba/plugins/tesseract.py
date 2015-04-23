@@ -4,6 +4,41 @@ nidaba.plugins.tesseract
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Plugin implementing an interface to tesseract
+
+This plugin exposes tesseract's functionality as a task. It implements two ways
+of calling tesseract, a direct method calling the tesseract executable and one
+utilizing the C-API available from tesseract 3.02 and upwards.
+
+The C-API requires a libtesseract shared object in the current library path and
+training data in the configured tessdata directory:
+
+.. code-block:: console
+
+    # apt-get install libtesseract3 tesseract-ocr-$lang
+
+Using the direct call method requires the tesseract binary installable by
+executing:
+
+.. code-block:: console
+
+    # apt-get install tesseract-ocr
+
+.. note::
+    It is strongly encouraged to use the C-API whenever possible. It is
+    supposedly stable while hOCR output file names change between tesseract
+    versions.
+    
+Configuration
+~~~~~~~~~~~~~
+
+implementation (default='capi')
+    Selector for the call method. May either be `capi`, `direct` (tesseract
+    hOCR output with .hocr extension), or `legacy` (tesseract hOCR output with
+    .html extension).
+
+tessdata (default='/usr/share/tesseract-ocr/')
+    Path to load tesseract training data and configuration from. Has to be one
+    directory level upwards from the actual tessdata directory
 """
 
 from __future__ import absolute_import

@@ -17,12 +17,11 @@ import json
 
 
 class NidabaTask(Task):
-
     """
     An abstract class propagating unused function arguments through the
-    execution chain. This means that no task should accept arbitrary (**kwargs)
-    arguments as they won't be forwarded to the actual function and will be
-    retained through the whole chain.
+    execution chain. This means that no task should accept arbitrary
+    (\*\*kwargs) arguments as they won't be forwarded to the actual function
+    and will be retained through the whole chain.
     """
     abstract = True
     acks_late = True

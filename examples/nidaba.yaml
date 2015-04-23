@@ -34,7 +34,6 @@ plugins_load:
              tessdata: /usr/share/tesseract-ocr} # location of the tessdata
                                                  # path. May also be a storage
                                                  # tuple.
-  ocropus: {legacy: false} # legacy ocropus-gpageseg does not have a
-                                     # --nocheck parameter
+  ocropus: {}
   kraken: {}
   leptonica: {}

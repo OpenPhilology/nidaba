@@ -1,14 +1,13 @@
-How To Contribute
-=================
+.. _contributing:
+
+Contributing
+------------
 
 Every open source project lives from the generous help by contributors
 that sacrifice their time and nibada is no different.
 
 Here are a few hints and rules to get you started:
 
--  Add yourself to the
-   `AUTHORS <https://github.com/mittagessen/nibada/blob/master/AUTHORS>`__
-   file in an alphabetical fashion.
 -  No contribution is too small; please submit as many fixes for typos
    and grammar bloopers as you can!
 -  Don’t *ever* break backward compatibility.
@@ -33,4 +32,4 @@ In the best case, we can mold it into something, in the worst case the
 pull request gets politely closed. There’s absolutely nothing to fear.
 
 Thank you for considering to contribute to nibada! If you have any
-question or concerns, feel free to reach out to me/us.
+question or concerns, feel free to reach out to us.

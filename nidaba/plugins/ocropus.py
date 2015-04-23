@@ -3,7 +3,24 @@
 nidaba.plugins.ocropus
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Plugin implementing an interface to ocropus
+Plugin implementing an interface to the `ocropus
+<http://github.com/tmbdev/ocropy>`_ OCR engine.
+
+It requires working ocropus-* tools in your execution path. Please have a look
+at the website for installation instructions. 
+
+.. important::
+    If you are not requiring specific functionality of ocropus please consider
+    using the :mod:`kraken <nidaba.plugins.kraken>` plugin. Kraken does not
+    require working around oddities in input argument acceptance and is
+    generally more well-behaved than ocropus.
+
+.. note::
+    ocropus uses a peculiar implementation of splitext removing all characters
+    after the first dot to determine the output path of OCR results. We
+    mitigate this by appending a unique UUID for each input file before the
+    first dot. Unfortunately, this process causes the loss of all processing
+    info carried in the file name.
 """
 
 from __future__ import absolute_import
@@ -13,6 +30,7 @@ import glob
 import os
 import re
 import shutil
+import uuid
 
 from nidaba import storage
 from nidaba.config import nidaba_cfg
@@ -20,11 +38,9 @@ from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
 from nidaba.nidabaexceptions import NidabaOcropusException
 
-legacy = False
 
 def setup(*args, **kwargs):
-    if kwargs.get('legacy'):
-        legacy = True
+    pass
 
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.ocropus')
@@ -93,17 +109,20 @@ def ocr(imagepath, outputfilepath, modelpath):
     """
 
     fglob = _allsplitext(imagepath)[0]
+    # ocropus removes everything after the first . anyway so we do it
+    # preemptively here and add a stable unique identifier to ensure uniqueness
+    # of output.
+    outputfilepath = fglob + '_' + uuid.uuid5(uuid.NAMESPACE_URL,
+                                              outputfilepath)
 
     # ocropus is stupid and needs the input file to end in .bin.png
     shutil.copyfile(imagepath, fglob + '.bin.png')
     imagepath = fglob + '.bin.png'
+    env = { 'PYTHONIOENCODING': 'utf-8' }
     # page layout analysis
-    if legacy:
-        flag = ''
-    else:
-        flag = '-n'
-    p = subprocess.Popen(['ocropus-gpageseg', flag, imagepath.encode('utf-8')],
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(['ocropus-gpageseg', imagepath.encode('utf-8')],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                         env=env)
     out, err = p.communicate()
     if p.returncode:
         raise NidabaOcropusException(err)
@@ -112,7 +131,7 @@ def ocr(imagepath, outputfilepath, modelpath):
     p = subprocess.Popen(['ocropus-rpred', '-q', '-m',
                          modelpath.encode('utf-8')] + glob.glob(fglob +
                          u'/*.bin.png'), stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE)
+                         stderr=subprocess.PIPE, env=env)
     out, err = p.communicate()
     if p.returncode:
         raise NidabaOcropusException(err)
@@ -121,7 +140,8 @@ def ocr(imagepath, outputfilepath, modelpath):
     # page segmentation is always converted to PNG
     p = subprocess.Popen(['ocropus-hocr', imagepath.encode('utf-8'), '-o',
                           outputfilepath.encode('utf-8')],
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                         env=env)
     out, err = p.communicate()
     if p.returncode:
         raise NidabaOcropusException(err)

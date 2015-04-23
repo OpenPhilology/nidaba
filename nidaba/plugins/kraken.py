@@ -2,7 +2,17 @@
 nidaba.plugins.kraken
 ~~~~~~~~~~~~~~~~~~~~~
 
-Plugin implementing access to kraken functions
+Plugin implementing access to kraken functions.
+
+`kraken <https://github.com/mittagessen/kraken>`_ is a fork of OCRopus
+implementing sane interfaces while preserving (mostly) functional equivalence.
+To use this plugin kraken has to be installed into the current python path,
+e.g. the current virtualenv. It is available from pypi::
+
+    $ pip install kraken
+
+It should be able to utilize any model trained for ocropus and is configured
+using the same global configuration options.
 """
 
 from __future__ import absolute_import

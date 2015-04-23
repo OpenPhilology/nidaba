@@ -3,7 +3,17 @@
 nidaba.plugins.leptonica
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Plugin for leptonica functions provided through leper
+Plugin accessing `leptonica <http://leptonica.com>`_ functions.
+
+This plugin requires a liblept shared object in the current library search
+path. On Debian-based systems it can be installed using apt-get::
+
+    # apt-get install libleptonica-dev
+
+Leptonica's APIs are rather unstable and may differ significantly between
+versions. If this plugin fails with weird error messages or workers are just
+dying without discernable cause please submit a bug report including your
+leptonica version.
 """
 
 from __future__ import absolute_import
@@ -25,9 +35,6 @@ def setup(*args, **kwargs):
         ctypes.cdll.LoadLibrary(leptlib)
     except:
         raise
-
-def setup(*args, **kwargs):
-    pass
 
 
 @app.task(base=NidabaTask, name=u'nidaba.binarize.sauvola')
