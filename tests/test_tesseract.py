@@ -22,11 +22,57 @@ class TesseractTests(unittest.TestCase):
     """
 
     def setUp(self):
-
         self.tempdir = tempfile.mkdtemp()
 
     def tearDown(self):
         shutil.rmtree(self.tempdir)
+
+    def test_capi_multiple(self):
+        """
+        Test that tesseract CAPI calls create hocr output for multiple
+        languages.
+        """
+        try:
+            ctypes.cdll.LoadLibrary('libtesseract.so.3')
+        except:
+            raise SkipTest
+
+        # for some unknown reason this test causes a segmentation fault while a
+        # manual execution of the test case does not trigger it.
+        raise SkipTest
+        tiffpath = os.path.join(tessdata, 'image.tiff')
+        outpath = os.path.join(self.tempdir, 'output')
+        tesseract.setup({'tessdata': tessdata, 'implementation': 'capi'})
+        tesseract.ocr_capi(tiffpath, outpath, ['grc+ara'])
+        self.assertTrue(os.path.isfile(outpath),
+                        msg='Tesseract did not output a file!')
+        try:
+            etree.parse(outpath)
+        except etree.XMLSyntaxError:
+            self.fail(msg='The output was not valid html/xml!')
+
+    def test_direct_multiple(self):
+        """
+        Test that direct tesseract calls create hocr output for multiple
+        languages.
+        """
+        if not spawn.find_executable('tesseract'):
+            raise SkipTest
+
+        tiffpath = os.path.join(tessdata, 'image.tiff')
+        outpath = os.path.join(self.tempdir, 'output')
+        tesseract.setup({'tessdata': tessdata, 'implementation': 'direct'})
+        tesseract.ocr_direct(tiffpath, outpath, ['grc', 'ara'])
+        if os.path.isfile(outpath + '.html'):
+            outpath = outpath + '.html'
+        else:
+            outpath = outpath + '.hocr'
+        self.assertTrue(os.path.isfile(outpath),
+                        msg='Tesseract did not output a file!')
+        try:
+            etree.parse(outpath)
+        except etree.XMLSyntaxError:
+            self.fail(msg='The output was not valid html/xml!')
 
     def test_capi_file_output_png(self):
         """
