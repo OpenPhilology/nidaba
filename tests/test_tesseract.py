@@ -33,17 +33,14 @@ class TesseractTests(unittest.TestCase):
         languages.
         """
         try:
-            ctypes.cdll.LoadLibrary('libtesseract.so.3')
+            t = ctypes.cdll.LoadLibrary('libtesseract.so.3')
         except:
             raise SkipTest
 
-        # for some unknown reason this test causes a segmentation fault while a
-        # manual execution of the test case does not trigger it.
-        raise SkipTest
         tiffpath = os.path.join(tessdata, 'image.tiff')
         outpath = os.path.join(self.tempdir, 'output')
-        tesseract.setup({'tessdata': tessdata, 'implementation': 'capi'})
-        tesseract.ocr_capi(tiffpath, outpath, ['grc+ara'])
+        tesseract.setup(tessdata=tessdata, implementation='capi')
+        tesseract.ocr_capi(tiffpath, outpath, ['grc', 'eng'])
         self.assertTrue(os.path.isfile(outpath),
                         msg='Tesseract did not output a file!')
         try:
@@ -61,8 +58,8 @@ class TesseractTests(unittest.TestCase):
 
         tiffpath = os.path.join(tessdata, 'image.tiff')
         outpath = os.path.join(self.tempdir, 'output')
-        tesseract.setup({'tessdata': tessdata, 'implementation': 'direct'})
-        tesseract.ocr_direct(tiffpath, outpath, ['grc', 'ara'])
+        tesseract.setup(tessdata=tessdata, implementation='direct')
+        tesseract.ocr_direct(tiffpath, outpath, ['grc', 'eng'])
         if os.path.isfile(outpath + '.html'):
             outpath = outpath + '.html'
         else:
@@ -78,14 +75,15 @@ class TesseractTests(unittest.TestCase):
         """
         Test that tesseract CAPI calls create hocr output for pngs.
         """
+
         try:
-            ctypes.cdll.LoadLibrary('libtesseract.so.3')
+            t = ctypes.cdll.LoadLibrary('libtesseract.so.3')
         except:
             raise SkipTest
 
         pngpath = os.path.join(tessdata, 'image.png')
         outpath = os.path.join(self.tempdir, 'output')
-        tesseract.setup({'tessdata': tessdata, 'implementation': 'capi'})
+        tesseract.setup(tessdata=tessdata, implementation='capi')
         tesseract.ocr_capi(pngpath, outpath, ['grc'])
         self.assertTrue(os.path.isfile(outpath),
                         msg='Tesseract did not output a file!')
@@ -99,13 +97,13 @@ class TesseractTests(unittest.TestCase):
         Test that tesseract CAPI calls create hocr output for tiffs.
         """
         try:
-            ctypes.cdll.LoadLibrary('libtesseract.so.3')
+            t = ctypes.cdll.LoadLibrary('libtesseract.so.3')
         except:
             raise SkipTest
 
         tiffpath = os.path.join(tessdata, 'image.tiff')
         outpath = os.path.join(self.tempdir, 'output')
-        tesseract.setup({'tessdata': tessdata, 'implementation': 'capi'})
+        tesseract.setup(tessdata=tessdata, implementation='capi')
         tesseract.ocr_capi(tiffpath, outpath, ['grc'])
         self.assertTrue(os.path.isfile(outpath),
                         msg='Tesseract did not output a file!')
@@ -118,14 +116,15 @@ class TesseractTests(unittest.TestCase):
         """
         Test that tesseract CAPI calls create hocr output for jpgs.
         """
+
         try:
-            ctypes.cdll.LoadLibrary('libtesseract.so.3')
+            t = ctypes.cdll.LoadLibrary('libtesseract.so.3')
         except:
             raise SkipTest
 
         jpgpath = os.path.join(tessdata, 'image.jpg')
         outpath = os.path.join(self.tempdir, 'output')
-        tesseract.setup({'tessdata': tessdata, 'implementation': 'capi'})
+        tesseract.setup(tessdata=tessdata, implementation='capi')
         tesseract.ocr_capi(jpgpath, outpath, ['grc'])
         self.assertTrue(os.path.isfile(outpath),
                         msg='Tesseract did not output a file!')
@@ -138,12 +137,13 @@ class TesseractTests(unittest.TestCase):
         """
         Test that direct tesseract calls create hocr output for pngs.
         """
+
         if not spawn.find_executable('tesseract'):
             raise SkipTest
 
         pngpath = os.path.join(tessdata, 'image.png')
         outpath = os.path.join(self.tempdir, 'output')
-        tesseract.setup({'tessdata': tessdata, 'implementation': 'direct'})
+        tesseract.setup(tessdata=tessdata, implementation='direct')
         tesseract.ocr_direct(pngpath, outpath, ['grc'])
         if os.path.isfile(outpath + '.html'):
             outpath = outpath + '.html'
@@ -165,7 +165,7 @@ class TesseractTests(unittest.TestCase):
 
         tiffpath = os.path.join(tessdata, 'image.tiff')
         outpath = os.path.join(self.tempdir, 'output')
-        tesseract.setup({'tessdata': tessdata, 'implementation': 'direct'})
+        tesseract.setup(tessdata=tessdata, implementation='direct')
         tesseract.ocr_direct(tiffpath, outpath, ['grc'])
         if os.path.isfile(outpath + '.html'):
             outpath = outpath + '.html'
@@ -187,7 +187,7 @@ class TesseractTests(unittest.TestCase):
 
         jpgpath = os.path.join(tessdata, 'image.jpg')
         outpath = os.path.join(self.tempdir, 'output')
-        tesseract.setup({'tessdata': tessdata, 'implementation': 'direct'})
+        tesseract.setup(tessdata=tessdata, implementation='direct')
         tesseract.ocr_direct(jpgpath, outpath, ['grc'])
         if os.path.isfile(outpath + '.html'):
             outpath = outpath + '.html'
