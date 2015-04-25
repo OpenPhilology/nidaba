@@ -60,8 +60,10 @@ tessdata = u'/usr/share/tesseract-ocr/'
 
 def setup(*args, **kwargs):
     if kwargs.get(u'implementation'):
+        global implementation
         implementation = kwargs.get(u'implementation')
     if kwargs.get(u'tessdata'):
+        global tessdata
         if isinstance(kwargs.get(u'tessdata'), list):
             tessdata = storage.get_abs_path(*kwargs.get(u'tessdata'))
         else:
@@ -126,19 +128,20 @@ def ocr_capi(image_path, output_path, languages):
     tesseract.TessVersion.restype = ctypes.c_char_p
     ver = tesseract.TessVersion()
     if int(ver.split('.')[0]) < 3 or int(ver.split('.')[1]) < 2:
+        tesseract.TessBaseAPIDelete(api)
         raise NidabaTesseractException('libtesseract version is too old. Set'
                                        'implementation to direct.')
     api = tesseract.TessBaseAPICreate()
-    rc = tesseract.TessBaseAPIInit3(api, str(tessdata), str('+'.join(languages)))
+    rc = tesseract.TessBaseAPIInit3(api, str(tessdata), '+'.join(languages))
     if (rc):
         tesseract.TessBaseAPIDelete(api)
         raise NidabaTesseractException('Tesseract initialization failed.')
-
     tesseract.TessBaseAPISetImage(api, ctypes.c_char_p(img.tobytes()), w, h, 1, w)
     with open(output_path, 'wb') as fp:
-        hocr = ctypes.string_at(tesseract.TessBaseAPIGetHOCRText(api))
-        fp.write(hocr)
-
+        tp = tesseract.TessBaseAPIGetHOCRText(api)
+        fp.write(ctypes.string_at(tp))
+        tesseract.TessDeleteText(tp)
+    tesseract.TessBaseAPIDelete(api)
 
 def ocr_direct(image_path, output_path, languages):
     """
