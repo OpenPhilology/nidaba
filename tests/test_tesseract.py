@@ -158,7 +158,7 @@ class TesseractTests(unittest.TestCase):
 
     def test_direct_file_output_tiff(self):
         """
-        Test that direct tesseract create hocr output for tiffs.
+        Test that direct tesseract calls create hocr output for tiffs.
         """
         if not spawn.find_executable('tesseract'):
             raise SkipTest

@@ -32,16 +32,19 @@ import re
 import shutil
 import uuid
 
+from distutils import spawn
 from nidaba import storage
 from nidaba.config import nidaba_cfg
 from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
 from nidaba.nidabaexceptions import NidabaOcropusException
-
+from nidaba.nidabaexceptions import NidabaPluginException
 
 def setup(*args, **kwargs):
-    pass
-
+    if None in [spawn.find_executable('ocropus-rpred'),
+                spawn.find_executable('ocropus-gpageseg'),
+                spawn.find_executable('ocropus-hocr')]:
+        raise NidabaPluginException('Prerequisites for ocropus module not installed.')
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.ocropus')
 def ocr_ocropus(doc, method=u'ocr_ocropus', model=None):
@@ -112,26 +115,31 @@ def ocr(imagepath, outputfilepath, modelpath):
     # ocropus removes everything after the first . anyway so we do it
     # preemptively here and add a stable unique identifier to ensure uniqueness
     # of output.
-    outputfilepath = fglob + '_' + uuid.uuid5(uuid.NAMESPACE_URL,
-                                              outputfilepath)
+    outputfilepath = _allsplitext(outputfilepath)[0]
+    outputfilepath += '_' + str(uuid.uuid5(uuid.NAMESPACE_URL,
+                                           outputfilepath.encode('utf-8')))
+    working_dir = os.path.dirname(outputfilepath)
 
     # ocropus is stupid and needs the input file to end in .bin.png
     shutil.copyfile(imagepath, fglob + '.bin.png')
     imagepath = fglob + '.bin.png'
-    env = { 'PYTHONIOENCODING': 'utf-8' }
+    env = os.environ.copy()
+    env['PYTHONIOENCODING'] = 'utf-8'
     # page layout analysis
-    p = subprocess.Popen(['ocropus-gpageseg', imagepath.encode('utf-8')],
+    p = subprocess.Popen(['ocropus-gpageseg', '-n', imagepath.encode('utf-8')],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                         env=env)
+                         env=env, cwd=working_dir)
     out, err = p.communicate()
+    print(out)
     if p.returncode:
         raise NidabaOcropusException(err)
 
     # text line recognition
     p = subprocess.Popen(['ocropus-rpred', '-q', '-m',
-                         modelpath.encode('utf-8')] + glob.glob(fglob +
-                         u'/*.bin.png'), stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE, env=env)
+                          modelpath.encode('utf-8')] + glob.glob(fglob +
+                                                                 '/*.bin.png'),
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                         env=env, cwd=working_dir)
     out, err = p.communicate()
     if p.returncode:
         raise NidabaOcropusException(err)
@@ -141,7 +149,7 @@ def ocr(imagepath, outputfilepath, modelpath):
     p = subprocess.Popen(['ocropus-hocr', imagepath.encode('utf-8'), '-o',
                           outputfilepath.encode('utf-8')],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                         env=env)
+                         env=env, cwd=working_dir)
     out, err = p.communicate()
     if p.returncode:
         raise NidabaOcropusException(err)

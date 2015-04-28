@@ -25,7 +25,8 @@ from nidaba import storage
 from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
 from nidaba.nidabaexceptions import (NidabaInvalidParameterException,
-                                     NidabaLeptonicaException)
+                                     NidabaLeptonicaException,
+                                     NidabaPluginException)
 
 leptlib = 'liblept.so'
 
@@ -33,8 +34,8 @@ leptlib = 'liblept.so'
 def setup(*args, **kwargs):
     try:
         ctypes.cdll.LoadLibrary(leptlib)
-    except:
-        raise
+    except Exception as e:
+        raise NidabaPluginException(e.message)
 
 
 @app.task(base=NidabaTask, name=u'nidaba.binarize.sauvola')

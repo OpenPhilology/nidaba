@@ -47,11 +47,13 @@ import subprocess
 import ctypes
 
 from PIL import Image
+from distutils import spawn
 
 from nidaba import storage
 from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
 from nidaba.nidabaexceptions import NidabaTesseractException
+from nidaba.nidabaexceptions import NidabaPluginException
 
 
 implementation = u'capi'
@@ -68,6 +70,13 @@ def setup(*args, **kwargs):
             tessdata = storage.get_abs_path(*kwargs.get(u'tessdata'))
         else:
             tessdata = kwargs.get(u'tessdata')
+    if implementation == 'direct' and not spawn.find_executable('tesseract'):
+        raise NidabaPluginException('No tesseract executable found')
+    if implementation == 'capi' :
+        try:
+            ctypes.cdll.LoadLibrary('libtesseract.so.3')
+        except:
+            raise NidabaPluginException('Loading libtesseract failed.')
 
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.tesseract')

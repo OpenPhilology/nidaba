@@ -3,6 +3,7 @@ import unittest
 import os
 import shutil
 import tempfile
+import os
 
 from lxml import etree
 from distutils import spawn
@@ -35,6 +36,31 @@ class OcropusTests(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.otempdir)
 
+    def test_file_path_correct(self):
+        """
+        Test that output is placed in the correct directory.
+        """
+        pngpath = os.path.join(self.tempdir, u'image_png.png')
+        wd = tempfile.mkdtemp()
+        swd = tempfile.mkdtemp()
+
+        outpath = os.path.join(swd, u'outpath_png.hocr')
+        os.chdir(wd)
+
+        modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
+        ocr = ocropus.ocr(pngpath, outpath, modelpath)
+        self.assertTrue(os.path.isfile(ocr),
+                        msg='Ocropus did not outpath a file!')
+        self.assertEqual(os.path.dirname(ocr), swd,
+                         msg='Output not placed in correct directory')
+        try:
+            etree.parse(ocr)
+        except etree.XMLSyntaxError:
+            self.fail(msg='The outpath was not valid html/xml!')
+        finally:
+            shutil.rmtree(swd)
+            shutil.rmtree(wd)
+
     def test_file_outpath_png(self):
         """
         Test that ocropus creates hocr output for pngs.
@@ -43,11 +69,10 @@ class OcropusTests(unittest.TestCase):
         outpath = os.path.join(self.tempdir, u'outpath_png.hocr')
         modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
         ocr = ocropus.ocr(pngpath, outpath, modelpath)
-        self.assertEqual(ocr, outpath)
-        self.assertTrue(os.path.isfile(outpath),
+        self.assertTrue(os.path.isfile(ocr),
                         msg='Ocropus did not outpath a file!')
         try:
-            etree.parse(outpath)
+            etree.parse(ocr)
         except etree.XMLSyntaxError:
             self.fail(msg='The outpath was not valid html/xml!')
 
@@ -59,11 +84,10 @@ class OcropusTests(unittest.TestCase):
         outpath = os.path.join(self.tempdir, u'outpath_tiff.hocr')
         modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
         ocr = ocropus.ocr(tiffpath, outpath, modelpath)
-        self.assertEqual(ocr, outpath)
-        self.assertTrue(os.path.isfile(outpath),
-                        msg='Ocropus did not outpath a file!')
+        self.assertTrue(os.path.isfile(ocr),
+                        msg='Ocropus did not output a file!')
         try:
-            etree.parse(outpath)
+            etree.parse(ocr)
         except etree.XMLSyntaxError:
             self.fail(msg='The outpath was not valid html/xml!')
 
@@ -75,11 +99,10 @@ class OcropusTests(unittest.TestCase):
         outpath = os.path.join(self.tempdir, u'outpath_jpg.hocr')
         modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
         ocr = ocropus.ocr(jpgpath, outpath, modelpath)
-        self.assertEqual(ocr, outpath)
-        self.assertTrue(os.path.isfile(outpath),
-                        msg='Ocropus did not outpath a file!')
+        self.assertTrue(os.path.isfile(ocr),
+                        msg='Ocropus did not output a file!')
         try:
-            etree.parse(outpath)
+            etree.parse(ocr)
         except etree.XMLSyntaxError:
             self.fail(msg='The outpath was not valid html/xml!')
 
