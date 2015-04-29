@@ -1,7 +1,7 @@
 .. _contributing:
 
 Contributing
-------------
+============
 
 Every open source project lives from the generous help by contributors
 that sacrifice their time and nibada is no different.

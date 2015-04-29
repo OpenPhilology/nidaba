@@ -29,7 +29,7 @@ Nidaba does a bunch of things for you:
 .. _installation:
 
 Installation
-------------
+============
 
 Unless you are installing from a precompiled source you will need the ability
 to build Python C-based modules from source in order to install NumPy and
@@ -86,7 +86,7 @@ Alternatively, run pip in the root directory of the `git repository
         $ pip install .
 
 Tests
------
+=====
 
 Per default no dictionaries and OCR models necessary to runs the tests are
 installed. To download the necessary files run:
@@ -105,7 +105,7 @@ Tests for plugins calling external programs, at the time only tesseract and
 ocropus, will be skipped if these aren't installed.
 
 Configuration
--------------
+=============
 
 There are currently two configuration files, one used by the celery framework
 and one containing the actual nidaba configuration. Both are written in `YAML
@@ -148,7 +148,7 @@ plugins_load (optional)
         data for each plugin. See :doc:`plugins <plugins>` for more information.
 
 Running
--------
+=======
 
 Celery requires a worker retrieving tasks from the message broker to actually
 execute them.  Starting the celery worker server is quite simple and the only
@@ -163,7 +163,7 @@ For further worker options have a look at the `Celery worker documentation
 <https://celery.readthedocs.org/en/latest/userguide/workers.html>`_.
 
 Command Line Interface
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 The simplest way to add jobs to the pipeline is using the nidaba command line
 utility. It is automatically installed during the installation procedure.
@@ -260,8 +260,10 @@ On failure the subtasks that failed and their error message will be printed:
 
 .. include:: ../CONTRIBUTING.rst
 
+.. include:: ../ChangeLog
+
 Licensing and Authorship
-------------------------
+========================
 
 This project is licensed under `GPL2.0+
 <https://www.gnu.org/licenses/gpl-2.0.html>`_, so feel free to use and adapt as
