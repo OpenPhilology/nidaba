@@ -141,7 +141,7 @@ def ocr_capi(image_path, output_path, languages):
         raise NidabaTesseractException('libtesseract version is too old. Set'
                                        'implementation to direct.')
     api = tesseract.TessBaseAPICreate()
-    rc = tesseract.TessBaseAPIInit3(api, str(tessdata), '+'.join(languages))
+    rc = tesseract.TessBaseAPIInit3(api, str(tessdata), str('+'.join(languages)))
     if (rc):
         tesseract.TessBaseAPIDelete(api)
         raise NidabaTesseractException('Tesseract initialization failed.')
