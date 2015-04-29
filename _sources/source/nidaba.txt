@@ -6,18 +6,11 @@ Subpackages
 
 .. toctree::
 
+    nidaba.algorithms
     nidaba.tasks
 
 Submodules
 ----------
-
-nidaba.algorithms module
-------------------------
-
-.. automodule:: nidaba.algorithms
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 nidaba.celery module
 --------------------
@@ -91,26 +84,10 @@ nidaba.nidabaexceptions module
     :undoc-members:
     :show-inheritance:
 
-nidaba.ocropus module
----------------------
-
-.. automodule:: nidaba.ocropus
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 nidaba.storage module
 ---------------------
 
 .. automodule:: nidaba.storage
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-nidaba.tesseract module
------------------------
-
-.. automodule:: nidaba.tesseract
     :members:
     :undoc-members:
     :show-inheritance:

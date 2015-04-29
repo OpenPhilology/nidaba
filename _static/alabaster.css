@@ -180,12 +180,12 @@ div.sphinxsidebar hr {
 /* -- body styles ----------------------------------------------------------- */
 
 a {
-    color: #004B6B;
+    color: #3782BE;
     text-decoration: underline;
 }
 
 a:hover {
-    color: #6D4100;
+    color: #3782BE;
     text-decoration: underline;
 }
 
@@ -402,22 +402,22 @@ tt.xref, code.xref, a tt {
 
 a.reference {
     text-decoration: none;
-    border-bottom: 1px dotted #004B6B;
+    border-bottom: 1px dotted #3782BE;
 }
 
 a.reference:hover {
-    border-bottom: 1px solid #6D4100;
+    border-bottom: 1px solid #3782BE;
 }
 
 a.footnote-reference {
     text-decoration: none;
     font-size: 0.7em;
     vertical-align: top;
-    border-bottom: 1px dotted #004B6B;
+    border-bottom: 1px dotted #3782BE;
 }
 
 a.footnote-reference:hover {
-    border-bottom: 1px solid #6D4100;
+    border-bottom: 1px solid #3782BE;
 }
 
 a:hover tt, a:hover code {

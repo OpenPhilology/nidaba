@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nidaba package &mdash; nidaba 0.3.2
+    <title>nidaba package &mdash; nidaba 0.3.10-1-g8c417de
  documentation</title>
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3.2
+        VERSION:     '0.3.10-1-g8c417de
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,8 +25,11 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.3.2
+    <link rel="top" title="nidaba 0.3.10-1-g8c417de
  documentation" href="../index.html" />
+    <link rel="up" title="nidaba" href="modules.html" />
+    <link rel="next" title="nidaba.algorithms package" href="nidaba.algorithms.html" />
+    <link rel="prev" title="nidaba" href="modules.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -42,8 +45,15 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.3.2
- documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="nidaba.algorithms.html" title="nidaba.algorithms package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="nidaba"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.3.10-1-g8c417de
+ documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">nidaba</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -58,6 +68,19 @@
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="nidaba.algorithms.html">nidaba.algorithms package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.algorithms.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.algorithms.html#module-nidaba.algorithms.otsu">nidaba.algorithms.otsu module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.algorithms.html#nidaba-algorithms-otsu">nidaba.algorithms.otsu</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.algorithms.html#module-nidaba.algorithms.string">nidaba.algorithms.string module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.algorithms.html#nidaba-algorithms-string">nidaba.algorithms.string</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.algorithms.html#module-nidaba.algorithms">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="nidaba.tasks.html">nidaba.tasks package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.binarize">nidaba.tasks.binarize module</a><ul>
@@ -70,10 +93,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.img">nidaba.tasks.img module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-img">nidaba.tasks.img</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.ocr">nidaba.tasks.ocr module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-ocr">nidaba.tasks.ocr</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.util">nidaba.tasks.util module</a><ul>
@@ -91,9 +110,6 @@
 </div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-nidaba.algorithms">
-<span id="nidaba-algorithms-module"></span><h2>nidaba.algorithms module<a class="headerlink" href="#module-nidaba.algorithms" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-nidaba.celery">
 <span id="nidaba-celery-module"></span><h2>nidaba.celery module<a class="headerlink" href="#module-nidaba.celery" title="Permalink to this headline">¶</a></h2>
@@ -159,6 +175,12 @@ to the highest data type in the ordering.</td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.cli.worker">
+<code class="descclassname">nidaba.cli.</code><code class="descname">worker</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.worker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the worker subcommand.</p>
 </dd></dl>
 
 </div>
@@ -678,6 +700,12 @@ should always define their exceptions here.</p>
 </dd></dl>
 
 <dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaLeptonicaException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaLeptonicaException</code><span class="sig-paren">(</span><em>message=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaLeptonicaException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
 <dt id="nidaba.nidabaexceptions.NidabaNoSuchAlgorithmException">
 <em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaNoSuchAlgorithmException</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaNoSuchAlgorithmException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
@@ -692,6 +720,12 @@ should always define their exceptions here.</p>
 <dl class="exception">
 <dt id="nidaba.nidabaexceptions.NidabaOcropusException">
 <em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaOcropusException</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaOcropusException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaPluginException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaPluginException</code><span class="sig-paren">(</span><em>message=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaPluginException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
 </dd></dl>
 
@@ -729,51 +763,6 @@ should always define their exceptions here.</p>
 <dt id="nidaba.nidabaexceptions.NidabaUnibarrierException">
 <em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaUnibarrierException</code><span class="sig-paren">(</span><em>message=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaUnibarrierException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
-</dd></dl>
-
-</div>
-</div>
-<div class="section" id="module-nidaba.ocropus">
-<span id="nidaba-ocropus-module"></span><h2>nidaba.ocropus module<a class="headerlink" href="#module-nidaba.ocropus" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="nidaba-ocropus">
-<h3>nidaba.ocropus<a class="headerlink" href="#nidaba-ocropus" title="Permalink to this headline">¶</a></h3>
-<p>Wrappers around the ocropus OCR engine.</p>
-<dl class="function">
-<dt id="nidaba.ocropus.ocr">
-<code class="descclassname">nidaba.ocropus.</code><code class="descname">ocr</code><span class="sig-paren">(</span><em>imagepath</em>, <em>outputfilepath</em>, <em>modelpath</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.ocropus.ocr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Scan a single image with ocropus.</p>
-<p>Reads a single image file from <code class="docutils literal"><span class="pre">`imagepath`</span></code> and writes the recognized
-text as in hOCR format into outputfilepath. Ocropus&#8217;s superfluous
-intermediate output remains in the directory imagepath is located in.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>imagepath</strong> (<em>unicode</em>) &#8211; Path of the input file</li>
-<li><strong>outputfilepath</strong> (<em>unicode</em>) &#8211; Path of the output file</li>
-<li><strong>modelpath</strong> (<em>unicode</em>) &#8211; Path of the recognition model. Must be a pyrnn.gz
-pickle dump interoperable with ocropus-rpred.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string of the output file that is actually written. As
-Ocropus rewrites output file paths without notice it may be
-different from the <code class="docutils literal"><span class="pre">`outputfilepath`</span></code> argument.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(unicode)</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NidabaOcropusException</span></code> &#8211;
-Ocropus somehow failed. The error output is
-contained in the message but as it is de facto
-unusable as a library it&#8217;s impossible to deduct
-the nature of the problem.</p>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 </div>
@@ -1046,93 +1035,6 @@ None: Failure</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-nidaba.tesseract">
-<span id="nidaba-tesseract-module"></span><h2>nidaba.tesseract module<a class="headerlink" href="#module-nidaba.tesseract" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="nidaba-tesseract">
-<h3>nidaba.tesseract<a class="headerlink" href="#nidaba-tesseract" title="Permalink to this headline">¶</a></h3>
-<p>Wrappers around the tesseract OCR engine.</p>
-<dl class="function">
-<dt id="nidaba.tesseract.ocr">
-<code class="descclassname">nidaba.tesseract.</code><code class="descname">ocr</code><span class="sig-paren">(</span><em>imagepath</em>, <em>outputfilepath</em>, <em>languages</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tesseract.ocr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Scan a single image with tesseract using the specified language,
-and writing output to the specified file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>imagepath</strong> (<em>unicode</em>) &#8211; Path to the image file</li>
-<li><strong>outputfilepath</strong> (<em>unicode</em>) &#8211; Path to the output file. Tesseract will
-independently append either .html or .hocr to
-this path.</li>
-<li><strong>languages</strong> (<em>list</em>) &#8211; A list of strings containing valid tesseract language
-descriptions.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Path of the output file.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">unicode</p>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Raise:</dt>
-<dd><dl class="first last docutils">
-<dt>NidabaTesseractException: Tesseract quit with a return code other than</dt>
-<dd><ol class="first last arabic simple" start="0">
-<li></li>
-</ol>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.tesseract.ocrdir">
-<code class="descclassname">nidaba.tesseract.</code><code class="descname">ocrdir</code><span class="sig-paren">(</span><em>dirpath</em>, <em>outputdir</em>, <em>languages</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tesseract.ocrdir" title="Permalink to this definition">¶</a></dt>
-<dd><p>Scans all documents deemed to be image files in a directory (recursively).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dir</strong> (<em>unicode</em>) &#8211; Path to the directory containing the image files.</li>
-<li><strong>outputdir</strong> (<em>unicode</em>) &#8211; Path to the output directory. It will be created
-if it doesn&#8217;t exist.</li>
-<li><strong>languages</strong> (<em>list</em>) &#8211; A list of strings containing valid tesseract language
-descriptions.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Paths of the output files.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Raise:</dt>
-<dd><dl class="first docutils">
-<dt>NidabaTesseractException: Tesseract quit with a return code other than</dt>
-<dd><ol class="first last arabic simple" start="0">
-<li></li>
-</ol>
-</dd>
-</dl>
-<p class="last">OSError: The output directory couldn&#8217;t be created.
-Exception: The input directory does not exist.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-</div>
 <div class="section" id="module-nidaba">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-nidaba" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -1144,57 +1046,31 @@ Exception: The input directory does not exist.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">nidaba package</a><ul>
-<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-nidaba.algorithms">nidaba.algorithms module</a></li>
-<li><a class="reference internal" href="#module-nidaba.celery">nidaba.celery module</a></li>
-<li><a class="reference internal" href="#module-nidaba.cli">nidaba.cli module</a></li>
-<li><a class="reference internal" href="#module-nidaba.config">nidaba.config module</a></li>
-<li><a class="reference internal" href="#module-nidaba.image">nidaba.image module</a><ul>
-<li><a class="reference internal" href="#nidaba-image">nidaba.image</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-nidaba.lex">nidaba.lex module</a><ul>
-<li><a class="reference internal" href="#nidaba-lex">nidaba.lex</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-nidaba.lock">nidaba.lock module</a><ul>
-<li><a class="reference internal" href="#nidaba-lock">nidaba.lock</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-nidaba.merge_hocr">nidaba.merge_hocr module</a></li>
-<li><a class="reference internal" href="#module-nidaba.nidaba">nidaba.nidaba module</a><ul>
-<li><a class="reference internal" href="#nidaba-nidaba">nidaba.nidaba</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-nidaba.nidabaexceptions">nidaba.nidabaexceptions module</a><ul>
-<li><a class="reference internal" href="#nidaba-nidabaexceptions">nidaba.nidabaexceptions</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-nidaba.ocropus">nidaba.ocropus module</a><ul>
-<li><a class="reference internal" href="#nidaba-ocropus">nidaba.ocropus</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-nidaba.storage">nidaba.storage module</a></li>
-<li><a class="reference internal" href="#module-nidaba.tesseract">nidaba.tesseract module</a><ul>
-<li><a class="reference internal" href="#nidaba-tesseract">nidaba.tesseract</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-nidaba">Module contents</a></li>
+<h1 class="logo"><a href="../index.html">nidaba</a></h1>
+
+
+
+<p class="blurb">An expandable and scalable OCR pipeline</p>
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=openphilology&repo=nidaba&type=watch&count=true&size=large"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQs</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Docs</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">nidaba package</a></li>
 </ul>
 </li>
 </ul>
 
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/source/nidaba.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
+
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">

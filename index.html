@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nidaba &mdash; nidaba 0.3.2
+    <title>Nidaba &mdash; nidaba 0.3.10-1-g8c417de
  documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.2
+        VERSION:     '0.3.10-1-g8c417de
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,9 +25,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.3.2
+    <link rel="top" title="nidaba 0.3.10-1-g8c417de
  documentation" href="#" />
-    <link rel="next" title="Installation" href="user-guide/index.html" />
+    <link rel="next" title="Plugins" href="plugins.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -44,9 +44,9 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="user-guide/index.html" title="Installation"
+          <a href="plugins.html" title="Plugins"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">nidaba 0.3.2
+        <li class="nav-item nav-item-0"><a href="#">nidaba 0.3.10-1-g8c417de
  documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -57,59 +57,221 @@
           <div class="body" role="main">
             
   <div class="section" id="nidaba">
-<h1>nidaba<a class="headerlink" href="#nidaba" title="Permalink to this headline">¶</a></h1>
-<p><cite>nidaba</cite> is an open source distributed optical character recognition pipeline
-that makes it easy to preprocess and OCR scans of text documents in a multitude
-of ways.</p>
-<p><cite>nidaba</cite> is a powerful tool allowing you to mix and combine some of the most
+<h1>Nidaba<a class="headerlink" href="#nidaba" title="Permalink to this headline">¶</a></h1>
+<p>Nidaba is an open source distributed optical character recognition pipeline
+that makes it easy to preprocess, OCR, and postprocess scans of text documents
+in a multitude of ways.</p>
+<p>Nidaba is a powerful tool allowing you to mix and combine some of the most
 advanced free image processing and character recognition software and
-distribute the execution of this software to multiple machines. While the
-learning curve may be high at first, you&#8217;ll be able in no time to process your
-own scanned documents.</p>
-<div class="section" id="what-it-does">
-<h2>What It Does<a class="headerlink" href="#what-it-does" title="Permalink to this headline">¶</a></h2>
-<p>nidaba does a bunch of things for you:</p>
+distribute the execution of this software to multiple machines.</p>
+<div class="toctree-wrapper compound">
+</div>
+<p>Nidaba does a bunch of things for you:</p>
 <blockquote>
 <div><ul class="simple">
-<li><strong>Grayscale Conversion</strong></li>
-<li><strong>Binarization</strong></li>
-<li><strong>Deskewing</strong></li>
-<li><strong>Dewarping</strong></li>
-<li><strong>OCR</strong></li>
-<li><strong>Output merging</strong></li>
+<li><a class="reference external" href="http://pillow.readthedocs.org/en/latest/reference/Image.html#PIL.Image.Image.convert">Grayscale Conversion</a></li>
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Thresholding_%28image_processing%29">Binarization</a></li>
+<li><a class="reference external" href="http://www.leptonica.com/skew-measurement.html">Deskewing</a></li>
+<li><a class="reference external" href="http://www.leptonica.com/dewarping.html">Dewarping</a></li>
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Optical_character_recognition">OCR</a></li>
+<li>Output merging</li>
 </ul>
 </div></blockquote>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="user-guide/index.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="user-guide/index.html#installing-external-dependencies">Installing External Dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user-guide/index.html#installing-from-pypi">Installing from PyPi</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user-guide/index.html#installing-from-source">Installing from Source</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="user-guide/index.html#configuration">Configuration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user-guide/index.html#quick-start">Quick Start</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="user-guide/index.html#running-the-celery-worker-server">Running the celery worker server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user-guide/index.html#the-command-line-interface">The Command Line Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user-guide/index.html#the-web-interface">The Web Interface</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tech-reference/index.html">Tech Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tech-reference/storage.html">Storage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tech-reference/tasks.html">Tasks</a></li>
-</ul>
-</li>
-</ul>
+</div>
+<div class="section" id="installation">
+<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>Unless you are installing from a precompiled source you will need the ability
+to build Python C-based modules from source in order to install NumPy and
+SciPy. Users on <strong>Unix-based platforms</strong> such as Ubuntu or Mac OS X will need
+the traditional C build toolchain installed (e.g. Developer Tools / XCode Tools
+on the Mac, or the <code class="docutils literal"><span class="pre">build-essential</span></code> package on Ubuntu or Debian Linux &#8211;
+basically, anything with <code class="docutils literal"><span class="pre">gcc</span></code>, <code class="docutils literal"><span class="pre">make</span></code> and so forth) as well as the Python
+development libraries, often named <code class="docutils literal"><span class="pre">python-dev</span></code> or similar:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">#</span> apt-get install build-essential python-dev
+<span class="gp">#</span> apt-get build-dep python-scipy
+</pre></div>
+</div>
+<p>In addition, some plugins require libraries and executables present on the
+system to work properly. A good start is install <a class="reference external" href="http://leptonica.com">leptonica</a> and <a class="reference external" href="https://code.google.com/p/tesseract-ocr/">tesseract</a>:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">#</span> apt-get install libtesseract3 tesseract-ocr-eng libleptonica-dev liblept
+</pre></div>
+</div>
+<p>Further, a <a class="reference external" href="http://docs.celeryproject.org/en/latest/getting-started/brokers/index.html">broker</a>
+is required for <a class="reference external" href="http://celeryproject.org">celery</a>. For testing purposes we
+recommend <a class="reference external" href="http://redis.io">redis</a>:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">#</span> apt-get install redis-server
+</pre></div>
+</div>
+<p>The recommended way to get Nidaba is to <strong>install the latest stable release</strong>
+via <a class="reference external" href="https://pip.pypa.io">pip</a>:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> pip install nidaba
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Deploying python applications can be painful in some circumstances.
+Unfortunately, nidaba is no exception to this and the build process of
+several dependencies is currently of a disastrous quality.
+nidaba should either be installed in disposable virtual machines or if
+installed on a machine that is intended to run other applications, e.g.
+a personal laptop or workstation, we strongly urge you to utilize
+<a class="reference external" href="https://virtualenv.pypa.io">virtualenv</a>.</p>
+</div>
+<p>Alternatively, run pip in the root directory of the <a class="reference external" href="https://github.com/openphilology/nidaba">git repository</a>:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> pip install .
+</pre></div>
 </div>
 </div>
-<div class="section" id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span>Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span>Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span>Search Page</span></a></li>
-</ul>
+<div class="section" id="tests">
+<h1>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h1>
+<p>Per default no dictionaries and OCR models necessary to runs the tests are
+installed. To download the necessary files run:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> python setup.py download
+</pre></div>
 </div>
+<p>Afterwards, the test suite can be run:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> python setup.py nosetests
+</pre></div>
+</div>
+<p>Tests for plugins calling external programs, at the time only tesseract and
+ocropus, will be skipped if these aren&#8217;t installed.</p>
+</div>
+<div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>There are currently two configuration files, one used by the celery framework
+and one containing the actual nidaba configuration. Both are written in <a class="reference external" href="http://www.yaml.org">YAML</a> so indentation and whitespace is important. They are
+installed automatically into <code class="docutils literal"><span class="pre">sys.prefix/etc/nidaba/{celery,nidaba}.yaml</span></code>;
+usually into the root of the virtualenv containing nidaba or
+<code class="docutils literal"><span class="pre">/usr/etc/nidaba/</span></code>.</p>
+<p>The former resembles a <a class="reference external" href="http://celery.readthedocs.org/en/latest/configuration.html">celery configuration object</a> and may contain
+all available options. The example file looks like this:</p>
+<p>The later contains essential configuration for several subtasks and the overall
+framework:</p>
+<dl class="docutils">
+<dt>storage_path</dt>
+<dd>The home directory for nidaba to store files created by OCR jobs, i.e.
+the location of the shared storage medium. This may differ on
+different machines in the cluster.</dd>
+<dt>ocropus_models (optional)</dt>
+<dd>A list of mappings from unique identifiers to storage tupels where a
+tupel is of the format [directory, path] resulting in the absolute path
+storage_path/directory/path. Each mapping defines a single neuronal
+network available to the ocropus OCR task. These have to exist on all
+machines running nidaba and therefore have to be on the common storage medium
+beneath storage_path.</dd>
+<dt>plugin_path (optional)</dt>
+<dd>A list of additional paths to look for plugins in.</dd>
+<dt>plugins_load (optional)</dt>
+<dd>An associative array of plugins to load with additional configuration
+data for each plugin. See <a class="reference internal" href="plugins.html"><em>plugins</em></a> for more information.</dd>
+</dl>
+</div>
+<div class="section" id="running">
+<h1>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h1>
+<p>Celery requires a worker retrieving tasks from the message broker to actually
+execute them.  Starting the celery worker server is quite simple and the only
+requirement is that it is NOT run inside the nidaba directory and the message
+broker is up and running:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba worker
+</pre></div>
+</div>
+<p>For further worker options have a look at the <a class="reference external" href="https://celery.readthedocs.org/en/latest/userguide/workers.html">Celery worker documentation</a>.</p>
+<div class="section" id="command-line-interface">
+<h2>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h2>
+<p>The simplest way to add jobs to the pipeline is using the nidaba command line
+utility. It is automatically installed during the installation procedure.</p>
+<p>The <code class="docutils literal"><span class="pre">config</span></code> subcommand is used to inspect the current nidabaconfig.py:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba config
+<span class="go">{&#39;lang_dicts&#39;: {&#39;german&#39;: [&#39;dicts&#39;, &#39;german.dic&#39;],</span>
+<span class="go">                &#39;lojban&#39;: [&#39;dicts&#39;, &#39;lojban.dic&#39;],</span>
+<span class="go">                &#39;polytonic_greek&#39;: [&#39;dicts&#39;, &#39;greek.dic&#39;]},</span>
+<span class="go"> &#39;ocropus_models&#39;: {&#39;atlantean&#39;: [&#39;models&#39;, &#39;atlantean.pyrnn.gz&#39;],</span>
+<span class="go">                    &#39;fancy_ligatures&#39;: [&#39;models&#39;, &#39;ligatures.pyrnn.gz&#39;],</span>
+<span class="go">                    &#39;fraktur&#39;: [&#39;models&#39;, &#39;fraktur.pyrnn.gz&#39;],</span>
+<span class="go">                    &#39;greek&#39;: [&#39;models&#39;, &#39;greek.pyrnn.gz&#39;]},</span>
+<span class="go"> &#39;plugins_load&#39;: {&#39;kraken&#39;: {},</span>
+<span class="go">                  &#39;leptonica&#39;: {},</span>
+<span class="go">                  &#39;ocropus&#39;: {&#39;legacy&#39;: False},</span>
+<span class="go">                  &#39;tesseract&#39;: {&#39;implementation&#39;: &#39;capi&#39;,</span>
+<span class="go">                                &#39;tessdata&#39;: &#39;/usr/share/tesseract-ocr&#39;}},</span>
+<span class="go"> &#39;storage_path&#39;: &#39;~/OCR&#39;}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">worker</span></code> subcommand is used to run a celery worker and accepts all
+options accepted by the <code class="docutils literal"><span class="pre">celery</span> <span class="pre">worker</span></code> command. In fact, running:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba worker
+</pre></div>
+</div>
+<p>is equivalent to:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> celery -A nidaba worker
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">batch</span></code> subcommand is used to add a job to the pipeline. A rather minimal
+invocation looks like this:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch --binarize nlbin sauvola --ocr tesseract:eng -- input.png
+<span class="go">90ae699a-7172-44ce-a8bf-5464bccd34d0</span>
+</pre></div>
+</div>
+<p>It converts the input file <code class="docutils literal"><span class="pre">input.png</span></code> to grayscale, binarizes it using the
+Sauvola and nlbin algorithm, and finally runs it through tesseract with the
+English language model.</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--binarize</span></kbd></td>
+<td>Defines the binarization parameters. It consists of a list of terms in
+the format algorithm1:arg1=a,arg2=b;arg1=n algorithm2:arg1=1;arg1=2;...
+where algorithm is one of the algorithms implemented and args are their
+configuration parameters. Have a look at <a class="reference internal" href="source/nidaba.tasks.html#module-nidaba.tasks.binarize" title="nidaba.tasks.binarize"><code class="xref py py-mod docutils literal"><span class="pre">nidaba.tasks.binarize</span></code></a>
+for possible values.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--ocr</span></kbd></td>
+<td>A list of OCR engine options in the format engine:lang1,lang2,lang3
+engine2:model... where engine is either <em>tesseract</em> or <em>ocropus</em> and
+lang is a tesseract language model and model is an ocropus model
+previously defined in nidabaconfig.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--willitblend</span></kbd></td>
+<td>Blends all output hOCR files into a single hOCR document using the
+dummy scoring algorithm</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--grayscale</span></kbd></td>
+<td>A switch to indicate that input files are already 8bpp grayscale and
+conversion to grayscale is unnecessary.</td></tr>
+</tbody>
+</table>
+<p>The <code class="docutils literal"><span class="pre">status</span></code> subcommand is used to retrieve the status of a job. It takes the
+return value of a previously executed <code class="docutils literal"><span class="pre">batch</span></code> command. A currently running
+command will return PENDING:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba status 90ae699a-7172-44ce-a8bf-5464bccd34d0
+<span class="go">PENDING</span>
+</pre></div>
+</div>
+<p>When the job has been processed the status command will return a list of paths
+containing the final output:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba status 90ae699a-7172-44ce-a8bf-5464bccd34d0
+<span class="go">SUCCESS</span>
+<span class="go">input.png -&gt; /home/mittagessen/OCR/90ae699a-7172-44ce-a8bf-5464bccd34d0/input_img.rgb_to_gray_binarize.nlbin_0.5_0.5_1.0_0.1_80_20_5_90_ocr.tesseract_eng.png.hocr</span>
+<span class="go">input.png -&gt; /home/mittagessen/OCR/90ae699a-7172-44ce-a8bf-5464bccd34d0/input_img.rgb_to_gray_binarize.sauvola_10_0.35_ocr.tesseract_eng.png.hocr</span>
+</pre></div>
+</div>
+<p>On failure the subtasks that failed and their error message will be printed:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba status 90ae699a-7172-44ce-a8bf-5464bccd34d0
+<span class="go">FAILURE</span>
+<span class="go">ocr.tesseract failed while operating on input_img.rgb_to_gray_binarize.sauvola_10_0.35.png which is based on input.png</span>
+<span class="go">ocr.tesseract failed while operating on input_img.rgb_to_gray_binarize.nlbin_0.5_0.5_1.0_0.1_80_20_5_90.png which is based on input.png</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="licensing-and-authorship">
+<h1>Licensing and Authorship<a class="headerlink" href="#licensing-and-authorship" title="Permalink to this headline">¶</a></h1>
+<p>This project is licensed under <a class="reference external" href="https://www.gnu.org/licenses/gpl-2.0.html">GPL2.0+</a>, so feel free to use and adapt as
+long as you respect the license. See <a class="reference external" href="https://github.com/openphilology/nidaba/blob/master/LICENSE">LICENSE</a> for details.</p>
+<p>nidaba is written as part of the <a class="reference external" href="https://www.dh.uni-leipzig.de/wo/projects/open-greek-and-latin-project/">Open Greek and Latin Project</a> at
+the <a class="reference external" href="https://www.dh.uni-leipzig.de">Humboldt Chair of Digital Humanities at the University of Leipzig</a>.</p>
 </div>
 
 
@@ -118,25 +280,28 @@ own scanned documents.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">nidaba</a><ul>
-<li><a class="reference internal" href="#what-it-does">What It Does</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-</ul>
-</li>
+<h1 class="logo"><a href="#">nidaba</a></h1>
+
+
+
+<p class="blurb">An expandable and scalable OCR pipeline</p>
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=openphilology&repo=nidaba&type=watch&count=true&size=large"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/modules.html">API Docs</a></li>
 </ul>
 
-  <h4>Next topic</h4>
-  <p class="topless"><a href="user-guide/index.html"
-                        title="next chapter">Installation</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/index.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
+
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nidaba.tasks package &mdash; nidaba 0.3.2
+    <title>nidaba.tasks package &mdash; nidaba 0.3.10-1-g8c417de
  documentation</title>
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3.2
+        VERSION:     '0.3.10-1-g8c417de
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,8 +25,10 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.3.2
+    <link rel="top" title="nidaba 0.3.10-1-g8c417de
  documentation" href="../index.html" />
+    <link rel="up" title="nidaba package" href="nidaba.html" />
+    <link rel="prev" title="nidaba.algorithms package" href="nidaba.algorithms.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -42,8 +44,13 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.3.2
- documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="nidaba.algorithms.html" title="nidaba.algorithms package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.3.10-1-g8c417de
+ documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >nidaba</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="nidaba.html" accesskey="U">nidaba package</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -63,110 +70,6 @@
 <h3>nidaba.tasks.binarize<a class="headerlink" href="#nidaba-tasks-binarize" title="Permalink to this headline">¶</a></h3>
 <p>Tasks for segmentation of color images into binary images. More often than not
 these will operate on grayscale input.</p>
-<dl class="function">
-<dt id="nidaba.tasks.binarize.nlbin">
-<code class="descclassname">nidaba.tasks.binarize.</code><code class="descname">nlbin</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>threshold</em>, <em>zoom</em>, <em>escale</em>, <em>border</em>, <em>perc</em>, <em>range</em>, <em>low</em>, <em>high</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.binarize.nlbin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Binarizes an input document utilizing ocropus&#8217;/kraken&#8217;s nlbin algorithm.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple.</li>
-<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files.</li>
-<li><strong>threshold</strong> (<em>float</em>) &#8211; </li>
-<li><strong>zoom</strong> (<em>float</em>) &#8211; </li>
-<li><strong>escale</strong> (<em>float</em>) &#8211; </li>
-<li><strong>(float)</strong> (<em>border</em>) &#8211; </li>
-<li><strong>perc</strong> (<em>int</em>) &#8211; </li>
-<li><strong>range</strong> (<em>int</em>) &#8211; </li>
-<li><strong>low</strong> (<em>int</em>) &#8211; </li>
-<li><strong>high</strong> (<em>int</em>) &#8211; </li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output file</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(unicode, unicode)</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NidabaInvalidParameterException</span></code> &#8211;
-Input parameters are outside the valid
-range.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.tasks.binarize.otsu">
-<code class="descclassname">nidaba.tasks.binarize.</code><code class="descname">otsu</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>thresh</em>, <em>mincount</em>, <em>bgval</em>, <em>smoothx</em>, <em>smoothy</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.binarize.otsu" title="Permalink to this definition">¶</a></dt>
-<dd><p>Binarizes an input document utilizing a naive implementation of Otsu&#8217;s
-thresholding.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple.</li>
-<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output file</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(unicode, unicode)</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NidabaInvalidParameterException</span></code> &#8211;
-Input parameters are outside the valid
-range.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.tasks.binarize.sauvola">
-<code class="descclassname">nidaba.tasks.binarize.</code><code class="descname">sauvola</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>whsize</em>, <em>factor</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.binarize.sauvola" title="Permalink to this definition">¶</a></dt>
-<dd><p>Binarizes an input document utilizing Sauvola thresholding as described in
-[0]. Expects 8bpp grayscale images as input.</p>
-<p>[0] Sauvola, Jaakko, and Matti Pietikäinen. &#8220;Adaptive document image
-binarization.&#8221; Pattern recognition 33.2 (2000): 225-236.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>doc</strong> (<em>unicode</em>) &#8211; The input document tuple.</li>
-<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files</li>
-<li><strong>whsize</strong> (<em>int</em>) &#8211; The window width and height that local statistics are
-calculated on are twice the value of whsize. The minimal
-value is 2.</li>
-<li><strong>factor</strong> (<em>float</em>) &#8211; The threshold reduction factor due to variance. 0 =&lt;
-factor &lt; 1.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output file</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(unicode, unicode)</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NidabaInvalidParameterException</span></code> &#8211;
-Input parameters are outside the valid
-range.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </div>
 </div>
 <div class="section" id="module-nidaba.tasks.helper">
@@ -180,9 +83,9 @@ logging of errors.</p>
 <em class="property">class </em><code class="descclassname">nidaba.tasks.helper.</code><code class="descname">NidabaTask</code><a class="headerlink" href="#nidaba.tasks.helper.NidabaTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">celery.app.task.Task</span></code></p>
 <p>An abstract class propagating unused function arguments through the
-execution chain. This means that no task should accept arbitrary (<a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs)
-arguments as they won&#8217;t be forwarded to the actual function and will be
-retained through the whole chain.</p>
+execution chain. This means that no task should accept arbitrary
+(**kwargs) arguments as they won&#8217;t be forwarded to the actual function
+and will be retained through the whole chain.</p>
 <dl class="attribute">
 <dt id="nidaba.tasks.helper.NidabaTask.acks_late">
 <code class="descname">acks_late</code><em class="property"> = True</em><a class="headerlink" href="#nidaba.tasks.helper.NidabaTask.acks_late" title="Permalink to this definition">¶</a></dt>
@@ -198,140 +101,6 @@ retained through the whole chain.</p>
 <h3>nidaba.tasks.img<a class="headerlink" href="#nidaba-tasks-img" title="Permalink to this headline">¶</a></h3>
 <p>Some general image processing tasks that are outside the scope of more specific
 packages (e.g. binarization).</p>
-<dl class="function">
-<dt id="nidaba.tasks.img.rgb_to_gray">
-<code class="descclassname">nidaba.tasks.img.</code><code class="descname">rgb_to_gray</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.img.rgb_to_gray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts an arbitrary bit depth image to grayscale and writes it back
-appending a suffix.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple</li>
-<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output file</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.tasks.img.dewarp">
-<code class="descclassname">nidaba.tasks.img.</code><code class="descname">dewarp</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.img.dewarp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes perspective distortion (as commonly exhibited by overhead scans)
-from an 1bpp input image.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple.</li>
-<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output file</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.tasks.img.deskew">
-<code class="descclassname">nidaba.tasks.img.</code><code class="descname">deskew</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.img.deskew" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes skew (rotational distortion) from an 1bpp input image.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple.</li>
-<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output file</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-</div>
-<div class="section" id="module-nidaba.tasks.ocr">
-<span id="nidaba-tasks-ocr-module"></span><h2>nidaba.tasks.ocr module<a class="headerlink" href="#module-nidaba.tasks.ocr" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="nidaba-tasks-ocr">
-<h3>nidaba.tasks.ocr<a class="headerlink" href="#nidaba-tasks-ocr" title="Permalink to this headline">¶</a></h3>
-<p>Tasks running optical character recognition on a binarized image. As of now
-this encapsulates page segmentation, recognition, and in the case of Tesseract
-language model application in a single task.</p>
-<dl class="function">
-<dt id="nidaba.tasks.ocr.ocr_tesseract">
-<code class="descclassname">nidaba.tasks.ocr.</code><code class="descname">ocr_tesseract</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>languages</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.ocr.ocr_tesseract" title="Permalink to this definition">¶</a></dt>
-<dd><p>Runs tesseract on an input document.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple</li>
-<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files
-languages (list of unicode): A list of languages for
-the tesseract language model</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple for the output file</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.tasks.ocr.ocr_ocropus">
-<code class="descclassname">nidaba.tasks.ocr.</code><code class="descname">ocr_ocropus</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>model</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.ocr.ocr_ocropus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Runs ocropus on an input document.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple</li>
-<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files</li>
-<li><strong>model</strong> (<em>unicode</em>) &#8211; Identifier for the font model to use</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple for the output file</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </div>
 </div>
 <div class="section" id="module-nidaba.tasks.util">
@@ -340,63 +109,18 @@ the tesseract language model</li>
 <h3>nidaba.tasks.util<a class="headerlink" href="#nidaba-tasks-util" title="Permalink to this headline">¶</a></h3>
 <p>Various utility tasks that either can&#8217;t be classified by purpose or are one of
 a kind.</p>
-<dl class="function">
-<dt id="nidaba.tasks.util.blend_hocr">
-<code class="descclassname">nidaba.tasks.util.</code><code class="descname">blend_hocr</code><span class="sig-paren">(</span><em>doc</em>, <em>language</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.util.blend_hocr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Blends multiple hOCR files using the algorithm from Bruce Robertsons
-rigaudon. It requires a working spell checking for the input document&#8217;s
-language; otherwise all matched bboxes will be bunched together without any
-scoring.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>[(id, path), ...]</strong> (<em>doc</em>) &#8211; A list of storage module tupels that will be</li>
-<li><strong>into a single output document.</strong> (<em>merged</em>) &#8211; </li>
-<li><strong>language</strong> (<em>unicode</em>) &#8211; Language used for spell-checking based scoring. If
-not defined no scoring will be used.</li>
-<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to the output file.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output document</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.tasks.util.sync">
-<code class="descclassname">nidaba.tasks.util.</code><code class="descname">sync</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.util.sync" title="Permalink to this definition">¶</a></dt>
-<dd><p>Takes ones argument and returns it. Used to synchronized stuff as
-chaining groups is not possible with the current celery version.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>doc</strong> &#8211; An arbitrary input argument</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The input argument unaltered</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </div>
 </div>
 <div class="section" id="module-nidaba.tasks">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-nidaba.tasks" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="nidaba-tasks">
 <h3>nidaba.tasks<a class="headerlink" href="#nidaba-tasks" title="Permalink to this headline">¶</a></h3>
-<p>The tasks package contains all celery tasks used by nidaba. Tasks should not
-contain any actual implementations but import them as separate packages and
-just shim around them doing some initial setup, most commonly conversion
-between storage module tuples and absolute paths.</p>
+<p>The tasks package contains all built-in celery tasks used by nidaba. Tasks
+should not contain any actual implementations but import them as separate
+packages and just shim around them doing some initial setup, most commonly
+conversion between storage module tuples and absolute paths.</p>
+<p>Additional tasks depending on external or complex dependencies are contained in
+plugins found in the plugins directory.</p>
 </div>
 </div>
 </div>
@@ -407,45 +131,31 @@ between storage module tuples and absolute paths.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">nidaba.tasks package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-nidaba.tasks.binarize">nidaba.tasks.binarize module</a><ul>
-<li><a class="reference internal" href="#nidaba-tasks-binarize">nidaba.tasks.binarize</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-nidaba.tasks.helper">nidaba.tasks.helper module</a><ul>
-<li><a class="reference internal" href="#nidaba-tasks-helper">nidaba.tasks.helper</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-nidaba.tasks.img">nidaba.tasks.img module</a><ul>
-<li><a class="reference internal" href="#nidaba-tasks-img">nidaba.tasks.img</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-nidaba.tasks.ocr">nidaba.tasks.ocr module</a><ul>
-<li><a class="reference internal" href="#nidaba-tasks-ocr">nidaba.tasks.ocr</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-nidaba.tasks.util">nidaba.tasks.util module</a><ul>
-<li><a class="reference internal" href="#nidaba-tasks-util">nidaba.tasks.util</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-nidaba.tasks">Module contents</a><ul>
-<li><a class="reference internal" href="#nidaba-tasks">nidaba.tasks</a></li>
-</ul>
-</li>
+<h1 class="logo"><a href="../index.html">nidaba</a></h1>
+
+
+
+<p class="blurb">An expandable and scalable OCR pipeline</p>
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=openphilology&repo=nidaba&type=watch&count=true&size=large"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQs</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Docs</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="nidaba.html">nidaba package</a></li>
 </ul>
 </li>
 </ul>
 
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/source/nidaba.tasks.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
+
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">

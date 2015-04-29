@@ -1,0 +1,382 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Plugins &mdash; nidaba 0.3.10-1-g8c417de
+ documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.10-1-g8c417de
+',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="nidaba 0.3.10-1-g8c417de
+ documentation" href="index.html" />
+    <link rel="next" title="Frequently Answered Questions" href="faq.html" />
+    <link rel="prev" title="Nidaba" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="faq.html" title="Frequently Answered Questions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Nidaba"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">nidaba 0.3.10-1-g8c417de
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="plugins">
+<h1>Plugins<a class="headerlink" href="#plugins" title="Permalink to this headline">¶</a></h1>
+<p>Tasks requiring external dependencies which are not installabe using Python
+utilities are separated into plugins. Plugins can be selected in the
+configuration file.</p>
+<span class="target" id="module-nidaba.plugins.kraken"></span><div class="section" id="nidaba-plugins-kraken">
+<h2>nidaba.plugins.kraken<a class="headerlink" href="#nidaba-plugins-kraken" title="Permalink to this headline">¶</a></h2>
+<p>Plugin implementing access to kraken functions.</p>
+<p><a class="reference external" href="https://github.com/mittagessen/kraken">kraken</a> is a fork of OCRopus
+implementing sane interfaces while preserving (mostly) functional equivalence.
+To use this plugin kraken has to be installed into the current python path,
+e.g. the current virtualenv. It is available from pypi:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ pip install kraken
+</pre></div>
+</div>
+<p>It should be able to utilize any model trained for ocropus and is configured
+using the same global configuration options.</p>
+<dl class="function">
+<dt id="nidaba.plugins.kraken.ocr_kraken">
+<code class="descclassname">nidaba.plugins.kraken.</code><code class="descname">ocr_kraken</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>model</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.plugins.kraken.ocr_kraken" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs kraken on an input document and writes a hOCR file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string append to all output files</li>
+<li><strong>model</strong> (<em>unicode</em>) &#8211; Identifier for the font model to use</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple for the output file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<span class="target" id="module-nidaba.plugins.ocropus"></span><div class="section" id="nidaba-plugins-ocropus">
+<h2>nidaba.plugins.ocropus<a class="headerlink" href="#nidaba-plugins-ocropus" title="Permalink to this headline">¶</a></h2>
+<p>Plugin implementing an interface to the <a class="reference external" href="http://github.com/tmbdev/ocropy">ocropus</a> OCR engine.</p>
+<p>It requires working ocropus-* tools in your execution path. Please have a look
+at the website for installation instructions.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">If you are not requiring specific functionality of ocropus please consider
+using the <a class="reference internal" href="#module-nidaba.plugins.kraken" title="nidaba.plugins.kraken"><code class="xref py py-mod docutils literal"><span class="pre">kraken</span></code></a> plugin. Kraken does not
+require working around oddities in input argument acceptance and is
+generally more well-behaved than ocropus.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">ocropus uses a peculiar implementation of splitext removing all characters
+after the first dot to determine the output path of OCR results. We
+mitigate this by appending a unique UUID for each input file before the
+first dot. Unfortunately, this process causes the loss of all processing
+info carried in the file name.</p>
+</div>
+<dl class="function">
+<dt id="nidaba.plugins.ocropus.ocr_ocropus">
+<code class="descclassname">nidaba.plugins.ocropus.</code><code class="descname">ocr_ocropus</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>model</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.plugins.ocropus.ocr_ocropus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs ocropus on an input document.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files</li>
+<li><strong>model</strong> (<em>unicode</em>) &#8211; Identifier for the font model to use</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple for the output file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<span class="target" id="module-nidaba.plugins.tesseract"></span><div class="section" id="nidaba-plugins-tesseract">
+<h2>nidaba.plugins.tesseract<a class="headerlink" href="#nidaba-plugins-tesseract" title="Permalink to this headline">¶</a></h2>
+<p>Plugin implementing an interface to tesseract</p>
+<p>This plugin exposes tesseract&#8217;s functionality as a task. It implements two ways
+of calling tesseract, a direct method calling the tesseract executable and one
+utilizing the C-API available from tesseract 3.02 and upwards.</p>
+<p>The C-API requires a libtesseract shared object in the current library path and
+training data in the configured tessdata directory:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">#</span> apt-get install libtesseract3 tesseract-ocr-<span class="nv">$lang</span>
+</pre></div>
+</div>
+<p>Using the direct call method requires the tesseract binary installable by
+executing:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">#</span> apt-get install tesseract-ocr
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is strongly encouraged to use the C-API whenever possible. It is
+supposedly stable while hOCR output file names change between tesseract
+versions.</p>
+</div>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>implementation (default=&#8217;capi&#8217;)</dt>
+<dd>Selector for the call method. May either be <cite>capi</cite>, <cite>direct</cite> (tesseract
+hOCR output with .hocr extension), or <cite>legacy</cite> (tesseract hOCR output with
+.html extension).</dd>
+<dt>tessdata (default=&#8217;/usr/share/tesseract-ocr/&#8217;)</dt>
+<dd>Path to load tesseract training data and configuration from. Has to be one
+directory level upwards from the actual tessdata directory</dd>
+</dl>
+<dl class="function">
+<dt id="nidaba.plugins.tesseract.ocr_tesseract">
+<code class="descclassname">nidaba.plugins.tesseract.</code><code class="descname">ocr_tesseract</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>languages</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.plugins.tesseract.ocr_tesseract" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs tesseract on an input document.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files
+languages (list of unicode): A list of languages for
+the tesseract language model</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple for the output file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<span class="target" id="module-nidaba.plugins.leptonica"></span><div class="section" id="nidaba-plugins-leptonica">
+<h2>nidaba.plugins.leptonica<a class="headerlink" href="#nidaba-plugins-leptonica" title="Permalink to this headline">¶</a></h2>
+<p>Plugin accessing <a class="reference external" href="http://leptonica.com">leptonica</a> functions.</p>
+<p>This plugin requires a liblept shared object in the current library search
+path. On Debian-based systems it can be installed using apt-get:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># apt-get install libleptonica-dev</span>
+</pre></div>
+</div>
+<p>Leptonica&#8217;s APIs are rather unstable and may differ significantly between
+versions. If this plugin fails with weird error messages or workers are just
+dying without discernable cause please submit a bug report including your
+leptonica version.</p>
+<dl class="function">
+<dt id="nidaba.plugins.leptonica.sauvola">
+<code class="descclassname">nidaba.plugins.leptonica.</code><code class="descname">sauvola</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>whsize</em>, <em>factor</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.plugins.leptonica.sauvola" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binarizes an input document utilizing Sauvola thresholding as described in
+[0]. Expects 8bpp grayscale images as input.</p>
+<p>[0] Sauvola, Jaakko, and Matti Pietikäinen. &#8220;Adaptive document image
+binarization.&#8221; Pattern recognition 33.2 (2000): 225-236.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doc</strong> (<em>unicode</em>) &#8211; The input document tuple.</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files</li>
+<li><strong>whsize</strong> (<em>int</em>) &#8211; The window width and height that local statistics are
+calculated on are twice the value of whsize. The minimal
+value is 2.</li>
+<li><strong>factor</strong> (<em>float</em>) &#8211; The threshold reduction factor due to variance. 0 =&lt;
+factor &lt; 1.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(unicode, unicode)</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NidabaInvalidParameterException</span></code> &#8211;
+Input parameters are outside the valid
+range.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.plugins.leptonica.dewarp">
+<code class="descclassname">nidaba.plugins.leptonica.</code><code class="descname">dewarp</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.plugins.leptonica.dewarp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes perspective distortion (as commonly exhibited by overhead scans)
+from an 1bpp input image.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple.</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.plugins.leptonica.deskew">
+<code class="descclassname">nidaba.plugins.leptonica.</code><code class="descname">deskew</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.plugins.leptonica.deskew" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes skew (rotational distortion) from an 1bpp input image.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple.</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">nidaba</a></h1>
+
+
+
+<p class="blurb">An expandable and scalable OCR pipeline</p>
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=openphilology&repo=nidaba&type=watch&count=true&size=large"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Plugins</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#nidaba-plugins-kraken">nidaba.plugins.kraken</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nidaba-plugins-ocropus">nidaba.plugins.ocropus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nidaba-plugins-tesseract">nidaba.plugins.tesseract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nidaba-plugins-leptonica">nidaba.plugins.leptonica</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/modules.html">API Docs</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2014-2015, Open Greek and Latin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+      |
+      <a href="_sources/plugins.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>
