@@ -16,6 +16,7 @@ distribute the execution of this software to multiple machines.
         Plugins <plugins>
         FAQs <faq>
         API Docs <source/modules>
+        Changelog <../ChangeLog>
 
 Nidaba does a bunch of things for you:
 
@@ -259,8 +260,6 @@ On failure the subtasks that failed and their error message will be printed:
         ocr.tesseract failed while operating on input_img.rgb_to_gray_binarize.nlbin_0.5_0.5_1.0_0.1_80_20_5_90.png which is based on input.png
 
 .. include:: ../CONTRIBUTING.rst
-
-.. include:: ../ChangeLog
 
 Licensing and Authorship
 ========================
