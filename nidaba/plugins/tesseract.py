@@ -94,6 +94,8 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None):
         (unicode, unicode): Storage tuple for the output file
     """
     image_path = storage.get_abs_path(*doc)
+    if isinstance(languages, basestring):
+        languages = [languages]
     output_path = storage.insert_suffix(image_path, method, *languages)
 
     if implementation == 'legacy':
