@@ -66,5 +66,7 @@ class NidabaTask(Task):
                                            e.message))
             app.backend.set(tracking_kwargs['id'], json.dumps(batch_struct))
             raise
+        if isinstance(ret, dict):
+            tracking_kwargs.update(ret)
         tracking_kwargs['doc'] = ret
         return tracking_kwargs
