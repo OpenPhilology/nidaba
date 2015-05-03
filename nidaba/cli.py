@@ -10,7 +10,7 @@ from nidaba import Batch, storage
 from nidaba.config import nidaba_cfg
 from nidaba import celery
 from pprint import pprint
-from inspect import getcallargs
+from inspect import getcallargs, getdoc
 
 import argparse
 import uuid
@@ -20,15 +20,8 @@ import sys
 import click
 import pkg_resources
 
-def print_version(ctx, param, value):
-    if not value or ctx.resilient_parsing:
-        return
-    click.echo(pkg_resources.require('nidaba')[0].version)
-    ctx.exit()
-
 @click.group()
-@click.option('--version', is_flag=True, callback=print_version,
-             expose_value=False, is_eager=True)
+@click.version_option()
 def main():
     """
     Sends jobs to nidaba and retrieves their status.
@@ -67,6 +60,26 @@ def get_prefix_tasks(prefix=''):
     t = celery.app.tasks
     return [k.split('.')[-1] for k in t.iterkeys() if k.startswith('nidaba.' +
             prefix)]
+
+
+def help_tasks(ctx, param, value):
+    t = celery.app.tasks
+    hidden = ['util']
+    last = u''
+    docs = u''
+    for k in sorted(t.keys()):
+        hier = k.split('.')
+        if hier[0] == 'nidaba':
+            if hier[1] in hidden:
+                continue
+            elif hier[1] != last:
+                docs += '{}\n{}\n\n'.format(hier[1].title(), len(hier[1]) *
+                                            '-')
+                last = hier[1]
+            docs += '{}\n{}\n\n{}'.format(hier[-1], len(hier[-1]) * '~',
+                                          getdoc(t[k].run).decode('utf-8').partition('Returns:')[0])
+    click.echo_via_pager(docs)
+    ctx.exit()
 
 def validate_definition(ctx, param, value):
     """
@@ -110,8 +123,9 @@ def validate_definition(ctx, param, value):
     return definitions
 
 @main.command()
-@click.argument('files', type=click.Path(exists=True), nargs=-1, required=True)
-@click.option('--binarize', '-b', multiple=True, callback=validate_definition)
+@click.option('--binarize', '-b', multiple=True, callback=validate_definition,
+              help='A configuration for a single binarization algorithm in the'
+              'format algorithm:param1,param2;param1,param2;...')
 @click.option('--ocr', '-o', multiple=True, callback=validate_definition, 
               help='A list of OCR engine options in '
               'the format engine:language1,language2 engine:model1, model2 '
@@ -128,6 +142,8 @@ def validate_definition(ctx, param, value):
 @click.option('--jobid', default=uuid.uuid4(), type=str, help='Force a job '
               'identifier. This may or may not be an UUID but it has to be an '
               'unused identifer.')
+@click.option('--help-tasks', is_eager=True, is_flag=True, callback=help_tasks)
+@click.argument('files', type=click.Path(exists=True), nargs=-1, required=True)
 def batch(files, binarize, ocr, blend, grayscale, erate, jobid):
     """
     Add a new job to the pipeline.
@@ -201,7 +217,7 @@ def status(job_id):
             print('Please contact your friendly nidaba support technician.')
         else:
             for doc in ret:
-                print(doc['root'][1].encode('utf-8'), '->',
+                click.echo(doc['root'][1].encode('utf-8') + u' \u2192 ' + 
                       storage.get_abs_path(*doc['doc']).encode('utf-8'))
     elif state == 'FAILURE':
         ret = batch.get_errors()
