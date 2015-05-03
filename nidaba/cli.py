@@ -63,6 +63,8 @@ def get_prefix_tasks(prefix=''):
 
 
 def help_tasks(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
     t = celery.app.tasks
     hidden = ['util']
     last = u''
@@ -132,11 +134,11 @@ def validate_definition(ctx, param, value):
               'where engine is either tesseract or ocropus and language* is a '
               'tesseract language model and model1 is a ocropus model defined '
               'in the nidaba config.')
-@click.option('--willitblend/--noblend', 'blend',  default=False, help='Blend '
-              'all output files into a single hOCR document.')
-@click.option('--grayscale/--color', default=False, help='Skip grayscale '
+@click.option('--willitblend', 'blend',  default=False, help='Blend all '
+              'output files into a single hOCR document.', is_flag=True)
+@click.option('--grayscale', default=False, help='Skip grayscale '
               'conversion using the ITU-R 601-2 luma transform if the input '
-              'documents are already in grayscale.')
+              'documents are already in grayscale.', is_flag=True)
 @click.option('--erate', type=click.Path(exists=True), help='Calculate the'
               'error rate using a ground truth.')
 @click.option('--jobid', default=uuid.uuid4(), type=str, help='Force a job '
