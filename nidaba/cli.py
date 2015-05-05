@@ -13,6 +13,7 @@ from pprint import pprint
 from inspect import getcallargs, getdoc
 
 import argparse
+import re
 import uuid
 import shutil
 import os.path
@@ -97,7 +98,7 @@ def validate_definition(ctx, param, value):
         for conf in params.split(u';'):
             args = []
             kwargs = {}
-            for arg in conf.split(u','):
+            for arg in re.split(r'(?<!\\):', conf):
                 # treat as kwarg
                 if '=' in arg:
                     k, v = arg.split('=')

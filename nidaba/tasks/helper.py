@@ -67,6 +67,14 @@ class NidabaTask(Task):
             app.backend.set(tracking_kwargs['id'], json.dumps(batch_struct))
             raise
         if isinstance(ret, dict):
-            tracking_kwargs.update(ret)
-        tracking_kwargs['doc'] = ret
+            for k,v in ret.iteritems():
+                # if a previous task has already created the key, for example a
+                # measure being computed before and after a processing step, we
+                # append the value.
+                if k in tracking_kwargs:
+                    tracking_kwargs[k].append(v)
+                else:
+                    tracking_kwargs[k] = v
+        else:
+            tracking_kwargs['doc'] = ret
         return tracking_kwargs
