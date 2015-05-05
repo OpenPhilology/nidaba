@@ -17,3 +17,5 @@ from __future__ import absolute_import
 from nidaba.tasks import util
 from nidaba.tasks import img
 from nidaba.tasks import binarize
+from nidaba.tasks import stats
+from nidaba.tasks import postprocessing

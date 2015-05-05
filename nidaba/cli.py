@@ -20,7 +20,7 @@ import sys
 import click
 import pkg_resources
 
-@click.group()
+@click.group(epilog='This nidaba may or may not have Super Cow Powers')
 @click.version_option()
 def main():
     """
@@ -126,27 +126,27 @@ def validate_definition(ctx, param, value):
 
 @main.command()
 @click.option('--binarize', '-b', multiple=True, callback=validate_definition,
-              help='A configuration for a single binarization algorithm in the'
-              'format algorithm:param1,param2;param1,param2;...')
+              help='A configuration for a single binarization algorithm in '
+              'the format algorithm:param1,param2;param1,param2;...')
 @click.option('--ocr', '-o', multiple=True, callback=validate_definition, 
-              help='A list of OCR engine options in '
-              'the format engine:language1,language2 engine:model1, model2 '
-              'where engine is either tesseract or ocropus and language* is a '
-              'tesseract language model and model1 is a ocropus model defined '
-              'in the nidaba config.')
+              help='A configuration for a single OCR engine in the format '
+              'engine:param1,param2;param1,param2;...')
+@click.option('--stats', '-s', multiple=True, callback=validate_definition,
+              help='A configuration for a single post-OCR measure in the '
+              'format measure:param1,param2;param1;param2...')
 @click.option('--willitblend', 'blend',  default=False, help='Blend all '
               'output files into a single hOCR document.', is_flag=True)
 @click.option('--grayscale', default=False, help='Skip grayscale '
               'conversion using the ITU-R 601-2 luma transform if the input '
               'documents are already in grayscale.', is_flag=True)
-@click.option('--erate', type=click.Path(exists=True), help='Calculate the'
-              'error rate using a ground truth.')
 @click.option('--jobid', default=uuid.uuid4(), type=str, help='Force a job '
               'identifier. This may or may not be an UUID but it has to be an '
               'unused identifer.')
-@click.option('--help-tasks', is_eager=True, is_flag=True, callback=help_tasks)
+@click.option('--help-tasks', is_eager=True, is_flag=True, callback=help_tasks,
+              help='Accesses the documentation of all tasks contained in '
+              'nidaba itself and in configured plugins.')
 @click.argument('files', type=click.Path(exists=True), nargs=-1, required=True)
-def batch(files, binarize, ocr, blend, grayscale, erate, jobid):
+def batch(files, binarize, ocr, stats, blend, grayscale, jobid, help_tasks):
     """
     Add a new job to the pipeline.
     """
@@ -177,10 +177,15 @@ def batch(files, binarize, ocr, blend, grayscale, erate, jobid):
         for alg in ocr:
             for kwargs in alg[1]:
                 batch.add_task(alg[0], **kwargs)
+    if stats:
+        batch.add_tick()
+        for alg in stats:
+            for kwargs in alg[1]:
+                batch.add_task(alg[0], **kwargs)
     if blend:
         batch.add_step()
         batch.add_tick()
-        batch.add_task('util.blend_hocr')
+        batch.add_task('postprocessing.blend_hocr')
     batch.run()
     click.secho(u'\u2713', fg='green', nl=False)
     click.echo(']')
