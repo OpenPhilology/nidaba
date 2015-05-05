@@ -129,6 +129,10 @@ def ocr_capi(image_path, output_path, languages):
     w, h = img.size
 
     assert img.mode == 'L' or img.mode == '1'
+    # There is a regression in TessBaseAPISetImage somewhere between 3.02 and
+    # 3.03. Unfortunately the tesseract maintainers close all bug reports
+    # concerning their API, so we just convert to grayscale here.
+    img = img.convert('L')
     try:
         tesseract = ctypes.cdll.LoadLibrary('libtesseract.so.3')
     except OSError as e:
@@ -147,7 +151,7 @@ def ocr_capi(image_path, output_path, languages):
     if (rc):
         tesseract.TessBaseAPIDelete(api)
         raise NidabaTesseractException('Tesseract initialization failed.')
-    tesseract.TessBaseAPISetImage(api, ctypes.c_char_p(img.tobytes()), w, h, 1, w)
+    tesseract.TessBaseAPISetImage(api, ctypes.c_char_p(str(img.tobytes())), w, h, 1, w)
     with open(output_path, 'wb') as fp:
         tp = tesseract.TessBaseAPIGetHOCRText(api)
         fp.write(ctypes.string_at(tp))
