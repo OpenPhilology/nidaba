@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Nidaba &mdash; nidaba 0.3.10-1-g8c417de
+    <title>Nidaba &mdash; nidaba 0.3.12
  documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.10-1-g8c417de
+        VERSION:     '0.3.12
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.3.10-1-g8c417de
+    <link rel="top" title="nidaba 0.3.12
  documentation" href="#" />
     <link rel="next" title="Plugins" href="plugins.html" />
    
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="plugins.html" title="Plugins"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">nidaba 0.3.10-1-g8c417de
+        <li class="nav-item nav-item-0"><a href="#">nidaba 0.3.12
  documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -67,8 +67,7 @@ distribute the execution of this software to multiple machines.</p>
 <div class="toctree-wrapper compound">
 </div>
 <p>Nidaba does a bunch of things for you:</p>
-<blockquote>
-<div><ul class="simple">
+<ul class="simple">
 <li><a class="reference external" href="http://pillow.readthedocs.org/en/latest/reference/Image.html#PIL.Image.Image.convert">Grayscale Conversion</a></li>
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Thresholding_%28image_processing%29">Binarization</a></li>
 <li><a class="reference external" href="http://www.leptonica.com/skew-measurement.html">Deskewing</a></li>
@@ -76,7 +75,6 @@ distribute the execution of this software to multiple machines.</p>
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Optical_character_recognition">OCR</a></li>
 <li>Output merging</li>
 </ul>
-</div></blockquote>
 </div>
 <div class="section" id="installation">
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
@@ -145,26 +143,50 @@ usually into the root of the virtualenv containing nidaba or
 <code class="docutils literal"><span class="pre">/usr/etc/nidaba/</span></code>.</p>
 <p>The former resembles a <a class="reference external" href="http://celery.readthedocs.org/en/latest/configuration.html">celery configuration object</a> and may contain
 all available options. The example file looks like this:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">BROKER_URL</span><span class="p-Indicator">:</span> <span class="s">&#39;redis://127.0.0.1:6379&#39;</span>
+<span class="l-Scalar-Plain">CELERY_RESULT_BACKEND</span><span class="p-Indicator">:</span> <span class="s">&#39;redis://127.0.0.1:6379&#39;</span>
+<span class="l-Scalar-Plain">CELERY_TASK_SERIALIZER</span><span class="p-Indicator">:</span> <span class="s">&#39;json&#39;</span>
+<span class="l-Scalar-Plain">CELERY_RESULT_SERIALIZER</span><span class="p-Indicator">:</span> <span class="s">&#39;json&#39;</span>
+<span class="l-Scalar-Plain">CELERY_ACCEPT_CONTENT</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="s">&#39;json&#39;</span><span class="p-Indicator">]</span>
+</pre></div>
+</div>
 <p>The later contains essential configuration for several subtasks and the overall
 framework:</p>
-<dl class="docutils">
-<dt>storage_path</dt>
-<dd>The home directory for nidaba to store files created by OCR jobs, i.e.
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">storage_path</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">~/OCR</span>
+<span class="l-Scalar-Plain">lang_dicts</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">polytonic_greek</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">dicts</span><span class="p-Indicator">,</span> <span class="nv">greek.dic</span><span class="p-Indicator">]</span>
+  <span class="l-Scalar-Plain">lojban</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">dicts</span><span class="p-Indicator">,</span> <span class="nv">lojban.dic</span><span class="p-Indicator">]</span>
+  <span class="l-Scalar-Plain">german</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">dicts</span><span class="p-Indicator">,</span> <span class="nv">german.dic</span><span class="p-Indicator">]</span>
+<span class="l-Scalar-Plain">ocropus_models</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">greek</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">models</span><span class="p-Indicator">,</span> <span class="nv">greek.pyrnn.gz</span><span class="p-Indicator">]</span>
+  <span class="l-Scalar-Plain">atlantean</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">models</span><span class="p-Indicator">,</span> <span class="nv">atlantean.pyrnn.gz</span><span class="p-Indicator">]</span>
+  <span class="l-Scalar-Plain">fraktur</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">models</span><span class="p-Indicator">,</span> <span class="nv">fraktur.pyrnn.gz</span><span class="p-Indicator">]</span>
+  <span class="l-Scalar-Plain">fancy_ligatures</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">models</span><span class="p-Indicator">,</span> <span class="nv">ligatures.pyrnn.gz</span><span class="p-Indicator">]</span>
+<span class="l-Scalar-Plain">plugin_path</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="s">&#39;/usr/share/nidaba/&#39;</span><span class="p-Indicator">]</span>
+<span class="l-Scalar-Plain">plugins_load</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">tesseract</span><span class="p-Indicator">:</span> <span class="p-Indicator">{</span><span class="nv">implementation</span><span class="p-Indicator">:</span> <span class="nv">capi</span><span class="p-Indicator">,</span>
+             <span class="nv">tessdata</span><span class="p-Indicator">:</span> <span class="nv">/usr/share/tesseract-ocr</span><span class="p-Indicator">}</span>
+  <span class="l-Scalar-Plain">ocropus</span><span class="p-Indicator">:</span> <span class="p-Indicator">{}</span>
+  <span class="l-Scalar-Plain">kraken</span><span class="p-Indicator">:</span> <span class="p-Indicator">{}</span>
+  <span class="l-Scalar-Plain">leptonica</span><span class="p-Indicator">:</span> <span class="p-Indicator">{}</span>
+</pre></div>
+</div>
+<p>storage_path
+The home directory for nidaba to store files created by OCR jobs, i.e.
 the location of the shared storage medium. This may differ on
-different machines in the cluster.</dd>
-<dt>ocropus_models (optional)</dt>
-<dd>A list of mappings from unique identifiers to storage tupels where a
+different machines in the cluster.</p>
+<p>ocropus_models (optional)
+A list of mappings from unique identifiers to storage tupels where a
 tupel is of the format [directory, path] resulting in the absolute path
 storage_path/directory/path. Each mapping defines a single neuronal
 network available to the ocropus OCR task. These have to exist on all
 machines running nidaba and therefore have to be on the common storage medium
-beneath storage_path.</dd>
-<dt>plugin_path (optional)</dt>
-<dd>A list of additional paths to look for plugins in.</dd>
-<dt>plugins_load (optional)</dt>
-<dd>An associative array of plugins to load with additional configuration
-data for each plugin. See <a class="reference internal" href="plugins.html"><em>plugins</em></a> for more information.</dd>
-</dl>
+beneath storage_path.</p>
+<p>plugin_path (optional)
+A list of additional paths to look for plugins in.</p>
+<p>plugins_load (optional)
+An associative array of plugins to load with additional configuration
+data for each plugin. See <a class="reference internal" href="plugins.html"><em>plugins</em></a> for more information.</p>
 </div>
 <div class="section" id="running">
 <h1>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h1>
@@ -189,9 +211,7 @@ utility. It is automatically installed during the installation procedure.</p>
 <span class="go">                    &#39;fancy_ligatures&#39;: [&#39;models&#39;, &#39;ligatures.pyrnn.gz&#39;],</span>
 <span class="go">                    &#39;fraktur&#39;: [&#39;models&#39;, &#39;fraktur.pyrnn.gz&#39;],</span>
 <span class="go">                    &#39;greek&#39;: [&#39;models&#39;, &#39;greek.pyrnn.gz&#39;]},</span>
-<span class="go"> &#39;plugins_load&#39;: {&#39;kraken&#39;: {},</span>
-<span class="go">                  &#39;leptonica&#39;: {},</span>
-<span class="go">                  &#39;ocropus&#39;: {&#39;legacy&#39;: False},</span>
+<span class="go"> &#39;plugins_load&#39;: {&#39;leptonica&#39;: {},</span>
 <span class="go">                  &#39;tesseract&#39;: {&#39;implementation&#39;: &#39;capi&#39;,</span>
 <span class="go">                                &#39;tessdata&#39;: &#39;/usr/share/tesseract-ocr&#39;}},</span>
 <span class="go"> &#39;storage_path&#39;: &#39;~/OCR&#39;}</span>
@@ -208,40 +228,41 @@ options accepted by the <code class="docutils literal"><span class="pre">celery<
 </div>
 <p>The <code class="docutils literal"><span class="pre">batch</span></code> subcommand is used to add a job to the pipeline. A rather minimal
 invocation looks like this:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch --binarize nlbin sauvola --ocr tesseract:eng -- input.png
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch --binarize nlbin -b sauvola -o tesseract:eng -- input.png
 <span class="go">90ae699a-7172-44ce-a8bf-5464bccd34d0</span>
 </pre></div>
 </div>
 <p>It converts the input file <code class="docutils literal"><span class="pre">input.png</span></code> to grayscale, binarizes it using the
 Sauvola and nlbin algorithm, and finally runs it through tesseract with the
 English language model.</p>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd><span class="option">--binarize</span></kbd></td>
-<td>Defines the binarization parameters. It consists of a list of terms in
-the format algorithm1:arg1=a,arg2=b;arg1=n algorithm2:arg1=1;arg1=2;...
-where algorithm is one of the algorithms implemented and args are their
-configuration parameters. Have a look at <a class="reference internal" href="source/nidaba.tasks.html#module-nidaba.tasks.binarize" title="nidaba.tasks.binarize"><code class="xref py py-mod docutils literal"><span class="pre">nidaba.tasks.binarize</span></code></a>
-for possible values.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">--ocr</span></kbd></td>
-<td>A list of OCR engine options in the format engine:lang1,lang2,lang3
-engine2:model... where engine is either <em>tesseract</em> or <em>ocropus</em> and
-lang is a tesseract language model and model is an ocropus model
-previously defined in nidabaconfig.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">--willitblend</span></kbd></td>
-<td>Blends all output hOCR files into a single hOCR document using the
-dummy scoring algorithm</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">--grayscale</span></kbd></td>
-<td>A switch to indicate that input files are already 8bpp grayscale and
-conversion to grayscale is unnecessary.</td></tr>
-</tbody>
-</table>
+<dl class="docutils">
+<dt>&#8211;binarize / -b</dt>
+<dd><p class="first">Defines a single configuration of a binarization algorithm. It consists
+of a term in the form algorithm:param1,param2,paramN=N;param1,param2...
+where algorithm is one of the algorithms implemented and params are
+their configuration parameters. Parameters may either be keyword
+argument, e.g. window_size=10, or positional arguments. Both can be
+mixed as long as no positional arguments are defined after a keyword
+argument.</p>
+<p class="last">Multiple &#8211;binarize options can be used to execute additional
+binarization algorithms. Have a look at <a class="reference internal" href="source/nidaba.tasks.html#module-nidaba.tasks.binarize" title="nidaba.tasks.binarize"><code class="xref py py-mod docutils literal"><span class="pre">nidaba.tasks.binarize</span></code></a>
+for possible values.</p>
+</dd>
+<dt>&#8211;ocr / -o</dt>
+<dd>Defines a single configuration of an OCR engine. It consists of a term
+in the form engine:param1,param2;param1,param2=N;... where engine is
+one of the loaded OCR engines and params are their configurations.</dd>
+<dt>&#8211;stats / -s</dt>
+<dd>Defines a single configuration of a post-OCR measure in the format
+measure:param1,param2,... Have a look a <code class="xref py py-mod docutils literal"><span class="pre">nidaba.tasks.stats</span></code> for
+possible values.</dd>
+<dt>&#8211;willitblend</dt>
+<dd>Blends all output hOCR files into a single hOCR document using the
+dummy scoring algorithm</dd>
+<dt>&#8211;grayscale</dt>
+<dd>A switch to indicate that input files are already 8bpp grayscale and
+conversion to grayscale is unnecessary.</dd>
+</dl>
 <p>The <code class="docutils literal"><span class="pre">status</span></code> subcommand is used to retrieve the status of a job. It takes the
 return value of a previously executed <code class="docutils literal"><span class="pre">batch</span></code> command. A currently running
 command will return PENDING:</p>
@@ -265,6 +286,36 @@ containing the final output:</p>
 </pre></div>
 </div>
 </div>
+</div>
+<div class="section" id="contributing">
+<span id="id2"></span><h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
+<p>Every open source project lives from the generous help by contributors
+that sacrifice their time and nibada is no different.</p>
+<p>Here are a few hints and rules to get you started:</p>
+<ul class="simple">
+<li>No contribution is too small; please submit as many fixes for typos
+and grammar bloopers as you can!</li>
+<li>Don’t <em>ever</em> break backward compatibility.</li>
+<li><em>Always</em> add tests and docs for your code.</li>
+<li>This is a hard rule; patches with missing tests or documentation
+won’t be merged. If a feature is not tested or documented, it doesn’t
+exist.</li>
+<li>Obey <a class="reference external" href="http://www.python.org/dev/peps/pep-0008/">PEP8</a> and
+<a class="reference external" href="http://www.python.org/dev/peps/pep-0257/">PEP257</a>.</li>
+<li>Write good commit messages.</li>
+<li>Ideally,
+<a class="reference external" href="http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html">squash</a>
+your commits, i.e. make your pull requests just one commit.</li>
+<li>If you&#8217;re not comfortable with using git, please use git format-patch
+and send me the resulting diff.</li>
+</ul>
+<p>If you have something great but aren’t sure whether it adheres &#8211; or
+even can adhere &#8211; to the rules above: <strong>please submit a pull request
+anyway</strong>!</p>
+<p>In the best case, we can mold it into something, in the worst case the
+pull request gets politely closed. There’s absolutely nothing to fear.</p>
+<p>Thank you for considering to contribute to nibada! If you have any
+question or concerns, feel free to reach out to us.</p>
 </div>
 <div class="section" id="licensing-and-authorship">
 <h1>Licensing and Authorship<a class="headerlink" href="#licensing-and-authorship" title="Permalink to this headline">¶</a></h1>
@@ -324,7 +375,7 @@ the <a class="reference external" href="https://www.dh.uni-leipzig.de">Humboldt 
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
       
       |
       <a href="_sources/index.txt"

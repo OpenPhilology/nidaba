@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nidaba package &mdash; nidaba 0.3.10-1-g8c417de
+    <title>nidaba package &mdash; nidaba 0.3.12
  documentation</title>
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3.10-1-g8c417de
+        VERSION:     '0.3.12
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.3.10-1-g8c417de
+    <link rel="top" title="nidaba 0.3.12
  documentation" href="../index.html" />
     <link rel="up" title="nidaba" href="modules.html" />
     <link rel="next" title="nidaba.algorithms package" href="nidaba.algorithms.html" />
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="modules.html" title="nidaba"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.3.10-1-g8c417de
+        <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.3.12
  documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">nidaba</a> &raquo;</li> 
       </ul>
@@ -118,24 +118,9 @@
 <span id="nidaba-cli-module"></span><h2>nidaba.cli module<a class="headerlink" href="#module-nidaba.cli" title="Permalink to this headline">¶</a></h2>
 <p>This module encapsulates all shell callable functions of nidaba.</p>
 <dl class="function">
-<dt id="nidaba.cli.batch">
-<code class="descclassname">nidaba.cli.</code><code class="descname">batch</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.batch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implements the batch subcommand of the nidaba binary.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>argparse.Namespace</em>) &#8211; Parsed input object from argparse</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.cli.config">
-<code class="descclassname">nidaba.cli.</code><code class="descname">config</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implements the config display subcommand.</p>
-</dd></dl>
+<dt id="nidaba.cli.help_tasks">
+<code class="descclassname">nidaba.cli.</code><code class="descname">help_tasks</code><span class="sig-paren">(</span><em>ctx</em>, <em>param</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.help_tasks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="nidaba.cli.int_float_or_str">
@@ -158,29 +143,19 @@ to the highest data type in the ordering.</td>
 </dd></dl>
 
 <dl class="function">
-<dt id="nidaba.cli.main">
-<code class="descclassname">nidaba.cli.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main function called by the hook installed by setuptools.</p>
+<dt id="nidaba.cli.move_to_storage">
+<code class="descclassname">nidaba.cli.</code><code class="descname">move_to_storage</code><span class="sig-paren">(</span><em>id</em>, <em>kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.move_to_storage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes as dictionary of kwargs and moves the suffix of all keys starting
+with the string &#8216;file:&#8217; to the storage medium, prepending a unique
+identifier. The path components are rewritten in storage tuple form and the
+modified dictionary is returned.</p>
+<p>It is assumed that the filestore is already created.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="nidaba.cli.status">
-<code class="descclassname">nidaba.cli.</code><code class="descname">status</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.status" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implements the status subcommand.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>argparse.Namespace</em>) &#8211; Parsed input object from argparse</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.cli.worker">
-<code class="descclassname">nidaba.cli.</code><code class="descname">worker</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.worker" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implements the worker subcommand.</p>
+<dt id="nidaba.cli.validate_definition">
+<code class="descclassname">nidaba.cli.</code><code class="descname">validate_definition</code><span class="sig-paren">(</span><em>ctx</em>, <em>param</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.validate_definition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates all task definitions of a group and returns them as a list.</p>
 </dd></dl>
 
 </div>
@@ -1093,7 +1068,7 @@ None: Failure</p>
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
       
       |
       <a href="../_sources/source/nidaba.txt"

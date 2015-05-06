@@ -20,12 +20,12 @@ distribute the execution of this software to multiple machines.
 
 Nidaba does a bunch of things for you:
 
-        - `Grayscale Conversion <http://pillow.readthedocs.org/en/latest/reference/Image.html#PIL.Image.Image.convert>`_
-        - `Binarization <http://en.wikipedia.org/wiki/Thresholding_%28image_processing%29>`_
-        - `Deskewing <http://www.leptonica.com/skew-measurement.html>`_
-        - `Dewarping <http://www.leptonica.com/dewarping.html>`_
-        - `OCR <http://en.wikipedia.org/wiki/Optical_character_recognition>`_
-        - Output merging
+- `Grayscale Conversion <http://pillow.readthedocs.org/en/latest/reference/Image.html#PIL.Image.Image.convert>`_
+- `Binarization <http://en.wikipedia.org/wiki/Thresholding_%28image_processing%29>`_
+- `Deskewing <http://www.leptonica.com/skew-measurement.html>`_
+- `Dewarping <http://www.leptonica.com/dewarping.html>`_
+- `OCR <http://en.wikipedia.org/wiki/Optical_character_recognition>`_
+- Output merging
 
 .. _installation:
 
@@ -71,13 +71,13 @@ via `pip <https://pip.pypa.io>`_:
         $ pip install nidaba
 
 .. note::
-        Deploying python applications can be painful in some circumstances.
-        Unfortunately, nidaba is no exception to this and the build process of
-        several dependencies is currently of a disastrous quality.
-        nidaba should either be installed in disposable virtual machines or if
-        installed on a machine that is intended to run other applications, e.g.
-        a personal laptop or workstation, we strongly urge you to utilize
-        `virtualenv <https://virtualenv.pypa.io>`_.
+   Deploying python applications can be painful in some circumstances.
+   Unfortunately, nidaba is no exception to this and the build process of
+   several dependencies is currently of a disastrous quality.
+   nidaba should either be installed in disposable virtual machines or if
+   installed on a machine that is intended to run other applications, e.g.
+   a personal laptop or workstation, we strongly urge you to utilize
+   `virtualenv <https://virtualenv.pypa.io>`_.
 
 Alternatively, run pip in the root directory of the `git repository
 <https://github.com/openphilology/nidaba>`_:
@@ -119,34 +119,56 @@ The former resembles a `celery configuration object
 <http://celery.readthedocs.org/en/latest/configuration.html>`_ and may contain
 all available options. The example file looks like this:
 
-.. literalinclude:: ../examples/celery.yaml
-        :language: yaml
+.. code-block:: yaml
+
+        BROKER_URL: 'redis://127.0.0.1:6379'
+        CELERY_RESULT_BACKEND: 'redis://127.0.0.1:6379'
+        CELERY_TASK_SERIALIZER: 'json'
+        CELERY_RESULT_SERIALIZER: 'json'
+        CELERY_ACCEPT_CONTENT: ['json']
 
 The later contains essential configuration for several subtasks and the overall
 framework:
 
-.. literalinclude:: ../examples/nidaba.yaml
-        :language: yaml
+.. code-block:: yaml
+
+        storage_path: ~/OCR
+        lang_dicts:
+          polytonic_greek: [dicts, greek.dic]
+          lojban: [dicts, lojban.dic]
+          german: [dicts, german.dic]
+        ocropus_models:
+          greek: [models, greek.pyrnn.gz]
+          atlantean: [models, atlantean.pyrnn.gz]
+          fraktur: [models, fraktur.pyrnn.gz]
+          fancy_ligatures: [models, ligatures.pyrnn.gz]
+        plugin_path: ['/usr/share/nidaba/']
+        plugins_load:
+          tesseract: {implementation: capi,
+                     tessdata: /usr/share/tesseract-ocr}
+          ocropus: {}
+          kraken: {}
+          leptonica: {}
 
 storage_path
-        The home directory for nidaba to store files created by OCR jobs, i.e.
-        the location of the shared storage medium. This may differ on
-        different machines in the cluster.
+The home directory for nidaba to store files created by OCR jobs, i.e.
+the location of the shared storage medium. This may differ on
+different machines in the cluster.
 
 ocropus_models (optional)
-        A list of mappings from unique identifiers to storage tupels where a
-        tupel is of the format [directory, path] resulting in the absolute path
-        storage_path/directory/path. Each mapping defines a single neuronal
-        network available to the ocropus OCR task. These have to exist on all
-        machines running nidaba and therefore have to be on the common storage medium
-        beneath storage_path.
+A list of mappings from unique identifiers to storage tupels where a
+tupel is of the format [directory, path] resulting in the absolute path
+storage_path/directory/path. Each mapping defines a single neuronal
+network available to the ocropus OCR task. These have to exist on all
+machines running nidaba and therefore have to be on the common storage medium
+beneath storage_path.
 
 plugin_path (optional)
-        A list of additional paths to look for plugins in.
+A list of additional paths to look for plugins in.
 
 plugins_load (optional)
-        An associative array of plugins to load with additional configuration
-        data for each plugin. See :doc:`plugins <plugins>` for more information.
+An associative array of plugins to load with additional configuration
+data for each plugin. See :doc:`plugins <plugins>` for more information.
 
 Running
 =======
@@ -181,9 +203,7 @@ The ``config`` subcommand is used to inspect the current nidabaconfig.py:
                             'fancy_ligatures': ['models', 'ligatures.pyrnn.gz'],
                             'fraktur': ['models', 'fraktur.pyrnn.gz'],
                             'greek': ['models', 'greek.pyrnn.gz']},
-         'plugins_load': {'kraken': {},
-                          'leptonica': {},
-                          'ocropus': {'legacy': False},
+         'plugins_load': {'leptonica': {},
                           'tesseract': {'implementation': 'capi',
                                         'tessdata': '/usr/share/tesseract-ocr'}},
          'storage_path': '~/OCR'}
@@ -206,28 +226,40 @@ invocation looks like this:
 
 .. code-block:: console
 
-        $ nidaba batch --binarize nlbin sauvola --ocr tesseract:eng -- input.png
+        $ nidaba batch --binarize nlbin -b sauvola -o tesseract:eng -- input.png
         90ae699a-7172-44ce-a8bf-5464bccd34d0
 
 It converts the input file ``input.png`` to grayscale, binarizes it using the
 Sauvola and nlbin algorithm, and finally runs it through tesseract with the
 English language model.
 
---binarize
-        Defines the binarization parameters. It consists of a list of terms in
-        the format algorithm1:arg1=a,arg2=b;arg1=n algorithm2:arg1=1;arg1=2;...
-        where algorithm is one of the algorithms implemented and args are their
-        configuration parameters. Have a look at :mod:`nidaba.tasks.binarize`
+--binarize / -b
+        Defines a single configuration of a binarization algorithm. It consists
+        of a term in the form algorithm:param1,param2,paramN=N;param1,param2...
+        where algorithm is one of the algorithms implemented and params are
+        their configuration parameters. Parameters may either be keyword
+        argument, e.g. window_size=10, or positional arguments. Both can be
+        mixed as long as no positional arguments are defined after a keyword
+        argument.
+        
+        Multiple --binarize options can be used to execute additional
+        binarization algorithms. Have a look at :mod:`nidaba.tasks.binarize`
         for possible values.
---ocr
-        A list of OCR engine options in the format engine:lang1,lang2,lang3
-        engine2:model... where engine is either *tesseract* or *ocropus* and
-        lang is a tesseract language model and model is an ocropus model
-        previously defined in nidabaconfig.
---willitblend
+
+--ocr / -o 
+        Defines a single configuration of an OCR engine. It consists of a term
+        in the form engine:param1,param2;param1,param2=N;... where engine is
+        one of the loaded OCR engines and params are their configurations.
+
+--stats / -s
+        Defines a single configuration of a post-OCR measure in the format
+        measure:param1,param2,... Have a look a :mod:`nidaba.tasks.stats` for
+        possible values.
+
+\-\-willitblend
         Blends all output hOCR files into a single hOCR document using the
         dummy scoring algorithm
---grayscale
+\-\-grayscale
         A switch to indicate that input files are already 8bpp grayscale and
         conversion to grayscale is unnecessary.
 
@@ -259,7 +291,43 @@ On failure the subtasks that failed and their error message will be printed:
         ocr.tesseract failed while operating on input_img.rgb_to_gray_binarize.sauvola_10_0.35.png which is based on input.png
         ocr.tesseract failed while operating on input_img.rgb_to_gray_binarize.nlbin_0.5_0.5_1.0_0.1_80_20_5_90.png which is based on input.png
 
-.. include:: ../CONTRIBUTING.rst
+
+.. _contributing:
+
+Contributing
+============
+
+Every open source project lives from the generous help by contributors
+that sacrifice their time and nibada is no different.
+
+Here are a few hints and rules to get you started:
+
+-  No contribution is too small; please submit as many fixes for typos
+   and grammar bloopers as you can!
+-  Don’t *ever* break backward compatibility.
+-  *Always* add tests and docs for your code.
+-  This is a hard rule; patches with missing tests or documentation
+   won’t be merged. If a feature is not tested or documented, it doesn’t
+   exist.
+-  Obey `PEP8 <http://www.python.org/dev/peps/pep-0008/>`__ and
+   `PEP257 <http://www.python.org/dev/peps/pep-0257/>`__.
+-  Write good commit messages.
+-  Ideally,
+   `squash <http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html>`__
+   your commits, i.e. make your pull requests just one commit.
+-  If you're not comfortable with using git, please use git format-patch
+   and send me the resulting diff.
+
+If you have something great but aren’t sure whether it adheres -- or
+even can adhere -- to the rules above: **please submit a pull request
+anyway**!
+
+In the best case, we can mold it into something, in the worst case the
+pull request gets politely closed. There’s absolutely nothing to fear.
+
+Thank you for considering to contribute to nibada! If you have any
+question or concerns, feel free to reach out to us.
+
 
 Licensing and Authorship
 ========================
