@@ -34,6 +34,6 @@ plugins_load:
              tessdata: /usr/share/tesseract-ocr} # location of the tessdata
                                                  # path. May also be a storage
                                                  # tuple.
-  ocropus: {}
-  kraken: {}
-  leptonica: {}
+  #ocropus: {}
+  #kraken: {}
+  #leptonica: {}
