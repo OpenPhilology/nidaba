@@ -53,15 +53,6 @@ def int_float_or_str(s):
             except UnicodeDecodeError:
                 return s
 
-def get_prefix_tasks(prefix=''):
-    """
-    Returns a list of all registered tasks (including in plugins) that start
-    with a certain prefix, i.e. are 
-    """
-    t = celery.app.tasks
-    return [k.split('.')[-1] for k in t.iterkeys() if k.startswith('nidaba.' +
-            prefix)]
-
 
 def help_tasks(ctx, param, value):
     if not value or ctx.resilient_parsing:
@@ -84,6 +75,7 @@ def help_tasks(ctx, param, value):
     click.echo_via_pager(docs)
     ctx.exit()
 
+
 def validate_definition(ctx, param, value):
     """
     Validates all task definitions of a group and returns them as a list.
@@ -98,7 +90,7 @@ def validate_definition(ctx, param, value):
         for conf in params.split(u';'):
             args = []
             kwargs = {}
-            for arg in re.split(r'(?<!\\):', conf):
+            for arg in conf.split(u','):
                 # treat as kwarg
                 if '=' in arg:
                     k, v = arg.split('=')
@@ -124,6 +116,28 @@ def validate_definition(ctx, param, value):
             configurations.append(kwargs)
         definitions.append([task, configurations])
     return definitions
+
+def move_to_storage(id, kwargs):
+    """
+    Takes as dictionary of kwargs and moves the suffix of all keys starting
+    with the string 'file:' to the storage medium, prepending a unique
+    identifier. The path components are rewritten in storage tuple form and the
+    modified dictionary is returned.
+
+    It is assumed that the filestore is already created.
+    """
+    nkwargs = {}
+    for k, v in kwargs.iteritems():
+        if isinstance(v, basestring) and v.startswith('file:'):
+            suffix = uuid.uuid4()
+            v = v.replace('file:', '', 1)
+            dest = unicode(suffix) + '_' + os.path.basename(v)
+            shutil.copy2(v, storage.get_abs_path(id, dest))
+            nkwargs[k] = (id, dest)
+        else:
+            nkwargs[k] = v
+    return nkwargs
+            
 
 @main.command()
 @click.option('--binarize', '-b', multiple=True, callback=validate_definition,
@@ -172,16 +186,19 @@ def batch(files, binarize, ocr, stats, blend, grayscale, jobid, help_tasks):
         batch.add_tick()
         for alg in binarize:
             for kwargs in alg[1]:
+                kwargs = move_to_storage(id, kwargs)
                 batch.add_task(alg[0], **kwargs)
     if ocr:
         batch.add_tick()
         for alg in ocr:
             for kwargs in alg[1]:
+                kwargs = move_to_storage(id, kwargs)
                 batch.add_task(alg[0], **kwargs)
     if stats:
         batch.add_tick()
         for alg in stats:
             for kwargs in alg[1]:
+                kwargs = move_to_storage(id, kwargs)
                 batch.add_task(alg[0], **kwargs)
     if blend:
         batch.add_step()
