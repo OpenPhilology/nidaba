@@ -8,7 +8,7 @@ import os
 from lxml import etree
 from distutils import spawn
 from nose.plugins.skip import SkipTest
-from nidaba.plugins import ocropus
+from mock import patch, MagicMock
 
 thisfile = os.path.abspath(os.path.dirname(__file__))
 resources = os.path.abspath(os.path.join(thisfile, 'resources/ocropus'))
@@ -25,6 +25,16 @@ class OcropusTests(unittest.TestCase):
                     spawn.find_executable('ocropus-gpageseg'),
                     spawn.find_executable('ocropus-hocr')]:
             raise SkipTest
+
+        self.config_mock = MagicMock()
+        self.config_mock.nidaba.config.everything.log.return_value = True
+        modules = {
+            'nidaba.config': self.config_mock.config
+        }
+        self.module_patcher = patch.dict('sys.modules', modules)
+        self.module_patcher.start()
+        from nidaba.plugins import ocropus
+        self.ocropus = ocropus
 
         self.otempdir = unicode(tempfile.mkdtemp())
         # copytree fails if the target directory already exists. Unfortunately
@@ -48,7 +58,7 @@ class OcropusTests(unittest.TestCase):
         os.chdir(wd)
 
         modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
-        ocr = ocropus.ocr(pngpath, outpath, modelpath)
+        ocr = self.ocropus.ocr(pngpath, outpath, modelpath)
         self.assertTrue(os.path.isfile(ocr),
                         msg='Ocropus did not outpath a file!')
         self.assertEqual(os.path.dirname(ocr), swd,
@@ -68,7 +78,7 @@ class OcropusTests(unittest.TestCase):
         pngpath = os.path.join(self.tempdir, u'image_png.png')
         outpath = os.path.join(self.tempdir, u'outpath_png.hocr')
         modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
-        ocr = ocropus.ocr(pngpath, outpath, modelpath)
+        ocr = self.ocropus.ocr(pngpath, outpath, modelpath)
         self.assertTrue(os.path.isfile(ocr),
                         msg='Ocropus did not outpath a file!')
         try:
@@ -83,7 +93,7 @@ class OcropusTests(unittest.TestCase):
         tiffpath = os.path.join(self.tempdir, u'image_tiff.tiff')
         outpath = os.path.join(self.tempdir, u'outpath_tiff.hocr')
         modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
-        ocr = ocropus.ocr(tiffpath, outpath, modelpath)
+        ocr = self.ocropus.ocr(tiffpath, outpath, modelpath)
         self.assertTrue(os.path.isfile(ocr),
                         msg='Ocropus did not output a file!')
         try:
@@ -98,7 +108,7 @@ class OcropusTests(unittest.TestCase):
         jpgpath = os.path.join(self.tempdir, u'image_jpg.jpg')
         outpath = os.path.join(self.tempdir, u'outpath_jpg.hocr')
         modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
-        ocr = ocropus.ocr(jpgpath, outpath, modelpath)
+        ocr = self.ocropus.ocr(jpgpath, outpath, modelpath)
         self.assertTrue(os.path.isfile(ocr),
                         msg='Ocropus did not output a file!')
         try:

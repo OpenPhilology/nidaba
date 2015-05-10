@@ -2,7 +2,7 @@
 
 from __future__ import absolute_import
 
-from lxml import etree
+from lxml import etree, html
 from operator import attrgetter
 from nidaba import storage
 
@@ -198,13 +198,14 @@ def merge(docs, lang, output):
     Returns:
         tuple: The output storage tuple. Should be the same as ```output```.
     """
-    tree1 = etree.parse(storage.get_abs_path(docs[0][0], docs[0][1]))
+    parser = etree.HTMLParser()
+    tree1 = etree.parse(storage.get_abs_path(docs[0][0], docs[0][1]), parser)
     lines_1, words_1 = get_hocr_lines_for_tree(tree1)
     sort_words_bbox(words_1)
     other_words = []
     for doc in docs[1:]:
         try:
-            tree2 = etree.parse(storage.get_abs_path(doc[0], doc[1]))
+            tree2 = etree.parse(storage.get_abs_path(doc[0], doc[1]), parser)
             lines_2, words_2 = get_hocr_lines_for_tree(tree2)
             other_words = other_words + words_2
         except Exception as e:

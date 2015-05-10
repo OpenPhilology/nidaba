@@ -108,7 +108,7 @@ def lept_sauvola(image_path, output_path, whsize=10, factor=0.35):
     if lept.pixSauvolaBinarize(pix, whsize, ctypes.c_float(factor), 0, None,
                                None, None, ctypes.byref(opix)):
         lept.pixDestroy(ctypes.byref(pix))
-        raise NidabaLeptonicaException('Binarization failed for unknown'
+        raise NidabaLeptonicaException('Binarization failed for unknown '
                                        'reason.')
     if lept.pixWriteImpliedFormat(output_path.encode('utf-8'), opix, 100, 0):
         lept.pixDestroy(ctypes.byref(pix))

@@ -1,8 +1,9 @@
-celery==3.1.17
-lxml==3.4.3
+-e git+git@github.com:mittagessen/pluginbase.git#egg=pluginbase
+celery==3.1.18
+click==4.0
+dominate==2.1.12
+lxml==3.4.4
 numpy==1.9.2
 Pillow==2.8.1
-pluginbase==0.3
 PyYAML==3.11
 redis==2.10.3
-click==4.0

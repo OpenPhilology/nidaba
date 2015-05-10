@@ -3,7 +3,8 @@ import unittest
 import os
 import tempfile
 import shutil
-from nidaba import lex
+
+from mock import patch, MagicMock
 
 
 class DictTests(unittest.TestCase):
@@ -24,6 +25,16 @@ class DictTests(unittest.TestCase):
 
         # Make an empty temp directory for general use
         self.tempdir = tempfile.mkdtemp().decode('utf-8')
+        
+        self.config_mock = MagicMock()
+        self.config_mock.nidaba.config.everything.log.return_value = True
+        modules = {
+            'nidaba.config': self.config_mock.config
+        }
+        self.module_patcher = patch.dict('sys.modules', modules)
+        self.module_patcher.start()
+        from nidaba import lex
+        self.lex = lex
 
     def tearDown(self):
         self.temp.close()
@@ -33,7 +44,7 @@ class DictTests(unittest.TestCase):
         """
         Test the cleanline function.
         """
-        words = lex.cleanlines(self.path)
+        words = self.lex.cleanlines(self.path)
         self.assertEqual(len(words), 4)
         self.assertEqual(words[0], u'word1')
         self.assertEqual(words[1], u'word2')
@@ -52,7 +63,7 @@ class DictTests(unittest.TestCase):
         expected = [u'adding', u'a', u'line', u'with', u'multiple', u'words',
                     u'another', u'with', u'Greek', u'αχιλλεύς', u'and',
                     u'some', u'NFC', u'αχιλλεύς']
-        words = lex.cleanwords(self.path)
+        words = self.lex.cleanwords(self.path)
         self.assertEqual(words, expected)
 
     def test_cleanuniquewords(self):
@@ -69,7 +80,7 @@ class DictTests(unittest.TestCase):
                         u'words', u'another', u'with', u'Greek', u'αχιλλεύς',
                         u'and', u'some', u'NFC', u'αχιλλεύς'])
         self.assertEqual(
-            lex.cleanuniquewords(self.temp1.name.decode(u'utf-8')), expected)
+            self.lex.cleanuniquewords(self.temp1.name.decode(u'utf-8')), expected)
 
     def test_words_from_files(self):
         """
@@ -86,7 +97,7 @@ class DictTests(unittest.TestCase):
         self.temp1.seek(0, 0)
         self.temp2.seek(0, 0)
         self.temp3.seek(0, 0)
-        words = lex.words_from_files(self.tempdir)
+        words = self.lex.words_from_files(self.tempdir)
         self.assertEqual(3, len(words))
         self.assertTrue(u'a' in words)
         self.assertTrue(u'b' in words)
@@ -113,7 +124,7 @@ class DictTests(unittest.TestCase):
         self.temp2.seek(0, 0)
         self.temp3.seek(0, 0)
         self.temp4.seek(0, 0)
-        words = lex.unique_words_from_files(self.tempdir)
+        words = self.lex.unique_words_from_files(self.tempdir)
         self.assertEqual(4, len(words))
         self.assertTrue(u'a' in words)
         self.assertTrue(u'b' in words)
@@ -131,8 +142,8 @@ class DictTests(unittest.TestCase):
         words = [u'a', u'b', u'c', u'd']
         mytemp = tempfile.mkdtemp().decode('utf-8')
         outpath = os.path.join(mytemp, u'testdict')
-        lex.make_dict(outpath, words)
-        retrived = lex.cleanuniquewords(outpath)
+        self.lex.make_dict(outpath, words)
+        retrived = self.lex.cleanuniquewords(outpath)
         self.assertEqual(len(retrived), 4)
         self.assertTrue(u'a' in retrived)
         self.assertTrue(u'b' in retrived)
@@ -146,8 +157,8 @@ class DictTests(unittest.TestCase):
         """
         outfile = tempfile.NamedTemporaryFile(dir=self.tempdir, delete=True)
         words = [u'aaa', u'bbb', u'ccc', u'ddd']
-        lex.make_deldict(outfile.name, words, 1)
-        lines = lex.cleanlines(outfile.name)
+        self.lex.make_deldict(outfile.name, words, 1)
+        lines = self.lex.cleanlines(outfile.name)
         self.assertEqual(u'aa\taaa', lines[0])
         self.assertEqual(u'bb\tbbb', lines[1])
         self.assertEqual(u'cc\tccc', lines[2])
@@ -161,7 +172,7 @@ class DictTests(unittest.TestCase):
         temp = tempfile.NamedTemporaryFile()
         temp.write('a a a a b b c c c b b b b d \n foobar foobar')
         temp.seek(0, 0)
-        f = lex.uniquewords_with_freq(temp.name.decode('utf-8'))
+        f = self.lex.uniquewords_with_freq(temp.name.decode('utf-8'))
         self.assertEqual(5, len(f.keys()))
         self.assertEqual(4, f['a'])
         self.assertEqual(6, f['b'])
