@@ -50,6 +50,7 @@ import dominate
 from PIL import Image
 from distutils import spawn
 from dominate.tags import div, span, meta, br
+from celery.utils.log import get_task_logger
 
 from nidaba import storage
 from nidaba.celery import app
@@ -61,6 +62,7 @@ from nidaba.nidabaexceptions import NidabaPluginException
 implementation = u'capi'
 tessdata = u'/usr/share/tesseract-ocr/'
 
+logger = get_task_logger(__name__)
 
 def setup(*args, **kwargs):
     if kwargs.get(u'implementation'):
@@ -105,7 +107,7 @@ class micro_hocr(object):
 
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.tesseract')
-def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None, extended=True):
+def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None, extended=False):
     """
     Runs tesseract on an input document.
 
@@ -196,10 +198,14 @@ def ocr_capi(image_path, output_path, languages, extended=True):
 
     # set up all return types
     tesseract.TessVersion.restype = ctypes.c_char_p
-    tesseract.TessResultIteratorConfidence.restype = ctypes.c_float
-    tesseract.TessResultIteratorWordRecognitionLanguage.restype = ctypes.c_char_p
-    tesseract.TessResultIteratorGetUTF8Text.restype = ctypes.c_char_p
-
+    if extended:
+        try: 
+            tesseract.TessResultIteratorConfidence.restype = ctypes.c_float
+            tesseract.TessResultIteratorWordRecognitionLanguage.restype = ctypes.c_char_p
+            tesseract.TessResultIteratorGetUTF8Text.restype = ctypes.c_char_p
+        except AttributeError as e:
+            raise NidabaTesseractException('Symbols required for extended '
+                    'output not available. Rerun using standard output.')
     # ensure we've loaded a tesseract object newer than 3.02
     ver = tesseract.TessVersion()
     if int(ver.split('.')[0]) < 3 or int(ver.split('.')[1]) < 2:
@@ -274,8 +280,9 @@ def ocr_capi(image_path, output_path, languages, extended=True):
                         confidences = []
                     word_span = span(cls='ocrx_word')
                     line_span.add(word_span)
-                    lang = tesseract.TessResultIteratorWordRecognitionLanguage(ri, RIL_WORD).decode('utf-8')
-                    word_span['lang'] = lang
+                    if not no_rec_lang:
+                        lang = tesseract.TessResultIteratorWordRecognitionLanguage(ri, RIL_WORD).decode('utf-8')
+                        word_span['lang'] = lang
                     tesseract.TessPageIteratorBoundingBox(pi, RIL_WORD,
                                                           ctypes.byref(x0),
                                                           ctypes.byref(y0),
