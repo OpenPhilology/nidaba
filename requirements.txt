@@ -7,3 +7,4 @@ numpy==1.9.2
 Pillow==2.8.1
 PyYAML==3.11
 redis==2.10.3
+pyxDamerauLevenshtein==1.3.1

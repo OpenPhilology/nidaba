@@ -12,12 +12,13 @@ from __future__ import absolute_import, unicode_literals
 import os
 import difflib
 
+from lxml import html
+from pyxdameraulevenshtein import normalized_damerau_levenshtein_distance
+
 from nidaba.algorithms.string import sanitize
 from nidaba.tasks.helper import NidabaTask
 from nidaba.celery import app
 from nidaba import storage
-
-from lxml import html
 
 
 def cleanup(text):
@@ -29,11 +30,13 @@ def cleanup(text):
 
 
 @app.task(base=NidabaTask, name=u'nidaba.stats.text_diff_ratio')
-def text_diff_ratio(doc, method=u'diff_ratio', ground_truth=None, hocr_in=True,
-                    hocr_gt=False, clean_in=True, clean_gt=True, divert=True):
+def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
+                    hocr_in=True, hocr_gt=False, clean_in=True, clean_gt=True,
+                    divert=True):
     """
     Calculates the similarity of the input documents and a given ground truth
-    using the algorithm of python's difflib SequenceMatcher.
+    using the algorithm of python's difflib SequenceMatcher. The result is a
+    value between 0.0 (no commonality) and 1.0 (identical strings).
 
     Args:
         doc (unicode, unicode): The input document tuple
@@ -63,23 +66,23 @@ def text_diff_ratio(doc, method=u'diff_ratio', ground_truth=None, hocr_in=True,
         text = cleanup(text)
     if clean_gt:
         gt = cleanup(gt)
-    print(text)
-    print(gt)
     sm = difflib.SequenceMatcher()
     sm.set_seqs(text, gt)
     if not divert:
         storage.write_text(*get_storage_path(output_path), text=unicode(sm.ratio()))
         return output_path
     else:
-        return {'error_rate': (doc, sm.ratio()), 'doc': doc}
+        return {'diff_ratio': (doc, sm.ratio()), 'doc': doc}
 
 
-@app.task(base=NidabaTask, name=u'nidaba.stats.text_error_rate')
-def text_error_rate(doc, method=u'error_rate', ground_truth=None, hocr_in=True,
-                    hocr_gt=False, divert=True):
+@app.task(base=NidabaTask, name=u'nidaba.stats.text_edit_ratio')
+def text_edit_ratio(doc, method=u'text_edit_ratio', ground_truth=None,
+                    hocr_in=True, hocr_gt=False, clean_in=True, clean_gt=True,
+                    divert=True):
     """
-    Estimates the error rate (edit distance) between an input document and a
-    given ground truth.
+    Calculates the similarity of the input documents and a given ground truth
+    using the Damerau-Levenshtein distance. The result is a value between 0.0
+    (no commonality) and 1.0 (identical strings).
 
     Args:
         doc (unicode, unicode): The input document tuple
@@ -105,9 +108,13 @@ def text_error_rate(doc, method=u'error_rate', ground_truth=None, hocr_in=True,
         text = html.fromstring(text.encode('utf-8')).text_content()
     if hocr_gt:
         gt = html.fromstring(gt.encode('utf-8')).text_content()
-    edist = string.edit_distance(text, gt)
-    print(edist)
+    if clean_in:
+        text = cleanup(text)
+    if clean_gt:
+        gt = cleanup(gt)
+    edist = 1.0 - normalized_damerau_levenshtein_distance(text, gt)
     if not divert:
+        storage.write_text(*get_storage_path(output_path), text=unicode(edit))
         return output_path
     else:
-        return {'error_rate': (doc, edist), 'doc': doc}
+        return {'edit_ratio': (doc, edist), 'doc': doc}
