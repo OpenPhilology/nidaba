@@ -1,6 +1,41 @@
 CHANGES
 =======
 
+0.3.13
+------
+
+* Squashed commit of the following:
+
+0.3.12
+------
+
+* text edit distance measure
+* Add move_to_storage for file: parameter on cli
+* Update documentation for new cli
+* Uncomment plugins not recommended in documentation
+
+0.3.11
+------
+
+* Preparatory for for diversion
+* Fix for B/W capi tesseract inputs
+* Add dependency for new cli
+* Change plugin hierarchy
+* Make batch do more than display task help
+* encoding preamble to kraken.py
+* Add --help-tasks option to batch command
+* Extract kwargs from task return values if dict
+* Tesseract hotfix
+* New and fancy command line interface
+* Fix makefile for new documentation
+
+0.3.10
+------
+
+* Hotfix: calling c function with unicode strings is not a good idea
+* Move changelog to sidebar
+* Add changelog to documentation
+* Make kraken an optional install
 * Miscellaneous fixes to plugins and correspoding tests
 * grc+ara somehow causes segfaults
 * Fix segfault caused by multiple API initializations
