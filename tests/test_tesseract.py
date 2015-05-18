@@ -52,7 +52,7 @@ class TesseractTests(unittest.TestCase):
         tiffpath = os.path.join(tessdata, 'image.tiff')
         outpath = os.path.join(self.tempdir, 'output')
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        self.tesseract.ocr_capi(tiffpath, outpath, ['grc', 'eng'])
+        self.tesseract.ocr_capi(tiffpath, outpath, ['grc', 'eng'], extended=False)
         self.assertTrue(os.path.isfile(outpath),
                         msg='Tesseract did not output a file!')
         try:
@@ -138,7 +138,7 @@ class TesseractTests(unittest.TestCase):
         pngpath = os.path.join(tessdata, 'image.png')
         outpath = os.path.join(self.tempdir, 'output')
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        self.tesseract.ocr_capi(pngpath, outpath, ['grc'])
+        self.tesseract.ocr_capi(pngpath, outpath, ['grc'], extended=False)
         self.assertTrue(os.path.isfile(outpath),
                         msg='Tesseract did not output a file!')
         try:
@@ -159,7 +159,7 @@ class TesseractTests(unittest.TestCase):
         tiffpath = os.path.join(tessdata, 'image.tiff')
         outpath = os.path.join(self.tempdir, 'output')
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        self.tesseract.ocr_capi(tiffpath, outpath, ['grc'])
+        self.tesseract.ocr_capi(tiffpath, outpath, ['grc'], extended=False)
         self.assertTrue(os.path.isfile(outpath),
                         msg='Tesseract did not output a file!')
         try:
@@ -181,7 +181,7 @@ class TesseractTests(unittest.TestCase):
         jpgpath = os.path.join(tessdata, 'image.jpg')
         outpath = os.path.join(self.tempdir, 'output')
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        self.tesseract.ocr_capi(jpgpath, outpath, ['grc'])
+        self.tesseract.ocr_capi(jpgpath, outpath, ['grc'], extended=False)
         self.assertTrue(os.path.isfile(outpath),
                         msg='Tesseract did not output a file!')
         try:

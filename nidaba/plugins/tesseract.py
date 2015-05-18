@@ -169,7 +169,7 @@ def delta(root=(0, 0, 0, 0), coordinates=None):
         root = box
 
 
-def ocr_capi(image_path, output_path, languages, extended=True):
+def ocr_capi(image_path, output_path, languages, extended=False):
     """
     OCRs an image using the C API provided by tesseract versions 3.02 and
     higher. Images are read using pillow allowing a wider range of formats than
