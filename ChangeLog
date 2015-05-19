@@ -1,6 +1,16 @@
 CHANGES
 =======
 
+0.3.14
+------
+
+* Explicitely enable/disable extended hocr output
+* Changelog up to 0.3.13
+* Edit distance using pyxDamerauLevenshtein
+* difflib result similarity measure
+* Error checking around functions required for extended tesseract output as there hasn't been a stable release containing them yet
+* new_join is on the result backend not broker url
+
 0.3.13
 ------
 
