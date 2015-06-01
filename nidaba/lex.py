@@ -65,7 +65,7 @@ def hocr_spellcheck(path, dictionary, deletion_dictionary,
         for sugg in suggestions[key]:
             alt = Tag(name=u'del')
             alt.attrs['class'] = u'alt'
-            alt.attrs['title'] = u'x_conf ' + unicode(alg.edit_distance(key, sugg))
+            alt.attrs['title'] = u'x_cost' + unicode(alg.edit_distance(key, sugg))
             alt.string = sugg
             new.append(alt)
         token.replace_with(new)
