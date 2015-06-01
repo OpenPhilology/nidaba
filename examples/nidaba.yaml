@@ -20,6 +20,11 @@ ocropus_models:
   fraktur: [models, fraktur.pyrnn.gz]
   fancy_ligatures: [models, ligatures.pyrnn.gz]
 
+# Models solely working with kraken (i.e. models in HDF5 format).
+kraken_models:
+  default: [models, en-default.hdf5]
+
+
 # An optional list of additional paths to load plugins from.
 # plugin_path: ['/usr/share/nidaba/']
 

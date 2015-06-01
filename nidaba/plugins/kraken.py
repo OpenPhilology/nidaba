@@ -36,10 +36,12 @@ def setup(*args, **kwargs):
         global pageseg
         global rpred
         global html
+        global models
         from kraken import binarization
         from kraken import pageseg
         from kraken import rpred
         from kraken import html
+        from kraken.lib import models
     except ImportError as e:
         raise NidabaPluginException(e.message)
 
@@ -62,7 +64,12 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
                                                                   method,
                                                                   model))[0] +
                    '.hocr')
-    model = storage.get_abs_path(*(nidaba_cfg['ocropus_models'][model]))
+    if model in nidaba_cfg['kraken_models']:
+        model = storage.get_abs_path(*(nidaba_cfg['kraken_models'][model]))
+    elif model in nidaba_cfg['ocropus_models']:
+        model = storage.get_abs_path(*(nidaba_cfg['ocropus_models'][model]))
+    else:
+        raise NidabaInvalidParameterException('Model not defined in configuration')
 
     storage.write_text(*output_path, text=ocr(input_path, model))
     return output_path
@@ -80,7 +87,7 @@ def ocr(image_path, model=None):
     """
     img = Image.open(image_path)
     lines = pageseg.segment(img)
-    rnn = rpred.load_rnn(model)
+    rnn = models.load_any(model)
     hocr = html.hocr(list(rpred.rpred(rnn, img, lines)), image_path, img.size)
     return unicode(hocr)
 
