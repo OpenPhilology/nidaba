@@ -4,11 +4,14 @@
 storage_path: ~/OCR
 
 # Spell check configuration. Dictionaries are kept on the common medium (i.e.
-# at STORAGE_PATH/tuple[0]/tuple[1]).
+# at STORAGE_PATH/tuple[0]/tuple[1]). Each spell checker requires a list of
+# valid words ('dictionary') and a dictionary containing all variants of words
+# attained by deletion of single characters (see nidaba.lex.make_deldict).
 lang_dicts:
-  polytonic_greek: [dicts, greek.dic]
-  lojban: [dicts, lojban.dic]
-  german: [dicts, german.dic]
+  polytonic_greek: {dictionary: [dicts, greek.dic], 
+                    deletion_dictionary: [dicts, del_greek.dic]}
+  latin: {dictionary: [dicts, latin.dic], 
+                    deletion_dictionary: [dicts, del_latin.dic]}
 
 # Ocropus/kraken models
 ocropus_models:
