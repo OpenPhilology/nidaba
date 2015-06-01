@@ -69,7 +69,7 @@ def hocr_spellcheck(path, dictionary, deletion_dictionary,
             alt.string = sugg
             new.append(alt)
         token.replace_with(new)
-    return doc
+    return doc.prettify()
 
 @alg.unibarrier
 def spellcheck(tokens, dictionary, deletion_dictionary):
