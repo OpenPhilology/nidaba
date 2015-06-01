@@ -13,8 +13,97 @@ from __future__ import absolute_import
 import os
 import codecs
 import glob
+import regex
 import nidaba.algorithms.string as alg
 from collections import Counter
+from bs4 import BeautifulSoup, Tag
+
+@alg.unibarrier
+def hocr_spellcheck(path, dictionary, deletion_dictionary,
+                    filter_punctuation=False, no_ocrx_words=u'auto'):
+    """
+    Performs a spell check on an hOCR document.
+
+    Each ``ocrx_word`` span is treated as a single word and spelling
+    corrections will be inserted using INS, DEL elements inside a span with
+    class ``alternatives``. Correct words are left untouched. The edit distance
+    of each suggestion is specified in an ``x_cost`` property on each element.
+
+    Args:
+        path (unicode): Path to an hOCR file.
+        dictionary (unicode): Path to a base dictionary.
+        deletion_dictionary (unicode): Path to a deletion dictionary.
+        filter_punctuation (bool): Switch to filter punctuation inside
+                                   ``ocrx_words``
+
+    Returns:
+        A unicode string of the new hOCR document.
+    """
+    doc = BeautifulSoup(open(path, 'rb'))
+    # old tesseract versions contain ocr_word spans instead of ocrx_word
+    tokens = doc.find_all(u'span', [u'ocrx_word', u'ocr_word'])
+    if no_ocrx_words == u'true' or not tokens and no_ocrx_words == u'auto':
+        pass
+    # first calculate all suggestions
+    text_tokens = [x.text for x in tokens]
+    if filter_punctuation:
+        text_tokens = [regex.sub('[^\w]', '', x) for x in text_tokens]
+    suggestions = spellcheck(text_tokens, dictionary, deletion_dictionary)
+    for token in tokens:
+        key = token.text
+        if filter_punctuation:
+            key = regex.sub('[^\w]', '', token.text)
+        if key not in suggestions:
+            continue
+        new = Tag(name=u'span')
+        new.attrs = token.attrs
+        new.attrs['class'] = u'alternatives'
+        orig = Tag(name=u'ins')
+        orig.string = token.text
+        orig.attrs['class'] = u'alt'
+        new.append(orig)
+        for sugg in suggestions[key]:
+            alt = Tag(name=u'del')
+            alt.attrs['class'] = u'alt'
+            alt.attrs['title'] = u'x_conf ' + unicode(alg.edit_distance(key, sugg))
+            alt.string = sugg
+            new.append(alt)
+        token.replace_with(new)
+    return doc
+
+@alg.unibarrier
+def spellcheck(tokens, dictionary, deletion_dictionary):
+    """
+    Performs a spell check on a sequence of tokens.
+
+    The spelling of each sequence of characters is compared against a
+    dictionary containing deletions of valid words and a dictionary of correct
+    words.
+
+    Args:
+        tokens (iterable): An iterable returning a sequences of unicode
+                           characters.
+        dictionary (unicode): Path to a base dictionary.
+        deletion_dictionary (unicode): Path to a deletion dictionary.
+
+    Returns:
+        A dictionary containing a sorted (least to highest edit distance) list
+        of suggestions for each character sequence that is not contained
+        verbatim in the dictionary. Tokens that are not recognized as valid
+        words but don't have spelling suggestions either will be contained in
+        the result dictionary.
+    """
+    suggestions = {}
+    for tok in tokens:
+        tok = alg.sanitize(tok)
+        if alg.mmap_bin_search(tok, dictionary,
+                           entryparser_fn=alg.key_for_single_word):
+            continue
+        if tok in suggestions:
+            continue
+        ret = alg.mapped_sym_suggest(tok, deletion_dictionary, dictionary, 1)
+        suggestions[tok] = alg.suggestions(tok, set.union(*ret.itervalues()))
+    return suggestions
 
 
 @alg.unibarrier
