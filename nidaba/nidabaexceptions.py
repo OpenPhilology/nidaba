@@ -19,12 +19,6 @@ class NidabaLeptonicaException(Exception):
         Exception.__init__(self, message)
 
 
-class NidabaUnibarrierException(Exception):
-
-    def __init__(self, message=None):
-        Exception.__init__(self, message)
-
-
 class NidabaAlgorithmException(Exception):
 
     def __init__(self, message=None):

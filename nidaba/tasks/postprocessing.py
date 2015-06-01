@@ -45,13 +45,13 @@ def spell_check(doc, method=u'spell_check', language=u'',
     """
     input_path = storage.get_abs_path(*doc)
     output_path = storage.insert_suffix(input_path, method, language,
-                                        filter_punctuation, no_ocrx_words)
-    dictionary = nidaba_cfg['lang_dicts'][language]['dictionary']
-    del_dictionary = nidaba_cfg['lang_dicts'][language]['deletion_dictionary']
+                                        unicode(filter_punctuation), no_ocrx_words)
+    dictionary = storage.get_abs_path(*nidaba_cfg['lang_dicts'][language]['dictionary'])
+    del_dictionary = storage.get_abs_path(*nidaba_cfg['lang_dicts'][language]['deletion_dictionary'])
     ret = lex.hocr_spellcheck(input_path, dictionary, del_dictionary,
                               filter_punctuation, no_ocrx_words)
-    storage.write_text(*get_storage_path(output_path), text=ret)
-    return get_storage_path(output_path)
+    storage.write_text(*storage.get_storage_path(output_path), text=ret)
+    return storage.get_storage_path(output_path)
 
 
 @app.task(base=NidabaTask, name=u'nidaba.postprocessing.blend_hocr')

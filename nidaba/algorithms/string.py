@@ -17,31 +17,11 @@ import itertools
 import mmap
 import math
 
-from nidaba.nidabaexceptions import (NidabaUnibarrierException,
-                                     NidabaAlgorithmException)
+from nidaba.nidabaexceptions import NidabaAlgorithmException
 
 # ----------------------------------------------------------------------
 # String and alignment algorithms --------------------------------------
 # ----------------------------------------------------------------------
-
-
-def unibarrier(func):
-    """
-    A decorator function; used to ensure that no str objects can be
-    passed as either args or kwargs.
-    """
-
-    def unishielded(*args, **kwargs):
-        for arg in args:
-            if isinstance(arg, str):
-                raise NidabaUnibarrierException(message='%s was a string!' %
-                                                arg)
-        for key, val in kwargs.iteritems():
-            if isinstance(val, str):
-                raise NidabaUnibarrierException(message='%s was a string!' %
-                                                val)
-        return func(*args, **kwargs)
-    return unishielded
 
 
 def sanitize(string, encoding=u'utf-8', normalization=u'NFD'):
@@ -56,7 +36,6 @@ def sanitize(string, encoding=u'utf-8', normalization=u'NFD'):
     return unicodedata.normalize(normalization, string.strip())
 
 
-@unibarrier
 def strings_by_deletion(unistr, dels):
     """
     Compute the unique strings which can be formed from a string by
@@ -70,7 +49,6 @@ def strings_by_deletion(unistr, dels):
     return sorted(list(new_words))
 
 
-@unibarrier
 def sym_suggest(ustr, dic, delete_dic, depth, ret_count=0):
     """
     Return a list of "spelling" corrections using a symmetric deletion search.
@@ -94,13 +72,11 @@ def sym_suggest(ustr, dic, delete_dic, depth, ret_count=0):
     return list(suggestions if ret_count <= 0 else suggestions[:ret_count])
 
 
-@unibarrier
 def parse_del_dict_entry(entry):
     return [] if entry is None else [word.strip()
                                      for word in entry.split(u' ')]
 
 
-@unibarrier
 def suggestions(ustr, sugs, freq=None):
     """
     Call mapped_sym_suggest, and return the suggestions as a
@@ -117,7 +93,6 @@ def suggestions(ustr, sugs, freq=None):
     return sugs
 
 
-@unibarrier
 def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
     """
     Generate a list of spelling suggestions using the memory mapped
@@ -166,7 +141,6 @@ def prev_newline(mm, line_buffer_size=100):
     return mm.rfind(u'\n', mm.tell() - line_buffer_size, mm.tell()) + 1
 
 
-@unibarrier
 def compare_strings(u1, u2):
     if u1 == u2:
         return 0
@@ -176,7 +150,6 @@ def compare_strings(u1, u2):
         return -1
 
 
-@unibarrier
 def todec(ustr):
     uthex = u''
     for cp in ustr:
@@ -184,7 +157,6 @@ def todec(ustr):
     return uthex.encode('utf-8')
 
 
-@unibarrier
 def truestring(unicode):
     out = u'<' + u':'.join([u for u in unicode]) + u'>'
     return out
@@ -194,7 +166,6 @@ def truestring(unicode):
 # ----------------------------------------------------------------------
 
 
-@unibarrier
 def key_for_del_dict_entry(entry):
     """
     Parse a line from a symmetric delete dictionary.
@@ -204,7 +175,6 @@ def key_for_del_dict_entry(entry):
     return (key, val.strip())
 
 
-@unibarrier
 def key_for_single_word(entry):
     """
     Parse a line from a simple "one word per line" dictionary.
@@ -220,7 +190,6 @@ def key_for_single_word(entry):
 # TODO Implement doubling-length backward search to make line_buffer_size
 # irrelevant.
 
-@unibarrier
 def mmap_bin_search(ustr, dictionary_path,
                     entryparser_fn=key_for_del_dict_entry,
                     line_buffer_size=200):
@@ -600,7 +569,6 @@ def inblock(c, bounds):
     return ord(c) >= ord(bounds[0]) and ord(c) <= ord(bounds[1])
 
 
-@unibarrier
 def identify(string, unicode_blocks):
     """
     Determine percent-wise how many characters in the given string
@@ -619,7 +587,6 @@ def identify(string, unicode_blocks):
     return result
 
 
-@unibarrier
 def islang(unistr, unicode_blocks, threshold=1.0):
     """
     Determine if a given (unicode) string belongs to a certain langauge.
@@ -639,7 +606,6 @@ def islang(unistr, unicode_blocks, threshold=1.0):
     return inlang / len(unistr) >= threshold
 
 
-@unibarrier
 def isgreek(ustr):
     return islang(ustr, [greek_coptic_range, extended_greek_diacritics,
                          greek_and_coptic_diacritics])
@@ -658,7 +624,6 @@ def greek_chars():
     return chars
 
 
-@unibarrier
 def greek_filter(string):
     """
     Remove all non-Greek characters from a string.
@@ -666,7 +631,6 @@ def greek_filter(string):
     return filter(greek_chars().__contains__, string)
 
 
-@unibarrier
 def strip_diacritics(ustr):
     """
     Remove all Greek diacritics from the specified string. Expects the

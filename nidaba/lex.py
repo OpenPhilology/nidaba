@@ -18,7 +18,6 @@ import nidaba.algorithms.string as alg
 from collections import Counter
 from bs4 import BeautifulSoup, Tag
 
-@alg.unibarrier
 def hocr_spellcheck(path, dictionary, deletion_dictionary,
                     filter_punctuation=False, no_ocrx_words=u'auto'):
     """
@@ -65,13 +64,13 @@ def hocr_spellcheck(path, dictionary, deletion_dictionary,
         for sugg in suggestions[key]:
             alt = Tag(name=u'del')
             alt.attrs['class'] = u'alt'
-            alt.attrs['title'] = u'x_cost' + unicode(alg.edit_distance(key, sugg))
+            alt.attrs['title'] = u'x_cost ' + unicode(alg.edit_distance(key, sugg))
             alt.string = sugg
             new.append(alt)
         token.replace_with(new)
     return doc.prettify()
 
-@alg.unibarrier
+
 def spellcheck(tokens, dictionary, deletion_dictionary):
     """
     Performs a spell check on a sequence of tokens.
@@ -106,7 +105,6 @@ def spellcheck(tokens, dictionary, deletion_dictionary):
     return suggestions
 
 
-@alg.unibarrier
 def cleanlines(path, encoding=u'utf-8', normalization=u'NFD'):
     """
     Read in lines from a file and return them as a sanitized list.
@@ -128,7 +126,6 @@ def cleanlines(path, encoding=u'utf-8', normalization=u'NFD'):
     return words
 
 
-@alg.unibarrier
 def cleanwords(path, encoding=u'utf-8', normalization=u'NFD'):
     """
     Read in every word from a files as separated by lines and spaces.
@@ -154,7 +151,6 @@ def cleanwords(path, encoding=u'utf-8', normalization=u'NFD'):
     return words
 
 
-@alg.unibarrier
 def uniquewords_with_freq(path, encoding=u'utf-8', normalization=u'NFD'):
     """
     Read in every word from a file as separated by lines and spaces.
@@ -174,7 +170,6 @@ def uniquewords_with_freq(path, encoding=u'utf-8', normalization=u'NFD'):
     return freq
 
 
-@alg.unibarrier
 def cleanuniquewords(path, encoding=u'utf-8', normalization=u'NFD'):
     """
     Read in lines from a file as separated by lines and spaces,
@@ -193,7 +188,6 @@ def cleanuniquewords(path, encoding=u'utf-8', normalization=u'NFD'):
                           normalization=normalization))
 
 
-@alg.unibarrier
 def words_from_files(dirpath, encoding=u'utf-8', normalization=u'NFD'):
     """
     Create a dictionary from a directory of text files.  All files in the given
@@ -214,7 +208,6 @@ def words_from_files(dirpath, encoding=u'utf-8', normalization=u'NFD'):
     return words
 
 
-@alg.unibarrier
 def unique_words_from_files(dirpath, encoding=u'utf-8', normalization=u'NFD'):
     """
     Create a set of unique words from a directory of text files.  All file in
@@ -232,7 +225,6 @@ def unique_words_from_files(dirpath, encoding=u'utf-8', normalization=u'NFD'):
                                 normalization=normalization))
 
 
-@alg.unibarrier
 def make_dict(outpath, iterable, encoding=u'utf-8'):
     """
     Create a file at outpath and write evrey object in iterable to its
@@ -248,7 +240,6 @@ def make_dict(outpath, iterable, encoding=u'utf-8'):
             f.write(s + u'\n')
 
 
-@alg.unibarrier
 def make_deldict(outpath, words, depth):
     """
     Creates a symmetric deletion dictionary from the specified word list.
