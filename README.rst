@@ -1,8 +1,8 @@
 Overview
 ========
 
-.. image:: https://travis-ci.org/mittagessen/kraken.svg
-        :target: https://travis-ci.org/mittagessen/kraken
+.. image:: https://travis-ci.org/OpenPhilology/nidaba.svg
+        :target: https://travis-ci.org/OpenPhilology/nidaba
 
 Nidaba is the central controller for the entire OGL OCR pipeline. It oversees
 and automates the process of converting raw images into citable collections of
