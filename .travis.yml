@@ -28,7 +28,7 @@ install:
   # ---------------------------------
   - conda install pbr nose pip
   # h5py has a false dependency on Cython, so we install it until it's fixed.
-  - conda install cython
+  - conda install cython h5py
   - sed
     '/pluginbase\|click\|dominate\|regex\|celery\|redis\|pyxDamerauLevenshtein\|beautifulsoup4/d'
     requirements.txt | xargs conda install
