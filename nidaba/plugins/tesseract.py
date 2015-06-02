@@ -209,7 +209,7 @@ def ocr_capi(image_path, output_path, languages, extended=False):
     # ensure we've loaded a tesseract object newer than 3.02
     ver = tesseract.TessVersion()
     if int(ver.split('.')[0]) < 3 or int(ver.split('.')[1]) < 2:
-        raise NidabaTesseractException('libtesseract version is too old. Set'
+        raise NidabaTesseractException('libtesseract version is too old. Set '
                                        'implementation to direct.')
     api = tesseract.TessBaseAPICreate()
     rc = tesseract.TessBaseAPIInit3(api, str(tessdata),
