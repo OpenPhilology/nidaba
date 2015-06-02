@@ -70,6 +70,14 @@ via `pip <https://pip.pypa.io>`_:
 
         $ pip install nidaba
 
+To also install the prerequisites for the :py:mod:`nidaba.plugins.kraken`
+plugin it is possible to install the `kraken
+<http://mittagessen.github.io/kraken>`_ bundle instead:
+
+.. code-block:: console
+        
+        $ pip install nidaba[kraken]
+
 .. note::
    Deploying python applications can be painful in some circumstances.
    Unfortunately, nidaba is no exception to this and the build process of

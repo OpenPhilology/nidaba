@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Plugins &mdash; nidaba 0.3.12
+    <title>Plugins &mdash; nidaba 0.3.16
  documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.12
+        VERSION:     '0.3.16
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.3.12
+    <link rel="top" title="nidaba 0.3.16
  documentation" href="index.html" />
     <link rel="next" title="Frequently Answered Questions" href="faq.html" />
     <link rel="prev" title="Nidaba" href="index.html" />
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="index.html" title="Nidaba"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">nidaba 0.3.12
+        <li class="nav-item nav-item-0"><a href="index.html">nidaba 0.3.16
  documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -196,6 +196,10 @@ directory level upwards from the actual tessdata directory</dd>
 <li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files
 languages (list of unicode): A list of languages for
 the tesseract language model</li>
+<li><strong>languages</strong> (<em>list</em>) &#8211; A list of tesseract classifier identifiers</li>
+<li><strong>extended</strong> (<em>bool</em>) &#8211; Switch to enable extended hOCR generation containing
+character cuts and confidences. Has no effect when
+direct or legacy implementation is used.</li>
 </ul>
 </td>
 </tr>

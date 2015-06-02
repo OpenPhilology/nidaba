@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nidaba.algorithms package &mdash; nidaba 0.3.12
+    <title>nidaba.algorithms package &mdash; nidaba 0.3.16
  documentation</title>
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3.12
+        VERSION:     '0.3.16
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.3.12
+    <link rel="top" title="nidaba 0.3.16
  documentation" href="../index.html" />
     <link rel="up" title="nidaba package" href="nidaba.html" />
     <link rel="next" title="nidaba.tasks package" href="nidaba.tasks.html" />
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="nidaba.html" title="nidaba package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.3.12
+        <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.3.16
  documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >nidaba</a> &raquo;</li>
           <li class="nav-item nav-item-2"><a href="nidaba.html" accesskey="U">nidaba package</a> &raquo;</li> 
@@ -100,7 +100,7 @@ algorithm Wikipedia describes as Otsu&#8217;s method).</p>
 e.g. alignment, edit distances, and symmetric deletion searches.</p>
 <dl class="function">
 <dt id="nidaba.algorithms.string.compare_strings">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">compare_strings</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.compare_strings" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">compare_strings</code><span class="sig-paren">(</span><em>u1</em>, <em>u2</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.compare_strings" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -128,13 +128,20 @@ Coptic, Extended Greek, and Combined Diacritical unicode blocks.</p>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.greek_filter">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">greek_filter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.greek_filter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">greek_filter</code><span class="sig-paren">(</span><em>string</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.greek_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all non-Greek characters from a string.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.identify">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">identify</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.identify" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">identify</code><span class="sig-paren">(</span><em>string</em>, <em>unicode_blocks</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.identify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine percent-wise how many characters in the given string
+belong in each given unicode block. Ranges may be user defined, and
+not official unicode ranges. It is assumed that ranges do not
+overlap. unicode_blocks is an iterable of 3-tuples of the form
+(&lt;name of block&gt;, &lt;first unichar in block&gt;, &lt;last unichar in the
+block&gt;).</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.inblock">
@@ -151,23 +158,31 @@ characters in the unicode table.</p>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.isgreek">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">isgreek</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.isgreek" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">isgreek</code><span class="sig-paren">(</span><em>ustr</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.isgreek" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.islang">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">islang</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.islang" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">islang</code><span class="sig-paren">(</span><em>unistr</em>, <em>unicode_blocks</em>, <em>threshold=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.islang" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if a given (unicode) string belongs to a certain langauge.
+This calls the identify function to determine what fraction of the
+string&#8217;s characters are in the specified blocks. It returns true if
+the number of chars in those blocks is &gt;= threshold.
+Threshold is a float between 0 and 1.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.key_for_del_dict_entry">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">key_for_del_dict_entry</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.key_for_del_dict_entry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">key_for_del_dict_entry</code><span class="sig-paren">(</span><em>entry</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.key_for_del_dict_entry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a line from a symmetric delete dictionary.
+Returns a tuple of the form (key, list of values).</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.key_for_single_word">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">key_for_single_word</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.key_for_single_word" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">key_for_single_word</code><span class="sig-paren">(</span><em>entry</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.key_for_single_word" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a line from a simple &#8220;one word per line&#8221; dictionary.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.list_to_uni">
@@ -178,13 +193,29 @@ strings using the specified encoding.</p>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.mapped_sym_suggest">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">mapped_sym_suggest</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.mapped_sym_suggest" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">mapped_sym_suggest</code><span class="sig-paren">(</span><em>ustr</em>, <em>del_dic_path</em>, <em>dic</em>, <em>depth</em>, <em>ret_count=0</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.mapped_sym_suggest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a list of spelling suggestions using the memory mapped
+dictionary search/symmetric delete algorithm. Return only
+suggestions at the specified depth, not up to and including that
+depth.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.mmap_bin_search">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">mmap_bin_search</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.mmap_bin_search" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">mmap_bin_search</code><span class="sig-paren">(</span><em>ustr</em>, <em>dictionary_path</em>, <em>entryparser_fn=&lt;function key_for_del_dict_entry&gt;</em>, <em>line_buffer_size=200</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.mmap_bin_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a binary search on a memory mapped dictionary file, and
+return the parsed entry, or None if the specified entry cannot be
+found. This function assumes that the dictionary is properly
+formatted and well-formed, otherwise the behavior is undefined.
+Line buffer must not be shorter than the longest line in the
+dictionary. Entries may be any strings which do not contain newlines
+(newlines delimint entries); the entryparser_fn should be of the
+form fn_name(unicodestr), decorated with &#64;unibarrier and return a
+tuple of the form (keytosort by, val). By default, it uses the
+function for parsing symmetric deletion dictionary entries.
+The line_buffer_size argument must be &gt;= the longest line in the
+dictionary, or behavior is undefined.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.mr">
@@ -277,7 +308,7 @@ not only the edit distance.</p>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.parse_del_dict_entry">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">parse_del_dict_entry</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.parse_del_dict_entry" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">parse_del_dict_entry</code><span class="sig-paren">(</span><em>entry</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.parse_del_dict_entry" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -297,40 +328,46 @@ encoding.</p>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.strings_by_deletion">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">strings_by_deletion</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.strings_by_deletion" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">strings_by_deletion</code><span class="sig-paren">(</span><em>unistr</em>, <em>dels</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.strings_by_deletion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the unique strings which can be formed from a string by
+deleting the specified number of characters from it. The results
+are sorted in ascending order.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.strip_diacritics">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">strip_diacritics</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.strip_diacritics" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">strip_diacritics</code><span class="sig-paren">(</span><em>ustr</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.strip_diacritics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all Greek diacritics from the specified string. Expects the
+string to be in NFD.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.suggestions">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">suggestions</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.suggestions" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">suggestions</code><span class="sig-paren">(</span><em>ustr</em>, <em>sugs</em>, <em>freq=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.suggestions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call mapped_sym_suggest, and return the suggestions as a
+sorted list. Python&#8217;s built in sort is stable, so we can
+simply sort repeatedly, from least important aspect to
+most important.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.sym_suggest">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">sym_suggest</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.sym_suggest" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">sym_suggest</code><span class="sig-paren">(</span><em>ustr</em>, <em>dic</em>, <em>delete_dic</em>, <em>depth</em>, <em>ret_count=0</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.sym_suggest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of &#8220;spelling&#8221; corrections using a symmetric deletion search.
+Dic is a set of correct words. Delete_dic is of the form
+{edit_term:[(candidate1, edit_distance), (candidate2, edit_distance),
+...]}.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.todec">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">todec</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.todec" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">todec</code><span class="sig-paren">(</span><em>ustr</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.todec" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.truestring">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">truestring</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.truestring" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">truestring</code><span class="sig-paren">(</span><em>unicode</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.truestring" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.string.unibarrier">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">unibarrier</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.unibarrier" title="Permalink to this definition">¶</a></dt>
-<dd><p>A decorator function; used to ensure that no str objects can be
-passed as either args or kwargs.</p>
-</dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.uniblock">

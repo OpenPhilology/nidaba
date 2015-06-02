@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nidaba package &mdash; nidaba 0.3.12
+    <title>nidaba package &mdash; nidaba 0.3.16
  documentation</title>
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3.12
+        VERSION:     '0.3.16
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.3.12
+    <link rel="top" title="nidaba 0.3.16
  documentation" href="../index.html" />
     <link rel="up" title="nidaba" href="modules.html" />
     <link rel="next" title="nidaba.algorithms package" href="nidaba.algorithms.html" />
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="modules.html" title="nidaba"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.3.12
+        <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.3.16
  documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">nidaba</a> &raquo;</li> 
       </ul>
@@ -232,6 +232,267 @@ interface to absolute file paths.</p>
 <p>This module contains functions for dealing with words and dictionaries, such as
 extracting words from texts, normalizing encodings, building symmetric deletion
 dictionaries, etc.</p>
+<dl class="function">
+<dt id="nidaba.lex.cleanlines">
+<code class="descclassname">nidaba.lex.</code><code class="descname">cleanlines</code><span class="sig-paren">(</span><em>path</em>, <em>encoding=u'utf-8'</em>, <em>normalization=u'NFD'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.cleanlines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in lines from a file and return them as a sanitized list.
+Non-unique linse will be repeated.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>unicode</em>) &#8211; Absolute path of the file to be read</li>
+<li><strong>encoding</strong> (<em>unicode</em>) &#8211; Encoding to use for decoding the file</li>
+<li><strong>normalization</strong> (<em>unicode</em>) &#8211; Normalization format to use</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of lines containing the sanitized output, i.e. normalized
+unicode objects.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.lex.cleanuniquewords">
+<code class="descclassname">nidaba.lex.</code><code class="descname">cleanuniquewords</code><span class="sig-paren">(</span><em>path</em>, <em>encoding=u'utf-8'</em>, <em>normalization=u'NFD'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.cleanuniquewords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in lines from a file as separated by lines and spaces,
+convert them to the specified normalization, and return a set
+of all unique words.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>unicode</em>) &#8211; Absolute path of the file to be read</li>
+<li><strong>encoding</strong> (<em>unicode</em>) &#8211; Encoding to use for decoding the file</li>
+<li><strong>normalization</strong> (<em>unicode</em>) &#8211; Normalization format to use</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Set of unique tokens</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">set</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.lex.cleanwords">
+<code class="descclassname">nidaba.lex.</code><code class="descname">cleanwords</code><span class="sig-paren">(</span><em>path</em>, <em>encoding=u'utf-8'</em>, <em>normalization=u'NFD'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.cleanwords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in every word from a files as separated by lines and spaces.
+Non-unique words will be repeated as they are read in. Detects only words
+divided by a standard space.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>unicode</em>) &#8211; Absolute path of the file to be read</li>
+<li><strong>encoding</strong> (<em>unicode</em>) &#8211; Encoding to use for decoding the file</li>
+<li><strong>normalization</strong> (<em>unicode</em>) &#8211; Normalization format to use</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of words containing the sanitized output, i.e. normalized
+unicode objects.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.lex.hocr_spellcheck">
+<code class="descclassname">nidaba.lex.</code><code class="descname">hocr_spellcheck</code><span class="sig-paren">(</span><em>path</em>, <em>dictionary</em>, <em>deletion_dictionary</em>, <em>filter_punctuation=False</em>, <em>no_ocrx_words=u'auto'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.hocr_spellcheck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a spell check on an hOCR document.</p>
+<p>Each <code class="docutils literal"><span class="pre">ocrx_word</span></code> span is treated as a single word and spelling
+corrections will be inserted using INS, DEL elements inside a span with
+class <code class="docutils literal"><span class="pre">alternatives</span></code>. Correct words are left untouched. The edit distance
+of each suggestion is specified in an <code class="docutils literal"><span class="pre">x_cost</span></code> property on each element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>unicode</em>) &#8211; Path to an hOCR file.</li>
+<li><strong>dictionary</strong> (<em>unicode</em>) &#8211; Path to a base dictionary.</li>
+<li><strong>deletion_dictionary</strong> (<em>unicode</em>) &#8211; Path to a deletion dictionary.</li>
+<li><strong>filter_punctuation</strong> (<em>bool</em>) &#8211; Switch to filter punctuation inside
+<code class="docutils literal"><span class="pre">ocrx_words</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A unicode string of the new hOCR document.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.lex.make_deldict">
+<code class="descclassname">nidaba.lex.</code><code class="descname">make_deldict</code><span class="sig-paren">(</span><em>outpath</em>, <em>words</em>, <em>depth</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.make_deldict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a symmetric deletion dictionary from the specified word list.</p>
+<p>WARNING! This is a naive approach, which requires all the variants to be
+stored in memory. For large dictionaries at higher depth, this can easily
+use all available memory on most machines.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>outpath</strong> (<em>unicode</em>) &#8211; File path to write to</li>
+<li><strong>words</strong> (<em>iterable</em>) &#8211; An iterable returning a single word per iteration</li>
+<li><strong>depth</strong> (<em>int</em>) &#8211; Maximum edit distance to calculate</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.lex.make_dict">
+<code class="descclassname">nidaba.lex.</code><code class="descname">make_dict</code><span class="sig-paren">(</span><em>outpath</em>, <em>iterable</em>, <em>encoding=u'utf-8'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.make_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a file at outpath and write evrey object in iterable to its
+own line. The file is opened in append mode.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>outpath</strong> (<em>unicode</em>) &#8211; File path to write to</li>
+<li><strong>iterable</strong> (<em>iterable</em>) &#8211; An iterable used as a data source</li>
+<li><strong>normalization</strong> (<em>unicode</em>) &#8211; Normalization format to use</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.lex.spellcheck">
+<code class="descclassname">nidaba.lex.</code><code class="descname">spellcheck</code><span class="sig-paren">(</span><em>tokens</em>, <em>dictionary</em>, <em>deletion_dictionary</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.spellcheck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a spell check on a sequence of tokens.</p>
+<p>The spelling of each sequence of characters is compared against a
+dictionary containing deletions of valid words and a dictionary of correct
+words.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tokens</strong> (<em>iterable</em>) &#8211; An iterable returning a sequences of unicode
+characters.</li>
+<li><strong>dictionary</strong> (<em>unicode</em>) &#8211; Path to a base dictionary.</li>
+<li><strong>deletion_dictionary</strong> (<em>unicode</em>) &#8211; Path to a deletion dictionary.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A dictionary containing a sorted (least to highest edit distance) list
+of suggestions for each character sequence that is not contained
+verbatim in the dictionary. Tokens that are not recognized as valid
+words but don&#8217;t have spelling suggestions either will be contained in
+the result dictionary.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.lex.unique_words_from_files">
+<code class="descclassname">nidaba.lex.</code><code class="descname">unique_words_from_files</code><span class="sig-paren">(</span><em>dirpath</em>, <em>encoding=u'utf-8'</em>, <em>normalization=u'NFD'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.unique_words_from_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a set of unique words from a directory of text files.  All file in
+the given directory will be parsed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dirpath</strong> (<em>unicode</em>) &#8211; Absolute path of the directory to enter</li>
+<li><strong>encoding</strong> (<em>unicode</em>) &#8211; Encoding to use for decoding the files</li>
+<li><strong>normalization</strong> (<em>unicode</em>) &#8211; Normalization format to use</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Set of words of all files in the directory</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">set</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.lex.uniquewords_with_freq">
+<code class="descclassname">nidaba.lex.</code><code class="descname">uniquewords_with_freq</code><span class="sig-paren">(</span><em>path</em>, <em>encoding=u'utf-8'</em>, <em>normalization=u'NFD'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.uniquewords_with_freq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in every word from a file as separated by lines and spaces.
+Return a counter (behaves like a dictionary) of unique words
+along with the number of times they occurred.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>unicode</em>) &#8211; Absolute path of the file to be read</li>
+<li><strong>encoding</strong> (<em>unicode</em>) &#8211; Encoding to use for decoding the file</li>
+<li><strong>normalization</strong> (<em>unicode</em>) &#8211; Normalization format to use</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Contains the frequency of each token</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Counter</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.lex.words_from_files">
+<code class="descclassname">nidaba.lex.</code><code class="descname">words_from_files</code><span class="sig-paren">(</span><em>dirpath</em>, <em>encoding=u'utf-8'</em>, <em>normalization=u'NFD'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.words_from_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a dictionary from a directory of text files.  All files in the given
+directory will be parsed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dirpath</strong> (<em>unicode</em>) &#8211; Absolute path of the directory to enter</li>
+<li><strong>encoding</strong> (<em>unicode</em>) &#8211; Encoding to use for decoding the files</li>
+<li><strong>normalization</strong> (<em>unicode</em>) &#8211; Normalization format to use</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of words of all files in the directory</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 </div>
 <div class="section" id="module-nidaba.lock">
@@ -731,12 +992,6 @@ should always define their exceptions here.</p>
 <dl class="exception">
 <dt id="nidaba.nidabaexceptions.NidabaTickException">
 <em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaTickException</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaTickException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
-</dd></dl>
-
-<dl class="exception">
-<dt id="nidaba.nidabaexceptions.NidabaUnibarrierException">
-<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaUnibarrierException</code><span class="sig-paren">(</span><em>message=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaUnibarrierException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
 </dd></dl>
 
