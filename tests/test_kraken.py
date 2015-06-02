@@ -82,6 +82,8 @@ class KrakenTests(unittest.TestCase):
         except etree.XMLSyntaxError:
             self.fail(msg='The outpath was not valid html/xml!')
 
+    # jpgs are not able to encode <8bpp and don't encode b/w as bilevel.
+    @unittest.expectedFailure
     def test_file_outpath_jpg(self):
         """
         Test that kraken creates hocr output for jpgs.
