@@ -34,7 +34,7 @@ install:
     requirements.txt | xargs conda install
   # Conda does not package everything, so we install a couple others via pip.
   - pip install -r requirements.txt
-
+  - pip install kraken
   # Package debug
   # -------------
   - conda list
