@@ -17,7 +17,7 @@ It offers the following functionality:
 - Deskewing
 - Dewarping
 - Integration of `tesseract <http://code.google.com/p/tesseract-ocr/>`_,
-  `kraken <http://mittagessen.github.io/kraken?`_, and `ocropus
+  `kraken <http://mittagessen.github.io/kraken>`_, and `ocropus
   <http://github.com/tmbdev/ocropy>`_ OCR engines
 - Various postprocessing utilities like spell-checking, merging of multiple
   results, and ground truth comparison.
