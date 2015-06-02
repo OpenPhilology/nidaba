@@ -7,22 +7,15 @@ nidaba.plugins
 
 from __future__ import absolute_import, print_function
 
-import os
-
-from pluginbase import PluginBase
 from nidaba.config import nidaba_cfg
 
+import stevedore
 
-plugin_base = PluginBase(package='nidaba.plugins')
-sp = [os.path.dirname(__file__)]
-if 'plugin_path' in nidaba_cfg:
-    sp.extend(nidaba_cfg['plugin_path'])
-plugin_source = plugin_base.make_plugin_source(searchpath=sp)
+def setup(ext, data):
+    ext.plugin.setup(**data[ext.name])
 
-with plugin_source:
-    if 'plugins_load' in nidaba_cfg:
-        for plugin in nidaba_cfg['plugins_load']:
-            pl = plugin_source.load_plugin(plugin)
-            pl.setup(**nidaba_cfg['plugins_load'][plugin])
-    else:
-        __import__('nidaba.plugins', globals(), locals(), plugin_source.list_plugins(), -1)
+mgr = stevedore.NamedExtensionManager(namespace='nidaba.plugins',
+        names=nidaba_cfg['plugins_load'].keys(),
+        propagate_map_exceptions=True)
+
+mgr.map(setup, nidaba_cfg['plugins_load'])

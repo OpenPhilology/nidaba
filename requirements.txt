@@ -1,4 +1,4 @@
-pluginbase==0.3
+stevedore==1.4.0
 celery==3.1.18
 click==4.0
 dominate==2.1.12

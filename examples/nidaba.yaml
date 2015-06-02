@@ -25,14 +25,10 @@ kraken_models:
   default: [models, en-default.hdf5]
 
 
-# An optional list of additional paths to load plugins from.
-# plugin_path: ['/usr/share/nidaba/']
-
-# List of plugins to load. If no plugins_load key is defined all available
-# plugins will be loaded. Additional fields in the associative array will be
-# handed over to the setup function of the plugin.
-# Be aware that plugins utilizing external components that aren't installed
-# will cause nidaba to abort. 
+# List of plugins to load. Additional fields in the associative array will be
+# handed over to the setup function of the plugin.  Be aware that plugins
+# utilizing external components that aren't installed will cause nidaba to
+# abort. 
 plugins_load:
   tesseract: {implementation: capi, # set to either legacy (hOCR
                                               # output in an *.html file),
