@@ -16,7 +16,7 @@ resources = os.path.abspath(os.path.join(thisfile, 'resources/ocropus'))
 class KrakenTests(unittest.TestCase):
 
     """
-    Tests for python ocropus bindings.
+    Tests for the kraken plugin.
     """
 
     def setUp(self):
@@ -35,8 +35,25 @@ class KrakenTests(unittest.TestCase):
         except:
             raise SkipTest
 
+
     def tearDown(self):
         shutil.rmtree(self.tempdir)
+
+
+    def test_hdf5_model(self):
+        """
+        Test that kraken creates hocr output with HDF5 models.
+        """
+        pngpath = os.path.join(resources, u'image_png.png')
+        modelpath = os.path.join(resources, u'en-default.hdf5')
+        ocr = self.kraken.ocr(pngpath, modelpath)
+        try:
+            parser = etree.HTMLParser()
+            etree.fromstring(ocr, parser)
+        except etree.XMLSyntaxError as e:
+            print(e.message)
+            self.fail(msg='The outpath was not valid html/xml!')
+
 
     def test_file_outpath_png(self):
         """
