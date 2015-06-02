@@ -27,11 +27,11 @@ install:
   # Customise the testing environment
   # ---------------------------------
   - conda install pbr nose pip
-  # h5py has a false dependency on Cython, so we install it until it's fixed.
-  - conda install cython h5py
   - sed
     '/pluginbase\|click\|dominate\|regex\|celery\|redis\|pyxDamerauLevenshtein\|beautifulsoup4/d'
     requirements.txt | xargs conda install
+  # we have to install some kraken dependencies using conda, too
+  - conda install numpy Pillow scipy Cython h5py
   # Conda does not package everything, so we install a couple others via pip.
   - pip install -r requirements.txt
   - pip install kraken
