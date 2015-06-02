@@ -35,6 +35,12 @@ install:
   # Conda does not package everything, so we install a couple others via pip.
   - pip install -r requirements.txt
   - pip install kraken
+  
+  # install ocropus
+  - git clone https://github.com/tmbdev/ocropy.git
+  - touch ocropy/models/en-default.pyrnn.gz
+  - pip install ./ocropy
+
   # Package debug
   # -------------
   - conda list
