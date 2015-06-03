@@ -1,3 +1,3 @@
-from __future__ import absolute_imports
+from __future__ import absolute_import
 
-from nidaba import Batch
+from nidaba.nidaba import Batch
