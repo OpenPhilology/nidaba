@@ -64,6 +64,12 @@ tessdata = u'/usr/share/tesseract-ocr/'
 
 logger = get_task_logger(__name__)
 
+class TessBaseAPI(ctypes.Structure):
+    """
+    Dummy class encapsulating the TessBaseAPI struct returned by
+    TessBaseAPICreate().
+    """
+    pass
 
 def setup(*args, **kwargs):
     if kwargs.get(u'implementation'):
@@ -199,6 +205,7 @@ def ocr_capi(image_path, output_path, languages, extended=False):
 
     # set up all return types
     tesseract.TessVersion.restype = ctypes.c_char_p
+    tesseract.TessBaseAPICreate.restype = ctypes.POINTER(TessBaseAPI)
     if extended:
         try:
             tesseract.TessResultIteratorConfidence.restype = ctypes.c_float
