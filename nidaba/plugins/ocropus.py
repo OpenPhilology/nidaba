@@ -7,7 +7,7 @@ Plugin implementing an interface to the `ocropus
 <http://github.com/tmbdev/ocropy>`_ OCR engine.
 
 It requires working ocropus-* tools in your execution path. Please have a look
-at the website for installation instructions. 
+at the website for installation instructions.
 
 .. important::
     If you are not requiring specific functionality of ocropus please consider
@@ -40,11 +40,14 @@ from nidaba.tasks.helper import NidabaTask
 from nidaba.nidabaexceptions import NidabaOcropusException
 from nidaba.nidabaexceptions import NidabaPluginException
 
+
 def setup(*args, **kwargs):
     if None in [spawn.find_executable('ocropus-rpred'),
                 spawn.find_executable('ocropus-gpageseg'),
                 spawn.find_executable('ocropus-hocr')]:
-        raise NidabaPluginException('Prerequisites for ocropus module not installed.')
+        raise NidabaPluginException('Prerequisites for ocropus module not '
+                                    'installed.')
+
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.ocropus')
 def ocr_ocropus(doc, method=u'ocr_ocropus', model=None):

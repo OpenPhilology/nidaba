@@ -69,10 +69,12 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     elif model in nidaba_cfg['ocropus_models']:
         model = storage.get_abs_path(*(nidaba_cfg['ocropus_models'][model]))
     else:
-        raise NidabaInvalidParameterException('Model not defined in configuration')
+        raise NidabaInvalidParameterException('Model not defined in '
+                                              'configuration')
 
     storage.write_text(*output_path, text=ocr(input_path, model))
     return output_path
+
 
 def ocr(image_path, model=None):
     """
@@ -90,6 +92,7 @@ def ocr(image_path, model=None):
     rnn = models.load_any(model)
     hocr = html.hocr(list(rpred.rpred(rnn, img, lines)), image_path, img.size)
     return unicode(hocr)
+
 
 @app.task(base=NidabaTask, name=u'nidaba.binarize.nlbin')
 def nlbin(doc, method=u'nlbin', threshold=0.5, zoom=0.5, escale=1.0,
@@ -126,6 +129,7 @@ def nlbin(doc, method=u'nlbin', threshold=0.5, zoom=0.5, escale=1.0,
     kraken_nlbin(input_path, output_path, threshold, zoom, escale, border,
                  perc, range, low, high)
     return storage.get_storage_path(output_path)
+
 
 def kraken_nlbin(input_path, output_path, threshold=0.5, zoom=0.5, escale=1.0,
                  border=0.1, perc=80, range=20, low=5, high=90):

@@ -64,6 +64,7 @@ tessdata = u'/usr/share/tesseract-ocr/'
 
 logger = get_task_logger(__name__)
 
+
 def setup(*args, **kwargs):
     if kwargs.get(u'implementation'):
         global implementation
@@ -107,7 +108,8 @@ class micro_hocr(object):
 
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.tesseract')
-def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None, extended=False):
+def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
+                  extended=False):
     """
     Runs tesseract on an input document.
 
@@ -142,7 +144,6 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None, extended=False):
         raise NidabaTesseractException('Invalid implementation selected',
                                        implementation)
     return storage.get_storage_path(result_path)
-
 
 
 def delta(root=(0, 0, 0, 0), coordinates=None):
@@ -199,7 +200,7 @@ def ocr_capi(image_path, output_path, languages, extended=False):
     # set up all return types
     tesseract.TessVersion.restype = ctypes.c_char_p
     if extended:
-        try: 
+        try:
             tesseract.TessResultIteratorConfidence.restype = ctypes.c_float
             tesseract.TessResultIteratorWordRecognitionLanguage.restype = ctypes.c_char_p
             tesseract.TessResultIteratorGetUTF8Text.restype = ctypes.c_char_p
