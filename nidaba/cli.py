@@ -12,14 +12,13 @@ from nidaba import celery
 from pprint import pprint
 from inspect import getcallargs, getdoc
 
-import argparse
-import re
 import uuid
 import shutil
 import os.path
 import sys
 import click
-import pkg_resources
+import stevedore
+
 
 @click.group(epilog='This nidaba may or may not have Super Cow Powers')
 @click.version_option()
@@ -117,6 +116,7 @@ def validate_definition(ctx, param, value):
         definitions.append([task, configurations])
     return definitions
 
+
 def move_to_storage(id, kwargs):
     """
     Takes as dictionary of kwargs and moves the suffix of all keys starting
@@ -137,21 +137,21 @@ def move_to_storage(id, kwargs):
         else:
             nkwargs[k] = v
     return nkwargs
-            
+
 
 @main.command()
 @click.option('--binarize', '-b', multiple=True, callback=validate_definition,
               help='A configuration for a single binarization algorithm in '
               'the format algorithm:param1,param2;param1,param2;...')
-@click.option('--ocr', '-o', multiple=True, callback=validate_definition, 
+@click.option('--ocr', '-o', multiple=True, callback=validate_definition,
               help='A configuration for a single OCR engine in the format '
               'engine:param1,param2;param1,param2;...')
 @click.option('--stats', '-s', multiple=True, callback=validate_definition,
               help='A configuration for a single post-OCR measure in the '
               'format measure:param1,param2;param1;param2...')
 @click.option('--postprocessing', '-p', multiple=True,
-              callback=validate_definition, help='A configuration for a single '
-              'postprocessing task in the format '
+              callback=validate_definition, help='A configuration for a '
+              'single postprocessing task in the format '
               'task:param1,param2;param1;param1...')
 @click.option('--willitblend', 'blend',  default=False, help='Blend all '
               'output files into a single hOCR document.', is_flag=True)
@@ -238,6 +238,22 @@ def config():
 
 
 @main.command()
+def plugins():
+    """
+    Displays available plugins and if they're enabled.
+    """
+    mgr = stevedore.ExtensionManager(namespace='nidaba.plugins')
+    enabled = set(nidaba_cfg['plugins_load'].keys()).intersection(set(mgr.names()))
+    disabled = set(mgr.names()) - enabled
+    for plugin in mgr.names():
+        click.echo(plugin, nl=False)
+        if plugin in disabled:
+            click.secho(u' (disabled)', fg='red')
+        else:
+            click.secho(u' (enabled)', fg='green')
+
+
+@main.command()
 @click.argument('job_id', nargs=1, type=str)
 def status(job_id):
     """
@@ -253,8 +269,8 @@ def status(job_id):
             print('Please contact your friendly nidaba support technician.')
         else:
             for doc in ret:
-                click.echo(doc['root'][1].encode('utf-8') + u' \u2192 ' + 
-                      storage.get_abs_path(*doc['doc']).encode('utf-8'))
+                click.echo(doc['root'][1].encode('utf-8') + u' \u2192 ' +
+                           storage.get_abs_path(*doc['doc']).encode('utf-8'))
     elif state == 'FAILURE':
         ret = batch.get_errors()
         if ret is None:
