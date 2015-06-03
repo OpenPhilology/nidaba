@@ -7,6 +7,7 @@ All custom exceptions raised by various nidaba modules and packages. Packages
 should always define their exceptions here.
 """
 
+
 class NidabaPluginException(Exception):
 
     def __init__(self, message=None):
