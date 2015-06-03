@@ -2,7 +2,7 @@
 
 from __future__ import absolute_import
 
-from lxml import etree, html
+from lxml import etree
 from operator import attrgetter
 from nidaba import storage
 
