@@ -15,7 +15,6 @@ import stevedore
 def setup(ext, data):
     ext.plugin.setup(**data[ext.name])
 
-print(nidaba_cfg['plugins_load'].keys())
 mgr = stevedore.NamedExtensionManager(namespace='nidaba.plugins',
                                       names=nidaba_cfg['plugins_load'].keys(),
                                       propagate_map_exceptions=True)
