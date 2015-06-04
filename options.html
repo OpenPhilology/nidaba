@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Option Groups &mdash; nidaba 0.3.17-1-gee31b9e
+ documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.17-1-gee31b9e
+',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="nidaba 0.3.17-1-gee31b9e
+ documentation" href="index.html" />
+    <link rel="next" title="nidaba" href="source/modules.html" />
+    <link rel="prev" title="Plugins" href="plugins.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="source/modules.html" title="nidaba"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="plugins.html" title="Plugins"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">nidaba 0.3.17-1-gee31b9e
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="option-groups">
+<h1>Option Groups<a class="headerlink" href="#option-groups" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="binarization">
+<span id="bin"></span><h2>Binarization<a class="headerlink" href="#binarization" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://en.wikipedia.org/wiki/Thresholding_%28image_processing%29">Binarization</a> is the
+process of converting a grayscale image to a bi-level image by selecting one or
+more thresholds separating foreground (usually the text to be recognized) from
+background (usually the white page) pixels. As all character recognition
+methods implemented in nidaba operate only on bi-level images, it is paramount
+to create properly binarized images as a preprocessing step.</p>
+<p>Binarization is an own group of tasks and functions can be accessed using the
+<code class="docutils literal"><span class="pre">--binarization</span></code> switch:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -b otsu -b sauvola ... -- *.tif
+</pre></div>
+</div>
+<div class="section" id="options-and-syntax">
+<h3>Options and Syntax<a class="headerlink" href="#options-and-syntax" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="nidaba.tasks.binarize.otsu">
+<code class="descclassname">nidaba.tasks.binarize.</code><code class="descname">otsu</code><span class="sig-paren">(</span><em>doc</em>, <em>method=u'spell_check'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.binarize.otsu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binarizes an input document utilizing a naive implementation of Otsu&#8217;s
+thresholding.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple.</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p>There are also additional, more advanced binarization algorithms available in
+the <a class="reference internal" href="plugins.html#module-nidaba.plugins.leptonica" title="nidaba.plugins.leptonica"><code class="xref py py-mod docutils literal"><span class="pre">leptonica</span></code></a> and <a class="reference internal" href="plugins.html#module-nidaba.plugins.kraken" title="nidaba.plugins.kraken"><code class="xref py py-mod docutils literal"><span class="pre">kraken</span></code></a> plugins.</p>
+</div>
+</div>
+<div class="section" id="optical-character-recognition">
+<span id="ocr-heading"></span><h2>Optical Character Recognition<a class="headerlink" href="#optical-character-recognition" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://en.wikipedia.org/wiki/Optical_character_recognition">OCR</a> is arguably
+the main part of nidaba. Currently 3 OCR engines are implemented and can be
+accessed using the <code class="docutils literal"><span class="pre">--ocr</span></code> group of task:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -o tesseract:eng -o kraken:en-default ... -- *.tif
+</pre></div>
+</div>
+<div class="section" id="id2">
+<h3>Options and Syntax<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>As OCR engines are usually quite large and sometimes hard to install, all
+functionality is contained in plugins. See <a class="reference internal" href="plugins.html#module-nidaba.plugins.tesseract" title="nidaba.plugins.tesseract"><code class="xref py py-mod docutils literal"><span class="pre">tesseract</span></code></a>, <a class="reference internal" href="plugins.html#module-nidaba.plugins.kraken" title="nidaba.plugins.kraken"><code class="xref py py-mod docutils literal"><span class="pre">kraken</span></code></a>, and
+<a class="reference internal" href="plugins.html#module-nidaba.plugins.ocropus" title="nidaba.plugins.ocropus"><code class="xref py py-mod docutils literal"><span class="pre">ocropus</span></code></a> for additional information,
+configuration keys, etc.</p>
+</div>
+</div>
+<div class="section" id="spell-checking">
+<span id="id3"></span><h2>Spell Checking<a class="headerlink" href="#spell-checking" title="Permalink to this headline">¶</a></h2>
+<p>Nidaba includes support for an edit distance based spell checker out of the
+box. Particular configurations of the spell checking algorithm have to be
+predefined in the <code class="docutils literal"><span class="pre">nidaba.yaml</span></code> configuration file under the <code class="docutils literal"><span class="pre">lang_dicts</span></code>
+section:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">lang_dicts</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">polytonic_greek</span><span class="p-Indicator">:</span> <span class="p-Indicator">{</span><span class="nv">dictionary</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">dicts</span><span class="p-Indicator">,</span> <span class="nv">greek.dic</span><span class="p-Indicator">],</span>
+                    <span class="nv">deletion_dictionary</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">dicts</span><span class="p-Indicator">,</span> <span class="nv">del_greek.dic</span><span class="p-Indicator">]}</span>
+  <span class="l-Scalar-Plain">latin</span><span class="p-Indicator">:</span> <span class="p-Indicator">{</span><span class="nv">dictionary</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">dicts</span><span class="p-Indicator">,</span> <span class="nv">latin.dic</span><span class="p-Indicator">],</span>
+                    <span class="nv">deletion_dictionary</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">dicts</span><span class="p-Indicator">,</span> <span class="nv">del_latin.dic</span><span class="p-Indicator">]}</span>
+</pre></div>
+</div>
+<p>The spell-checker is part of the postprocessing group of tasks and can be
+accessed be the name <code class="docutils literal"><span class="pre">spell_check</span></code>, e.g.:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -p spell_check:polytonic_greek ... -- *.tif
+</pre></div>
+</div>
+<div class="section" id="creating-dictionaries">
+<h3>Creating Dictionaries<a class="headerlink" href="#creating-dictionaries" title="Permalink to this headline">¶</a></h3>
+<p>The spell checker requires two dictionaries on the common storage medium: a
+dictionary of valid word forms and a corresponding file containing a mapping
+between variants and those valid word forms. Both are best created using the
+<code class="docutils literal"><span class="pre">nidaba_mkdict</span></code> tool installed by the default distribution. It takes a
+arbitrary text document, extracts all unique character sequences, and
+calculates the dictionaries in a normalized format. For example:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba_mkdict --input greek.txt --del_dict del_greek.dic --dictionary greek.dic
+<span class="go">Reading input file      [✓]</span>
+<span class="go">Writing dictionary      [✓]</span>
+<span class="go">Writing deletions       [✓]</span>
+</pre></div>
+</div>
+<p>Be aware that calculating the deletion dictionary is a process requiring a lot
+of memory, e.g. for a 31Mb word list mkdict utilizes around 8Gb memory and the
+resulting deletion dictionary will be 750Mb large.</p>
+</div>
+<div class="section" id="id4">
+<h3>Options and Syntax<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="nidaba.tasks.postprocessing.spell_check">
+<code class="descclassname">nidaba.tasks.postprocessing.</code><code class="descname">spell_check</code><span class="sig-paren">(</span><em>doc</em>, <em>method=u'spell_check'</em>, <em>language=u''</em>, <em>filter_punctuation=False</em>, <em>no_ocrx_words=u'auto'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.postprocessing.spell_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds spelling suggestions to an hOCR document.</p>
+<p>Alternative spellings for each hocr <code class="docutils literal"><span class="pre">ocrx_word</span></code> span are created using
+the INS-DEL syntax defined for alternative readings in the hOCR
+specification. Correct words, i.e. words appearing verbatim in the
+dictionary, are left untouched; words not appearing in the dictionary and
+without suggestions will still be encoded as a</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple.</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to the output file.</li>
+<li><strong>language</strong> (<em>unicode</em>) &#8211; Identifier defined in the nidaba configuration as a
+valid dictionary.</li>
+<li><strong>filter_punctuation</strong> (<em>bool</em>) &#8211; Switch to filter punctuation inside
+<code class="docutils literal"><span class="pre">ocrx_words</span></code></li>
+<li><strong>no_ocrx_words</strong> (<em>unicode</em>) &#8211; Fallback switch to extract words from on hOCR
+document without <code class="docutils literal"><span class="pre">ocrx_word</span></code> elements. May
+be set to <code class="docutils literal"><span class="pre">auto</span></code>, <code class="docutils literal"><span class="pre">true</span></code>, or <code class="docutils literal"><span class="pre">false</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output document</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="metrics">
+<span id="id5"></span><h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">nidaba</a></h1>
+
+
+
+<p class="blurb">An expandable and scalable OCR pipeline</p>
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=openphilology&repo=nidaba&type=watch&count=true&size=large"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+    
+
+<p>
+<a href="https://travis-ci.org/OpenPhilology/nidaba">
+    <img
+        alt="https://secure.travis-ci.org/OpenPhilology/nidaba.png?branch=master"
+        src="https://secure.travis-ci.org/OpenPhilology/nidaba.png?branch=master"
+    >
+</a>
+</p>
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Option Groups</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#binarization">Binarization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optical-character-recognition">Optical Character Recognition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spell-checking">Spell Checking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#metrics">Metrics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source/modules.html">API Docs</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2014-2015, Open Greek and Latin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      
+      |
+      <a href="_sources/options.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

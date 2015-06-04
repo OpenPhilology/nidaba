@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Nidaba &mdash; nidaba 0.3.16
+    <title>Nidaba &mdash; nidaba 0.3.17-1-gee31b9e
  documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.16
+        VERSION:     '0.3.17-1-gee31b9e
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.3.16
+    <link rel="top" title="nidaba 0.3.17-1-gee31b9e
  documentation" href="#" />
     <link rel="next" title="Plugins" href="plugins.html" />
    
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="plugins.html" title="Plugins"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">nidaba 0.3.16
+        <li class="nav-item nav-item-0"><a href="#">nidaba 0.3.17-1-gee31b9e
  documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -74,10 +74,10 @@ distribute the execution of this software to multiple machines.</p>
 <li><a class="reference external" href="http://www.leptonica.com/dewarping.html">Dewarping</a></li>
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Optical_character_recognition">OCR</a></li>
 <li>Output merging</li>
+<li><a class="reference internal" href="options.html#spell-checking"><span>Spell-checking</span></a></li>
 </ul>
-</div>
 <div class="section" id="installation">
-<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>Unless you are installing from a precompiled source you will need the ability
 to build Python C-based modules from source in order to install NumPy and
 SciPy. Users on <strong>Unix-based platforms</strong> such as Ubuntu or Mac OS X will need
@@ -126,7 +126,7 @@ a personal laptop or workstation, we strongly urge you to utilize
 </div>
 </div>
 <div class="section" id="tests">
-<h1>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h1>
+<h2>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h2>
 <p>Per default no dictionaries and OCR models necessary to runs the tests are
 installed. To download the necessary files run:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> python setup.py download
@@ -140,7 +140,7 @@ installed. To download the necessary files run:</p>
 ocropus, will be skipped if these aren&#8217;t installed.</p>
 </div>
 <div class="section" id="configuration">
-<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p>There are currently two configuration files, one used by the celery framework
 and one containing the actual nidaba configuration. Both are written in <a class="reference external" href="http://www.yaml.org">YAML</a> so indentation and whitespace is important. They are
 installed automatically into <code class="docutils literal"><span class="pre">sys.prefix/etc/nidaba/{celery,nidaba}.yaml</span></code>;
@@ -159,15 +159,17 @@ all available options. The example file looks like this:</p>
 framework:</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">storage_path</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">~/OCR</span>
 <span class="l-Scalar-Plain">lang_dicts</span><span class="p-Indicator">:</span>
-  <span class="l-Scalar-Plain">polytonic_greek</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">dicts</span><span class="p-Indicator">,</span> <span class="nv">greek.dic</span><span class="p-Indicator">]</span>
-  <span class="l-Scalar-Plain">lojban</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">dicts</span><span class="p-Indicator">,</span> <span class="nv">lojban.dic</span><span class="p-Indicator">]</span>
-  <span class="l-Scalar-Plain">german</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">dicts</span><span class="p-Indicator">,</span> <span class="nv">german.dic</span><span class="p-Indicator">]</span>
+  <span class="l-Scalar-Plain">polytonic_greek</span><span class="p-Indicator">:</span> <span class="p-Indicator">{</span><span class="nv">dictionary</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">dicts</span><span class="p-Indicator">,</span> <span class="nv">greek.dic</span><span class="p-Indicator">],</span>
+                    <span class="nv">deletion_dictionary</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">dicts</span><span class="p-Indicator">,</span> <span class="nv">del_greek.dic</span><span class="p-Indicator">]}</span>
+  <span class="l-Scalar-Plain">latin</span><span class="p-Indicator">:</span> <span class="p-Indicator">{</span><span class="nv">dictionary</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">dicts</span><span class="p-Indicator">,</span> <span class="nv">latin.dic</span><span class="p-Indicator">],</span>
+                    <span class="nv">deletion_dictionary</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">dicts</span><span class="p-Indicator">,</span> <span class="nv">del_latin.dic</span><span class="p-Indicator">]}</span>
 <span class="l-Scalar-Plain">ocropus_models</span><span class="p-Indicator">:</span>
   <span class="l-Scalar-Plain">greek</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">models</span><span class="p-Indicator">,</span> <span class="nv">greek.pyrnn.gz</span><span class="p-Indicator">]</span>
   <span class="l-Scalar-Plain">atlantean</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">models</span><span class="p-Indicator">,</span> <span class="nv">atlantean.pyrnn.gz</span><span class="p-Indicator">]</span>
   <span class="l-Scalar-Plain">fraktur</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">models</span><span class="p-Indicator">,</span> <span class="nv">fraktur.pyrnn.gz</span><span class="p-Indicator">]</span>
   <span class="l-Scalar-Plain">fancy_ligatures</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">models</span><span class="p-Indicator">,</span> <span class="nv">ligatures.pyrnn.gz</span><span class="p-Indicator">]</span>
-<span class="l-Scalar-Plain">plugin_path</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="s">&#39;/usr/share/nidaba/&#39;</span><span class="p-Indicator">]</span>
+<span class="l-Scalar-Plain">kraken_models</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">default</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">models</span><span class="p-Indicator">,</span> <span class="nv">en-default.hdf5</span><span class="p-Indicator">]</span>
 <span class="l-Scalar-Plain">plugins_load</span><span class="p-Indicator">:</span>
   <span class="l-Scalar-Plain">tesseract</span><span class="p-Indicator">:</span> <span class="p-Indicator">{</span><span class="nv">implementation</span><span class="p-Indicator">:</span> <span class="nv">capi</span><span class="p-Indicator">,</span>
              <span class="nv">tessdata</span><span class="p-Indicator">:</span> <span class="nv">/usr/share/tesseract-ocr</span><span class="p-Indicator">}</span>
@@ -176,25 +178,21 @@ framework:</p>
   <span class="l-Scalar-Plain">leptonica</span><span class="p-Indicator">:</span> <span class="p-Indicator">{}</span>
 </pre></div>
 </div>
-<p>storage_path
-The home directory for nidaba to store files created by OCR jobs, i.e.
-the location of the shared storage medium. This may differ on
-different machines in the cluster.</p>
-<p>ocropus_models (optional)
-A list of mappings from unique identifiers to storage tupels where a
-tupel is of the format [directory, path] resulting in the absolute path
-storage_path/directory/path. Each mapping defines a single neuronal
-network available to the ocropus OCR task. These have to exist on all
-machines running nidaba and therefore have to be on the common storage medium
-beneath storage_path.</p>
-<p>plugin_path (optional)
-A list of additional paths to look for plugins in.</p>
-<p>plugins_load (optional)
-An associative array of plugins to load with additional configuration
-data for each plugin. See <a class="reference internal" href="plugins.html"><em>plugins</em></a> for more information.</p>
+<p><code class="docutils literal"><span class="pre">storage_path</span></code></p>
+<p>The home directory for nidaba to store files created by OCR jobs, i.e. the
+location of the shared storage medium. This may differ on different machines in
+the cluster.</p>
+<p><code class="docutils literal"><span class="pre">lang_dicts</span></code> (optional)</p>
+<p>See the <a class="reference internal" href="options.html#spell-checking"><span>spell-checking</span></a> documentation for further
+information.</p>
+<p><code class="docutils literal"><span class="pre">ocropus_models</span></code> and <code class="docutils literal"><span class="pre">kraken_models</span></code> (optional)</p>
+<p>See the <a class="reference internal" href="plugins.html"><em>plugins</em></a> documentation for further information.</p>
+<p><code class="docutils literal"><span class="pre">plugins_load</span></code> (optional)</p>
+<p>An associative array of plugins to load with additional configuration data for
+each plugin. See <a class="reference internal" href="plugins.html"><em>plugins</em></a> for more information.</p>
 </div>
 <div class="section" id="running">
-<h1>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h1>
+<h2>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h2>
 <p>Celery requires a worker retrieving tasks from the message broker to actually
 execute them.  Starting the celery worker server is quite simple and the only
 requirement is that it is NOT run inside the nidaba directory and the message
@@ -204,26 +202,40 @@ broker is up and running:</p>
 </div>
 <p>For further worker options have a look at the <a class="reference external" href="https://celery.readthedocs.org/en/latest/userguide/workers.html">Celery worker documentation</a>.</p>
 <div class="section" id="command-line-interface">
-<h2>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h2>
+<h3>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h3>
 <p>The simplest way to add jobs to the pipeline is using the nidaba command line
 utility. It is automatically installed during the installation procedure.</p>
+<div class="section" id="configuration-and-plugins">
+<h4>Configuration and Plugins<a class="headerlink" href="#configuration-and-plugins" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal"><span class="pre">config</span></code> subcommand is used to inspect the current nidabaconfig.py:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba config
-<span class="go">{&#39;lang_dicts&#39;: {&#39;german&#39;: [&#39;dicts&#39;, &#39;german.dic&#39;],</span>
-<span class="go">                &#39;lojban&#39;: [&#39;dicts&#39;, &#39;lojban.dic&#39;],</span>
-<span class="go">                &#39;polytonic_greek&#39;: [&#39;dicts&#39;, &#39;greek.dic&#39;]},</span>
+<span class="go">{&#39;kraken_models&#39;: {&#39;default&#39;: [&#39;models&#39;, &#39;en-default.hdf5&#39;]},</span>
+<span class="go"> &#39;lang_dicts&#39;: {&#39;latin&#39;: {&#39;deletion_dictionary&#39;: [&#39;dicts&#39;, &#39;del_latin.dic&#39;],</span>
+<span class="go">                          &#39;dictionary&#39;: [&#39;dicts&#39;, &#39;latin.dic&#39;]},</span>
+<span class="go">                &#39;polytonic_greek&#39;: {&#39;deletion_dictionary&#39;: [&#39;dicts&#39;,</span>
+<span class="go">                                                            &#39;del_greek.dic&#39;],</span>
+<span class="go">                                    &#39;dictionary&#39;: [&#39;dicts&#39;, &#39;greek.dic&#39;]}},</span>
 <span class="go"> &#39;ocropus_models&#39;: {&#39;atlantean&#39;: [&#39;models&#39;, &#39;atlantean.pyrnn.gz&#39;],</span>
 <span class="go">                    &#39;fancy_ligatures&#39;: [&#39;models&#39;, &#39;ligatures.pyrnn.gz&#39;],</span>
 <span class="go">                    &#39;fraktur&#39;: [&#39;models&#39;, &#39;fraktur.pyrnn.gz&#39;],</span>
 <span class="go">                    &#39;greek&#39;: [&#39;models&#39;, &#39;greek.pyrnn.gz&#39;]},</span>
-<span class="go"> &#39;plugins_load&#39;: {&#39;leptonica&#39;: {},</span>
-<span class="go">                  &#39;tesseract&#39;: {&#39;implementation&#39;: &#39;capi&#39;,</span>
+<span class="go"> &#39;plugins_load&#39;: {&#39;tesseract&#39;: {&#39;implementation&#39;: &#39;capi&#39;,</span>
 <span class="go">                                &#39;tessdata&#39;: &#39;/usr/share/tesseract-ocr&#39;}},</span>
 <span class="go"> &#39;storage_path&#39;: &#39;~/OCR&#39;}</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal"><span class="pre">worker</span></code> subcommand is used to run a celery worker and accepts all
-options accepted by the <code class="docutils literal"><span class="pre">celery</span> <span class="pre">worker</span></code> command. In fact, running:</p>
+<p>To see which plugins are available and enabled the <code class="docutils literal"><span class="pre">plugins</span></code> subcommand may be used:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba plugins
+<span class="go">ocropus (disabled)</span>
+<span class="go">tesseract (enabled)</span>
+<span class="go">kraken (disabled)</span>
+<span class="go">leptonica (disabled)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="workers">
+<h4>Workers<a class="headerlink" href="#workers" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal"><span class="pre">worker</span></code> subcommand is a shorthand to start up a celery worker. In fact</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba worker
 </pre></div>
 </div>
@@ -231,6 +243,9 @@ options accepted by the <code class="docutils literal"><span class="pre">celery<
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> celery -A nidaba worker
 </pre></div>
 </div>
+</div>
+<div class="section" id="batches">
+<h4>Batches<a class="headerlink" href="#batches" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal"><span class="pre">batch</span></code> subcommand is used to add a job to the pipeline. A rather minimal
 invocation looks like this:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch --binarize nlbin -b sauvola -o tesseract:eng -- input.png
@@ -238,29 +253,39 @@ invocation looks like this:</p>
 </pre></div>
 </div>
 <p>It converts the input file <code class="docutils literal"><span class="pre">input.png</span></code> to grayscale, binarizes it using the
-Sauvola and nlbin algorithm, and finally runs it through tesseract with the
-English language model.</p>
+Sauvola and nlbin algorithm, and finally runs both binarizations through
+tesseract with the English language model, creating two hOCR files.</p>
+<p>There are several groups of options, each associated with a particular set of
+functions of the pipeline. An option may appear multiple times to define
+additional execution paths similar to adding new branches to the leaves of a
+tree where each leaf is one result of the, logically, preceding group of
+options. All paths through this tree will then be executed by the workers in
+the cluster.</p>
+<p>Each option must follow the same format
+<code class="docutils literal"><span class="pre">algorithm:val,named_param2=val2,...,paramN=N;param1=val1,param2=val2,...</span></code>
+where configurations of the same algorithm are divided by <code class="docutils literal"><span class="pre">;</span></code> and the
+parameters are divided by <code class="docutils literal"><span class="pre">,</span></code>. Parameters may either be named or unnamed,
+although unnamed parameters may not appear after named ones. Additionally,
+there is a helper preamble <code class="docutils literal"><span class="pre">file:</span></code> which must be followed by a valid path to
+a file. This file will be copied to the common storage medium and its new
+location will be used instead of the path when executing the function.</p>
+<p>Available option groups in order of processing are:</p>
 <dl class="docutils">
 <dt>&#8211;binarize / -b</dt>
-<dd><p class="first">Defines a single configuration of a binarization algorithm. It consists
-of a term in the form algorithm:param1,param2,paramN=N;param1,param2...
-where algorithm is one of the algorithms implemented and params are
-their configuration parameters. Parameters may either be keyword
-argument, e.g. window_size=10, or positional arguments. Both can be
-mixed as long as no positional arguments are defined after a keyword
-argument.</p>
-<p class="last">Multiple &#8211;binarize options can be used to execute additional
-binarization algorithms. Have a look at <a class="reference internal" href="source/nidaba.tasks.html#module-nidaba.tasks.binarize" title="nidaba.tasks.binarize"><code class="xref py py-mod docutils literal"><span class="pre">nidaba.tasks.binarize</span></code></a>
-for possible values.</p>
-</dd>
+<dd>Defines binarization parameters. See the <a class="reference internal" href="options.html#bin"><span>binarization</span></a> documentation for more details.</dd>
 <dt>&#8211;ocr / -o</dt>
-<dd>Defines a single configuration of an OCR engine. It consists of a term
-in the form engine:param1,param2;param1,param2=N;... where engine is
-one of the loaded OCR engines and params are their configurations.</dd>
+<dd>Defines OCR parameters. See the <a class="reference internal" href="options.html#ocr-heading"><span>OCR</span></a> documentation
+for more details.</dd>
+<dt>&#8211;postprocessing / -p</dt>
+<dd>Defines parameters of various postprocessing methods. See the
+<a class="reference internal" href="options.html#spell-checking"><span>spell-checking</span></a> documentation for more details.</dd>
 <dt>&#8211;stats / -s</dt>
-<dd>Defines a single configuration of a post-OCR measure in the format
-measure:param1,param2,... Have a look a <code class="xref py py-mod docutils literal"><span class="pre">nidaba.tasks.stats</span></code> for
-possible values.</dd>
+<dd>Defines parameters of metrics. See the <a class="reference internal" href="options.html#metrics"><span>Metrics</span></a> documentation for
+more details.</dd>
+</dl>
+<p>There are two more options that are technically part of of other option groups
+but can&#8217;t be included in other groups for several reasons.</p>
+<dl class="docutils">
 <dt>&#8211;willitblend</dt>
 <dd>Blends all output hOCR files into a single hOCR document using the
 dummy scoring algorithm</dd>
@@ -268,6 +293,9 @@ dummy scoring algorithm</dd>
 <dd>A switch to indicate that input files are already 8bpp grayscale and
 conversion to grayscale is unnecessary.</dd>
 </dl>
+</div>
+<div class="section" id="batch-status">
+<h4>Batch status<a class="headerlink" href="#batch-status" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal"><span class="pre">status</span></code> subcommand is used to retrieve the status of a job. It takes the
 return value of a previously executed <code class="docutils literal"><span class="pre">batch</span></code> command. A currently running
 command will return PENDING:</p>
@@ -292,8 +320,9 @@ containing the final output:</p>
 </div>
 </div>
 </div>
+</div>
 <div class="section" id="contributing">
-<span id="id2"></span><h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
+<span id="id2"></span><h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
 <p>Every open source project lives from the generous help by contributors
 that sacrifice their time and nibada is no different.</p>
 <p>Here are a few hints and rules to get you started:</p>
@@ -323,11 +352,12 @@ pull request gets politely closed. There’s absolutely nothing to fear.</p>
 question or concerns, feel free to reach out to us.</p>
 </div>
 <div class="section" id="licensing-and-authorship">
-<h1>Licensing and Authorship<a class="headerlink" href="#licensing-and-authorship" title="Permalink to this headline">¶</a></h1>
+<h2>Licensing and Authorship<a class="headerlink" href="#licensing-and-authorship" title="Permalink to this headline">¶</a></h2>
 <p>This project is licensed under <a class="reference external" href="https://www.gnu.org/licenses/gpl-2.0.html">GPL2.0+</a>, so feel free to use and adapt as
 long as you respect the license. See <a class="reference external" href="https://github.com/openphilology/nidaba/blob/master/LICENSE">LICENSE</a> for details.</p>
 <p>nidaba is written as part of the <a class="reference external" href="https://www.dh.uni-leipzig.de/wo/projects/open-greek-and-latin-project/">Open Greek and Latin Project</a> at
 the <a class="reference external" href="https://www.dh.uni-leipzig.de">Humboldt Chair of Digital Humanities at the University of Leipzig</a>.</p>
+</div>
 </div>
 
 
@@ -350,10 +380,22 @@ the <a class="reference external" href="https://www.dh.uni-leipzig.de">Humboldt 
 </p>
 
 
+
+
+    
+
+<p>
+<a href="https://travis-ci.org/OpenPhilology/nidaba">
+    <img
+        alt="https://secure.travis-ci.org/OpenPhilology/nidaba.png?branch=master"
+        src="https://secure.travis-ci.org/OpenPhilology/nidaba.png?branch=master"
+    >
+</a>
+</p>
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins</a></li>
-<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">Option Groups</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source/modules.html">API Docs</a></li>
 </ul>
 

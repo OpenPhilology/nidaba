@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Plugins &mdash; nidaba 0.3.16
+    <title>Plugins &mdash; nidaba 0.3.17-1-gee31b9e
  documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.16
+        VERSION:     '0.3.17-1-gee31b9e
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,9 +25,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.3.16
+    <link rel="top" title="nidaba 0.3.17-1-gee31b9e
  documentation" href="index.html" />
-    <link rel="next" title="Frequently Answered Questions" href="faq.html" />
+    <link rel="next" title="Option Groups" href="options.html" />
     <link rel="prev" title="Nidaba" href="index.html" />
    
   
@@ -45,12 +45,12 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="faq.html" title="Frequently Answered Questions"
+          <a href="options.html" title="Option Groups"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Nidaba"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">nidaba 0.3.16
+        <li class="nav-item nav-item-0"><a href="index.html">nidaba 0.3.17-1-gee31b9e
  documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -62,13 +62,41 @@
             
   <div class="section" id="plugins">
 <h1>Plugins<a class="headerlink" href="#plugins" title="Permalink to this headline">¶</a></h1>
-<p>Tasks requiring external dependencies which are not installabe using Python
-utilities are separated into plugins. Plugins can be selected in the
-configuration file.</p>
-<span class="target" id="module-nidaba.plugins.kraken"></span><div class="section" id="nidaba-plugins-kraken">
-<h2>nidaba.plugins.kraken<a class="headerlink" href="#nidaba-plugins-kraken" title="Permalink to this headline">¶</a></h2>
+<p>Tasks requiring extensive external or hard-to-install dependencies are
+contained in plugins. Some plugins are shipped with the standard distribution
+while others may be available from third parties. Prerequisites needed for
+using each plugin are usually stated in its docstring.</p>
+<div class="section" id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h2>
+<p>Nidaba uses the <a class="reference external" href="http://docs.openstack.org/developer/stevedore/">stevedore</a>
+Python package for dynamic plugin management. It builds on top of <a class="reference external" href="https://pythonhosted.org/setuptools/setuptools.html#dynamic-discovery-of-services-and-plugins">setuptools
+entry points</a>
+enabling it to use plugins from any source as long as it has been installed
+using setuptools.</p>
+<p>Plugins are located in the <code class="docutils literal"><span class="pre">nidaba.plugins</span></code> namespace and configured in the
+<code class="docutils literal"><span class="pre">nidaba.yaml</span></code> configuration file in the <code class="docutils literal"><span class="pre">plugins_load</span></code> section:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">plugins_load</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">tesseract</span><span class="p-Indicator">:</span> <span class="p-Indicator">{</span><span class="nv">implementation</span><span class="p-Indicator">:</span> <span class="nv">capi</span><span class="p-Indicator">,</span>
+              <span class="nv">tessdata</span><span class="p-Indicator">:</span> <span class="nv">/usr/share/tesseract-ocr</span><span class="p-Indicator">}</span>
+  <span class="l-Scalar-Plain">ocropus</span><span class="p-Indicator">:</span> <span class="p-Indicator">{}</span>
+  <span class="l-Scalar-Plain">kraken</span><span class="p-Indicator">:</span> <span class="p-Indicator">{}</span>
+  <span class="l-Scalar-Plain">leptonica</span><span class="p-Indicator">:</span> <span class="p-Indicator">{}</span>
+</pre></div>
+</div>
+<p>Configuration data required by plugins can be stored in the dictionary beneath
+the plugin name; after importing the module the setup function of the module
+will be called with the corresponding configuration data.</p>
+<p>Registering tasks requires getting access to the global application object of
+celery. After importing it from <code class="docutils literal"><span class="pre">nidaba.celery</span></code> your tasks can be decorated
+as usual. Remember that all tasks should derive from the
+<code class="docutils literal"><span class="pre">nidaba.tasks.helper.NidabaTask</span></code> object.</p>
+</div>
+<div class="section" id="module-nidaba.plugins.kraken">
+<span id="id1"></span><span id="builtin-plugins"></span><h2>Builtin Plugins<a class="headerlink" href="#module-nidaba.plugins.kraken" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-plugins-kraken">
+<h3>nidaba.plugins.kraken<a class="headerlink" href="#nidaba-plugins-kraken" title="Permalink to this headline">¶</a></h3>
 <p>Plugin implementing access to kraken functions.</p>
-<p><a class="reference external" href="https://github.com/mittagessen/kraken">kraken</a> is a fork of OCRopus
+<p><a class="reference external" href="https://mittagessen.github.io/kraken">kraken</a> is a fork of OCRopus
 implementing sane interfaces while preserving (mostly) functional equivalence.
 To use this plugin kraken has to be installed into the current python path,
 e.g. the current virtualenv. It is available from pypi:</p>
@@ -102,9 +130,46 @@ using the same global configuration options.</p>
 </table>
 </dd></dl>
 
+<dl class="function">
+<dt id="nidaba.plugins.kraken.nlbin">
+<code class="descclassname">nidaba.plugins.kraken.</code><code class="descname">nlbin</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>threshold</em>, <em>zoom</em>, <em>escale</em>, <em>border</em>, <em>perc</em>, <em>range</em>, <em>low</em>, <em>high</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.plugins.kraken.nlbin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binarizes an input document utilizing ocropus&#8217;/kraken&#8217;s nlbin algorithm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple.</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files.</li>
+<li><strong>threshold</strong> (<em>float</em>) &#8211; </li>
+<li><strong>zoom</strong> (<em>float</em>) &#8211; </li>
+<li><strong>escale</strong> (<em>float</em>) &#8211; </li>
+<li><strong>(float)</strong> (<em>border</em>) &#8211; </li>
+<li><strong>perc</strong> (<em>int</em>) &#8211; </li>
+<li><strong>range</strong> (<em>int</em>) &#8211; </li>
+<li><strong>low</strong> (<em>int</em>) &#8211; </li>
+<li><strong>high</strong> (<em>int</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(unicode, unicode)</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">NidabaInvalidParameterException</span></code> &#8211;
+Input parameters are outside the valid
+range.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <span class="target" id="module-nidaba.plugins.ocropus"></span><div class="section" id="nidaba-plugins-ocropus">
-<h2>nidaba.plugins.ocropus<a class="headerlink" href="#nidaba-plugins-ocropus" title="Permalink to this headline">¶</a></h2>
+<h3>nidaba.plugins.ocropus<a class="headerlink" href="#nidaba-plugins-ocropus" title="Permalink to this headline">¶</a></h3>
 <p>Plugin implementing an interface to the <a class="reference external" href="http://github.com/tmbdev/ocropy">ocropus</a> OCR engine.</p>
 <p>It requires working ocropus-* tools in your execution path. Please have a look
 at the website for installation instructions.</p>
@@ -150,7 +215,7 @@ info carried in the file name.</p>
 
 </div>
 <span class="target" id="module-nidaba.plugins.tesseract"></span><div class="section" id="nidaba-plugins-tesseract">
-<h2>nidaba.plugins.tesseract<a class="headerlink" href="#nidaba-plugins-tesseract" title="Permalink to this headline">¶</a></h2>
+<h3>nidaba.plugins.tesseract<a class="headerlink" href="#nidaba-plugins-tesseract" title="Permalink to this headline">¶</a></h3>
 <p>Plugin implementing an interface to tesseract</p>
 <p>This plugin exposes tesseract&#8217;s functionality as a task. It implements two ways
 of calling tesseract, a direct method calling the tesseract executable and one
@@ -173,7 +238,7 @@ versions.</p>
 </div>
 </div>
 <div class="section" id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
 <dl class="docutils">
 <dt>implementation (default=&#8217;capi&#8217;)</dt>
 <dd>Selector for the call method. May either be <cite>capi</cite>, <cite>direct</cite> (tesseract
@@ -215,11 +280,11 @@ direct or legacy implementation is used.</li>
 
 </div>
 <span class="target" id="module-nidaba.plugins.leptonica"></span><div class="section" id="nidaba-plugins-leptonica">
-<h2>nidaba.plugins.leptonica<a class="headerlink" href="#nidaba-plugins-leptonica" title="Permalink to this headline">¶</a></h2>
+<h3>nidaba.plugins.leptonica<a class="headerlink" href="#nidaba-plugins-leptonica" title="Permalink to this headline">¶</a></h3>
 <p>Plugin accessing <a class="reference external" href="http://leptonica.com">leptonica</a> functions.</p>
 <p>This plugin requires a liblept shared object in the current library search
-path. On Debian-based systems it can be installed using apt-get:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># apt-get install libleptonica-dev</span>
+path. On Debian-based systems it can be installed using apt-get</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">#</span> apt-get install libleptonica-dev
 </pre></div>
 </div>
 <p>Leptonica&#8217;s APIs are rather unstable and may differ significantly between
@@ -314,6 +379,7 @@ from an 1bpp input image.</p>
 
 </div>
 </div>
+</div>
 
 
           </div>
@@ -335,17 +401,26 @@ from an 1bpp input image.</p>
 </p>
 
 
+
+
+    
+
+<p>
+<a href="https://travis-ci.org/OpenPhilology/nidaba">
+    <img
+        alt="https://secure.travis-ci.org/OpenPhilology/nidaba.png?branch=master"
+        src="https://secure.travis-ci.org/OpenPhilology/nidaba.png?branch=master"
+    >
+</a>
+</p>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="">Plugins</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#nidaba-plugins-kraken">nidaba.plugins.kraken</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#nidaba-plugins-ocropus">nidaba.plugins.ocropus</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#nidaba-plugins-tesseract">nidaba.plugins.tesseract</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#nidaba-plugins-leptonica">nidaba.plugins.leptonica</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-nidaba.plugins.kraken">Builtin Plugins</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">Option Groups</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source/modules.html">API Docs</a></li>
 </ul>
 
