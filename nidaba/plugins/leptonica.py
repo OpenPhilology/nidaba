@@ -6,7 +6,9 @@ nidaba.plugins.leptonica
 Plugin accessing `leptonica <http://leptonica.com>`_ functions.
 
 This plugin requires a liblept shared object in the current library search
-path. On Debian-based systems it can be installed using apt-get::
+path. On Debian-based systems it can be installed using apt-get
+
+.. code-block:: console
 
     # apt-get install libleptonica-dev
 

@@ -1,3 +1,4 @@
+======
 Nidaba
 ======
 
@@ -14,9 +15,8 @@ distribute the execution of this software to multiple machines.
         :maxdepth: 2
 
         Plugins <plugins>
-        FAQs <faq>
+        Option Groups <options>
         API Docs <source/modules>
-        Changelog <../ChangeLog>
 
 Nidaba does a bunch of things for you:
 
@@ -26,6 +26,7 @@ Nidaba does a bunch of things for you:
 - `Dewarping <http://www.leptonica.com/dewarping.html>`_
 - `OCR <http://en.wikipedia.org/wiki/Optical_character_recognition>`_
 - Output merging
+- :ref:`Spell-checking <spell-checking>`
 
 .. _installation:
 
@@ -142,15 +143,17 @@ framework:
 
         storage_path: ~/OCR
         lang_dicts:
-          polytonic_greek: [dicts, greek.dic]
-          lojban: [dicts, lojban.dic]
-          german: [dicts, german.dic]
+          polytonic_greek: {dictionary: [dicts, greek.dic], 
+                            deletion_dictionary: [dicts, del_greek.dic]}
+          latin: {dictionary: [dicts, latin.dic], 
+                            deletion_dictionary: [dicts, del_latin.dic]}
         ocropus_models:
           greek: [models, greek.pyrnn.gz]
           atlantean: [models, atlantean.pyrnn.gz]
           fraktur: [models, fraktur.pyrnn.gz]
           fancy_ligatures: [models, ligatures.pyrnn.gz]
-        plugin_path: ['/usr/share/nidaba/']
+        kraken_models:
+          default: [models, en-default.hdf5]
         plugins_load:
           tesseract: {implementation: capi,
                      tessdata: /usr/share/tesseract-ocr}
@@ -158,25 +161,26 @@ framework:
           kraken: {}
           leptonica: {}
 
-storage_path
-The home directory for nidaba to store files created by OCR jobs, i.e.
-the location of the shared storage medium. This may differ on
-different machines in the cluster.
 
-ocropus_models (optional)
-A list of mappings from unique identifiers to storage tupels where a
-tupel is of the format [directory, path] resulting in the absolute path
-storage_path/directory/path. Each mapping defines a single neuronal
-network available to the ocropus OCR task. These have to exist on all
-machines running nidaba and therefore have to be on the common storage medium
-beneath storage_path.
+``storage_path``
 
-plugin_path (optional)
-A list of additional paths to look for plugins in.
+The home directory for nidaba to store files created by OCR jobs, i.e. the
+location of the shared storage medium. This may differ on different machines in
+the cluster.
 
-plugins_load (optional)
-An associative array of plugins to load with additional configuration
-data for each plugin. See :doc:`plugins <plugins>` for more information.
+``lang_dicts`` (optional)
+
+See the :ref:`spell-checking <spell-checking>` documentation for further
+information.
+
+``ocropus_models`` and ``kraken_models`` (optional)
+
+See the :doc:`plugins <plugins>` documentation for further information.
+
+``plugins_load`` (optional)
+
+An associative array of plugins to load with additional configuration data for
+each plugin. See :doc:`plugins <plugins>` for more information.
 
 Running
 =======
@@ -199,25 +203,42 @@ Command Line Interface
 The simplest way to add jobs to the pipeline is using the nidaba command line
 utility. It is automatically installed during the installation procedure.
 
+Configuration and Plugins
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The ``config`` subcommand is used to inspect the current nidabaconfig.py:
 
 .. code-block:: console
 
         $ nidaba config
-        {'lang_dicts': {'german': ['dicts', 'german.dic'],
-                        'lojban': ['dicts', 'lojban.dic'],
-                        'polytonic_greek': ['dicts', 'greek.dic']},
+        {'kraken_models': {'default': ['models', 'en-default.hdf5']},
+         'lang_dicts': {'latin': {'deletion_dictionary': ['dicts', 'del_latin.dic'],
+                                  'dictionary': ['dicts', 'latin.dic']},
+                        'polytonic_greek': {'deletion_dictionary': ['dicts',
+                                                                    'del_greek.dic'],
+                                            'dictionary': ['dicts', 'greek.dic']}},
          'ocropus_models': {'atlantean': ['models', 'atlantean.pyrnn.gz'],
                             'fancy_ligatures': ['models', 'ligatures.pyrnn.gz'],
                             'fraktur': ['models', 'fraktur.pyrnn.gz'],
                             'greek': ['models', 'greek.pyrnn.gz']},
-         'plugins_load': {'leptonica': {},
-                          'tesseract': {'implementation': 'capi',
+         'plugins_load': {'tesseract': {'implementation': 'capi',
                                         'tessdata': '/usr/share/tesseract-ocr'}},
          'storage_path': '~/OCR'}
 
-The ``worker`` subcommand is used to run a celery worker and accepts all
-options accepted by the ``celery worker`` command. In fact, running:
+To see which plugins are available and enabled the ``plugins`` subcommand may be used:
+
+.. code-block:: console
+
+        $ nidaba plugins
+        ocropus (disabled)
+        tesseract (enabled)
+        kraken (disabled)
+        leptonica (disabled)
+
+Workers
+~~~~~~~
+
+The ``worker`` subcommand is a shorthand to start up a celery worker. In fact
 
 .. code-block:: console
 
@@ -229,6 +250,9 @@ is equivalent to:
 
         $ celery -A nidaba worker
 
+Batches
+~~~~~~~
+
 The ``batch`` subcommand is used to add a job to the pipeline. A rather minimal
 invocation looks like this:
 
@@ -238,31 +262,45 @@ invocation looks like this:
         90ae699a-7172-44ce-a8bf-5464bccd34d0
 
 It converts the input file ``input.png`` to grayscale, binarizes it using the
-Sauvola and nlbin algorithm, and finally runs it through tesseract with the
-English language model.
+Sauvola and nlbin algorithm, and finally runs both binarizations through
+tesseract with the English language model, creating two hOCR files.
+
+There are several groups of options, each associated with a particular set of
+functions of the pipeline. An option may appear multiple times to define
+additional execution paths similar to adding new branches to the leaves of a
+tree where each leaf is one result of the, logically, preceding group of
+options. All paths through this tree will then be executed by the workers in
+the cluster.
+
+Each option must follow the same format
+``algorithm:val,named_param2=val2,...,paramN=N;param1=val1,param2=val2,...``
+where configurations of the same algorithm are divided by ``;`` and the
+parameters are divided by ``,``. Parameters may either be named or unnamed,
+although unnamed parameters may not appear after named ones. Additionally,
+there is a helper preamble ``file:`` which must be followed by a valid path to
+a file. This file will be copied to the common storage medium and its new
+location will be used instead of the path when executing the function.
+
+Available option groups in order of processing are:
 
 --binarize / -b
-        Defines a single configuration of a binarization algorithm. It consists
-        of a term in the form algorithm:param1,param2,paramN=N;param1,param2...
-        where algorithm is one of the algorithms implemented and params are
-        their configuration parameters. Parameters may either be keyword
-        argument, e.g. window_size=10, or positional arguments. Both can be
-        mixed as long as no positional arguments are defined after a keyword
-        argument.
+        Defines binarization parameters. See the :ref:`binarization
+        <bin>` documentation for more details.
         
-        Multiple --binarize options can be used to execute additional
-        binarization algorithms. Have a look at :mod:`nidaba.tasks.binarize`
-        for possible values.
-
 --ocr / -o 
-        Defines a single configuration of an OCR engine. It consists of a term
-        in the form engine:param1,param2;param1,param2=N;... where engine is
-        one of the loaded OCR engines and params are their configurations.
+        Defines OCR parameters. See the :ref:`OCR <ocr_heading>` documentation
+        for more details.
+
+--postprocessing / -p
+        Defines parameters of various postprocessing methods. See the
+        :ref:`spell-checking <spell-checking>` documentation for more details.
 
 --stats / -s
-        Defines a single configuration of a post-OCR measure in the format
-        measure:param1,param2,... Have a look a :mod:`nidaba.tasks.stats` for
-        possible values.
+        Defines parameters of metrics. See the :ref:`metrics` documentation for
+        more details.
+
+There are two more options that are technically part of of other option groups
+but can't be included in other groups for several reasons.
 
 \-\-willitblend
         Blends all output hOCR files into a single hOCR document using the
@@ -270,6 +308,10 @@ English language model.
 \-\-grayscale
         A switch to indicate that input files are already 8bpp grayscale and
         conversion to grayscale is unnecessary.
+
+
+Batch status
+~~~~~~~~~~~~
 
 The ``status`` subcommand is used to retrieve the status of a job. It takes the
 return value of a previously executed ``batch`` command. A currently running

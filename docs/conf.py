@@ -34,8 +34,7 @@ html_theme_options = {
     'description': "An expandable and scalable OCR pipeline",
     'github_user': 'openphilology',
     'github_repo': 'nidaba',
-    'link': '#3782BE',
-    'link_hover': '#3782BE',
+    'travis_button': 'OpenPhilology/nidaba',
 }
 
 
