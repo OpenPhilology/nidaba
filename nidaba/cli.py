@@ -269,8 +269,8 @@ def status(job_id):
             print('Please contact your friendly nidaba support technician.')
         else:
             for doc in ret:
-                click.echo(doc['root'][1].encode('utf-8') + u' \u2192 ' +
-                           storage.get_abs_path(*doc['doc']).encode('utf-8'))
+                click.echo(doc[1][1].encode('utf-8') + u' \u2192 ' +
+                           storage.get_abs_path(*doc[0]).encode('utf-8'))
     elif state == 'FAILURE':
         ret = batch.get_errors()
         if ret is None:

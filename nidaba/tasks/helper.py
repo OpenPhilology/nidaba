@@ -11,9 +11,28 @@ from __future__ import absolute_import
 
 from celery import Task
 from inspect import getargspec
+from redis import WatchError
 from nidaba.celery import app
+from nidaba.config import Redis
 
 import json
+
+def _redis_set_atomically(batch_id, subtask, key, val):
+    """
+    Atomically sets a field in the Redis batch object to a value.
+    """
+    with Redis.pipeline() as pipe:
+        while 1:
+            try:
+                pipe.watch(batch_id)
+                batch_struct = json.loads(pipe.get(batch_id))
+                pipe.multi()
+                batch_struct[subtask][key] = val
+                pipe.set(batch_id, json.dumps(batch_struct))
+                pipe.execute()
+                break
+            except WatchError:
+                continue
 
 
 class NidabaTask(Task):
@@ -27,6 +46,7 @@ class NidabaTask(Task):
     acks_late = True
 
     def __call__(self, *args, **kwargs):
+
         # if args is a dictionary we merge it into kwargs
         if len(args) == 1 and isinstance(args[0], dict):
 
@@ -41,10 +61,7 @@ class NidabaTask(Task):
                 root = set()
                 for o in kwargs['doc']:
                     docs.append(tuple(o['doc']))
-                    root.add(tuple(o['root']))
                 kwargs['doc'] = docs
-                assert len(root) == 1, 'Nonmatching root documents'
-                kwargs['root'] = root.pop()
 
         # and then filter all tracking objects (root document, job id, ...) out
         # again
@@ -57,24 +74,15 @@ class NidabaTask(Task):
                 nkwargs[k] = v
             else:
                 tracking_kwargs[k] = v
+        task_id = tracking_kwargs['task_id']
+        batch_id = tracking_kwargs['batch_id']
         try:
+            _redis_set_atomically(batch_id, task_id, 'state', 'RUNNING')
             ret = super(NidabaTask, self).__call__(*args, **nkwargs)
         except Exception as e:
-            # write error to backend and reraise exception
-            batch_struct = json.loads(app.backend.get(tracking_kwargs['id']))
-            batch_struct['errors'].append((nkwargs, tracking_kwargs,
-                                           e.message))
-            app.backend.set(tracking_kwargs['id'], json.dumps(batch_struct))
+            _redis_set_atomically(batch_id, task_id, 'errors', (nkwargs, e.message))
+            _redis_set_atomically(batch_id, task_id, 'state', 'FAILURE')
             raise
-        if isinstance(ret, dict):
-            for k,v in ret.iteritems():
-                # if a previous task has already created the key, for example a
-                # measure being computed before and after a processing step, we
-                # append the value.
-                if k in tracking_kwargs:
-                    tracking_kwargs[k].append(v)
-                else:
-                    tracking_kwargs[k] = v
-        else:
-            tracking_kwargs['doc'] = ret
-        return tracking_kwargs
+        _redis_set_atomically(batch_id, task_id, 'state', 'SUCCESS')
+        _redis_set_atomically(batch_id, task_id, 'result', ret)
+        return ret
