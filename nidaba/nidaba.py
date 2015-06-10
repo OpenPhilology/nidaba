@@ -109,7 +109,7 @@ class Batch(object):
                 PENDING: The batch is currently running.
                 SUCCESS: The batch has completed successfully.
         """
-        r = redis.from_url(config.nidaba_cfg['redis_url'])
+        r = config.Redis
         batch = r.get(self.id)
         try:
             batch = json.loads(batch)
@@ -150,8 +150,7 @@ class Batch(object):
 
         Returns:
         """
-        r = redis.from_url(config.nidaba_cfg['redis_url'])
-        batch = r.get(self.id)
+        batch = config.Redis.get(self.id)
         try:
             batch = json.loads(batch)
         except Exception:
@@ -173,6 +172,7 @@ class Batch(object):
         Returns:
             A dictionary containing an entry for each subtask.
         """
+        return json.loads(config.Redis.get(self.id))
 
     def add_document(self, doc):
         """Add a document to the batch.
@@ -338,7 +338,7 @@ class Batch(object):
                     }
                     group_list[step[0]].kwargs['task_id'] = task_id
                     group_list[step[0]].kwargs['batch_id'] = self.id
-        r = redis.from_url(config.nidaba_cfg['redis_url'])
+        r = config.Redis
         r.set(self.id, json.dumps(result_data))
         [x.apply_async() for x in chains]
         return self.id
