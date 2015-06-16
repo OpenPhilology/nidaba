@@ -288,9 +288,8 @@ def ocr_capi(image_path, output_path, languages, extended=False):
                         confidences = []
                     word_span = span(cls='ocrx_word')
                     line_span.add(word_span)
-                    if not no_rec_lang:
-                        lang = tesseract.TessResultIteratorWordRecognitionLanguage(ri, RIL_WORD).decode('utf-8')
-                        word_span['lang'] = lang
+                    lang = tesseract.TessResultIteratorWordRecognitionLanguage(ri, RIL_WORD).decode('utf-8')
+                    word_span['lang'] = lang
                     tesseract.TessPageIteratorBoundingBox(pi, RIL_WORD,
                                                           ctypes.byref(x0),
                                                           ctypes.byref(y0),
