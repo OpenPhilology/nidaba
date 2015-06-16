@@ -84,5 +84,11 @@ class NidabaTask(Task):
             _redis_set_atomically(batch_id, task_id, 'state', 'FAILURE')
             raise
         _redis_set_atomically(batch_id, task_id, 'state', 'SUCCESS')
+
+        if isinstance(ret, dict):
+            doc = ret.pop('doc')
+            if ret:
+                _redis_set_atomically(batch_id, task_id, 'misc', ret)
+            ret = doc
         _redis_set_atomically(batch_id, task_id, 'result', ret)
         return ret
