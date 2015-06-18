@@ -6,7 +6,8 @@ This module encapsulates all shell callable functions of nidaba.
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-from nidaba import Batch, storage
+from nidaba import storage
+from nidaba.nidaba import Batch
 from nidaba.config import nidaba_cfg
 from nidaba import celery
 from pprint import pprint
