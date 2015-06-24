@@ -13,6 +13,7 @@ from nidaba import tasks
 from nidaba import plugins
 from nidaba import celery
 from nidaba import storage
+from nidaba import config
 from nidaba.nidabaexceptions import (NidabaInputException,
                                      NidabaNoSuchAlgorithmException,
                                      NidabaTickException, NidabaStepException)
@@ -24,7 +25,8 @@ from celery.result import AsyncResult
 from celery.states import state
 
 import json
-
+import uuid
+import redis
 
 class Batch(object):
 
@@ -107,19 +109,19 @@ class Batch(object):
                 PENDING: The batch is currently running.
                 SUCCESS: The batch has completed successfully.
         """
-        batch = celery.app.backend.get(self.id)
+        r = config.Redis
+        batch = r.get(self.id)
         try:
             batch = json.loads(batch)
         except Exception:
             return u'NONE'
-        if len(batch['errors']) > 0:
-            return u'FAILURE'
-
-        st = state('SUCCESS')
-        for id in batch['task_ids']:
-            if AsyncResult(id).state < st:
-                st = AsyncResult(id).state
-        return unicode(st)
+        st = 'SUCCESS'
+        for subtask in batch.itervalues():
+            if subtask['state'] == 'PENDING' or subtask['state'] == 'RUNNING':
+                st = u'PENDING'
+            if subtask['state'] == 'FAILURE':
+                return u'FAILURE'
+        return st
 
     def get_errors(self):
         """
@@ -144,15 +146,11 @@ class Batch(object):
 
     def get_results(self):
         """
-        Retrieves the storage tuples of a successful batch or None.
+        Retrieves the storage tuples of a successful batch.
 
         Returns:
-            A list of dictionaries containing the output document name under
-            the key 'doc', the original document it is based upon under the key
-            'root', and all further tracking data that may be added during
-            execution.
         """
-        batch = celery.app.backend.get(self.id)
+        batch = config.Redis.get(self.id)
         try:
             batch = json.loads(batch)
         except Exception:
@@ -162,14 +160,19 @@ class Batch(object):
             return None
 
         outfiles = []
-        for id in batch['task_ids']:
-            ch = AsyncResult(id)
-            if ch.successful():
-                if type(ch.result['doc'][0]) == dict:
-                    outfiles.extend([x for x in ch.result['doc']])
-                else:
-                    outfiles.append(ch.result)
+        for subtask in batch.itervalues():
+            if len(subtask['children']) == 0 and not subtask['housekeeping']:
+                outfiles.append((subtask['result'], subtask['root_document']))
         return outfiles
+
+    def get_extended_state(self):
+        """
+        Returns extended batch state information.
+
+        Returns:
+            A dictionary containing an entry for each subtask.
+        """
+        return json.loads(config.Redis.get(self.id))
 
     def add_document(self, doc):
         """Add a document to the batch.
@@ -207,7 +210,6 @@ class Batch(object):
         if u'nidaba.' + method not in celery.app.tasks:
             raise NidabaNoSuchAlgorithmException('No such task in registry')
         kwargs[u'method'] = method
-        kwargs[u'id'] = self.id
         self.cur_tick.append(kwargs)
 
     def add_tick(self):
@@ -243,7 +245,7 @@ class Batch(object):
     def run(self):
         """Executes the current batch definition.
 
-        Expands the current batch definition to a series of celery chords and
+        Expands the current batch definition to a series of celery chains and
         executes them asynchronously. Additionally a batch record is written to
         the celery result backend.
 
@@ -256,6 +258,9 @@ class Batch(object):
 
         groups = []
         tick = []
+
+        result_data = {}
+
         # We first expand the tasks starting from the second step as these are
         # the same for each input document.
         if len(self.batch_def) > 1:
@@ -263,7 +268,7 @@ class Batch(object):
             for tset in self.batch_def[1:]:
                 for sequence in product(*tset):
                     method = celery.app.tasks[
-                        'nidaba.' + sequence[0]['method']]
+                            'nidaba.' + sequence[0]['method']]
                     ch = chain(method.s(**(sequence[0])))
                     for seq in sequence[1:]:
                         method = celery.app.tasks['nidaba.' + seq['method']]
@@ -273,22 +278,67 @@ class Batch(object):
                 groups.append(tasks.util.sync.s())
 
         # The expansion steps described above is redone for each input document
-        rets = []
+        chains = []
         for doc in self.docs:
             tick = []
             # the first step is handled differently as the input document has
             # to be added explicitely.
             for sequence in product([doc], *self.batch_def[0]):
                 method = celery.app.tasks['nidaba.' + sequence[1]['method']]
-                ch = chain(method.s(doc=sequence[0], root=sequence[0],
-                                    **(sequence[1])))
+                root = sequence[0]
+                ch = chain(method.s(doc=root, **(sequence[1])))
                 for seq in sequence[2:]:
                     method = celery.app.tasks['nidaba.' + seq['method']]
                     ch |= method.s(**seq)
                 tick.append(ch)
-            rets.append(
-                chain([group(tick)] + [tasks.util.sync.s()] +
-                      groups[:-1]).apply_async().id)
-        celery.app.backend.set(
-            self.id, json.dumps({'errors': [], 'task_ids': rets}))
+            doc_group = group(tick)
+            parents = []
+            group_list = [doc_group] + groups
+            chains.append(chain(group_list))
+
+            # Now we give out another set of unique task identifiers and save
+            # them to the database. Presetting the celery task ID does not work
+            # as our chains get automagically upgraded to chords by celery,
+            # erasing the ID fields in the process.
+            for step in enumerate(group_list):
+                if hasattr(step[1], 'tasks'):
+                    for tick in enumerate(step[1].tasks):
+                        if step[0]:
+                            parents = parent_step
+                        else:
+                            parents = []
+                        for task in enumerate(tick[1].tasks):
+                            task_id = uuid.uuid4().get_hex()
+                            result_data[task_id] = {
+                                'children': [],
+                                'parents': parents,
+                                'housekeeping': False,
+                                'root_document': doc,
+                                'state': 'PENDING',
+                                'result': None,
+                                'task': (task[1]['task'], task[1]['kwargs']),
+                            }
+                            for parent in parents:
+                                result_data[parent]['children'] = task_id
+                            group_list[step[0]].tasks[tick[0]].tasks[task[0]].kwargs['task_id'] = task_id
+                            group_list[step[0]].tasks[tick[0]].tasks[task[0]].kwargs['batch_id'] = self.id
+                            parents = [task_id]
+                    parent_step = [x.tasks[-1].kwargs['task_id'] for x in
+                                   step[1].tasks]
+                else:
+                    task_id = uuid.uuid4().get_hex()
+                    result_data[task_id] = {
+                        'children': [],
+                        'parents': [],
+                        'housekeeping': True,
+                        'root_document': doc,
+                        'state': 'PENDING',
+                        'result': None,
+                        'task': (task[1]['task'], task[1]['kwargs']),
+                    }
+                    group_list[step[0]].kwargs['task_id'] = task_id
+                    group_list[step[0]].kwargs['batch_id'] = self.id
+        r = config.Redis
+        r.set(self.id, json.dumps(result_data))
+        [x.apply_async() for x in chains]
         return self.id

@@ -6,7 +6,8 @@ This module encapsulates all shell callable functions of nidaba.
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-from nidaba import Batch, storage
+from nidaba import storage
+from nidaba.nidaba import Batch
 from nidaba.config import nidaba_cfg
 from nidaba import celery
 from pprint import pprint
@@ -254,8 +255,9 @@ def plugins():
 
 
 @main.command()
+@click.option('-v', '--verbose', count=True)
 @click.argument('job_id', nargs=1, type=str)
-def status(job_id):
+def status(verbose, job_id):
     """
     Diplays the status and results of jobs.
     """
@@ -269,8 +271,23 @@ def status(job_id):
             print('Please contact your friendly nidaba support technician.')
         else:
             for doc in ret:
-                click.echo(doc['root'][1].encode('utf-8') + u' \u2192 ' +
-                           storage.get_abs_path(*doc['doc']).encode('utf-8'))
+                click.echo(doc[1][1].encode('utf-8') + u' \u2192 ' +
+                           storage.get_abs_path(*doc[0]).encode('utf-8'))
+    elif state == 'PENDING':
+        ret = batch.get_extended_state()
+        done = 0
+        running = 0
+        pending = 0
+        for subtask in ret.itervalues():
+            if subtask['state'] == 'SUCCESS':
+                done += 1
+            elif subtask['state'] == 'RUNNING':
+                running += 1
+            elif subtask['state'] == 'PENDING':
+                pending += 1
+        click.echo(u'\u25cf' * done, nl=False)
+        click.echo(u'\u25f5' * running, nl=False)
+        click.echo(u'\u25cb' * pending)
     elif state == 'FAILURE':
         ret = batch.get_errors()
         if ret is None:

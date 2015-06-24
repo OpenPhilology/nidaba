@@ -72,7 +72,7 @@ def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
         storage.write_text(*get_storage_path(output_path), text=unicode(sm.ratio()))
         return output_path
     else:
-        return {'diff_ratio': (doc, sm.ratio()), 'doc': doc}
+        return {'diff_ratio': sm.ratio(), 'doc': doc}
 
 
 @app.task(base=NidabaTask, name=u'nidaba.stats.text_edit_ratio')
@@ -117,4 +117,4 @@ def text_edit_ratio(doc, method=u'text_edit_ratio', ground_truth=None,
         storage.write_text(*get_storage_path(output_path), text=unicode(edit))
         return output_path
     else:
-        return {'edit_ratio': (doc, edist), 'doc': doc}
+        return {'edit_ratio': edist, 'doc': doc}
