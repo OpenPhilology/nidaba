@@ -144,6 +144,10 @@ def move_to_storage(id, kwargs):
 @click.option('--binarize', '-b', multiple=True, callback=validate_definition,
               help='A configuration for a single binarization algorithm in '
               'the format algorithm:param1,param2;param1,param2;...')
+@click.option('--segmentation', '-l', multiple=True,
+               callback=validate_definition,
+              help='A configuration for a single page segmentation algorithm in '
+              'the format algorithm:param1,param2;param1,param2;...')
 @click.option('--ocr', '-o', multiple=True, callback=validate_definition,
               help='A configuration for a single OCR engine in the format '
               'engine:param1,param2;param1,param2;...')
@@ -166,8 +170,8 @@ def move_to_storage(id, kwargs):
               help='Accesses the documentation of all tasks contained in '
               'nidaba itself and in configured plugins.')
 @click.argument('files', type=click.Path(exists=True), nargs=-1, required=True)
-def batch(files, binarize, ocr, stats, postprocessing, blend, grayscale, jobid,
-          help_tasks):
+def batch(files, binarize, ocr, segmentation, stats, postprocessing, blend,
+          grayscale, jobid, help_tasks):
     """
     Add a new job to the pipeline.
     """
@@ -191,6 +195,12 @@ def batch(files, binarize, ocr, stats, postprocessing, blend, grayscale, jobid,
     if binarize:
         batch.add_tick()
         for alg in binarize:
+            for kwargs in alg[1]:
+                kwargs = move_to_storage(id, kwargs)
+                batch.add_task(alg[0], **kwargs)
+    if segmentation:
+        batch.add_tick()
+        for alg in segmentation:
             for kwargs in alg[1]:
                 kwargs = move_to_storage(id, kwargs)
                 batch.add_task(alg[0], **kwargs)
