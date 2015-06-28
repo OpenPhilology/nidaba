@@ -56,6 +56,7 @@ import subprocess
 import ctypes
 import dominate
 
+from shutil import copyfile
 from distutils import spawn
 from os.path import splitext
 from dominate.tags import div, span, meta, br
@@ -83,6 +84,7 @@ class TessBaseAPI(ctypes.Structure):
     TessBaseAPICreate().
     """
     pass
+
 
 def setup(*args, **kwargs):
     if kwargs.get(u'implementation'):
@@ -287,6 +289,11 @@ def ocr_capi(image_path, output_path, segmentation_path, languages, extended=Fal
     if (rc):
         tesseract.TessBaseAPIDelete(api)
         raise NidabaTesseractException('Tesseract initialization failed.')
+
+    # tesseract expects the UNZ file to have the same name as the input image.
+    seg_base_path = splitext(image_path)[0] + '.uzn'
+    copyfile(segmentation_path, seg_base_path)
+
     tesseract.TessBaseAPIProcessPages(api, image_path, None, 0, None)
     if tesseract.TessBaseAPIRecognize(api, None):
         tesseract.TessBaseAPIDelete(api)
@@ -398,7 +405,7 @@ def ocr_direct(image_path, output_path, segmentation_path, languages):
         languages (list): List of valid tesseract language identifiers
     """
     # tesseract expects the UNZ file to have the same name as the input image.
-    seg_base_path = splitext(image_path)[0] + '.unz'
+    seg_base_path = splitext(image_path)[0] + '.uzn'
     copyfile(segmentation_path, seg_base_path)
     p = subprocess.Popen(['tesseract', image_path, output_path, '-l',
                           '+'.join(languages), '-psm', '4', '--tessdata-dir',
