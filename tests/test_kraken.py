@@ -6,6 +6,7 @@ import tempfile
 import os
 
 from lxml import etree
+from celery import Task
 from nose.plugins.skip import SkipTest
 from mock import patch, MagicMock
 
@@ -20,36 +21,52 @@ class KrakenTests(unittest.TestCase):
     """
 
     def setUp(self):
-        try:
-            self.config_mock = MagicMock()
-            self.config_mock.nidaba.config.everything.log.return_value = True
-            modules = {
-                'nidaba.config': self.config_mock.config
-            }
-            self.module_patcher = patch.dict('sys.modules', modules)
-            self.module_patcher.start()
-            from nidaba.plugins import kraken
-            kraken.setup()
-            self.kraken = kraken
-            self.tempdir = unicode(tempfile.mkdtemp())
-        except:
-            raise SkipTest
+        config_mock = MagicMock()
+        storage_path = unicode(tempfile.mkdtemp())
+        config_mock.nidaba_cfg = {
+            'storage_path': storage_path,
+            'kraken_models': {'default': ('test', 'en-default.hdf5')},
+            'ocropus_models': {'ocropus': ('test', 'en-default.pyrnn.gz')},
+            'plugins_load': {}
+        }
+
+        self.patches = {
+            'nidaba.config': config_mock,
+        }
+        self.patcher = patch.dict('sys.modules', self.patches)
+        self.addCleanup(self.patcher.stop)
+        self.patcher.start()
+	self.storage_path = storage_path
+        shutil.copytree(resources, self.storage_path + '/test')
+        from nidaba.plugins import kraken
+        kraken.setup()
+        self.kraken = kraken
 
 
     def tearDown(self):
-        shutil.rmtree(self.tempdir)
+        
+        shutil.rmtree(self.storage_path)
+
+
+    def test_segmentation(self):
+        """
+        Test that kraken's page segmentation is working
+        """
+        o = self.kraken.segmentation_kraken.run(('test', 'image_png.png'))
+        self.assertTrue(os.path.isfile(os.path.join(self.storage_path, *o[0])),
+                        msg='Kraken did not output a file!')
 
 
     def test_hdf5_model(self):
         """
         Test that kraken creates hocr output with HDF5 models.
         """
-        pngpath = os.path.join(resources, u'image_png.png')
-        modelpath = os.path.join(resources, u'en-default.hdf5')
-        ocr = self.kraken.ocr(pngpath, modelpath)
+        ocr = self.kraken.ocr_kraken.run((('test', 'image.uzn'), 
+                                      ('test', 'image_png.png')), 
+                                     model='default')
         try:
             parser = etree.HTMLParser()
-            etree.fromstring(ocr, parser)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)), parser)
         except etree.XMLSyntaxError as e:
             print(e.message)
             self.fail(msg='The outpath was not valid html/xml!')
@@ -59,12 +76,12 @@ class KrakenTests(unittest.TestCase):
         """
         Test that kraken creates hocr output for pngs.
         """
-        pngpath = os.path.join(resources, u'image_png.png')
-        modelpath = os.path.join(resources, u'en-default.pyrnn.gz')
-        ocr = self.kraken.ocr(pngpath, modelpath)
+        ocr = self.kraken.ocr_kraken.run((('test', 'image.uzn'), 
+                                      ('test', 'image_png.png')), 
+                                     model='ocropus')
         try:
             parser = etree.HTMLParser()
-            etree.fromstring(ocr, parser)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)), parser)
         except etree.XMLSyntaxError as e:
             print(e.message)
             self.fail(msg='The outpath was not valid html/xml!')
@@ -73,38 +90,36 @@ class KrakenTests(unittest.TestCase):
         """
         Test that kraken creates hocr output for tiffs.
         """
-        tiffpath = os.path.join(resources, u'image_tiff.tiff')
-        modelpath = os.path.join(resources, u'en-default.pyrnn.gz')
-        ocr = self.kraken.ocr(tiffpath, modelpath)
+        ocr = self.kraken.ocr_kraken.run((('test', 'image.uzn'), 
+                                      ('test', 'image_tiff.tiff')), 
+                                     model='ocropus')
         try:
             parser = etree.HTMLParser()
-            etree.fromstring(ocr, parser)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)), parser)
         except etree.XMLSyntaxError:
             self.fail(msg='The outpath was not valid html/xml!')
 
-    # jpgs are not able to encode <8bpp and don't encode b/w as bilevel.
-    @unittest.expectedFailure
+
     def test_file_outpath_jpg(self):
         """
         Test that kraken creates hocr output for jpgs.
         """
-        jpgpath = os.path.join(resources, u'image_jpg.jpg')
-        modelpath = os.path.join(resources, u'en-default.pyrnn.gz')
-        ocr = self.kraken.ocr(jpgpath, modelpath)
+        ocr = self.kraken.ocr_kraken.run((('test', 'image.uzn'), 
+                                      ('test', 'image_jpg.jpg')), 
+                                     model='ocropus')
         try:
             parser = etree.HTMLParser()
-            etree.fromstring(ocr, parser)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)), parser)
         except etree.XMLSyntaxError:
             self.fail(msg='The outpath was not valid html/xml!')
+
 
     def test_nlbin(self):
         """
         Test that kraken's nlbin is callable.
         """
-        jpgpath = os.path.join(resources, u'image_jpg.jpg')
-        outpath = os.path.join(self.tempdir, u'output.png')
-        self.kraken.kraken_nlbin(jpgpath, outpath)
-        self.assertTrue(os.path.isfile(outpath),
+        ret = self.kraken.nlbin.run(('test', 'image_jpg.jpg'))
+        self.assertTrue(os.path.isfile(os.path.join(self.storage_path, *ret)),
                         msg='Kraken did not output a file!')
 
 
