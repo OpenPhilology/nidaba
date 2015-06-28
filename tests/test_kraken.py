@@ -3,10 +3,8 @@ import unittest
 import os
 import shutil
 import tempfile
-import os
 
 from lxml import etree
-from celery import Task
 from nose.plugins.skip import SkipTest
 from mock import patch, MagicMock
 
@@ -44,7 +42,7 @@ class KrakenTests(unittest.TestCase):
 
 
     def tearDown(self):
-        
+        self.patcher.stop()
         shutil.rmtree(self.storage_path)
 
 
