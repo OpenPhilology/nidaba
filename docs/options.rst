@@ -16,7 +16,7 @@ methods implemented in nidaba operate only on bi-level images, it is paramount
 to create properly binarized images as a preprocessing step.
 
 Binarization is an own group of tasks and functions can be accessed using the
-``--binarization`` switch:
+``--binarization/-b`` switch:
 
 .. code-block:: console
 
@@ -30,6 +30,30 @@ Options and Syntax
 There are also additional, more advanced binarization algorithms available in
 the :mod:`leptonica <nidaba.plugins.leptonica>` and :mod:`kraken
 <nidaba.plugins.kraken>` plugins.
+
+
+.. _segmentation_heading:
+
+Page Segmentation
+=================
+
+A prerequisite to the actual OCR is the extraction of textual elements,
+columns, paragraphs, and lines, from the page. Page segmentation is a separate
+group of tasks and functions can be accessed using the ``--segmentation/-l``
+switch:
+
+.. code-block:: console
+
+    # nidaba batch ... -l kraken -l tesseract ... -- *.tif
+
+Options and Syntax
+------------------
+
+Segmentation is usually an integral part of an OCR engine, so different
+implementations are situated in their respective plugins. See :mod:`tesseract
+<nidaba.plugins.tesseract>` and :mod:`kraken <nidaba.plugins.kraken>` for
+additional information.
+
 
 .. _ocr_heading:
 

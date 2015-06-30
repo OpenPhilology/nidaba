@@ -258,12 +258,13 @@ invocation looks like this:
 
 .. code-block:: console
 
-        $ nidaba batch --binarize nlbin -b sauvola -o tesseract:eng -- input.png
+        $ nidaba batch --binarize nlbin -b sauvola -l tesseract -o tesseract:eng -- input.png
         90ae699a-7172-44ce-a8bf-5464bccd34d0
 
 It converts the input file ``input.png`` to grayscale, binarizes it using the
-Sauvola and nlbin algorithm, and finally runs both binarizations through
-tesseract with the English language model, creating two hOCR files.
+Sauvola and nlbin algorithm, creates page segmentations of both images using
+tesseract's algorithm, and finally runs both binarizations/segmentations
+through tesseract with the English language model, creating two hOCR files.
 
 There are several groups of options, each associated with a particular set of
 functions of the pipeline. An option may appear multiple times to define
@@ -286,7 +287,11 @@ Available option groups in order of processing are:
 --binarize / -b
         Defines binarization parameters. See the :ref:`binarization
         <bin>` documentation for more details.
-        
+
+--segmentation / -l
+        Defines page segmentation parameters. See the :ref:`segmentation
+        <segmentation_heading>` documentation for more details.
+
 --ocr / -o 
         Defines OCR parameters. See the :ref:`OCR <ocr_heading>` documentation
         for more details.
