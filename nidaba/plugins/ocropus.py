@@ -14,13 +14,6 @@ at the website for installation instructions.
     using the :mod:`kraken <nidaba.plugins.kraken>` plugin. Kraken does not
     require working around oddities in input argument acceptance and is
     generally more well-behaved than ocropus.
-
-.. note::
-    ocropus uses a peculiar implementation of splitext removing all characters
-    after the first dot to determine the output path of OCR results. We
-    mitigate this by appending a unique UUID for each input file before the
-    first dot. Unfortunately, this process causes the loss of all processing
-    info carried in the file name.
 """
 
 from __future__ import absolute_import
@@ -31,9 +24,15 @@ import os
 import re
 import shutil
 import uuid
+import dominate
+import numpy as np
 
+from dominate.tags import div, span, meta, br
 from distutils import spawn
+from PIL import Image
+
 from nidaba import storage
+from nidaba import uzn
 from nidaba.config import nidaba_cfg
 from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
@@ -42,11 +41,34 @@ from nidaba.nidabaexceptions import NidabaPluginException
 
 
 def setup(*args, **kwargs):
-    if None in [spawn.find_executable('ocropus-rpred'),
-                spawn.find_executable('ocropus-gpageseg'),
-                spawn.find_executable('ocropus-hocr')]:
+    try:
+        global ocrolib
+        import ocrolib
+    except:
         raise NidabaPluginException('Prerequisites for ocropus module not '
                                     'installed.')
+
+class micro_hocr(object):
+    """
+    A simple class encapsulating hOCR attributes
+    """
+    def __init__(self):
+        self.output = u''
+
+    def __str__(self):
+        return self.output
+
+    def add(self, *args):
+        if self.output:
+            self.output += u'; '
+        for arg in args:
+            if isinstance(arg, basestring):
+                self.output += arg + ' '
+            elif isinstance(arg, tuple):
+                self.output += u','.join([unicode(v) for v in arg]) + u' '
+            else:
+                self.output += unicode(arg) + u' '
+        self.output = self.output.strip()
 
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.ocropus')
@@ -63,43 +85,27 @@ def ocr_ocropus(doc, method=u'ocr_ocropus', model=None):
         (unicode, unicode): Storage tuple for the output file
 
     """
-    input_path = storage.get_abs_path(*doc)
-    output_path = os.path.splitext(storage.insert_suffix(input_path, method,
-                                                         model))[0] + '.html'
+    image_path = storage.get_abs_path(*doc[1])
+    segmentation_path = storage.get_abs_path(*doc[0])
+    output_path = os.path.splitext(storage.insert_suffix(image_path, method,
+                                   model))[0] + '.html'
     model = storage.get_abs_path(*(nidaba_cfg['ocropus_models'][model]))
     return storage.get_storage_path(ocr(input_path, output_path, model))
 
 
-def _allsplitext(path):
-    """
-    Split all the pathname extensions, so that "a/b.c.d" -> "a/b", ".c.d"
 
-    Args:
-        path (unicode): A unicode object containing a file path.
-
-    Returns:
-        (tuple): Result containing firstly the path without extensions and
-                 secondly the extracted extensions.
-    """
-    match = re.search(ur'((.*/)*[^.]*)([^/]*)', path)
-    if not match:
-        return (path, u'')
-    else:
-        return (match.group(1), match.group(3))
-
-
-def ocr(imagepath, outputfilepath, modelpath):
+def ocr(image_path, segmentation_path, output_path, model_path):
     """
     Scan a single image with ocropus.
 
     Reads a single image file from ```imagepath``` and writes the recognized
-    text as in hOCR format into outputfilepath. Ocropus's superfluous
-    intermediate output remains in the directory imagepath is located in.
+    text as in hOCR format into output_path.
 
     Args:
-        imagepath (unicode): Path of the input file
-        outputfilepath (unicode): Path of the output file
-        modelpath (unicode): Path of the recognition model. Must be a pyrnn.gz
+        image_path (unicode): Path of the input file
+        segmentation_path (unicode): Path of the segmentation .uzn file.
+        output_path (unicode): Path of the output file
+        model_path (unicode): Path of the recognition model. Must be a pyrnn.gz
                              pickle dump interoperable with ocropus-rpred.
 
     Returns:
@@ -114,46 +120,43 @@ def ocr(imagepath, outputfilepath, modelpath):
                                 the nature of the problem.
     """
 
-    fglob = _allsplitext(imagepath)[0]
-    # ocropus removes everything after the first . anyway so we do it
-    # preemptively here and add a stable unique identifier to ensure uniqueness
-    # of output.
-    outputfilepath = _allsplitext(outputfilepath)[0]
-    outputfilepath += '_' + str(uuid.uuid5(uuid.NAMESPACE_URL,
-                                           outputfilepath.encode('utf-8')))
-    working_dir = os.path.dirname(outputfilepath)
+    try:
+        network = ocrolib.load_object(model_path, verbose=0)
+        lnorm = getattr(network, "lnorm")
+    except Exception as e:
+        raise NidabaOcropusException('Something somewhere broke: ' + e.msg)
+    im = Image.open(image_path)
+    w, h = im.size
 
-    # ocropus is stupid and needs the input file to end in .bin.png
-    shutil.copyfile(imagepath, fglob + '.bin.png')
-    imagepath = fglob + '.bin.png'
-    env = os.environ.copy()
-    env['PYTHONIOENCODING'] = 'utf-8'
-    # page layout analysis
-    p = subprocess.Popen(['ocropus-gpageseg', '-n', imagepath.encode('utf-8')],
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                         env=env, cwd=working_dir)
-    out, err = p.communicate()
-    print(out)
-    if p.returncode:
-        raise NidabaOcropusException(err)
+    with open(segmentation_path, 'r') as seg_fp:
+        doc = dominate.document()
+        with doc.head:
+            meta(name='ocr-system', content='ocropus')
+            meta(name='ocr-capabilities', content='ocr_page ocr_line')
+            meta(charset='utf-8')
 
-    # text line recognition
-    p = subprocess.Popen(['ocropus-rpred', '-q', '-m',
-                          modelpath.encode('utf-8')] + glob.glob(fglob +
-                                                                 '/*.bin.png'),
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                         env=env, cwd=working_dir)
-    out, err = p.communicate()
-    if p.returncode:
-        raise NidabaOcropusException(err)
+        hocr_title = micro_hocr()
+        hocr_title.add(u'bbox', 0, 0, str(w), str(h))
+        hocr_title.add(u'image', image_path)
 
-    # recognition hOCR assembly
-    # page segmentation is always converted to PNG
-    p = subprocess.Popen(['ocropus-hocr', imagepath.encode('utf-8'), '-o',
-                          outputfilepath.encode('utf-8')],
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                         env=env, cwd=working_dir)
-    out, err = p.communicate()
-    if p.returncode:
-        raise NidabaOcropusException(err)
-    return outputfilepath
+        with doc.add(div(cls='ocr_page', title=str(hocr_title))):
+            for box in uzn.UZNReader(seg_fp):
+                with span(cls='ocr_line') as line_span:
+                    line_title = micro_hocr()
+                    line_title.add(u'bbox', *box[:-1])
+                    line_span['title'] = str(line_title)
+                    line = ocrolib.pil2array(im.crop(box[:-1]))
+                    temp = np.amax(line)-line
+                    temp = temp*1.0/np.amax(temp)
+                    lnorm.measure(temp)
+                    line = lnorm.normalize(line,cval=np.amax(line))
+                    if line.ndim == 3:
+                        np.mean(line, 2)
+                    line = ocrolib.lstm.prepare_line(line, 16)
+                    pred = network.predictString(line)
+                    pred = ocrolib.normalize_text(pred)
+                    line_span.add(pred)
+
+        with open(output_path, 'wb') as fp:
+            fp.write(unicode(doc).encode('utf-8'))
+    return output_path

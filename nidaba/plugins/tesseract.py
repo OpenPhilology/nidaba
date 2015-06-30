@@ -310,6 +310,7 @@ def ocr_capi(image_path, output_path, segmentation_path, languages, extended=Fal
             meta(charset='utf-8')
 
         hocr_title = micro_hocr()
+        w, h = Image.open(image_path).size
         hocr_title.add(u'bbox', 0, 0, str(w), str(h))
         hocr_title.add(u'image', image_path)
 
