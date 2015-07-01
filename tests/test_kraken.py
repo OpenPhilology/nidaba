@@ -19,27 +19,29 @@ class KrakenTests(unittest.TestCase):
     """
 
     def setUp(self):
-        config_mock = MagicMock()
-        storage_path = unicode(tempfile.mkdtemp())
-        config_mock.nidaba_cfg = {
-            'storage_path': storage_path,
-            'kraken_models': {'default': ('test', 'en-default.hdf5')},
-            'ocropus_models': {'ocropus': ('test', 'en-default.pyrnn.gz')},
-            'plugins_load': {}
-        }
-
-        self.patches = {
-            'nidaba.config': config_mock,
-        }
-        self.patcher = patch.dict('sys.modules', self.patches)
-        self.addCleanup(self.patcher.stop)
-        self.patcher.start()
-	self.storage_path = storage_path
-        shutil.copytree(resources, self.storage_path + '/test')
-        from nidaba.plugins import kraken
-        kraken.setup()
-        self.kraken = kraken
-
+        try:
+            config_mock = MagicMock()
+            storage_path = unicode(tempfile.mkdtemp())
+            config_mock.nidaba_cfg = {
+                'storage_path': storage_path,
+                'kraken_models': {'default': ('test', 'en-default.hdf5')},
+                'ocropus_models': {'ocropus': ('test', 'en-default.pyrnn.gz')},
+                'plugins_load': {}
+            }
+    
+            self.patches = {
+                'nidaba.config': config_mock,
+            }
+            self.patcher = patch.dict('sys.modules', self.patches)
+            self.addCleanup(self.patcher.stop)
+            self.patcher.start()
+            self.storage_path = storage_path
+            shutil.copytree(resources, self.storage_path + '/test')
+            from nidaba.plugins import kraken
+            kraken.setup()
+            self.kraken = kraken
+        except:
+            raise SkipTest
 
     def tearDown(self):
         self.patcher.stop()
