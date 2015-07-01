@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
+
+from __future__ import absolute_import
+
 import unittest
 import os
 import shutil
 import tempfile
-import subprocess
 import ctypes
-import unicodedata
 
 from lxml import html, etree
 from distutils import spawn
@@ -23,21 +24,31 @@ class TesseractTests(unittest.TestCase):
     """
 
     def setUp(self):
-        self.tempdir = tempfile.mkdtemp()
         self.config_mock = MagicMock()
-        self.config_mock.nidaba.config.everything.log.return_value = True
-        modules = {
-            'nidaba.config': self.config_mock.config
+        storage_path = unicode(tempfile.mkdtemp())
+        self.config_mock.nidaba_cfg = {
+            'storage_path': storage_path,
+            'plugins_load': {}
         }
-        self.module_patcher = patch.dict('sys.modules', modules)
-        self.module_patcher.start()
+
+        self.patches = {
+            'nidaba.config': self.config_mock,
+        }
+        self.patcher = patch.dict('sys.modules', self.patches)
+        self.patcher2 = patch('nidaba.storage.nidaba_cfg', self.config_mock.nidaba_cfg)
+        self.addCleanup(self.patcher2.stop)
+        self.addCleanup(self.patcher.stop)
+        self.patcher.start()
+        self.patcher2.start()
+	self.storage_path = storage_path
+        shutil.copytree(tessdata, self.storage_path + '/test')
         from nidaba.plugins import tesseract
         self.tesseract = tesseract
         
 
     def tearDown(self):
-        shutil.rmtree(self.tempdir)
-
+        self.patcher.stop()
+        shutil.rmtree(self.storage_path)
 
     def test_capi_multiple(self):
         """
@@ -48,13 +59,14 @@ class TesseractTests(unittest.TestCase):
             t = ctypes.cdll.LoadLibrary('libtesseract.so.3')
         except:
             raise SkipTest
-
-        tiffpath = os.path.join(tessdata, 'image.tiff')
-        outpath = os.path.join(self.tempdir, 'output')
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        self.tesseract.ocr_capi(tiffpath, outpath, ['grc', 'eng'], extended=False)
-        self.assertTrue(os.path.isfile(outpath),
-                        msg='Tesseract did not output a file!')
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.tiff'), ('test',
+                                           'image.uzn')), 
+                                           languages=['grc', 'eng'],
+                                           extended=False)
+        outpath = os.path.join(self.storage_path, *ocr)
+        self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
+                        'output a file!')
         try:
             html.parse(outpath)
         except etree.XMLSyntaxError:
@@ -69,16 +81,14 @@ class TesseractTests(unittest.TestCase):
         if not spawn.find_executable('tesseract'):
             raise SkipTest
 
-        tiffpath = os.path.join(tessdata, 'image.tiff')
-        outpath = os.path.join(self.tempdir, 'output')
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        self.tesseract.ocr_direct(tiffpath, outpath, ['grc', 'eng'])
-        if os.path.isfile(outpath + '.html'):
-            outpath = outpath + '.html'
-        else:
-            outpath = outpath + '.hocr'
-        self.assertTrue(os.path.isfile(outpath),
-                        msg='Tesseract did not output a file!')
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.tiff'), ('test',
+                                           'image.uzn')), 
+                                           languages=['grc', 'eng'],
+                                           extended=False)
+        outpath = os.path.join(self.storage_path, *ocr)
+        self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
+                        'output a file!')
         try:
             html.parse(outpath)
         except etree.XMLSyntaxError:
@@ -95,13 +105,15 @@ class TesseractTests(unittest.TestCase):
             ctypes.cdll.LoadLibrary('libtesseract.so.3')
         except:
             raise SkipTest
-
-        pngpath = os.path.join(tessdata, 'image.png')
-        outpath = os.path.join(self.tempdir, 'output')
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        self.tesseract.ocr_capi(pngpath, outpath, ['grc'], extended=True)
-        self.assertTrue(os.path.isfile(outpath),
-                        msg='Tesseract did not output a file!')
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.tiff'), ('test',
+                                           'image.uzn')), 
+                                           languages=['eng'],
+                                           extended=True)
+        outpath = os.path.join(self.storage_path, *ocr)
+        self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
+                        'output a file!')
+
         try:
             h = html.parse(outpath)
         except etree.XMLSyntaxError:
@@ -135,12 +147,14 @@ class TesseractTests(unittest.TestCase):
         except:
             raise SkipTest
 
-        pngpath = os.path.join(tessdata, 'image.png')
-        outpath = os.path.join(self.tempdir, 'output')
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        self.tesseract.ocr_capi(pngpath, outpath, ['grc'], extended=False)
-        self.assertTrue(os.path.isfile(outpath),
-                        msg='Tesseract did not output a file!')
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.png'), ('test',
+                                           'image.uzn')), 
+                                           languages=['eng'],
+                                           extended=False)
+        outpath = os.path.join(self.storage_path, *ocr)
+        self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
+                        'output a file!')
         try:
             html.parse(outpath)
         except etree.XMLSyntaxError:
@@ -156,12 +170,14 @@ class TesseractTests(unittest.TestCase):
         except:
             raise SkipTest
 
-        tiffpath = os.path.join(tessdata, 'image.tiff')
-        outpath = os.path.join(self.tempdir, 'output')
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        self.tesseract.ocr_capi(tiffpath, outpath, ['grc'], extended=False)
-        self.assertTrue(os.path.isfile(outpath),
-                        msg='Tesseract did not output a file!')
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.tiff'), ('test',
+                                           'image.uzn')), 
+                                           languages=['eng'],
+                                           extended=False)
+        outpath = os.path.join(self.storage_path, *ocr)
+        self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
+                        'output a file!')
         try:
             html.parse(outpath)
         except etree.XMLSyntaxError:
@@ -178,12 +194,14 @@ class TesseractTests(unittest.TestCase):
         except:
             raise SkipTest
 
-        jpgpath = os.path.join(tessdata, 'image.jpg')
-        outpath = os.path.join(self.tempdir, 'output')
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        self.tesseract.ocr_capi(jpgpath, outpath, ['grc'], extended=False)
-        self.assertTrue(os.path.isfile(outpath),
-                        msg='Tesseract did not output a file!')
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.jpg'), ('test',
+                                           'image.uzn')), 
+                                           languages=['eng'],
+                                           extended=False)
+        outpath = os.path.join(self.storage_path, *ocr)
+        self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
+                        'output a file!')
         try:
             html.parse(outpath)
         except etree.XMLSyntaxError:
@@ -198,16 +216,14 @@ class TesseractTests(unittest.TestCase):
         if not spawn.find_executable('tesseract'):
             raise SkipTest
 
-        pngpath = os.path.join(tessdata, 'image.png')
-        outpath = os.path.join(self.tempdir, 'output')
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        self.tesseract.ocr_direct(pngpath, outpath, ['grc'])
-        if os.path.isfile(outpath + '.html'):
-            outpath = outpath + '.html'
-        else:
-            outpath = outpath + '.hocr'
-        self.assertTrue(os.path.isfile(outpath),
-                        msg='Tesseract did not output a file!')
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.png'), ('test',
+                                           'image.uzn')), 
+                                           languages=['eng'],
+                                           extended=False)
+        outpath = os.path.join(self.storage_path, *ocr)
+        self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
+                        'output a file!')
         try:
             html.parse(outpath)
         except etree.XMLSyntaxError:
@@ -221,16 +237,14 @@ class TesseractTests(unittest.TestCase):
         if not spawn.find_executable('tesseract'):
             raise SkipTest
 
-        tiffpath = os.path.join(tessdata, 'image.tiff')
-        outpath = os.path.join(self.tempdir, 'output')
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        self.tesseract.ocr_direct(tiffpath, outpath, ['grc'])
-        if os.path.isfile(outpath + '.html'):
-            outpath = outpath + '.html'
-        else:
-            outpath = outpath + '.hocr'
-        self.assertTrue(os.path.isfile(outpath),
-                        msg='Tesseract did not output a file!')
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.tiff'), ('test',
+                                           'image.uzn')), 
+                                           languages=['eng'],
+                                           extended=False)
+        outpath = os.path.join(self.storage_path, *ocr)
+        self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
+                        'output a file!')
         try:
             html.parse(outpath)
         except etree.XMLSyntaxError:
@@ -244,16 +258,14 @@ class TesseractTests(unittest.TestCase):
         if not spawn.find_executable('tesseract'):
             raise SkipTest
 
-        jpgpath = os.path.join(tessdata, 'image.jpg')
-        outpath = os.path.join(self.tempdir, 'output')
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        self.tesseract.ocr_direct(jpgpath, outpath, ['grc'])
-        if os.path.isfile(outpath + '.html'):
-            outpath = outpath + '.html'
-        else:
-            outpath = outpath + '.hocr'
-        self.assertTrue(os.path.isfile(outpath),
-                        msg='Tesseract did not output a file!')
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.jpg'), ('test',
+                                           'image.uzn')), 
+                                           languages=['eng'],
+                                           extended=False)
+        outpath = os.path.join(self.storage_path, *ocr)
+        self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
+                        'output a file!')
         try:
             html.parse(outpath)
         except etree.XMLSyntaxError:

@@ -19,6 +19,7 @@ It offers the following functionality:
 - Integration of `tesseract <http://code.google.com/p/tesseract-ocr/>`_,
   `kraken <http://mittagessen.github.io/kraken>`_, and `ocropus
   <http://github.com/tmbdev/ocropy>`_ OCR engines
+- Page segmentation from the aforementioned OCR packages
 - Various postprocessing utilities like spell-checking, merging of multiple
   results, and ground truth comparison.
 
@@ -83,7 +84,7 @@ Next jobs can be added to the pipeline using the nidaba executable:
 
 ::
 
-    $ nidaba batch -b otsu -o tesseract:eng -- ./input.tiff
+    $ nidaba batch -b otsu -l tesseract -o tesseract:eng -- ./input.tiff
     Preparing filestore             [✓]
     Building batch                  [✓]
     951c57e5-f8a0-432d-8d77-8a2e27fff53c

@@ -28,6 +28,15 @@ executing:
     supposedly stable while hOCR output file names change between tesseract
     versions.
 
+.. note::
+    Parameters in configuration files supersede command line parameters.
+    Modular page segmentation utilizing zone files requires that the page
+    segmentation mode may be set freely. Uncomment the line:
+
+        tessedit_pageseg_mode 1
+
+    in the default hocr configuration (in TESSDATA/configs/).
+
 Configuration
 ~~~~~~~~~~~~~
 
@@ -48,10 +57,13 @@ import ctypes
 import dominate
 
 from PIL import Image
+from shutil import copyfile
 from distutils import spawn
+from os.path import splitext
 from dominate.tags import div, span, meta, br
 from celery.utils.log import get_task_logger
 
+from nidaba import uzn
 from nidaba import storage
 from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
@@ -62,6 +74,9 @@ from nidaba.nidabaexceptions import NidabaPluginException
 implementation = u'capi'
 tessdata = u'/usr/share/tesseract-ocr/'
 
+(RIL_BLOCK, RIL_PARA, RIL_TEXTLINE, RIL_WORD, RIL_SYMBOL) = map(ctypes.c_int,
+                                                                xrange(5))
+
 logger = get_task_logger(__name__)
 
 class TessBaseAPI(ctypes.Structure):
@@ -70,6 +85,7 @@ class TessBaseAPI(ctypes.Structure):
     TessBaseAPICreate().
     """
     pass
+
 
 def setup(*args, **kwargs):
     if kwargs.get(u'implementation'):
@@ -113,6 +129,63 @@ class micro_hocr(object):
         self.output = self.output.strip()
 
 
+@app.task(base=NidabaTask, name=u'nidaba.segmentation.tesseract')
+def segmentation_tesseract(doc, method=u'segment_tesseract'):
+    """
+    Performs page segmentation using tesseract's built-in algorithm and writes
+    an UNLV zone file.
+
+    Args:
+        doc (unicode, unicode): The input document tuple
+        method (unicode): The suffix string appended to all output files.
+
+    Returns:
+        Two storage tuples with the first one containing the segmentation and
+        the second one being the file the segmentation was calculated upon.
+    """
+    input_path = storage.get_abs_path(*doc)
+    output_path = splitext(storage.insert_suffix(input_path, method))[0] + '.uzn'
+
+    with open(output_path, 'w') as fp:
+        zones = uzn.UZNWriter(fp)
+        try:
+            tesseract = ctypes.cdll.LoadLibrary('libtesseract.so.3')
+        except OSError as e:
+            raise NidabaTesseractException('Loading libtesseract failed: ' +
+                                           e.message)
+        tesseract.TessVersion.restype = ctypes.c_char_p
+        tesseract.TessBaseAPICreate.restype = ctypes.POINTER(TessBaseAPI)
+        ver = tesseract.TessVersion()
+        if int(ver.split('.')[0]) < 3 or int(ver.split('.')[1]) < 2:
+            raise NidabaTesseractException('libtesseract version is too old. Set '
+                                           'implementation to direct.')
+        api = tesseract.TessBaseAPICreate()
+        rc = tesseract.TessBaseAPIInit3(api, str(tessdata), None)
+        if (rc):
+            tesseract.TessBaseAPIDelete(api)
+            raise NidabaTesseractException('Tesseract initialization failed.')
+
+        # only do segmentation and script detection
+        tesseract.TessBaseAPISetPageSegMode(api, 2)
+        tesseract.TessBaseAPIProcessPages(api, input_path.encode('utf-8'), None, 0, None)
+        it = tesseract.TessBaseAPIAnalyseLayout(api)
+        x0, y0, x1, y1 = (ctypes.c_int(), ctypes.c_int(), ctypes.c_int(),
+                          ctypes.c_int())
+        while True:
+            tesseract.TessPageIteratorBoundingBox(it,
+                                                  RIL_TEXTLINE,
+                                                  ctypes.byref(x0),
+                                                  ctypes.byref(y0),
+                                                  ctypes.byref(x1),
+                                                  ctypes.byref(y1))
+            zones.writerow(x0.value, y0.value, x1.value, y1.value)
+            if not tesseract.TessPageIteratorNext(it, RIL_TEXTLINE):
+                break
+        tesseract.TessPageIteratorDelete(it)
+        tesseract.TessBaseAPIDelete(api)
+    return storage.get_storage_path(output_path), doc
+
+
 @app.task(base=NidabaTask, name=u'nidaba.ocr.tesseract')
 def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
                   extended=False):
@@ -122,8 +195,6 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
     Args:
         doc (unicode, unicode): The input document tuple
         method (unicode): The suffix string appended to all output files
-                          languages (list of unicode): A list of languages for
-                          the tesseract language model
         languages (list): A list of tesseract classifier identifiers
         extended (bool): Switch to enable extended hOCR generation containing
                          character cuts and confidences. Has no effect when
@@ -132,20 +203,21 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
     Returns:
         (unicode, unicode): Storage tuple for the output file
     """
-    image_path = storage.get_abs_path(*doc)
+    image_path = storage.get_abs_path(*doc[1])
+    segmentation_path = storage.get_abs_path(*doc[0])
     if isinstance(languages, basestring):
         languages = [languages]
     output_path = storage.insert_suffix(image_path, method, *languages)
 
     if implementation == 'legacy':
         result_path = output_path + '.html'
-        ocr_direct(image_path, output_path, languages)
+        ocr_direct(image_path, output_path, segmentation_path, languages)
     elif implementation == 'direct':
         result_path = output_path + '.hocr'
-        ocr_direct(image_path, output_path, languages)
+        ocr_direct(image_path, output_path, segmentation_path, languages)
     elif implementation == 'capi':
         result_path = output_path + '.hocr'
-        ocr_capi(image_path, result_path, languages, extended)
+        ocr_capi(image_path, result_path, segmentation_path, languages, extended)
     else:
         raise NidabaTesseractException('Invalid implementation selected',
                                        implementation)
@@ -176,27 +248,20 @@ def delta(root=(0, 0, 0, 0), coordinates=None):
         root = box
 
 
-def ocr_capi(image_path, output_path, languages, extended=False):
+def ocr_capi(image_path, output_path, segmentation_path, languages, extended=False):
     """
     OCRs an image using the C API provided by tesseract versions 3.02 and
-    higher. Images are read using pillow allowing a wider range of formats than
-    leptonica and results are written to a fixed output document.
+    higher.
 
     Args:
         image_path (unicode): Path to the input image
         output_path (unicode): Path to the hOCR output
+        segmentation_path (unicode): Path to the UNLV zone file.
         languages (list): List of valid tesseract language identifiers
         extended (bool): Switch to select extended hOCR output containing
                          character cuts and confidences values.
     """
 
-    img = Image.open(image_path)
-    w, h = img.size
-
-    # There is a regression in TessBaseAPISetImage somewhere between 3.02 and
-    # 3.03. Unfortunately the tesseract maintainers close all bug reports
-    # concerning their API, so we just convert to grayscale here.
-    img = img.convert('L')
     try:
         tesseract = ctypes.cdll.LoadLibrary('libtesseract.so.3')
     except OSError as e:
@@ -220,13 +285,16 @@ def ocr_capi(image_path, output_path, languages, extended=False):
         raise NidabaTesseractException('libtesseract version is too old. Set '
                                        'implementation to direct.')
     api = tesseract.TessBaseAPICreate()
-    rc = tesseract.TessBaseAPIInit3(api, str(tessdata),
+    rc = tesseract.TessBaseAPIInit3(api, tessdata.encode('utf-8'),
                                     ('+'.join(languages)).encode('utf-8'))
     if (rc):
         tesseract.TessBaseAPIDelete(api)
         raise NidabaTesseractException('Tesseract initialization failed.')
-    tesseract.TessBaseAPISetImage(api, ctypes.c_char_p(str(img.tobytes())), w,
-                                  h, 1, w)
+
+    # tesseract expects the UNZ file to have the same name as the input image.
+    seg_base_path = splitext(image_path)[0] + '.uzn'
+    copyfile(segmentation_path, seg_base_path)
+    tesseract.TessBaseAPIProcessPages(api, image_path.encode('utf-8'), None, 0, None)
     if tesseract.TessBaseAPIRecognize(api, None):
         tesseract.TessBaseAPIDelete(api)
         raise NidabaTesseractException('Tesseract recognition failed')
@@ -235,9 +303,6 @@ def ocr_capi(image_path, output_path, languages, extended=False):
         pi = tesseract.TessResultIteratorGetPageIterator(ri)
         doc = dominate.document()
 
-        (RIL_BLOCK, RIL_PARA, RIL_TEXTLINE,
-         RIL_WORD, RIL_SYMBOL) = map(ctypes.c_int, xrange(5))
-
         with doc.head:
             meta(name='ocr-system', content='tesseract')
             meta(name='ocr-capabilities', content='ocr_page ocr_carea '
@@ -245,6 +310,7 @@ def ocr_capi(image_path, output_path, languages, extended=False):
             meta(charset='utf-8')
 
         hocr_title = micro_hocr()
+        w, h = Image.open(image_path).size
         hocr_title.add(u'bbox', 0, 0, str(w), str(h))
         hocr_title.add(u'image', image_path)
 
@@ -318,6 +384,7 @@ def ocr_capi(image_path, output_path, languages, extended=False):
                     break
         with open(output_path, 'wb') as fp:
             fp.write(unicode(doc).encode('utf-8'))
+        tesseract.TessResultIteratorDelete(ri)
     else:
         with open(output_path, 'wb') as fp:
             tp = tesseract.TessBaseAPIGetHOCRText(api)
@@ -326,7 +393,7 @@ def ocr_capi(image_path, output_path, languages, extended=False):
     tesseract.TessBaseAPIDelete(api)
 
 
-def ocr_direct(image_path, output_path, languages):
+def ocr_direct(image_path, output_path, segmentation_path, languages):
     """
     OCRs an image by calling the tesseract executable directly. Images are read
     using the linked leptonica library and the given output_path WILL be
@@ -334,14 +401,17 @@ def ocr_direct(image_path, output_path, languages):
 
     Args:
         image_path (unicode): Path to the input image
+        segmentation_path (unicode): Path to the UNLV zone file.
         output_path (unicode): Path to the hOCR output
         languages (list): List of valid tesseract language identifiers
     """
-
+    # tesseract expects the UNZ file to have the same name as the input image.
+    seg_base_path = splitext(image_path)[0] + '.uzn'
+    copyfile(segmentation_path, seg_base_path)
     p = subprocess.Popen(['tesseract', image_path, output_path, '-l',
-                          '+'.join(languages), '--tessdata-dir', tessdata,
-                          'hocr'], stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE)
+                          '+'.join(languages), '-psm', '4', '--tessdata-dir',
+                          tessdata, 'hocr'], stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode:
         raise NidabaTesseractException(err)

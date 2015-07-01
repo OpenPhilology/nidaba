@@ -19,7 +19,9 @@ using the same global configuration options.
 from __future__ import absolute_import
 
 import os
+import shutil
 
+from nidaba import uzn
 from nidaba import storage
 from nidaba.config import nidaba_cfg
 from nidaba.celery import app
@@ -46,6 +48,31 @@ def setup(*args, **kwargs):
         raise NidabaPluginException(e.message)
 
 
+@app.task(base=NidabaTask, name=u'nidaba.segmentation.kraken')
+def segmentation_kraken(doc, method=u'segment_kraken'):
+    """
+    Performs page segmentation using kraken's built-in algorithm and writes an
+    UNLV zone file.
+
+    Args:
+
+    Returns:
+        Two storage tuples with the first one containing the segmentation and
+        the second one being the file the segmentation was calculated upon.
+    """
+    input_path = storage.get_abs_path(*doc)
+    output_path, ext = os.path.splitext(storage.insert_suffix(input_path,
+                                        method))
+    shutil.copy2(input_path, output_path + ext)
+    img = Image.open(input_path)
+    with open(output_path + '.uzn', 'w') as fp:
+        zones = uzn.UZNWriter(fp)
+        zones.writerows(pageseg.segment(img))
+
+    return (storage.get_storage_path(output_path + '.uzn'),
+            storage.get_storage_path(output_path + ext))
+
+
 @app.task(base=NidabaTask, name=u'nidaba.ocr.kraken')
 def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     """
@@ -59,11 +86,12 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     Returns:
         (unicode, unicode): Storage tuple for the output file
     """
-    input_path = storage.get_abs_path(*doc)
-    output_path = (doc[0], os.path.splitext(storage.insert_suffix(doc[1],
+    input_path = storage.get_abs_path(*doc[1])
+    output_path = (doc[1][0], os.path.splitext(storage.insert_suffix(doc[1][1],
                                                                   method,
                                                                   model))[0] +
                    '.hocr')
+    lines = storage.get_abs_path(*doc[0])
     if model in nidaba_cfg['kraken_models']:
         model = storage.get_abs_path(*(nidaba_cfg['kraken_models'][model]))
     elif model in nidaba_cfg['ocropus_models']:
@@ -72,23 +100,24 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
         raise NidabaInvalidParameterException('Model not defined in '
                                               'configuration')
 
-    storage.write_text(*output_path, text=ocr(input_path, model))
+    storage.write_text(*output_path, text=ocr(input_path, lines, model))
     return output_path
 
 
-def ocr(image_path, model=None):
+def ocr(image_path, segmentation_path, model=None):
     """
     Runs kraken on an input document and writes a hOCR file.
 
     Args:
         image_path (unicode): Path to the input image
+        segmentation_path (unicode): Path to the UZN file
         model (unicode): Path to the ocropus model
 
     Returns:
         A string containing the hOCR output.
     """
     img = Image.open(image_path)
-    lines = pageseg.segment(img)
+    lines = [tuple(x[:-1]) for x in uzn.UZNReader(open(segmentation_path, 'r'))]
     rnn = models.load_any(model)
     hocr = html.hocr(list(rpred.rpred(rnn, img, lines)), image_path, img.size)
     return unicode(hocr)
