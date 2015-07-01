@@ -154,18 +154,16 @@ def prepare_filestore(jobID):
     Args:
         jobID (unicode): Identifier of the bin to be created.
 
-    Returns:
-        None: Failure
-        (unicode): String containing the job ID
+    Raises:
+        NidabaStorageViolationException if the job ID already exists.
     """
     if is_valid_job(jobID):
-        return None
+        return NidabaStorageViolationException(jobID + ' already exists')
     try:
         jobPath = _sanitize_path(nidaba_cfg['storage_path'], jobID)
         os.mkdir(jobPath)
-        return jobID
     except Exception:
-        return None
+        return NidabaStorageViolationException(jobID + ' already exists')
 
 
 def list_content(jobID, pattern=u'*'):
@@ -178,9 +176,12 @@ def list_content(jobID, pattern=u'*'):
 
     Returns:
         list: A list of unicode strings of the matching files.
+
+    Raises:
+        NidabaNoSuchStorageBin if the job identifer is not known.
     """
     if not is_valid_job(jobID):
-        return None
+        raise NidabaNoSuchStorageBin('ID ' + jobID + ' not known.')
     flist = []
     jpath = _sanitize_path(nidaba_cfg['storage_path'], jobID)
     for root, dirs, files in os.walk(jpath):
@@ -199,11 +200,13 @@ def retrieve_content(jobID, documents=None):
         documents (tuple or list of tuples): Documents to read in
 
     Returns:
-        None: Failure
         Dictionary: A dictionary mapping file identifiers to their contents.
+
+    Raises:
+        NidabaNoSuchStorageBin if the job identifer is not known.
     """
     if not is_valid_job(jobID):
-        return None
+        raise NidabaNoSuchStorageBin('ID ' + jobID + ' not known.')
     if documents:
         if isinstance(documents, basestring):
             documents = [documents]
@@ -227,8 +230,10 @@ def retrieve_text(jobID, documents=None):
         documents (tuple or list of tuples): Documents to read in
 
     Returns:
-        None: Failure
         Dictionary: A dictionary mapping file identifiers to their contents.
+
+    Raises:
+        NidabaNoSuchStorageBin if the job identifer is not known.
     """
     res = retrieve_content(jobID, documents)
     return {t: res[t].decode('utf-8') for t in res}
@@ -246,21 +251,17 @@ def write_content(jobID, dest, data):
 
     Returns:
         int: Length of data written
-        None: Failure
     """
     if not is_valid_job(jobID):
-        return None
+        raise NidabaNoSuchStorageBin('ID ' + jobID + ' not known.')
     if not isinstance(data, basestring):
-        return None
-    try:
-        with open(_sanitize_path(nidaba_cfg['storage_path'],
-                                 os.path.join(jobID, dest)), 'wb') as f:
-            l = lock(f.name)
-            l.acquire()
-            f.write(data)
-            l.release()
-    except:
-        return None
+        raise NidabaStorageViolationException('data is not string')
+    with open(_sanitize_path(nidaba_cfg['storage_path'],
+                             os.path.join(jobID, dest)), 'wb') as f:
+        l = lock(f.name)
+        l.acquire()
+        f.write(data)
+        l.release()
     return len(data)
 
 
