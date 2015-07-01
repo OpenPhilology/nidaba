@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+from __future__ import absolute_import
+
 import unittest
 import os
 import shutil
@@ -21,19 +24,22 @@ class TesseractTests(unittest.TestCase):
     """
 
     def setUp(self):
-        config_mock = MagicMock()
+        self.config_mock = MagicMock()
         storage_path = unicode(tempfile.mkdtemp())
-        config_mock.nidaba_cfg = {
+        self.config_mock.nidaba_cfg = {
             'storage_path': storage_path,
             'plugins_load': {}
         }
 
         self.patches = {
-            'nidaba.config': config_mock,
+            'nidaba.config': self.config_mock,
         }
         self.patcher = patch.dict('sys.modules', self.patches)
+        self.patcher2 = patch('nidaba.storage.nidaba_cfg', self.config_mock.nidaba_cfg)
+        self.addCleanup(self.patcher2.stop)
         self.addCleanup(self.patcher.stop)
         self.patcher.start()
+        self.patcher2.start()
 	self.storage_path = storage_path
         shutil.copytree(tessdata, self.storage_path + '/test')
         from nidaba.plugins import tesseract
@@ -43,7 +49,6 @@ class TesseractTests(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
         shutil.rmtree(self.storage_path)
-
 
     def test_capi_multiple(self):
         """
