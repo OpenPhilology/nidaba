@@ -293,7 +293,8 @@ def ocr_capi(image_path, output_path, segmentation_path, languages, extended=Fal
 
     # tesseract expects the UNZ file to have the same name as the input image.
     seg_base_path = splitext(image_path)[0] + '.uzn'
-    copyfile(segmentation_path, seg_base_path)
+    if segmentation_path != seg_base_path:
+        copyfile(segmentation_path, seg_base_path)
     tesseract.TessBaseAPIProcessPages(api, image_path.encode('utf-8'), None, 0, None)
     if tesseract.TessBaseAPIRecognize(api, None):
         tesseract.TessBaseAPIDelete(api)
@@ -407,7 +408,8 @@ def ocr_direct(image_path, output_path, segmentation_path, languages):
     """
     # tesseract expects the UNZ file to have the same name as the input image.
     seg_base_path = splitext(image_path)[0] + '.uzn'
-    copyfile(segmentation_path, seg_base_path)
+    if segmentation_path != seg_base_path:
+        copyfile(segmentation_path, seg_base_path)
     p = subprocess.Popen(['tesseract', image_path, output_path, '-l',
                           '+'.join(languages), '-psm', '4', '--tessdata-dir',
                           tessdata, 'hocr'], stdout=subprocess.PIPE,
