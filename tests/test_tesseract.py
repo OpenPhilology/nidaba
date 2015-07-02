@@ -60,8 +60,8 @@ class TesseractTests(unittest.TestCase):
         except:
             raise SkipTest
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.tiff'), ('test',
-                                           'image.uzn')), 
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+                                           'image.tiff')),
                                            languages=['grc', 'eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -82,8 +82,8 @@ class TesseractTests(unittest.TestCase):
             raise SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.tiff'), ('test',
-                                           'image.uzn')), 
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+                                           'image.tiff')),
                                            languages=['grc', 'eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -106,8 +106,8 @@ class TesseractTests(unittest.TestCase):
         except:
             raise SkipTest
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.tiff'), ('test',
-                                           'image.uzn')), 
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+                                           'image.tiff')),
                                            languages=['eng'],
                                            extended=True)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -148,8 +148,8 @@ class TesseractTests(unittest.TestCase):
             raise SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.png'), ('test',
-                                           'image.uzn')), 
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+                                           'image.png')),
                                            languages=['eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -171,8 +171,8 @@ class TesseractTests(unittest.TestCase):
             raise SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.tiff'), ('test',
-                                           'image.uzn')), 
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+                                           'image.tiff')),
                                            languages=['eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -195,8 +195,8 @@ class TesseractTests(unittest.TestCase):
             raise SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.jpg'), ('test',
-                                           'image.uzn')), 
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+                                           'image.jpg')),
                                            languages=['eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -217,8 +217,8 @@ class TesseractTests(unittest.TestCase):
             raise SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.png'), ('test',
-                                           'image.uzn')), 
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+                                           'image.png')),
                                            languages=['eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -238,8 +238,8 @@ class TesseractTests(unittest.TestCase):
             raise SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.tiff'), ('test',
-                                           'image.uzn')), 
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+                                           'image.tiff')),
                                            languages=['eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -259,8 +259,8 @@ class TesseractTests(unittest.TestCase):
             raise SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.jpg'), ('test',
-                                           'image.uzn')), 
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+                                           'image.jpg')),
                                            languages=['eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
