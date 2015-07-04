@@ -90,7 +90,8 @@ def ocr_ocropus(doc, method=u'ocr_ocropus', model=None):
     output_path = os.path.splitext(storage.insert_suffix(image_path, method,
                                    model))[0] + '.html'
     model = storage.get_abs_path(*(nidaba_cfg['ocropus_models'][model]))
-    return storage.get_storage_path(ocr(input_path, output_path, model))
+    return storage.get_storage_path(ocr(image_path, segmentation_path,
+                                        output_path, model))
 
 
 
