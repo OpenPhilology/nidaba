@@ -25,96 +25,84 @@ class OcropusTests(unittest.TestCase):
                     spawn.find_executable('ocropus-gpageseg'),
                     spawn.find_executable('ocropus-hocr')]:
             raise SkipTest
-
         self.config_mock = MagicMock()
-        self.config_mock.nidaba.config.everything.log.return_value = True
-        modules = {
-            'nidaba.config': self.config_mock.config
+        storage_path = unicode(tempfile.mkdtemp())
+        self.config_mock.nidaba_cfg = {
+            'storage_path': storage_path,
+            'ocropus_models': {'ocropus': ('test', 'en-default.pyrnn.gz')},
+            'plugins_load': {}
         }
-        self.module_patcher = patch.dict('sys.modules', modules)
-        self.module_patcher.start()
+
+        self.patches = {
+            'nidaba.config': self.config_mock,
+        }
+        self.patcher = patch.dict('sys.modules', self.patches)
+        self.patcher2 = patch('nidaba.storage.nidaba_cfg', self.config_mock.nidaba_cfg)
+        self.addCleanup(self.patcher2.stop)
+        self.addCleanup(self.patcher.stop)
+        self.patcher.start()
+        self.patcher2.start()
+	self.storage_path = storage_path
+        shutil.copytree(resources, self.storage_path + '/test')
         from nidaba.plugins import ocropus
+        ocropus.setup()
         self.ocropus = ocropus
 
-        self.otempdir = unicode(tempfile.mkdtemp())
-        # copytree fails if the target directory already exists. Unfortunately
-        # not creating the temporary directory using mkstemp() is
-        # race-conditiony.
-        self.tempdir = os.path.join(self.otempdir, u'stupid')
-        shutil.copytree(resources, self.tempdir)
 
     def tearDown(self):
-        shutil.rmtree(self.otempdir)
+        shutil.rmtree(self.storage_path)
 
     def test_file_path_correct(self):
         """
         Test that output is placed in the correct directory.
         """
-        pngpath = os.path.join(self.tempdir, u'image_png.png')
-        wd = tempfile.mkdtemp()
-        swd = tempfile.mkdtemp()
-
-        outpath = os.path.join(swd, u'outpath_png.hocr')
-        os.chdir(wd)
-
-        modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
-        ocr = self.ocropus.ocr(pngpath, outpath, modelpath)
-        self.assertTrue(os.path.isfile(ocr),
-                        msg='Ocropus did not outpath a file!')
-        self.assertEqual(os.path.dirname(ocr), swd,
-                         msg='Output not placed in correct directory')
+        ocr = self.ocropus.ocr_ocropus.run((('test', 'image.uzn'),
+                                            ('test', 'image_png.png')),
+                                           model='ocropus')
         try:
-            etree.parse(ocr)
+            parser = etree.HTMLParser()
+            etree.parse(open(os.path.join(self.storage_path, *ocr)), parser)
         except etree.XMLSyntaxError:
-            self.fail(msg='The outpath was not valid html/xml!')
-        finally:
-            shutil.rmtree(swd)
-            shutil.rmtree(wd)
+            self.fail(msg='The output was not valid html/xml!')
 
     def test_file_outpath_png(self):
         """
         Test that ocropus creates hocr output for pngs.
         """
-        pngpath = os.path.join(self.tempdir, u'image_png.png')
-        outpath = os.path.join(self.tempdir, u'outpath_png.hocr')
-        modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
-        ocr = self.ocropus.ocr(pngpath, outpath, modelpath)
-        self.assertTrue(os.path.isfile(ocr),
-                        msg='Ocropus did not outpath a file!')
+        ocr = self.ocropus.ocr_ocropus.run((('test', 'image.uzn'),
+                                            ('test', 'image_png.png')),
+                                           model='ocropus')
         try:
-            etree.parse(ocr)
+            parser = etree.HTMLParser()
+            etree.parse(open(os.path.join(self.storage_path, *ocr)), parser)
         except etree.XMLSyntaxError:
-            self.fail(msg='The outpath was not valid html/xml!')
+            self.fail(msg='The output was not valid html/xml!')
 
     def test_file_outpath_tiff(self):
         """
         Test that ocropus creates hocr output for tiffs.
         """
-        tiffpath = os.path.join(self.tempdir, u'image_tiff.tiff')
-        outpath = os.path.join(self.tempdir, u'outpath_tiff.hocr')
-        modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
-        ocr = self.ocropus.ocr(tiffpath, outpath, modelpath)
-        self.assertTrue(os.path.isfile(ocr),
-                        msg='Ocropus did not output a file!')
+        ocr = self.ocropus.ocr_ocropus.run((('test', 'image.uzn'),
+                                            ('test', 'image_tiff.tiff')),
+                                           model='ocropus')
         try:
-            etree.parse(ocr)
+            parser = etree.HTMLParser()
+            etree.parse(open(os.path.join(self.storage_path, *ocr)), parser)
         except etree.XMLSyntaxError:
-            self.fail(msg='The outpath was not valid html/xml!')
+            self.fail(msg='The output was not valid html/xml!')
 
     def test_file_outpath_jpg(self):
         """
         Test that ocropus creates hocr output for jpgs.
         """
-        jpgpath = os.path.join(self.tempdir, u'image_jpg.jpg')
-        outpath = os.path.join(self.tempdir, u'outpath_jpg.hocr')
-        modelpath = os.path.join(self.tempdir, u'en-default.pyrnn.gz')
-        ocr = self.ocropus.ocr(jpgpath, outpath, modelpath)
-        self.assertTrue(os.path.isfile(ocr),
-                        msg='Ocropus did not output a file!')
+        ocr = self.ocropus.ocr_ocropus.run((('test', 'image.uzn'),
+                                            ('test', 'image_jpg.jpg')),
+                                           model='ocropus')
         try:
-            etree.parse(ocr)
+            parser = etree.HTMLParser()
+            etree.parse(open(os.path.join(self.storage_path, *ocr)), parser)
         except etree.XMLSyntaxError:
-            self.fail(msg='The outpath was not valid html/xml!')
+            self.fail(msg='The output was not valid html/xml!')
 
 
 if __name__ == '__main__':
