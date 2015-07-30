@@ -73,6 +73,13 @@ class NidabaInvalidParameterException(Exception):
         Exception.__init__(self, status_code)
 
 
+class NidabaTEIException(Exception):
+
+    def __init__(self, status_code):
+        self.status_code = status_code
+        Exception.__init__(self, status_code)
+
+
 class NidabaTesseractException(Exception):
 
     def __init__(self, status_code):
