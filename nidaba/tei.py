@@ -206,13 +206,13 @@ class TEIFacsimile(object):
     def lines(self):
         """
         Returns an reading order sorted list of tuples in the format (x0, y0,
-        x1, y1, text).
+        x1, y1, xml id, text).
         """
         lines = []
         for line in self.doc.iter(self.tei_ns + 'line'):
             text = ''.join(line.itertext())
             lines.append((line.get('ulx'), line.get('uly'), line.get('lrx'),
-                          line.get('lry'), text))
+                          line.get('lry'), line.get(self.xml_ns + 'id'), text))
         return lines
 
     def add_line(self, dim):
@@ -251,13 +251,14 @@ class TEIFacsimile(object):
     def segments(self):
         """
         Returns an reading order sorted list of tuples in the format (x0, y0,
-        x1, y1, text).
+        x1, y1, id, text).
         """
         segments = []
         for seg in self.doc.iter(self.tei_ns + 'seg'):
             text = ''.join(seg.itertext())
             segments.append((seg.get('ulx'), seg.get('uly'), seg.get('lrx'),
-                             seg.get('lry'), text))
+                             seg.get('lry'), seg.get(self.xml_ns + 'id'),
+                             text))
         return segments
 
     def add_segment(self, dim):
@@ -279,7 +280,7 @@ class TEIFacsimile(object):
     def graphemes(self):
         """
         Returns a reading order sorted list of tuples in the format (x0, y0,
-        x1, y1, text).
+        x1, y1, id, text).
         """
         graphemes = []
         for g in self.doc.iter(self.tei_ns + 'g'):
@@ -287,7 +288,9 @@ class TEIFacsimile(object):
             graphemes.append((g.getparent().get('ulx'),
                               g.getparent().get('uly'),
                               g.getparent().get('lrx'),
-                              g.getparent().get('lry'), text))
+                              g.getparent().get('lry'), 
+                              g.get(self.xml_ns + 'id'),
+                              text))
         return graphemes
 
     def add_graphemes(self, it):
