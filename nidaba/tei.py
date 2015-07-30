@@ -17,21 +17,6 @@ from collections import OrderedDict
 from nidaba.nidabaexceptions import NidabaTEIException
 
 
-def max_bbox(boxes):
-    """
-    Calculates the minimal bounding box containing all boxes contained in an
-    iterator.
-
-    Args:
-        boxes (iterator): An iterator returning tuples of the format (x0, y0,
-                          x1, y1)
-    Returns:
-        A box covering all bounding boxes in the input argument
-    """
-    sbox = list(map(sorted, list(zip(*boxes))))
-    return (sbox[0][0], sbox[1][0], sbox[2][-1], sbox[3][-1])
-
-
 class TEIFacsimile(object):
 
     xml_ns = '{http://www.w3.org/XML/1998/namespace}'
@@ -263,13 +248,14 @@ class TEIFacsimile(object):
                              text))
         return segments
 
-    def add_segment(self, dim):
+    def add_segment(self, dim, lang=None):
         """
         Marks the beginning of a new topographical segment in the current
         scope. Most often this correspond to a word recognized by an engine.
 
         Args:
             dim (tuple): A tuple containing the bounding box (x0, y0, x1, y1)
+            lang (unicode): Optional identifier of the segment language.
         """
         zone = SubElement(self.line_scope, self.tei_ns + 'zone', 
                           ulx=str(dim[0]), uly=str(dim[1]), lrx=str(dim[2]),
@@ -334,6 +320,19 @@ class TEIFacsimile(object):
             if self.resp:
                 glyph.set('resp', '#' + self.resp)
 
+    def clear_lines(self):
+        """
+        Deletes all <line> nodes from the document.
+        """
+        for zone in self.doc.iterfind('.//' + self.tei_ns +
+                                      "line"):
+            zone.getparent().remove(zone)
+        self.line_scope = None
+        self.word_scope = None
+        self.line_cnt = -1
+        self.seg_cnt = -1
+        self.grapheme_cnt = -1
+
     def clear_graphemes(self):
         """
         Deletes all <g> nodes from the document. Mainly used when combining
@@ -362,6 +361,13 @@ class TEIFacsimile(object):
         self.word_scope = None
         self.seg_cnt = -1
         self.grapheme_cnt = -1
+
+    def load_hocr(text):
+        """
+        Extracts as much information as possible from an hOCR file and converts
+        it to TEI.
+        """
+        pass
 
     def write(self, fp):
         """
