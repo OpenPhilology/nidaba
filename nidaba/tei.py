@@ -44,10 +44,10 @@ class TEIFacsimile(object):
     def __init__(self):
         doc = Element('TEI', nsmap={None: 'http://www.tei-c.org/ns/1.0'},
                       version='5.0')
-        header = SubElement(doc, 'teiHeader')
-        fileDesc = SubElement(header, 'fileDesc')
-        SubElement(fileDesc, 'titleStmt')
-        SubElement(fileDesc, 'publicationStmt')
+        header = SubElement(doc, self.tei_ns + 'teiHeader')
+        fileDesc = SubElement(header, self.tei_ns + 'fileDesc')
+        SubElement(fileDesc, self.tei_ns + 'titleStmt')
+        SubElement(fileDesc, self.tei_ns + 'publicationStmt')
 
         self.word_scope = None
         self.line_scope = None
@@ -57,11 +57,11 @@ class TEIFacsimile(object):
         self.doc = doc
 
     def document(self, dim, image_url):
-        sourceDoc = SubElement(self.doc, 'sourceDoc')
-        surface = SubElement(sourceDoc, 'surface', ulx='0', uly='0',
-                             lrx=str(dim[0]), lry=str(dim[1]))
-        SubElement(surface, 'graphic', url=image_url)
-        SubElement(surface, 'zone')
+        sourceDoc = SubElement(self.doc, self.tei_ns + 'sourceDoc')
+        surface = SubElement(sourceDoc, self.tei_ns + 'surface', ulx='0',
+                             uly='0', lrx=str(dim[0]), lry=str(dim[1]))
+        SubElement(surface, self.tei_ns + 'graphic', url=image_url)
+        SubElement(surface, self.tei_ns + 'zone')
 
     @property
     def description(self):
@@ -78,8 +78,7 @@ class TEIFacsimile(object):
 
     @property
     def title(self):
-        title = self.doc.find('//' + self.tei_ns + 'teiHeader//' + self.tei_ns
-                              + 'title')
+        title = self.doc.find('.//' + self.tei_ns + 'teiHeader//' + self.tei_ns + 'title')
         if hasattr(title, 'text'):
             return title.text
         else:
@@ -87,16 +86,16 @@ class TEIFacsimile(object):
 
     @title.setter
     def title(self, value):
-        title = self.doc.find('//' + self.tei_ns + 'teiHeader//' + self.tei_ns
+        title = self.doc.find('.//' + self.tei_ns + 'teiHeader//' + self.tei_ns
                               + 'title')
-        if not title:
-            title = SubElement(self.doc.find('//' + self.tei_ns + 'titleStmt'),
-                               'title')
+        if title is None:
+            title = SubElement(self.doc.find('.//' + self.tei_ns + 'titleStmt'),
+                               self.tei_ns + 'title')
         title.text = value
 
     @property
     def authority(self):
-        authority = self.doc.find('//' + self.tei_ns + 'teiHeader//' +
+        authority = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
                                   self.tei_ns + 'authority')
         if hasattr(authority, 'text'):
             return authority.text
@@ -105,17 +104,17 @@ class TEIFacsimile(object):
 
     @authority.setter
     def authority(self, value):
-        authority = self.doc.find('//' + self.tei_ns + 'teiHeader//' +
+        authority = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
                                   self.tei_ns + 'title')
-        if not authority:
+        if authority is None:
             authority = SubElement(self.doc.find('//' + self.tei_ns +
                                                  'publicationStmt'),
-                                   'authority')
+                                   self.tei_ns + 'authority')
         authority.text = value
 
     @property
     def sourceDesc(self):
-        sourceDesc = self.doc.find('//' + self.tei_ns + 'teiHeader//' +
+        sourceDesc = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
                                    self.tei_ns + 'sourceDesc')
         if hasattr(sourceDesc, 'text'):
             return sourceDesc.text
@@ -124,16 +123,16 @@ class TEIFacsimile(object):
 
     @sourceDesc.setter
     def sourceDesc(self, value):
-        sourceDesc = self.doc.find('//' + self.tei_ns + 'teiHeader//' +
+        sourceDesc = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
                                    self.tei_ns + 'sourceDesc')
-        if not sourceDesc:
+        if sourceDesc is None:
             sourceDesc = SubElement(self.doc.find('//' + self.tei_ns +
-                                    'fileDesc'), 'sourceDesc')
+                                    'fileDesc'), self.tei_ns + 'sourceDesc')
         sourceDesc.text = value
 
     @property
     def license(self):
-        license = self.doc.find('//' + self.tei_ns + 'teiHeader//' +
+        license = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
                                 self.tei_ns + 'licence')
         if hasattr(license, 'text'):
             return license.text
@@ -142,12 +141,13 @@ class TEIFacsimile(object):
 
     @license.setter
     def license(self, value):
-        license = self.doc.find('//' + self.tei_ns + 'teiHeader//' +
+        license = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
                                 self.tei_ns + 'licence')
-        if not license:
+        if license is None:
             avail = SubElement(self.doc.find('//' + self.tei_ns +
-                               'publicationStmt'), 'availability')
-            license = SubElement(avail, 'licence')
+                               'publicationStmt'), self.tei_ns +
+                               'availability')
+            license = SubElement(avail, self.tei_ns + 'licence')
         license.text = value
 
     @property
@@ -176,15 +176,15 @@ class TEIFacsimile(object):
         Returns:
             A unicode string corresponding to the responsibility identifier.
         """
-        id = 0
-        for resp in self.doc.iter(self.tei_ns + 'respStmt'):
+        id = -1
+        for rstmt in self.doc.iter(self.tei_ns + 'respStmt'):
             id += 1
-        r = SubElement(self.doc.find('//' + self.tei_ns + 'titleStmt'),
-                       'respStmt')
+        r = SubElement(self.doc.find('.//' + self.tei_ns + 'titleStmt'),
+                       self.tei_ns + 'respStmt')
         r.set(self.xml_ns + 'id', u'resp_' + unicode(id + 1))
         self.resp = r.get(self.xml_ns + 'id')
-        SubElement(r, 'resp').text = resp
-        SubElement(r, 'name').text = name
+        SubElement(r, self.tei_ns + 'resp').text = resp
+        SubElement(r, self.tei_ns + 'name').text = name
         return r.get(self.xml_ns + 'id')
 
     def scope_respstmt(self, id):
@@ -197,8 +197,8 @@ class TEIFacsimile(object):
         Raises:
             NidabaTEIException if the identifier is unknown
         """
-        if not self.doc.find("//" + self.tei_ns + "respStmt[@" + self.xml_ns +
-                             "id='" + id + "']"):
+        if self.doc.find(".//" + self.tei_ns + "respStmt[@" + self.xml_ns +
+                         "id='" + id + "']") is None:
             raise NidabaTEIException('No such responsibility statement.')
         self.resp = id
 
@@ -222,12 +222,14 @@ class TEIFacsimile(object):
         Args:
             dim (tuple): A tuple containing the bounding box (x0, y0, x1, y1)
         """
-        zone = self.doc.find('//' + self.tei_ns + 'zone')
-        self.line_scope = SubElement(zone, 'line', ulx=str(dim[0]),
-                                     uly=str(dim[1]), lrx=str(dim[2]),
-                                     lry=str(dim[3]))
+        zone = self.doc.find('.//' + self.tei_ns + 'zone')
+        self.line_scope = SubElement(zone, self.tei_ns + 'line',
+                                     ulx=str(dim[0]), uly=str(dim[1]),
+                                     lrx=str(dim[2]), lry=str(dim[3]))
         self.line_cnt += 1
         self.line_scope.set(self.xml_ns + 'id', 'line_' + str(self.line_cnt))
+        if self.resp:
+            self.line_scope.set('resp', '#' + self.resp)
         self.word_scope = None
 
     def scope_line(self, id):
@@ -241,9 +243,9 @@ class TEIFacsimile(object):
         Raises:
             NidabaTEIException if the identifier is unknown
         """
-        line = self.doc.find("//" + self.tei_ns + "line[@" + self.xml_ns +
+        line = self.doc.find(".//" + self.tei_ns + "line[@" + self.xml_ns +
                              "id='" + id + "']")
-        if not line:
+        if line is None:
             raise NidabaTEIException('No such line')
         self.line_scope = line
 
@@ -269,12 +271,14 @@ class TEIFacsimile(object):
         Args:
             dim (tuple): A tuple containing the bounding box (x0, y0, x1, y1)
         """
-        zone = SubElement(self.line_scope, 'zone', ulx=str(dim[0]),
-                          uly=str(dim[1]), lrx=str(dim[2]), lry=str(dim[3]),
-                          type='word')
-        self.word_scope = SubElement(zone, 'seg')
+        zone = SubElement(self.line_scope, self.tei_ns + 'zone', 
+                          ulx=str(dim[0]), uly=str(dim[1]), lrx=str(dim[2]),
+                          lry=str(dim[3]), type='word')
+        self.word_scope = SubElement(zone, self.tei_ns + 'seg')
         self.seg_cnt += 1
-        self.word_scope.attrib[self.xml_ns + 'id'] = 'seg_' + str(self.seg_cnt)
+        self.word_scope.set(self.xml_ns + 'id', 'seg_' + str(self.seg_cnt))
+        if self.resp:
+            self.word_scope.set('resp', '#' + self.resp)
 
     @property
     def graphemes(self):
@@ -303,7 +307,7 @@ class TEIFacsimile(object):
             (unicode), and optionally the bounding box of this glyph (x0, y0,
             x1, y1) and a recognition confidence value in the range 0 and 1.
         """
-        scope = self.word_scope if self.word_scope else self.line_scope
+        scope = self.word_scope if self.word_scope is not None else self.line_scope
         for t in it:
             if len(t) == 1:
                 g = t
@@ -315,19 +319,20 @@ class TEIFacsimile(object):
                 else:
                     g, box, conf = t
                 ulx, uly, lrx, lry = box
-                zone = SubElement(scope, 'zone', ulx=str(ulx), uly=str(uly),
-                                  lrx=str(lrx), lry=str(lry), type='grapheme')
+                zone = SubElement(scope, self.tei_ns + 'zone', ulx=str(ulx),
+                                  uly=str(uly), lrx=str(lrx), lry=str(lry),
+                                  type='grapheme', resp= '#' + self.resp)
                 if conf:
-                    cert = SubElement(zone, 'certainty',
+                    cert = SubElement(zone, self.tei_ns + 'certainty',
                                       degree=u'{0:.2f}'.format(conf))
                     if self.resp:
-                        cert.attrib['resp'] = '#' + self.resp
-            glyph = SubElement(zone, 'g')
+                        cert.set('resp', '#' + self.resp)
+            glyph = SubElement(zone, self.tei_ns + 'g')
             self.grapheme_cnt += 1
             glyph.set(self.xml_ns + 'id', 'grapheme_' + str(self.grapheme_cnt))
             glyph.text = g
             if self.resp:
-                glyph.attrib['resp'] = '#' + self.resp
+                glyph.set('resp', '#' + self.resp)
 
     def clear_graphemes(self):
         """
@@ -336,11 +341,12 @@ class TEIFacsimile(object):
         operating on lexemes. Also resets the current scope to the first line
         (and if applicable its first segment).
         """
-        for zone in self.doc.iterfind('//' + self.tei_ns +
-                                      "zone[@type='glyph']"):
+        for zone in self.doc.iterfind('.//' + self.tei_ns +
+                                      "zone[@type='grapheme']"):
             zone.getparent().remove(zone)
-        self.word_scope = self.doc.find('//' + self.tei_ns + 'seg')
-        self.line_scope = self.doc.find('//' + self.tei_ns + 'line')
+        self.line_scope = self.doc.find('.//' + self.tei_ns + 'line')
+        self.word_scope = self.doc.find('.//' + self.tei_ns + 'seg')
+        self.grapheme_cnt = -1
 
     def clear_segments(self):
         """
@@ -349,10 +355,13 @@ class TEIFacsimile(object):
         engines operating on lines. Also resets the current scope to the first
         line.
         """
-        for zone in self.doc.iterfind('//' + self.tei_ns +
+        for zone in self.doc.iterfind('.//' + self.tei_ns +
                                       "zone[@type='word']"):
             zone.getparent().remove(zone)
-        self.line_scope = self.doc.find('//' + self.tei_ns + 'line')
+        self.line_scope = self.doc.find('.//' + self.tei_ns + 'line')
+        self.word_scope = None
+        self.seg_cnt = -1
+        self.grapheme_cnt = -1
 
     def write(self, fp):
         """
