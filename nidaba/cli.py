@@ -178,7 +178,9 @@ def batch(files, binarize, ocr, segmentation, stats, postprocessing, blend,
     id = unicode(jobid)
     batch = Batch(id)
     click.echo(u'Preparing filestore\t\t[', nl=False),
-    if storage.prepare_filestore(id) is None:
+    try:
+        storage.prepare_filestore(id)
+    except NidabaStorageViolationException:
         click.secho(u'\u2717', fg='red', nl=False)
         click.echo(']')
         exit()
