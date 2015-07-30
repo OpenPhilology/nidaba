@@ -72,7 +72,7 @@ def segmentation_kraken(doc, method=u'segment_kraken', black_colseps=False):
     with open(output_path + '.xml', 'w') as fp:
         tei = TEIFacsimile()
         tei.document(img.size, os.path.join(*doc))
-        tei.title(os.path.basename(doc[1]))
+        tei.title = os.path.basename(doc[1])
         tei.add_respstmt('kraken', 'page segmentation')
         for seg in pageseg.segment(img, black_colseps):
             tei.add_line(seg)
@@ -112,15 +112,15 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     with open(segmentation, 'r') as seg:
         tei.read(seg)
     # kraken is a line recognizer
-    tei.clear_segments()
     tei.clear_graphemes()
-    # add and scope no responsibility statement
+    tei.clear_segments()
+    # add and scope new responsibility statement
     tei.add_respstmt('kraken', 'character recognition')
     lines = tei.lines
 
     rnn = models.load_any(model)
     i = 0
-    for rec in rpred.rpred(rnn, img, [x[:-2] for x in lines]):
+    for rec in rpred.rpred(rnn, img, [(int(x[0]), int(x[1]), int(x[2]), int(x[3])) for x in lines]):
         # scope the current line and add all graphemes recognized by kraken to
         # it.
         tei.scope_line(lines[i][4])
