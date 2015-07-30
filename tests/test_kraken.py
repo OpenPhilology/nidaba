@@ -55,18 +55,22 @@ class KrakenTests(unittest.TestCase):
         o = self.kraken.segmentation_kraken.run(('test', 'image_png.png'))
         self.assertTrue(os.path.isfile(os.path.join(self.storage_path, *o[0])),
                         msg='Kraken did not output a file!')
+        try:
+            etree.parse(open(os.path.join(self.storage_path, *o[0])))
+        except etree.XMLSyntaxError as e:
+            print(e.message)
+            self.fail(msg='The outpath was not valid xml!')
 
 
     def test_hdf5_model(self):
         """
         Test that kraken creates hocr output with HDF5 models.
         """
-        ocr = self.kraken.ocr_kraken.run((('test', 'image.uzn'), 
+        ocr = self.kraken.ocr_kraken.run((('test', 'segmentation.xml'), 
                                       ('test', 'image_png.png')), 
                                      model='default')
         try:
-            parser = etree.HTMLParser()
-            etree.parse(open(os.path.join(self.storage_path, *ocr)), parser)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)))
         except etree.XMLSyntaxError as e:
             print(e.message)
             self.fail(msg='The outpath was not valid html/xml!')
@@ -76,42 +80,39 @@ class KrakenTests(unittest.TestCase):
         """
         Test that kraken creates hocr output for pngs.
         """
-        ocr = self.kraken.ocr_kraken.run((('test', 'image.uzn'), 
+        ocr = self.kraken.ocr_kraken.run((('test', 'segmentation.xml'), 
                                       ('test', 'image_png.png')), 
                                      model='ocropus')
         try:
-            parser = etree.HTMLParser()
-            etree.parse(open(os.path.join(self.storage_path, *ocr)), parser)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)))
         except etree.XMLSyntaxError as e:
             print(e.message)
-            self.fail(msg='The outpath was not valid html/xml!')
+            self.fail(msg='The outpath was not valid xml!')
 
     def test_file_outpath_tiff(self):
         """
         Test that kraken creates hocr output for tiffs.
         """
-        ocr = self.kraken.ocr_kraken.run((('test', 'image.uzn'), 
+        ocr = self.kraken.ocr_kraken.run((('test', 'segmentation.xml'), 
                                       ('test', 'image_tiff.tiff')), 
                                      model='ocropus')
         try:
-            parser = etree.HTMLParser()
-            etree.parse(open(os.path.join(self.storage_path, *ocr)), parser)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)))
         except etree.XMLSyntaxError:
-            self.fail(msg='The outpath was not valid html/xml!')
+            self.fail(msg='The outpath was not valid xml!')
 
 
     def test_file_outpath_jpg(self):
         """
         Test that kraken creates hocr output for jpgs.
         """
-        ocr = self.kraken.ocr_kraken.run((('test', 'image.uzn'), 
+        ocr = self.kraken.ocr_kraken.run((('test', 'segmentation.xml'), 
                                       ('test', 'image_jpg.jpg')), 
                                      model='ocropus')
         try:
-            parser = etree.HTMLParser()
-            etree.parse(open(os.path.join(self.storage_path, *ocr)), parser)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)))
         except etree.XMLSyntaxError:
-            self.fail(msg='The outpath was not valid html/xml!')
+            self.fail(msg='The outpath was not valid xml!')
 
 
     def test_nlbin(self):
