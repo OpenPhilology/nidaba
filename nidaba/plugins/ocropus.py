@@ -125,23 +125,24 @@ def ocr(image_path, segmentation_path, output_path, model_path):
         tei.read(seg_fp)
 
     # ocropus is a line recognizer
-    tei.clear_segments()
     tei.clear_graphemes()
+    tei.clear_segments()
     # add and scope new responsibility statement
     tei.add_respstmt('ocropus', 'character recognition')
     for box in tei.lines:
-            line = ocrolib.pil2array(im.crop(box[:-2]))
-            temp = np.amax(line)-line
-            temp = temp*1.0/np.amax(temp)
-            lnorm.measure(temp)
-            line = lnorm.normalize(line, cval=np.amax(line))
-            if line.ndim == 3:
-                np.mean(line, 2)
-            line = ocrolib.lstm.prepare_line(line, 16)
-            pred = network.predictString(line)
-            pred = ocrolib.normalize_text(pred)
-            tei.scope_line(box[4])
-            tei.add_graphemes(pred)
+        ib = tuple(int(x) for x in box[:-2])
+        line = ocrolib.pil2array(im.crop(ib))
+        temp = np.amax(line)-line
+        temp = temp*1.0/np.amax(temp)
+        lnorm.measure(temp)
+        line = lnorm.normalize(line, cval=np.amax(line))
+        if line.ndim == 3:
+            np.mean(line, 2)
+        line = ocrolib.lstm.prepare_line(line, 16)
+        pred = network.predictString(line)
+        pred = ocrolib.normalize_text(pred)
+        tei.scope_line(box[4])
+        tei.add_graphemes(pred)
     with open(output_path, 'wb') as fp:
         tei.write(fp)
     return output_path
