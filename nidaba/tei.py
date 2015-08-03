@@ -297,6 +297,12 @@ class TEIFacsimile(object):
         if self.resp:
             self.word_scope.set('resp', '#' + self.resp)
 
+    def clear_segment(self):
+        """
+        Marks the end of the current topographical segment.
+        """
+        self.word_scope = None
+
     @property
     def graphemes(self):
         """
@@ -425,7 +431,10 @@ class TEIFacsimile(object):
                 if 'x_wconf' in o:
                     confidence = o['x_wconf'][0]
                 self.add_segment(bbox, confidence=confidence)
-                self.add_graphemes(''.join(span.itertext()) + ' ')
+                self.add_graphemes(''.join(span.itertext()))
+                if span.tail:
+                    self.clear_segment()
+                    self.add_graphemes(span.tail)
 
     def write_hocr(fp):
         """
