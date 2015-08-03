@@ -268,9 +268,11 @@ class TEIFacsimile(object):
         segments = []
         for seg in self.doc.iter(self.tei_ns + 'seg'):
             text = ''.join(seg.itertext())
-            segments.append((seg.get('ulx'), seg.get('uly'), seg.get('lrx'),
-                             seg.get('lry'), seg.get(self.xml_ns + 'id'),
-                             text))
+            segments.append((seg.getparent().get('ulx'),
+                             seg.getparent().get('uly'),
+                             seg.getparent().get('lrx'),
+                             seg.getparent().get('lry'),
+                             seg.get(self.xml_ns + 'id'), text))
         return segments
 
     def add_segment(self, dim, lang=None, confidence=None):
