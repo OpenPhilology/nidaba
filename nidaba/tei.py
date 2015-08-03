@@ -268,11 +268,14 @@ class TEIFacsimile(object):
         segments = []
         for seg in self.doc.iter(self.tei_ns + 'seg'):
             text = ''.join(seg.itertext())
-            segments.append((seg.getparent().get('ulx'),
-                             seg.getparent().get('uly'),
-                             seg.getparent().get('lrx'),
-                             seg.getparent().get('lry'),
-                             seg.get(self.xml_ns + 'id'), text))
+            if seg.getparent().get('type') == 'word':
+                bbox = (seg.getparent().get('ulx'),
+                        seg.getparent().get('uly'),
+                        seg.getparent().get('lrx'),
+                        seg.getparent().get('lry'))
+            else:
+                bbox = (None, None, None, None)
+            segments.append(bbox + (seg.get(self.xml_ns + 'id'), text))
         return segments
 
     def add_segment(self, dim, lang=None, confidence=None):
@@ -314,12 +317,14 @@ class TEIFacsimile(object):
         graphemes = []
         for g in self.doc.iter(self.tei_ns + 'g'):
             text = ''.join(g.itertext())
-            graphemes.append((g.getparent().get('ulx'),
-                              g.getparent().get('uly'),
-                              g.getparent().get('lrx'),
-                              g.getparent().get('lry'), 
-                              g.get(self.xml_ns + 'id'),
-                              text))
+            if g.getparent().get('type') == 'grapheme':
+                bbox = (g.getparent().get('ulx'),
+                        g.getparent().get('uly'),
+                        g.getparent().get('lrx'),
+                        g.getparent().get('lry'))
+            else:
+                bbox = (None, None, None, None)
+            graphemes.append(bbox + (g.get(self.xml_ns + 'id'), text))
         return graphemes
 
     def add_graphemes(self, it):
