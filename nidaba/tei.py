@@ -17,6 +17,31 @@ from collections import OrderedDict
 from nidaba.nidabaexceptions import NidabaTEIException
 
 
+def _parse_hocr(title):
+    """
+    Parses the hOCR title string and returns a dictionary containing its
+    contents.
+    """
+    def int_float_or_str(s):
+        try:
+            return int(s)
+        except ValueError:
+            try:
+                return float(s)
+            except ValueError:
+                try:
+                    return unicode(s)
+                except UnicodeDecodeError:
+                    return s
+
+    out = {}
+    props = [x.strip() for x in title.split(';')]
+    for prop in props:
+        p = prop.split()
+        out[p[0]] = tuple(int_float_or_str(x) for x in p[1:])
+    return out
+
+
 class TEIFacsimile(object):
 
     xml_ns = '{http://www.w3.org/XML/1998/namespace}'
@@ -248,7 +273,7 @@ class TEIFacsimile(object):
                              text))
         return segments
 
-    def add_segment(self, dim, lang=None):
+    def add_segment(self, dim, lang=None, confidence=None):
         """
         Marks the beginning of a new topographical segment in the current
         scope. Most often this correspond to a word recognized by an engine.
@@ -256,6 +281,7 @@ class TEIFacsimile(object):
         Args:
             dim (tuple): A tuple containing the bounding box (x0, y0, x1, y1)
             lang (unicode): Optional identifier of the segment language.
+            confidence (float): Optional confidence value between 0 and 1.
         """
         zone = SubElement(self.line_scope, self.tei_ns + 'zone', 
                           ulx=str(dim[0]), uly=str(dim[1]), lrx=str(dim[2]),
@@ -263,6 +289,11 @@ class TEIFacsimile(object):
         self.word_scope = SubElement(zone, self.tei_ns + 'seg')
         self.seg_cnt += 1
         self.word_scope.set(self.xml_ns + 'id', 'seg_' + str(self.seg_cnt))
+        if confidence:
+            cert = SubElement(self.word_scope, self.tei_ns + 'certainty',
+            degree = u'{0:.2f}'.format(confidence))
+            if self.resp:
+                cert.set('resp', '#' + self.resp)
         if self.resp:
             self.word_scope.set('resp', '#' + self.resp)
 
@@ -362,10 +393,46 @@ class TEIFacsimile(object):
         self.seg_cnt = -1
         self.grapheme_cnt = -1
 
-    def load_hocr(text):
+    def load_hocr(self, fp):
         """
         Extracts as much information as possible from an hOCR file and converts
         it to TEI.
+
+        TODO: Write a robust XSL transformation.
+
+        Args:
+            fp (file): File descriptor to read data from.
+        """
+        doc = etree.HTML(fp.read())
+        self.clear_lines()
+        self.clear_segments()
+        self.clear_graphemes()
+        el = doc.find(".//meta[@name='ocr-system']")
+        self.add_respstmt(el.get('content'), 'ocr-system')
+        page = doc.find('.//div[@class="ocr_page"]')
+        o = _parse_hocr(page.get('title'))
+        self.document(o['bbox'], o['image'][0])
+        for line in doc.iterfind('.//span[@class="ocr_line"]'):
+            self.add_line(_parse_hocr(line.get('title'))['bbox'])
+            if not line.xpath('.//span[starts-with(@class, "ocrx")]'):
+                self.add_graphemes(''.join(line.itertext()))
+            for span in line.xpath('.//span[starts-with(@class, "ocrx")]'):
+                o = _parse_hocr(span.get('title'))
+                confidence = None
+                bbox = None
+                if 'bbox' in o:
+                    bbox = o['bbox']
+                if 'x_wconf' in o:
+                    confidence = o['x_wconf'][0]
+                self.add_segment(bbox, confidence=confidence)
+                self.add_graphemes(''.join(span.itertext()) + ' ')
+
+    def write_hocr(fp):
+        """
+        Writes the TEI document as an hOCR file.
+
+        Args:
+            fp (file): File descriptor to write to.
         """
         pass
 
