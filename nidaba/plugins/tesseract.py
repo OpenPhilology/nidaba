@@ -336,7 +336,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
     else:
         with open(output_path, 'wb') as fp:
             tp = tesseract.TessBaseAPIGetHOCRText(api)
-            tei.from_hocr(tp)
+            tei.load_hocr(tp)
             tei.write(fp)
             tesseract.TessDeleteText(tp)
     tesseract.TessBaseAPIDelete(api)
@@ -362,3 +362,9 @@ def ocr_direct(image_path, output_path, facsimile, languages):
     out, err = p.communicate()
     if p.returncode:
         raise NidabaTesseractException(err)
+    tei = TEIFacsimile()
+    with open(output_path) as fp:
+        tei.load_hocr(fp)
+    os.unlink(output_path)
+    with open(output_path, 'wb') as fp:
+        tei.write(fp)
