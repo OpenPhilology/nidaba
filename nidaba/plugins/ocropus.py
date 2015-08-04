@@ -18,21 +18,13 @@ at the website for installation instructions.
 
 from __future__ import absolute_import
 
-import subprocess
-import glob
 import os
-import re
-import shutil
-import uuid
-import dominate
 import numpy as np
 
-from dominate.tags import div, span, meta, br
-from distutils import spawn
 from PIL import Image
 
 from nidaba import storage
-from nidaba import uzn
+from nidaba.tei import TEIFacsimile
 from nidaba.config import nidaba_cfg
 from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
@@ -47,6 +39,7 @@ def setup(*args, **kwargs):
     except:
         raise NidabaPluginException('Prerequisites for ocropus module not '
                                     'installed.')
+
 
 class micro_hocr(object):
     """
@@ -88,11 +81,10 @@ def ocr_ocropus(doc, method=u'ocr_ocropus', model=None):
     image_path = storage.get_abs_path(*doc[1])
     segmentation_path = storage.get_abs_path(*doc[0])
     output_path = os.path.splitext(storage.insert_suffix(image_path, method,
-                                   model))[0] + '.html'
+                                   model))[0] + '.xml'
     model = storage.get_abs_path(*(nidaba_cfg['ocropus_models'][model]))
     return storage.get_storage_path(ocr(image_path, segmentation_path,
                                         output_path, model))
-
 
 
 def ocr(image_path, segmentation_path, output_path, model_path):
@@ -100,11 +92,11 @@ def ocr(image_path, segmentation_path, output_path, model_path):
     Scan a single image with ocropus.
 
     Reads a single image file from ```imagepath``` and writes the recognized
-    text as in hOCR format into output_path.
+    text as a TEI document into output_path.
 
     Args:
         image_path (unicode): Path of the input file
-        segmentation_path (unicode): Path of the segmentation .uzn file.
+        segmentation_path (unicode): Path of the segmentation XML file.
         output_path (unicode): Path of the output file
         model_path (unicode): Path of the recognition model. Must be a pyrnn.gz
                              pickle dump interoperable with ocropus-rpred.
@@ -127,37 +119,30 @@ def ocr(image_path, segmentation_path, output_path, model_path):
     except Exception as e:
         raise NidabaOcropusException('Something somewhere broke: ' + e.msg)
     im = Image.open(image_path)
-    w, h = im.size
 
+    tei = TEIFacsimile()
     with open(segmentation_path, 'r') as seg_fp:
-        doc = dominate.document()
-        with doc.head:
-            meta(name='ocr-system', content='ocropus')
-            meta(name='ocr-capabilities', content='ocr_page ocr_line')
-            meta(charset='utf-8')
+        tei.read(seg_fp)
 
-        hocr_title = micro_hocr()
-        hocr_title.add(u'bbox', 0, 0, str(w), str(h))
-        hocr_title.add(u'image', image_path)
-
-        with doc.add(div(cls='ocr_page', title=str(hocr_title))):
-            for box in uzn.UZNReader(seg_fp):
-                with span(cls='ocr_line') as line_span:
-                    line_title = micro_hocr()
-                    line_title.add(u'bbox', *box[:-1])
-                    line_span['title'] = str(line_title)
-                    line = ocrolib.pil2array(im.crop(box[:-1]))
-                    temp = np.amax(line)-line
-                    temp = temp*1.0/np.amax(temp)
-                    lnorm.measure(temp)
-                    line = lnorm.normalize(line,cval=np.amax(line))
-                    if line.ndim == 3:
-                        np.mean(line, 2)
-                    line = ocrolib.lstm.prepare_line(line, 16)
-                    pred = network.predictString(line)
-                    pred = ocrolib.normalize_text(pred)
-                    line_span.add(pred)
-
-        with open(output_path, 'wb') as fp:
-            fp.write(unicode(doc).encode('utf-8'))
+    # ocropus is a line recognizer
+    tei.clear_graphemes()
+    tei.clear_segments()
+    # add and scope new responsibility statement
+    tei.add_respstmt('ocropus', 'character recognition')
+    for box in tei.lines:
+        ib = tuple(int(x) for x in box[:-2])
+        line = ocrolib.pil2array(im.crop(ib))
+        temp = np.amax(line)-line
+        temp = temp*1.0/np.amax(temp)
+        lnorm.measure(temp)
+        line = lnorm.normalize(line, cval=np.amax(line))
+        if line.ndim == 3:
+            np.mean(line, 2)
+        line = ocrolib.lstm.prepare_line(line, 16)
+        pred = network.predictString(line)
+        pred = ocrolib.normalize_text(pred)
+        tei.scope_line(box[4])
+        tei.add_graphemes(pred)
+    with open(output_path, 'wb') as fp:
+        tei.write(fp)
     return output_path

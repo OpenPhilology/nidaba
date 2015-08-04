@@ -23,6 +23,7 @@ import shutil
 
 from nidaba import uzn
 from nidaba import storage
+from nidaba.tei import TEIFacsimile
 from nidaba.config import nidaba_cfg
 from nidaba.celery import app
 from nidaba.nidabaexceptions import NidabaInvalidParameterException
@@ -37,46 +38,53 @@ def setup(*args, **kwargs):
         global binarization
         global pageseg
         global rpred
-        global html
         global models
         from kraken import binarization
         from kraken import pageseg
         from kraken import rpred
-        from kraken import html
         from kraken.lib import models
     except ImportError as e:
         raise NidabaPluginException(e.message)
 
 
 @app.task(base=NidabaTask, name=u'nidaba.segmentation.kraken')
-def segmentation_kraken(doc, method=u'segment_kraken'):
+def segmentation_kraken(doc, method=u'segment_kraken', black_colseps=False):
     """
-    Performs page segmentation using kraken's built-in algorithm and writes an
-    UNLV zone file.
+    Performs page segmentation using kraken's built-in algorithm and writes a
+    skeleton TEI file.
 
     Args:
+        doc (unicode, unicode): The input document tuple
+        method (unicode): The suffix string append to all output files
+        black_colseps (bool): Assume black column separator instead of white
+        ones.
 
     Returns:
         Two storage tuples with the first one containing the segmentation and
         the second one being the file the segmentation was calculated upon.
     """
+
     input_path = storage.get_abs_path(*doc)
     output_path, ext = os.path.splitext(storage.insert_suffix(input_path,
                                         method))
     shutil.copy2(input_path, output_path + ext)
     img = Image.open(input_path)
-    with open(output_path + '.uzn', 'w') as fp:
-        zones = uzn.UZNWriter(fp)
-        zones.writerows(pageseg.segment(img))
-
-    return (storage.get_storage_path(output_path + '.uzn'),
+    with open(output_path + '.xml', 'w') as fp:
+        tei = TEIFacsimile()
+        tei.document(img.size, os.path.join(*doc))
+        tei.title = os.path.basename(doc[1])
+        tei.add_respstmt('kraken', 'page segmentation')
+        for seg in pageseg.segment(img, black_colseps):
+            tei.add_line(seg)
+        tei.write(fp)
+    return (storage.get_storage_path(output_path + '.xml'),
             storage.get_storage_path(output_path + ext))
 
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.kraken')
 def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     """
-    Runs kraken on an input document and writes a hOCR file.
+    Runs kraken on an input document and writes a TEI file.
 
     Args:
         doc (unicode, unicode): The input document tuple
@@ -88,10 +96,10 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     """
     input_path = storage.get_abs_path(*doc[1])
     output_path = (doc[1][0], os.path.splitext(storage.insert_suffix(doc[1][1],
-                                                                  method,
-                                                                  model))[0] +
-                   '.hocr')
-    lines = storage.get_abs_path(*doc[0])
+                                                                     method,
+                                                                     model))[0]
+                   + '.xml')
+    segmentation = storage.get_abs_path(*doc[0])
     if model in nidaba_cfg['kraken_models']:
         model = storage.get_abs_path(*(nidaba_cfg['kraken_models'][model]))
     elif model in nidaba_cfg['ocropus_models']:
@@ -99,28 +107,28 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     else:
         raise NidabaInvalidParameterException('Model not defined in '
                                               'configuration')
+    img = Image.open(input_path)
+    tei = TEIFacsimile()
+    with open(segmentation, 'r') as seg:
+        tei.read(seg)
+    # kraken is a line recognizer
+    tei.clear_graphemes()
+    tei.clear_segments()
+    # add and scope new responsibility statement
+    tei.add_respstmt('kraken', 'character recognition')
+    lines = tei.lines
 
-    storage.write_text(*output_path, text=ocr(input_path, lines, model))
-    return output_path
-
-
-def ocr(image_path, segmentation_path, model=None):
-    """
-    Runs kraken on an input document and writes a hOCR file.
-
-    Args:
-        image_path (unicode): Path to the input image
-        segmentation_path (unicode): Path to the UZN file
-        model (unicode): Path to the ocropus model
-
-    Returns:
-        A string containing the hOCR output.
-    """
-    img = Image.open(image_path)
-    lines = [tuple(x[:-1]) for x in uzn.UZNReader(open(segmentation_path, 'r'))]
     rnn = models.load_any(model)
-    hocr = html.hocr(list(rpred.rpred(rnn, img, lines)), image_path, img.size)
-    return unicode(hocr)
+    i = 0
+    for rec in rpred.rpred(rnn, img, [(int(x[0]), int(x[1]), int(x[2]), int(x[3])) for x in lines]):
+        # scope the current line and add all graphemes recognized by kraken to
+        # it.
+        tei.scope_line(lines[i][4])
+        tei.add_graphemes(rec)
+        i += 1
+    with open(storage.get_abs_path(*output_path), 'w') as fp:
+        tei.write(fp)
+    return output_path
 
 
 @app.task(base=NidabaTask, name=u'nidaba.binarize.nlbin')
