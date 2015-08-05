@@ -53,6 +53,7 @@ tessdata (default='/usr/share/tesseract-ocr/')
 from __future__ import absolute_import
 
 import subprocess
+import StringIO
 import ctypes
 import os
 
@@ -220,10 +221,10 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
     output_path = storage.insert_suffix(image_path, method, *languages)
 
     if implementation == 'legacy':
-        result_path = output_path + '.xml'
+        result_path = output_path + '.html'
         ocr_direct(image_path, output_path, seg, languages)
     elif implementation == 'direct':
-        result_path = output_path + '.xml'
+        result_path = output_path + '.hocr'
         ocr_direct(image_path, output_path, seg, languages)
     elif implementation == 'capi':
         result_path = output_path + '.xml'
@@ -231,6 +232,14 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
     else:
         raise NidabaTesseractException('Invalid implementation selected',
                                        implementation)
+    if not result_path[-4:] == '.xml':
+        tei = TEIFacsimile()
+        with open(result_path) as fp:
+            tei.load_hocr(fp)
+        os.unlink(result_path)
+        with open(output_path + '.xml', 'wb') as fp:
+            tei.write(fp)
+        result_path = output_path + '.xml'
     return storage.get_storage_path(result_path)
 
 
@@ -336,8 +345,11 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
     else:
         with open(output_path, 'wb') as fp:
             tp = tesseract.TessBaseAPIGetHOCRText(api)
-            tei.load_hocr(tp)
-            tei.write(fp)
+            hocr = StringIO.StringIO()
+            hocr.write(ctypes.string_at(tp))
+            hocr.seek(0)
+            facsimile.load_hocr(hocr)
+            facsimile.write(fp)
             tesseract.TessDeleteText(tp)
     tesseract.TessBaseAPIDelete(api)
 
@@ -362,9 +374,4 @@ def ocr_direct(image_path, output_path, facsimile, languages):
     out, err = p.communicate()
     if p.returncode:
         raise NidabaTesseractException(err)
-    tei = TEIFacsimile()
-    with open(output_path) as fp:
-        tei.load_hocr(fp)
-    os.unlink(output_path)
-    with open(output_path, 'wb') as fp:
-        tei.write(fp)
+

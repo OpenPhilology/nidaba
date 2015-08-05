@@ -61,6 +61,7 @@ class TEIFacsimile(object):
 
         self.word_scope = None
         self.line_scope = None
+        self.resp = None
         self.line_cnt = -1
         self.seg_cnt = -1
         self.grapheme_cnt = -1
@@ -421,7 +422,8 @@ class TEIFacsimile(object):
         self.clear_segments()
         self.clear_graphemes()
         el = doc.find(".//meta[@name='ocr-system']")
-        self.add_respstmt(el.get('content'), 'ocr-system')
+        if el is not None:
+            self.add_respstmt(el.get('content'), 'ocr-system')
         page = doc.find('.//div[@class="ocr_page"]')
         o = _parse_hocr(page.get('title'))
         self.document(o['bbox'], o['image'][0])
@@ -470,7 +472,7 @@ class TEIFacsimile(object):
         Args:
             fp (file): file object to read from
         """
-        self.doc = etree.parse(fp)
+        self.doc = etree.parse(fp).getroot()
         self.line_cnt = len(list(self.doc.iter(self.tei_ns + 'line'))) - 1
         self.seg_cnt = len(list(self.doc.iter(self.tei_ns + 'seg'))) - 1
         self.grapheme_cnt = len(list(self.doc.iter(self.tei_ns + 'g'))) - 1
