@@ -8,7 +8,7 @@ import shutil
 import tempfile
 import ctypes
 
-from lxml import html, etree
+from lxml import etree
 from distutils import spawn
 from nose.plugins.skip import SkipTest
 from mock import patch, MagicMock
@@ -60,7 +60,7 @@ class TesseractTests(unittest.TestCase):
         except:
             raise SkipTest
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
                                            'image.tiff')),
                                            languages=['grc', 'eng'],
                                            extended=False)
@@ -68,7 +68,8 @@ class TesseractTests(unittest.TestCase):
         self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
                         'output a file!')
         try:
-            html.parse(outpath)
+            doc = etree.parse(open(os.path.join(self.storage_path, *ocr)))
+            print(etree.tostring(doc))
         except etree.XMLSyntaxError:
             self.fail(msg='The output was not valid html/xml!')
 
@@ -82,7 +83,7 @@ class TesseractTests(unittest.TestCase):
             raise SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
                                            'image.tiff')),
                                            languages=['grc', 'eng'],
                                            extended=False)
@@ -90,7 +91,7 @@ class TesseractTests(unittest.TestCase):
         self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
                         'output a file!')
         try:
-            html.parse(outpath)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)))
         except etree.XMLSyntaxError:
             self.fail(msg='The output was not valid html/xml!')
 
@@ -106,7 +107,7 @@ class TesseractTests(unittest.TestCase):
         except:
             raise SkipTest
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
                                            'image.tiff')),
                                            languages=['eng'],
                                            extended=True)
@@ -115,26 +116,12 @@ class TesseractTests(unittest.TestCase):
                         'output a file!')
 
         try:
-            h = html.parse(outpath)
+            h = etree.parse(open(os.path.join(self.storage_path, *ocr)))
         except etree.XMLSyntaxError:
             self.fail(msg='The output was not valid html/xml!')
-        lines = h.findall(".//span[@class='ocr_line']")
-        words = h.findall(".//span[@class='ocrx_word']")
-        for line in lines:
-            self.assertIn('cuts', line.get('title'), 'ocr_Line without '
-                          'character cuts')
-        for word in words:
-            title = word.get('title')
-            fields = [field.strip() for field in title.split(';')]
-            conf = [b for b in fields if b.startswith('x_conf')]
-            self.assertEqual(len(conf), 1, 'ocrx_word contains more than one '
-                             'x_conf field')
-            # As one grapheme (visual character) is not always equal to one
-            # codepoint it only makes sense to test that there are less
-            # confidence value than codepoints.
-            self.assertLess(len(conf[0].split()), word.text,
-                             'ocrx_word contains incorrect number of '
-                             'character confidences')
+        self.assertIsNotNone(h.findall(".//line"), msg='Tesseract did not write lines.')
+        self.assertIsNotNone(h.findall(".//seg"), msg='Tesseract did not write segments.')
+        self.assertIsNotNone(h.findall(".//g"), msg='Tesseract did not write graphemes.')
 
 
     def test_capi_file_output_png(self):
@@ -148,7 +135,7 @@ class TesseractTests(unittest.TestCase):
             raise SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
                                            'image.png')),
                                            languages=['eng'],
                                            extended=False)
@@ -156,7 +143,7 @@ class TesseractTests(unittest.TestCase):
         self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
                         'output a file!')
         try:
-            html.parse(outpath)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)))
         except etree.XMLSyntaxError:
             self.fail(msg='The output was not valid html/xml!')
 
@@ -171,7 +158,7 @@ class TesseractTests(unittest.TestCase):
             raise SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
                                            'image.tiff')),
                                            languages=['eng'],
                                            extended=False)
@@ -179,7 +166,7 @@ class TesseractTests(unittest.TestCase):
         self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
                         'output a file!')
         try:
-            html.parse(outpath)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)))
         except etree.XMLSyntaxError:
             self.fail(msg='The output was not valid html/xml!')
 
@@ -195,7 +182,7 @@ class TesseractTests(unittest.TestCase):
             raise SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
                                            'image.jpg')),
                                            languages=['eng'],
                                            extended=False)
@@ -203,7 +190,7 @@ class TesseractTests(unittest.TestCase):
         self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
                         'output a file!')
         try:
-            html.parse(outpath)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)))
         except etree.XMLSyntaxError:
             self.fail(msg='The output was not valid html/xml!')
 
@@ -217,7 +204,7 @@ class TesseractTests(unittest.TestCase):
             raise SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
                                            'image.png')),
                                            languages=['eng'],
                                            extended=False)
@@ -225,7 +212,7 @@ class TesseractTests(unittest.TestCase):
         self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
                         'output a file!')
         try:
-            html.parse(outpath)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)))
         except etree.XMLSyntaxError:
             self.fail(msg='The output was not valid html/xml!')
 
@@ -238,7 +225,7 @@ class TesseractTests(unittest.TestCase):
             raise SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
                                            'image.tiff')),
                                            languages=['eng'],
                                            extended=False)
@@ -246,7 +233,7 @@ class TesseractTests(unittest.TestCase):
         self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
                         'output a file!')
         try:
-            html.parse(outpath)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)))
         except etree.XMLSyntaxError:
             self.fail(msg='The output was not valid html/xml!')
 
@@ -259,7 +246,7 @@ class TesseractTests(unittest.TestCase):
             raise SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'image.uzn'), ('test',
+        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
                                            'image.jpg')),
                                            languages=['eng'],
                                            extended=False)
@@ -267,7 +254,7 @@ class TesseractTests(unittest.TestCase):
         self.assertTrue(os.path.isfile(outpath), msg='Tesseract did not '
                         'output a file!')
         try:
-            html.parse(outpath)
+            etree.parse(open(os.path.join(self.storage_path, *ocr)))
         except etree.XMLSyntaxError:
             self.fail(msg='The output was not valid html/xml!')
 
