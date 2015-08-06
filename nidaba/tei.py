@@ -342,11 +342,11 @@ class TEIFacsimile(object):
         """
         scope = self.word_scope if self.word_scope is not None else self.line_scope
         for t in it:
+            conf = None
             if len(t) == 1:
                 g = t
                 zone = scope
             else:
-                conf = None
                 if len(t) == 2:
                     g, box = t
                 else:
