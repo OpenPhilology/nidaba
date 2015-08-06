@@ -325,8 +325,9 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                                                       ctypes.byref(y0),
                                                       ctypes.byref(x1),
                                                       ctypes.byref(y1))
+                conf = tesseract.TessResultIteratorConfidence(ri, RIL_WORD)
                 facsimile.add_segment((x0.value, y0.value, x1.value, y1.value),
-                                      lang)
+                                      lang, conf)
             
             conf = tesseract.TessResultIteratorConfidence(ri, RIL_SYMBOL)
             tesseract.TessPageIteratorBoundingBox(pi, RIL_SYMBOL,

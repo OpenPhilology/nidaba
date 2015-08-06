@@ -297,7 +297,9 @@ class TEIFacsimile(object):
         self.word_scope.set(self.xml_ns + 'id', 'seg_' + str(self.seg_cnt))
         if confidence:
             cert = SubElement(self.word_scope, self.tei_ns + 'certainty',
-            degree = u'{0:.2f}'.format(confidence/100.0))
+                              degree = u'{0:.2f}'.format(confidence/100.0),
+                              locus = 'value',
+                              target = '#' + 'seg_' + str(self.seg_cnt))
             if self.resp:
                 cert.set('resp', '#' + self.resp)
         if self.resp:
@@ -353,15 +355,18 @@ class TEIFacsimile(object):
                 zone = SubElement(scope, self.tei_ns + 'zone', ulx=str(ulx),
                                   uly=str(uly), lrx=str(lrx), lry=str(lry),
                                   type='grapheme', resp= '#' + self.resp)
-                if conf:
-                    cert = SubElement(zone, self.tei_ns + 'certainty',
-                                      degree=u'{0:.2f}'.format(conf/100.0))
-                    if self.resp:
-                        cert.set('resp', '#' + self.resp)
             glyph = SubElement(zone, self.tei_ns + 'g')
             self.grapheme_cnt += 1
             glyph.set(self.xml_ns + 'id', 'grapheme_' + str(self.grapheme_cnt))
             glyph.text = g
+            if conf:
+                cert = SubElement(zone, self.tei_ns + 'certainty',
+                                  degree=u'{0:.2f}'.format(conf/100.0),
+                                  locus = 'value',
+                                  target = '#' + 'grapheme_' +
+                                  str(self.grapheme_cnt))
+                if self.resp:
+                    cert.set('resp', '#' + self.resp)
             if self.resp:
                 glyph.set('resp', '#' + self.resp)
 
