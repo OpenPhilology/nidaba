@@ -287,7 +287,7 @@ class TEIFacsimile(object):
         Args:
             dim (tuple): A tuple containing the bounding box (x0, y0, x1, y1)
             lang (unicode): Optional identifier of the segment language.
-            confidence (float): Optional confidence value between 0 and 1.
+            confidence (float): Optional confidence value between 0 and 100.
         """
         zone = SubElement(self.line_scope, self.tei_ns + 'zone', 
                           ulx=str(dim[0]), uly=str(dim[1]), lrx=str(dim[2]),
@@ -297,7 +297,7 @@ class TEIFacsimile(object):
         self.word_scope.set(self.xml_ns + 'id', 'seg_' + str(self.seg_cnt))
         if confidence:
             cert = SubElement(self.word_scope, self.tei_ns + 'certainty',
-            degree = u'{0:.2f}'.format(confidence))
+            degree = u'{0:.2f}'.format(confidence/100.0))
             if self.resp:
                 cert.set('resp', '#' + self.resp)
         if self.resp:
@@ -336,7 +336,7 @@ class TEIFacsimile(object):
         Args:
             it (iterable): An iterable returning a tuple containing a glyph
             (unicode), and optionally the bounding box of this glyph (x0, y0,
-            x1, y1) and a recognition confidence value in the range 0 and 1.
+            x1, y1) and a recognition confidence value in the range 0 and 100.
         """
         scope = self.word_scope if self.word_scope is not None else self.line_scope
         for t in it:
@@ -355,7 +355,7 @@ class TEIFacsimile(object):
                                   type='grapheme', resp= '#' + self.resp)
                 if conf:
                     cert = SubElement(zone, self.tei_ns + 'certainty',
-                                      degree=u'{0:.2f}'.format(conf))
+                                      degree=u'{0:.2f}'.format(conf/100.0))
                     if self.resp:
                         cert.set('resp', '#' + self.resp)
             glyph = SubElement(zone, self.tei_ns + 'g')
@@ -438,7 +438,7 @@ class TEIFacsimile(object):
                 if 'bbox' in o:
                     bbox = o['bbox']
                 if 'x_wconf' in o:
-                    confidence = o['x_wconf'][0]
+                    confidence = int(o['x_wconf'][0])/100.0
                 self.add_segment(bbox, confidence=confidence)
                 self.add_graphemes(''.join(span.itertext()))
                 if span.tail:
