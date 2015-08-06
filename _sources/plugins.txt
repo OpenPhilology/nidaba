@@ -44,8 +44,9 @@ Builtin Plugins
 
 .. automodule:: nidaba.plugins.kraken
 
-   .. autofunction:: ocr_kraken(doc, method, model)
    .. autofunction:: nlbin(doc, method, threshold, zoom, escale, border, perc, range, low, high)
+   .. autofunction:: segmentation_kraken(doc, method)
+   .. autofunction:: ocr_kraken(doc, method, model)
 
 .. automodule:: nidaba.plugins.ocropus
 
@@ -53,6 +54,7 @@ Builtin Plugins
 
 .. automodule:: nidaba.plugins.tesseract
 
+   .. autofunction:: segmentation_tesseract(doc, method)
    .. autofunction:: ocr_tesseract(doc, method, languages)
 
 .. automodule:: nidaba.plugins.leptonica

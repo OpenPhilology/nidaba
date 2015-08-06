@@ -1,0 +1,37 @@
+==========
+TEI Output
+==========
+
+.. _tei_output:
+
+`TEI <http://www.tei-c.org/>`_ is a consortium maintaining standards for the
+representation of texts in digital form which are widely used in the
+humanities. Nidaba is capable of encoding the OCR results and their metadata
+into XML documents following the most recent `P5 guidelines
+<http://www.tei-c.org/Guidelines/P5/>`_. The output is designed to facilitate
+further manual annotation.
+
+Format
+======
+
+Fundamentally output is generated following the `embedded transcription
+<http://www.tei-c.org/release/doc/tei-p5-doc/en/html/PH.html#PHZLAB>`_ scheme
+with a single surface containing all recognized line elements with their
+textual representation. When merging the output of multiple OCR engines
+diverging ``readings`` will be attributed to their origin using the
+``respStmt`` tag. Alternative spellings provided by a spell checker will also
+be properly attributed.
+
+The skeleton of a TEI-OCR file will look like this::
+
+        <sourceDoc>
+                <surface ulx="0" uly="0" lrx="500" lry="500">
+                        <graphic url="foo.png"/>
+                        <zone>
+                                <line ulx=a uly=b lrx=c lry=d>text...</line>
+                                ...
+                        </zone>
+                </surface>
+        </sourceDoc>
+
+

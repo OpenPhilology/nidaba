@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Nidaba &mdash; nidaba 0.3.18
+    <title>Nidaba &mdash; nidaba 0.4.1
  documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.18
+        VERSION:     '0.4.1
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.3.18
+    <link rel="top" title="nidaba 0.4.1
  documentation" href="#" />
     <link rel="next" title="Plugins" href="plugins.html" />
    
@@ -33,23 +33,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="plugins.html" title="Plugins"
-             accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">nidaba 0.3.18
- documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+  <body role="document">  
 
     <div class="document">
       <div class="documentwrapper">
@@ -73,7 +57,7 @@ distribute the execution of this software to multiple machines.</p>
 <li><a class="reference external" href="http://www.leptonica.com/skew-measurement.html">Deskewing</a></li>
 <li><a class="reference external" href="http://www.leptonica.com/dewarping.html">Dewarping</a></li>
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Optical_character_recognition">OCR</a></li>
-<li>Output merging</li>
+<li>Output merging (adapted from Bruce Robertson&#8217;s <a class="reference external" href="https://github.com/brobertson/rigaudon">rigaudon</a>)</li>
 <li><a class="reference internal" href="options.html#spell-checking"><span>Spell-checking</span></a></li>
 </ul>
 <div class="section" id="installation">
@@ -248,13 +232,14 @@ utility. It is automatically installed during the installation procedure.</p>
 <h4>Batches<a class="headerlink" href="#batches" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal"><span class="pre">batch</span></code> subcommand is used to add a job to the pipeline. A rather minimal
 invocation looks like this:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch --binarize nlbin -b sauvola -o tesseract:eng -- input.png
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch --binarize nlbin -b sauvola -l tesseract -o tesseract:eng -- input.png
 <span class="go">90ae699a-7172-44ce-a8bf-5464bccd34d0</span>
 </pre></div>
 </div>
 <p>It converts the input file <code class="docutils literal"><span class="pre">input.png</span></code> to grayscale, binarizes it using the
-Sauvola and nlbin algorithm, and finally runs both binarizations through
-tesseract with the English language model, creating two hOCR files.</p>
+Sauvola and nlbin algorithm, creates page segmentations of both images using
+tesseract&#8217;s algorithm, and finally runs both binarizations/segmentations
+through tesseract with the English language model, creating two hOCR files.</p>
 <p>There are several groups of options, each associated with a particular set of
 functions of the pipeline. An option may appear multiple times to define
 additional execution paths similar to adding new branches to the leaves of a
@@ -273,6 +258,8 @@ location will be used instead of the path when executing the function.</p>
 <dl class="docutils">
 <dt>&#8211;binarize / -b</dt>
 <dd>Defines binarization parameters. See the <a class="reference internal" href="options.html#bin"><span>binarization</span></a> documentation for more details.</dd>
+<dt>&#8211;segmentation / -l</dt>
+<dd>Defines page segmentation parameters. See the <a class="reference internal" href="options.html#segmentation-heading"><span>segmentation</span></a> documentation for more details.</dd>
 <dt>&#8211;ocr / -o</dt>
 <dd>Defines OCR parameters. See the <a class="reference internal" href="options.html#ocr-heading"><span>OCR</span></a> documentation
 for more details.</dd>
@@ -422,11 +409,11 @@ the <a class="reference external" href="https://www.dh.uni-leipzig.de">Humboldt 
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
       
       |
       <a href="_sources/index.txt"
-          rel="nofollow">Page source</a></li>
+          rel="nofollow">Page source</a>
     </div>
 
     

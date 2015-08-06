@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nidaba package &mdash; nidaba 0.3.18
+    <title>nidaba package &mdash; nidaba 0.4.1
  documentation</title>
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3.18
+        VERSION:     '0.4.1
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.3.18
+    <link rel="top" title="nidaba 0.4.1
  documentation" href="../index.html" />
     <link rel="up" title="nidaba" href="modules.html" />
     <link rel="next" title="nidaba.algorithms package" href="nidaba.algorithms.html" />
@@ -35,27 +35,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="nidaba.algorithms.html" title="nidaba.algorithms package"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="modules.html" title="nidaba"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">nidaba 0.3.18
- documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">nidaba</a> &raquo;</li> 
-      </ul>
-    </div>  
+  <body role="document">  
 
     <div class="document">
       <div class="documentwrapper">
@@ -81,6 +61,12 @@
 <li class="toctree-l2"><a class="reference internal" href="nidaba.algorithms.html#module-nidaba.algorithms">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="nidaba.contrib.html">nidaba.contrib package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.contrib.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.contrib.html#module-nidaba.contrib.mkdict">nidaba.contrib.mkdict module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.contrib.html#module-nidaba.contrib">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="nidaba.tasks.html">nidaba.tasks package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.binarize">nidaba.tasks.binarize module</a><ul>
@@ -93,6 +79,14 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.img">nidaba.tasks.img module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-img">nidaba.tasks.img</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.postprocessing">nidaba.tasks.postprocessing module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-postprocessing">nidaba.tasks.postprocessing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.stats">nidaba.tasks.stats module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-stats">nidaba.tasks.stats</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.util">nidaba.tasks.util module</a><ul>
@@ -164,7 +158,8 @@ modified dictionary is returned.</p>
 <dl class="function">
 <dt id="nidaba.config.reload_config">
 <code class="descclassname">nidaba.config.</code><code class="descname">reload_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.config.reload_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Triggers a global reloading of the configuration files.</p>
+<dd><p>Triggers a global reloading of the configuration files and reinitializes
+the redis connection pool.</p>
 <p>As of now configuration files are only read from sys.prefix/etc/nidaba/.</p>
 </dd></dl>
 
@@ -852,20 +847,24 @@ the failure.</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="nidaba.nidaba.Batch.get_results">
-<code class="descname">get_results</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.get_results" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves the storage tuples of a successful batch or None.</p>
+<dt id="nidaba.nidaba.Batch.get_extended_state">
+<code class="descname">get_extended_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.get_extended_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns extended batch state information.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of dictionaries containing the output document name under
-the key &#8216;doc&#8217;, the original document it is based upon under the key
-&#8216;root&#8217;, and all further tracking data that may be added during
-execution.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A dictionary containing an entry for each subtask.</td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.nidaba.Batch.get_results">
+<code class="descname">get_results</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.get_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the storage tuples of a successful batch.</p>
+<p>Returns:</p>
 </dd></dl>
 
 <dl class="method">
@@ -892,7 +891,7 @@ SUCCESS: The batch has completed successfully.</p>
 <dt id="nidaba.nidaba.Batch.run">
 <code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes the current batch definition.</p>
-<p>Expands the current batch definition to a series of celery chords and
+<p>Expands the current batch definition to a series of celery chains and
 executes them asynchronously. Additionally a batch record is written to
 the celery result backend.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -920,6 +919,12 @@ should always define their exceptions here.</p>
 <dl class="exception">
 <dt id="nidaba.nidabaexceptions.NidabaAlgorithmException">
 <em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaAlgorithmException</code><span class="sig-paren">(</span><em>message=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaAlgorithmException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaConfigException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaConfigException</code><span class="sig-paren">(</span><em>message=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaConfigException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
 </dd></dl>
 
@@ -978,6 +983,12 @@ should always define their exceptions here.</p>
 </dd></dl>
 
 <dl class="exception">
+<dt id="nidaba.nidabaexceptions.NidabaTEIException">
+<em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaTEIException</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaTEIException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
 <dt id="nidaba.nidabaexceptions.NidabaTaskException">
 <em class="property">exception </em><code class="descclassname">nidaba.nidabaexceptions.</code><code class="descname">NidabaTaskException</code><span class="sig-paren">(</span><em>status_code</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidabaexceptions.NidabaTaskException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
@@ -999,6 +1010,98 @@ should always define their exceptions here.</p>
 </div>
 <div class="section" id="module-nidaba.storage">
 <span id="nidaba-storage-module"></span><h2>nidaba.storage module<a class="headerlink" href="#module-nidaba.storage" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nidaba.storage.StorageFile">
+<em class="property">class </em><code class="descclassname">nidaba.storage.</code><code class="descname">StorageFile</code><span class="sig-paren">(</span><em>jobID</em>, <em>path</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">io.IOBase</span></code></p>
+<p>A file-like interface to a file on the storage medium.</p>
+<dl class="attribute">
+<dt id="nidaba.storage.StorageFile.abs_path">
+<code class="descname">abs_path</code><a class="headerlink" href="#nidaba.storage.StorageFile.abs_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.storage.StorageFile.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.storage.StorageFile.closed">
+<code class="descname">closed</code><a class="headerlink" href="#nidaba.storage.StorageFile.closed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.storage.StorageFile.flush">
+<code class="descname">flush</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.flush" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.storage.StorageFile.isatty">
+<code class="descname">isatty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.isatty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.storage.StorageFile.read">
+<code class="descname">read</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.read" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.storage.StorageFile.readable">
+<code class="descname">readable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.readable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.storage.StorageFile.readall">
+<code class="descname">readall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.readall" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.storage.StorageFile.readinto">
+<code class="descname">readinto</code><span class="sig-paren">(</span><em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.readinto" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.storage.StorageFile.readline">
+<code class="descname">readline</code><span class="sig-paren">(</span><em>limit=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.readline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.storage.StorageFile.readlines">
+<code class="descname">readlines</code><span class="sig-paren">(</span><em>hint=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.readlines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.storage.StorageFile.seek">
+<code class="descname">seek</code><span class="sig-paren">(</span><em>offset</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.seek" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.storage.StorageFile.seekable">
+<code class="descname">seekable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.seekable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.storage.StorageFile.storage_path">
+<code class="descname">storage_path</code><a class="headerlink" href="#nidaba.storage.StorageFile.storage_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.storage.StorageFile.tell">
+<code class="descname">tell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.tell" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.storage.StorageFile.writable">
+<code class="descname">writable</code><span class="sig-paren">(</span><em>lines</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.writable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.storage.StorageFile.write">
+<code class="descname">write</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="nidaba.storage.get_abs_path">
 <code class="descclassname">nidaba.storage.</code><code class="descname">get_abs_path</code><span class="sig-paren">(</span><em>jobID</em>, <em>*path</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.get_abs_path" title="Permalink to this definition">¶</a></dt>
@@ -1135,7 +1238,10 @@ document such paltry information as exceptions.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list of unicode strings of the matching files.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">list</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NidabaNoSuchStorageBin if the job identifer is not known.</strong> &#8211;</p>
 </td>
 </tr>
 </tbody>
@@ -1152,10 +1258,7 @@ document such paltry information as exceptions.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>jobID</strong> (<em>unicode</em>) &#8211; Identifier of the bin to be created.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Failure
-(unicode): String containing the job ID</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>NidabaStorageViolationException if the job ID already exists.</strong> &#8211;</td>
 </tr>
 </tbody>
 </table>
@@ -1176,11 +1279,13 @@ for retrieving unicode text use retrieve_text().</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Failure
-Dictionary: A dictionary mapping file identifiers to their contents.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A dictionary mapping file identifiers to their contents.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">Dictionary</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NidabaNoSuchStorageBin if the job identifer is not known.</strong> &#8211;</p>
 </td>
 </tr>
 </tbody>
@@ -1201,11 +1306,13 @@ Dictionary: A dictionary mapping file identifiers to their contents.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Failure
-Dictionary: A dictionary mapping file identifiers to their contents.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A dictionary mapping file identifiers to their contents.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">Dictionary</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NidabaNoSuchStorageBin if the job identifer is not known.</strong> &#8211;</p>
 </td>
 </tr>
 </tbody>
@@ -1228,8 +1335,7 @@ does not accept unicode objects; use write_text() for that.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Length of data written
-None: Failure</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Length of data written</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
@@ -1264,6 +1370,327 @@ None: Failure</p>
 </table>
 </dd></dl>
 
+</div>
+<div class="section" id="module-nidaba.tei">
+<span id="nidaba-tei-module"></span><h2>nidaba.tei module<a class="headerlink" href="#module-nidaba.tei" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-tei">
+<h3>nidaba.tei<a class="headerlink" href="#nidaba-tei" title="Permalink to this headline">¶</a></h3>
+<p>A module for interfacing TEI OCR output</p>
+<dl class="class">
+<dt id="nidaba.tei.TEIFacsimile">
+<em class="property">class </em><code class="descclassname">nidaba.tei.</code><code class="descname">TEIFacsimile</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.add_graphemes">
+<code class="descname">add_graphemes</code><span class="sig-paren">(</span><em>it</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.add_graphemes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a number of graphemes to the current scope (either line or word).
+A line or segment has to be created beforehand.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>it</strong> (<em>iterable</em>) &#8211; An iterable returning a tuple containing a glyph</li>
+<li><strong>and optionally the bounding box of this glyph (x0, y0,</strong> (<em>(unicode),</em>) &#8211; </li>
+<li><strong>y1) and a recognition confidence value in the range 0 and 1.</strong> (<em>x1,</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.add_line">
+<code class="descname">add_line</code><span class="sig-paren">(</span><em>dim</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.add_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marks the beginning of a new topographical line and scopes it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dim</strong> (<em>tuple</em>) &#8211; A tuple containing the bounding box (x0, y0, x1, y1)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.add_respstmt">
+<code class="descname">add_respstmt</code><span class="sig-paren">(</span><em>name</em>, <em>resp</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.add_respstmt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a responsibility statement and treats all subsequently added text
+as a responsibility of this statement.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<em>unicode</em>) &#8211; Identifier of the process that generated the
+output.</li>
+<li><strong>resp</strong> (<em>unicode</em>) &#8211; Phrase describing the nature of the process
+generating the output.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A unicode string corresponding to the responsibility identifier.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.add_segment">
+<code class="descname">add_segment</code><span class="sig-paren">(</span><em>dim</em>, <em>lang=None</em>, <em>confidence=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.add_segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marks the beginning of a new topographical segment in the current
+scope. Most often this correspond to a word recognized by an engine.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dim</strong> (<em>tuple</em>) &#8211; A tuple containing the bounding box (x0, y0, x1, y1)</li>
+<li><strong>lang</strong> (<em>unicode</em>) &#8211; Optional identifier of the segment language.</li>
+<li><strong>confidence</strong> (<em>float</em>) &#8211; Optional confidence value between 0 and 1.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.authority">
+<code class="descname">authority</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.authority" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.clear_graphemes">
+<code class="descname">clear_graphemes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.clear_graphemes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes all &lt;g&gt; nodes from the document. Mainly used when combining
+page segmentation algorithms extracting graphemes and OCR engines
+operating on lexemes. Also resets the current scope to the first line
+(and if applicable its first segment).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.clear_lines">
+<code class="descname">clear_lines</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.clear_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes all &lt;line&gt; nodes from the document.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.clear_segment">
+<code class="descname">clear_segment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.clear_segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marks the end of the current topographical segment.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.clear_segments">
+<code class="descname">clear_segments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.clear_segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes all &lt;seg&gt; nodes from the document. Mainly used when combining
+page segmentation algorithms extracting lexemes (and graphemes) and OCR
+engines operating on lines. Also resets the current scope to the first
+line.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.description">
+<code class="descname">description</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a tuple containing a source document&#8217;s path and its dimensions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.document">
+<code class="descname">document</code><span class="sig-paren">(</span><em>dim</em>, <em>image_url</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.document" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.graphemes">
+<code class="descname">graphemes</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.graphemes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a reading order sorted list of tuples in the format (x0, y0,
+x1, y1, id, text).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.license">
+<code class="descname">license</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.license" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.lines">
+<code class="descname">lines</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an reading order sorted list of tuples in the format (x0, y0,
+x1, y1, xml id, text).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.load_hocr">
+<code class="descname">load_hocr</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.load_hocr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts as much information as possible from an hOCR file and converts
+it to TEI.</p>
+<p>TODO: Write a robust XSL transformation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fp</strong> (<em>file</em>) &#8211; File descriptor to read data from.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.read">
+<code class="descname">read</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads an XML document from a file object and populates all recognized
+attributes. Also sets the scope to the first line (and if applicable
+segment) of the document.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fp</strong> (<em>file</em>) &#8211; file object to read from</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.respstmt">
+<code class="descname">respstmt</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.respstmt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an ordered dictionary of responsibility statements from the XML
+document.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.scope_line">
+<code class="descname">scope_line</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.scope_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scopes a particular line for addition of segments/graphemes. Also
+disables the current segment scope.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>id</strong> (<em>unicode</em>) &#8211; XML id of the line tag</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>NidabaTEIException if the identifier is unknown</strong> &#8211;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.scope_respstmt">
+<code class="descname">scope_respstmt</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.scope_respstmt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scopes a respStmt for subsequent addition of graphemes/segments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>id</strong> (<em>unicode</em>) &#8211; XML id of the responsibility statement</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>NidabaTEIException if the identifier is unknown</strong> &#8211;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.segments">
+<code class="descname">segments</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an reading order sorted list of tuples in the format (x0, y0,
+x1, y1, id, text).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.sourceDesc">
+<code class="descname">sourceDesc</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.sourceDesc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.tei_ns">
+<code class="descname">tei_ns</code><em class="property"> = u'{http://www.tei-c.org/ns/1.0}'</em><a class="headerlink" href="#nidaba.tei.TEIFacsimile.tei_ns" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class encapsulating a TEI XML document following the TEI digital
+facsimile guidelines for embedded transcriptions.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.title">
+<code class="descname">title</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.title" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.write">
+<code class="descname">write</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the TEI XML document to a file object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fp</strong> (<em>file</em>) &#8211; file object to write to</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.write_hocr">
+<code class="descname">write_hocr</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.write_hocr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the TEI document as an hOCR file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fp</strong> (<em>file</em>) &#8211; File descriptor to write to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.xml_ns">
+<code class="descname">xml_ns</code><em class="property"> = u'{http://www.w3.org/XML/1998/namespace}'</em><a class="headerlink" href="#nidaba.tei.TEIFacsimile.xml_ns" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-nidaba.uzn">
+<span id="nidaba-uzn-module"></span><h2>nidaba.uzn module<a class="headerlink" href="#module-nidaba.uzn" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nidaba-uzn">
+<h3>nidaba.uzn<a class="headerlink" href="#nidaba-uzn" title="Permalink to this headline">¶</a></h3>
+<p>A simple writer/reader interface for UNLV-style zone files.</p>
+<dl class="class">
+<dt id="nidaba.uzn.UZNReader">
+<em class="property">class </em><code class="descclassname">nidaba.uzn.</code><code class="descname">UZNReader</code><span class="sig-paren">(</span><em>f</em>, <em>**kwds</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.uzn.UZNReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A reader parsing a UNLV zone file from a file object &#8216;f&#8217;.</p>
+<dl class="method">
+<dt id="nidaba.uzn.UZNReader.next">
+<code class="descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.uzn.UZNReader.next" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nidaba.uzn.UZNWriter">
+<em class="property">class </em><code class="descclassname">nidaba.uzn.</code><code class="descname">UZNWriter</code><span class="sig-paren">(</span><em>f</em>, <em>**kwds</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.uzn.UZNWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A class writing a UNLV zone file.</p>
+<dl class="method">
+<dt id="nidaba.uzn.UZNWriter.writerow">
+<code class="descname">writerow</code><span class="sig-paren">(</span><em>x0</em>, <em>y0</em>, <em>x1</em>, <em>y1</em>, <em>descriptor='Text'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.uzn.UZNWriter.writerow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nidaba.uzn.UZNWriter.writerows">
+<code class="descname">writerows</code><span class="sig-paren">(</span><em>rows</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.uzn.UZNWriter.writerows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-nidaba">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-nidaba" title="Permalink to this headline">¶</a></h2>
@@ -1335,11 +1762,11 @@ None: Failure</p>
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
       
       |
       <a href="../_sources/source/nidaba.txt"
-          rel="nofollow">Page source</a></li>
+          rel="nofollow">Page source</a>
     </div>
 
     

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Option Groups &mdash; nidaba 0.3.18
+    <title>Option Groups &mdash; nidaba 0.4.1
  documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.18
+        VERSION:     '0.4.1
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.3.18
+    <link rel="top" title="nidaba 0.4.1
  documentation" href="index.html" />
     <link rel="next" title="nidaba" href="source/modules.html" />
     <link rel="prev" title="Plugins" href="plugins.html" />
@@ -34,26 +34,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="source/modules.html" title="nidaba"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="plugins.html" title="Plugins"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">nidaba 0.3.18
- documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+  <body role="document">  
 
     <div class="document">
       <div class="documentwrapper">
@@ -71,7 +52,7 @@ background (usually the white page) pixels. As all character recognition
 methods implemented in nidaba operate only on bi-level images, it is paramount
 to create properly binarized images as a preprocessing step.</p>
 <p>Binarization is an own group of tasks and functions can be accessed using the
-<code class="docutils literal"><span class="pre">--binarization</span></code> switch:</p>
+<code class="docutils literal"><span class="pre">--binarization/-b</span></code> switch:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -b otsu -b sauvola ... -- *.tif
 </pre></div>
 </div>
@@ -106,6 +87,22 @@ thresholding.</p>
 the <a class="reference internal" href="plugins.html#module-nidaba.plugins.leptonica" title="nidaba.plugins.leptonica"><code class="xref py py-mod docutils literal"><span class="pre">leptonica</span></code></a> and <a class="reference internal" href="plugins.html#module-nidaba.plugins.kraken" title="nidaba.plugins.kraken"><code class="xref py py-mod docutils literal"><span class="pre">kraken</span></code></a> plugins.</p>
 </div>
 </div>
+<div class="section" id="page-segmentation">
+<span id="segmentation-heading"></span><h2>Page Segmentation<a class="headerlink" href="#page-segmentation" title="Permalink to this headline">¶</a></h2>
+<p>A prerequisite to the actual OCR is the extraction of textual elements,
+columns, paragraphs, and lines, from the page. Page segmentation is a separate
+group of tasks and functions can be accessed using the <code class="docutils literal"><span class="pre">--segmentation/-l</span></code>
+switch:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">#</span> nidaba batch ... -l kraken -l tesseract ... -- *.tif
+</pre></div>
+</div>
+<div class="section" id="id2">
+<h3>Options and Syntax<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Segmentation is usually an integral part of an OCR engine, so different
+implementations are situated in their respective plugins. See <a class="reference internal" href="plugins.html#module-nidaba.plugins.tesseract" title="nidaba.plugins.tesseract"><code class="xref py py-mod docutils literal"><span class="pre">tesseract</span></code></a> and <a class="reference internal" href="plugins.html#module-nidaba.plugins.kraken" title="nidaba.plugins.kraken"><code class="xref py py-mod docutils literal"><span class="pre">kraken</span></code></a> for
+additional information.</p>
+</div>
+</div>
 <div class="section" id="optical-character-recognition">
 <span id="ocr-heading"></span><h2>Optical Character Recognition<a class="headerlink" href="#optical-character-recognition" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="http://en.wikipedia.org/wiki/Optical_character_recognition">OCR</a> is arguably
@@ -114,8 +111,8 @@ accessed using the <code class="docutils literal"><span class="pre">--ocr</span>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -o tesseract:eng -o kraken:en-default ... -- *.tif
 </pre></div>
 </div>
-<div class="section" id="id2">
-<h3>Options and Syntax<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Options and Syntax<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>As OCR engines are usually quite large and sometimes hard to install, all
 functionality is contained in plugins. See <a class="reference internal" href="plugins.html#module-nidaba.plugins.tesseract" title="nidaba.plugins.tesseract"><code class="xref py py-mod docutils literal"><span class="pre">tesseract</span></code></a>, <a class="reference internal" href="plugins.html#module-nidaba.plugins.kraken" title="nidaba.plugins.kraken"><code class="xref py py-mod docutils literal"><span class="pre">kraken</span></code></a>, and
 <a class="reference internal" href="plugins.html#module-nidaba.plugins.ocropus" title="nidaba.plugins.ocropus"><code class="xref py py-mod docutils literal"><span class="pre">ocropus</span></code></a> for additional information,
@@ -123,7 +120,7 @@ configuration keys, etc.</p>
 </div>
 </div>
 <div class="section" id="spell-checking">
-<span id="id3"></span><h2>Spell Checking<a class="headerlink" href="#spell-checking" title="Permalink to this headline">¶</a></h2>
+<span id="id4"></span><h2>Spell Checking<a class="headerlink" href="#spell-checking" title="Permalink to this headline">¶</a></h2>
 <p>Nidaba includes support for an edit distance based spell checker out of the
 box. Particular configurations of the spell checking algorithm have to be
 predefined in the <code class="docutils literal"><span class="pre">nidaba.yaml</span></code> configuration file under the <code class="docutils literal"><span class="pre">lang_dicts</span></code>
@@ -158,8 +155,8 @@ calculates the dictionaries in a normalized format. For example:</p>
 of memory, e.g. for a 31Mb word list mkdict utilizes around 8Gb memory and the
 resulting deletion dictionary will be 750Mb large.</p>
 </div>
-<div class="section" id="id4">
-<h3>Options and Syntax<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h3>Options and Syntax<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="nidaba.tasks.postprocessing.spell_check">
 <code class="descclassname">nidaba.tasks.postprocessing.</code><code class="descname">spell_check</code><span class="sig-paren">(</span><em>doc</em>, <em>method=u'spell_check'</em>, <em>language=u''</em>, <em>filter_punctuation=False</em>, <em>no_ocrx_words=u'auto'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.postprocessing.spell_check" title="Permalink to this definition">¶</a></dt>
@@ -199,7 +196,7 @@ be set to <code class="docutils literal"><span class="pre">auto</span></code>, <
 </div>
 </div>
 <div class="section" id="metrics">
-<span id="id5"></span><h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
+<span id="id6"></span><h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -240,6 +237,7 @@ be set to <code class="docutils literal"><span class="pre">auto</span></code>, <
 <li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Option Groups</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#binarization">Binarization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#page-segmentation">Page Segmentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#optical-character-recognition">Optical Character Recognition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spell-checking">Spell Checking</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#metrics">Metrics</a></li>
@@ -271,11 +269,11 @@ be set to <code class="docutils literal"><span class="pre">auto</span></code>, <
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
       
       |
       <a href="_sources/options.txt"
-          rel="nofollow">Page source</a></li>
+          rel="nofollow">Page source</a>
     </div>
 
     

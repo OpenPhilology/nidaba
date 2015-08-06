@@ -7,6 +7,8 @@ Subpackages
 .. toctree::
 
     nidaba.algorithms
+    nidaba.contrib
+    nidaba.plugins
     nidaba.tasks
 
 Submodules
@@ -88,6 +90,22 @@ nidaba.storage module
 ---------------------
 
 .. automodule:: nidaba.storage
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+nidaba.tei module
+-----------------
+
+.. automodule:: nidaba.tei
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+nidaba.uzn module
+-----------------
+
+.. automodule:: nidaba.uzn
     :members:
     :undoc-members:
     :show-inheritance:
