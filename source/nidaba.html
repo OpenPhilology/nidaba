@@ -61,12 +61,6 @@
 <li class="toctree-l2"><a class="reference internal" href="nidaba.algorithms.html#module-nidaba.algorithms">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="nidaba.contrib.html">nidaba.contrib package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="nidaba.contrib.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="nidaba.contrib.html#module-nidaba.contrib.mkdict">nidaba.contrib.mkdict module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="nidaba.contrib.html#module-nidaba.contrib">Module contents</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="nidaba.tasks.html">nidaba.tasks package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.binarize">nidaba.tasks.binarize module</a><ul>
@@ -1392,7 +1386,7 @@ A line or segment has to be created beforehand.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>it</strong> (<em>iterable</em>) &#8211; An iterable returning a tuple containing a glyph</li>
 <li><strong>and optionally the bounding box of this glyph (x0, y0,</strong> (<em>(unicode),</em>) &#8211; </li>
-<li><strong>y1) and a recognition confidence value in the range 0 and 1.</strong> (<em>x1,</em>) &#8211; </li>
+<li><strong>y1) and a recognition confidence value in the range 0 and 100.</strong> (<em>x1,</em>) &#8211; </li>
 </ul>
 </td>
 </tr>
@@ -1450,7 +1444,7 @@ scope. Most often this correspond to a word recognized by an engine.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>dim</strong> (<em>tuple</em>) &#8211; A tuple containing the bounding box (x0, y0, x1, y1)</li>
 <li><strong>lang</strong> (<em>unicode</em>) &#8211; Optional identifier of the segment language.</li>
-<li><strong>confidence</strong> (<em>float</em>) &#8211; Optional confidence value between 0 and 1.</li>
+<li><strong>confidence</strong> (<em>float</em>) &#8211; Optional confidence value between 0 and 100.</li>
 </ul>
 </td>
 </tr>
@@ -1733,6 +1727,7 @@ facsimile guidelines for embedded transcriptions.</p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../plugins.html">Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../options.html">Option Groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tei.html">TEI</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Docs</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="">nidaba package</a></li>
 </ul>
