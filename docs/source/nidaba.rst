@@ -92,6 +92,22 @@ nidaba.storage module
     :undoc-members:
     :show-inheritance:
 
+nidaba.tei module
+-----------------
+
+.. automodule:: nidaba.tei
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+nidaba.uzn module
+-----------------
+
+.. automodule:: nidaba.uzn
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

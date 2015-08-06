@@ -16,6 +16,7 @@ distribute the execution of this software to multiple machines.
 
         Plugins <plugins>
         Option Groups <options>
+        TEI <tei>
         API Docs <source/modules>
 
 Nidaba does a bunch of things for you:
@@ -25,8 +26,10 @@ Nidaba does a bunch of things for you:
 - `Deskewing <http://www.leptonica.com/skew-measurement.html>`_
 - `Dewarping <http://www.leptonica.com/dewarping.html>`_
 - `OCR <http://en.wikipedia.org/wiki/Optical_character_recognition>`_
-- Output merging
+- Output merging (adapted from Bruce Robertson's `rigaudon
+  <https://github.com/brobertson/rigaudon>`_)
 - :ref:`Spell-checking <spell-checking>`
+- :ref:`TEI output <tei_output>`
 
 .. _installation:
 
