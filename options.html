@@ -161,7 +161,8 @@ resulting deletion dictionary will be 750Mb large.</p>
 <dt id="nidaba.tasks.postprocessing.spell_check">
 <code class="descclassname">nidaba.tasks.postprocessing.</code><code class="descname">spell_check</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>language</em>, <em>filter_punctuation</em>, <em>no_ocrx_words</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.postprocessing.spell_check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds spelling suggestions to an TEI XML document.</p>
-<p>Alternative spellings for each hocr <code class="docutils literal"><span class="pre">ocrx_word</span></code> span are created using
+<p>Alternative spellings for each segment
+Alternative spellings for each hocr <code class="docutils literal"><span class="pre">ocrx_word</span></code> span are created using
 the INS-DEL syntax defined for alternative readings in the hOCR
 specification. Correct words, i.e. words appearing verbatim in the
 dictionary, are left untouched; words not appearing in the dictionary and
@@ -198,14 +199,22 @@ be set to <code class="docutils literal"><span class="pre">auto</span></code>, <
 <div class="section" id="output-merging">
 <span id="merging"></span><h2>Output Merging<a class="headerlink" href="#output-merging" title="Permalink to this headline">¶</a></h2>
 <p>There is a rudimentary merging algorithm able to combine multiple recognition
-results into a single document if certain conditions are met. It has been
-ported from Bruce Robertson&#8217;s <a class="reference external" href="https://github.com/brobertson/rigaudon">rigaudon</a>, an OCR engine for polytonic Greek.</p>
-<p>Its basic operation is as follows. First (word) bboxes from all documents are
-roughly matched, then all matching bboxes are scored using a spell checker. If
-no spell checker is available all matches will be merged without ranking.</p>
-<p>The matching is naive, i.e. we just grab the first input document and assume
-that all other documents have similar segmentation results. Issues like high
-variance in segmentation, especially word boundaries are not accounted for.</p>
+results into a single document if certain conditions are met. The combined
+output can then be used for further postprocessing, e.g manual correction or
+lexicality based weighting. It has been ported from Bruce Robertson&#8217;s
+<a class="reference external" href="https://github.com/brobertson/rigaudon">rigaudon</a>, an OCR engine for
+polytonic Greek.</p>
+<p>Currently, its basic operation is as follows. First (word) bboxes from all
+documents are roughly matched, then all matching bboxes are scored using a
+spell checker. If no spell checker is available all matches will be merged
+without ranking.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The matching is naive, i.e. we just grab the first input document and
+assume that all other documents have similar segmentation results.
+Issues like high variance in segmentation, especially word boundaries
+are not accounted for.</p>
+</div>
 <div class="section" id="id6">
 <h3>Options and Syntax<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <dl class="function">

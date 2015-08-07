@@ -304,34 +304,6 @@ unicode objects.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="nidaba.lex.hocr_spellcheck">
-<code class="descclassname">nidaba.lex.</code><code class="descname">hocr_spellcheck</code><span class="sig-paren">(</span><em>path</em>, <em>dictionary</em>, <em>deletion_dictionary</em>, <em>filter_punctuation=False</em>, <em>no_ocrx_words=u'auto'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.hocr_spellcheck" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs a spell check on an hOCR document.</p>
-<p>Each <code class="docutils literal"><span class="pre">ocrx_word</span></code> span is treated as a single word and spelling
-corrections will be inserted using INS, DEL elements inside a span with
-class <code class="docutils literal"><span class="pre">alternatives</span></code>. Correct words are left untouched. The edit distance
-of each suggestion is specified in an <code class="docutils literal"><span class="pre">x_cost</span></code> property on each element.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>path</strong> (<em>unicode</em>) &#8211; Path to an hOCR file.</li>
-<li><strong>dictionary</strong> (<em>unicode</em>) &#8211; Path to a base dictionary.</li>
-<li><strong>deletion_dictionary</strong> (<em>unicode</em>) &#8211; Path to a deletion dictionary.</li>
-<li><strong>filter_punctuation</strong> (<em>bool</em>) &#8211; Switch to filter punctuation inside
-<code class="docutils literal"><span class="pre">ocrx_words</span></code></li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A unicode string of the new hOCR document.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
 <dt id="nidaba.lex.make_deldict">
 <code class="descclassname">nidaba.lex.</code><code class="descname">make_deldict</code><span class="sig-paren">(</span><em>outpath</em>, <em>words</em>, <em>depth</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.make_deldict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a symmetric deletion dictionary from the specified word list.</p>
@@ -397,6 +369,34 @@ of suggestions for each character sequence that is not contained
 verbatim in the dictionary. Tokens that are not recognized as valid
 words but don&#8217;t have spelling suggestions either will be contained in
 the result dictionary.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.lex.tei_spellcheck">
+<code class="descclassname">nidaba.lex.</code><code class="descname">tei_spellcheck</code><span class="sig-paren">(</span><em>path</em>, <em>dictionary</em>, <em>deletion_dictionary</em>, <em>filter_punctuation=False</em>, <em>no_words=u'auto'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.tei_spellcheck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a spell check on an TEI XML document.</p>
+<p>Each <code class="docutils literal"><span class="pre">ocrx_word</span></code> span is treated as a single word and spelling
+corrections will be inserted using INS, DEL elements inside a span with
+class <code class="docutils literal"><span class="pre">alternatives</span></code>. Correct words are left untouched. The edit distance
+of each suggestion is specified in an <code class="docutils literal"><span class="pre">x_cost</span></code> property on each element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>unicode</em>) &#8211; Path to an hOCR file.</li>
+<li><strong>dictionary</strong> (<em>unicode</em>) &#8211; Path to a base dictionary.</li>
+<li><strong>deletion_dictionary</strong> (<em>unicode</em>) &#8211; Path to a deletion dictionary.</li>
+<li><strong>filter_punctuation</strong> (<em>bool</em>) &#8211; Switch to filter punctuation inside
+<code class="docutils literal"><span class="pre">ocrx_words</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A unicode string of the new hOCR document.</p>
 </td>
 </tr>
 </tbody>
