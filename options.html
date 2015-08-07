@@ -159,8 +159,8 @@ resulting deletion dictionary will be 750Mb large.</p>
 <h3>Options and Syntax<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="nidaba.tasks.postprocessing.spell_check">
-<code class="descclassname">nidaba.tasks.postprocessing.</code><code class="descname">spell_check</code><span class="sig-paren">(</span><em>doc</em>, <em>method=u'spell_check'</em>, <em>language=u''</em>, <em>filter_punctuation=False</em>, <em>no_ocrx_words=u'auto'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.postprocessing.spell_check" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds spelling suggestions to an hOCR document.</p>
+<code class="descclassname">nidaba.tasks.postprocessing.</code><code class="descname">spell_check</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>language</em>, <em>filter_punctuation</em>, <em>no_ocrx_words</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.postprocessing.spell_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds spelling suggestions to an TEI XML document.</p>
 <p>Alternative spellings for each hocr <code class="docutils literal"><span class="pre">ocrx_word</span></code> span are created using
 the INS-DEL syntax defined for alternative readings in the hOCR
 specification. Correct words, i.e. words appearing verbatim in the
@@ -195,8 +195,53 @@ be set to <code class="docutils literal"><span class="pre">auto</span></code>, <
 
 </div>
 </div>
+<div class="section" id="output-merging">
+<span id="merging"></span><h2>Output Merging<a class="headerlink" href="#output-merging" title="Permalink to this headline">¶</a></h2>
+<p>There is a rudimentary merging algorithm able to combine multiple recognition
+results into a single document if certain conditions are met. It has been
+ported from Bruce Robertson&#8217;s <a class="reference external" href="https://github.com/brobertson/rigaudon">rigaudon</a>, an OCR engine for polytonic Greek.</p>
+<p>Its basic operation is as follows. First (word) bboxes from all documents are
+roughly matched, then all matching bboxes are scored using a spell checker. If
+no spell checker is available all matches will be merged without ranking.</p>
+<p>The matching is naive, i.e. we just grab the first input document and assume
+that all other documents have similar segmentation results. Issues like high
+variance in segmentation, especially word boundaries are not accounted for.</p>
+<div class="section" id="id6">
+<h3>Options and Syntax<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="nidaba.tasks.postprocessing.blend_hocr">
+<code class="descclassname">nidaba.tasks.postprocessing.</code><code class="descname">blend_hocr</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>language</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.postprocessing.blend_hocr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Blends multiple hOCR files using the algorithm from Bruce Robertsons
+rigaudon. It requires a working spell checking for the input document&#8217;s
+language; otherwise all matched bboxes will be bunched together without any
+scoring.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>[(id, path), ...]</strong> (<em>doc</em>) &#8211; A list of storage module tupels that will be</li>
+<li><strong>into a single output document.</strong> (<em>merged</em>) &#8211; </li>
+<li><strong>language</strong> (<em>unicode</em>) &#8211; Language used for spell-checking based scoring. If
+not defined no scoring will be used.</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to the output file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output document</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
 <div class="section" id="metrics">
-<span id="id6"></span><h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
+<span id="id7"></span><h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -240,6 +285,7 @@ be set to <code class="docutils literal"><span class="pre">auto</span></code>, <
 <li class="toctree-l2"><a class="reference internal" href="#page-segmentation">Page Segmentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#optical-character-recognition">Optical Character Recognition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spell-checking">Spell Checking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#output-merging">Output Merging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#metrics">Metrics</a></li>
 </ul>
 </li>

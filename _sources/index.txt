@@ -26,8 +26,7 @@ Nidaba does a bunch of things for you:
 - `Deskewing <http://www.leptonica.com/skew-measurement.html>`_
 - `Dewarping <http://www.leptonica.com/dewarping.html>`_
 - `OCR <http://en.wikipedia.org/wiki/Optical_character_recognition>`_
-- Output merging (adapted from Bruce Robertson's `rigaudon
-  <https://github.com/brobertson/rigaudon>`_)
+- :ref:`Output merging <merging>` 
 - :ref:`Spell-checking <spell-checking>`
 - :ref:`TEI output <tei_output>`
 
