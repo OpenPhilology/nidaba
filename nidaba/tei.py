@@ -13,6 +13,7 @@ from lxml import etree
 from lxml.etree import Element, SubElement
 
 from collections import OrderedDict
+from copy import deepcopy
 
 from nidaba.nidabaexceptions import NidabaTEIException
 
@@ -337,8 +338,9 @@ class TEIFacsimile(object):
 
         Args:
             it (iterable): An iterable returning a tuple containing a glyph
-            (unicode), and optionally the bounding box of this glyph (x0, y0,
-            x1, y1) and a recognition confidence value in the range 0 and 100.
+                           (unicode), and optionally the bounding box of this
+                           glyph (x0, y0, x1, y1) and a recognition confidence
+                           value in the range 0 and 100.
         """
         scope = self.word_scope if self.word_scope is not None else self.line_scope
         for t in it:
@@ -369,6 +371,36 @@ class TEIFacsimile(object):
                     cert.set('resp', '#' + self.resp)
             if self.resp:
                 glyph.set('resp', '#' + self.resp)
+    
+    def add_choices(self, id, it):
+        """
+        Adds alternative interpretations to an element.
+
+        Args:
+            id (unicode): 
+            it (iterable): An iterable returning a tuple containing an
+                           alternative reading and an optional confidence value
+                           in the range between 0 and 100.
+        """
+        el = self.doc.xpath("//*[@xml:id=$tagid]", tagid = id)[0]
+        sic = deepcopy(el)
+        # remove old tree
+        parent = el.getparent()
+        parent.remove(el)
+        choice = SubElement(parent, self.tei_ns + 'choice')
+        # reinsert beneath sic element
+        SubElement(choice, self.tei_ns + 'sic').append(sic)
+        for alt in it:
+            corr = SubElement(choice, self.tei_ns + 'corr')
+            if self.resp:
+                corr.set('resp', '#' + self.resp)
+            corr.text = alt[0]
+            if len(alt) == 2:
+                cert = SubElement(corr, self.tei_ns + 'certainty',
+                                  degree = u'{0:.2f}'.format(alt[1]/100.0),
+                                  locus = 'value')
+                if self.resp:
+                    cert.set('resp', '#' + self.resp)
 
     def clear_lines(self):
         """
