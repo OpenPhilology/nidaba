@@ -383,13 +383,16 @@ class TEIFacsimile(object):
                            in the range between 0 and 100.
         """
         el = self.doc.xpath("//*[@xml:id=$tagid]", tagid = id)[0]
-        sic = deepcopy(el)
-        # remove old tree
+        # remove old tree only if not already part of an choice segment.
         parent = el.getparent()
-        parent.remove(el)
-        choice = SubElement(parent, self.tei_ns + 'choice')
-        # reinsert beneath sic element
-        SubElement(choice, self.tei_ns + 'sic').append(sic)
+        if parent.tag == self.tei_ns + 'sic':
+            choice = parent.find('..')
+        else:
+            sic = deepcopy(el)
+            parent.remove(el)
+            choice = SubElement(parent, self.tei_ns + 'choice')
+            # reinsert beneath sic element
+            SubElement(choice, self.tei_ns + 'sic').append(sic)
         for alt in it:
             corr = SubElement(choice, self.tei_ns + 'corr')
             if self.resp:
