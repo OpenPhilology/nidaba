@@ -26,8 +26,11 @@ class StorageFile(io.IOBase):
         self.fd = io.OpenWrapper(self.path, *args, **kwargs)
 
     def __del__(self):
-        self.fd.close()
-        self.lock.release()
+        try:
+            self.fd.close()
+            self.lock.release()
+        except:
+            pass
 
     def readable():
         return self.fd.readable()
