@@ -303,11 +303,9 @@ def status(verbose, job_id):
     elif state == 'FAILURE':
         ret = batch.get_errors()
         if ret is None:
-            print('Something somewhere went wrong.')
+            click.echo('Something somewhere went wrong.')
         else:
-            for fun in ret:
-                print(fun[0]['method'].encode('utf-8'),
-                      'failed while operating on',
-                      fun[0]['doc'][1].encode('utf-8'),
-                      'which is based on',
-                      fun[1]['root'][1].encode('utf-8'))
+            for task in ret:
+                print(task['task'][0].encode('utf-8'),
+                      'failed. root document: ',
+                      task['root_document'][1].encode('utf-8'))

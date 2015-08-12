@@ -139,10 +139,11 @@ class Batch(object):
             batch = json.loads(batch)
         except:
             return None
-        if len(batch['errors']) > 0:
-            return batch['errors']
-
-        return None
+        errors = []
+        for subtask in batch.itervalues():
+            if subtask['state'] == 'FAILURE':
+                errors.append(subtask)
+        return errors
 
     def get_results(self):
         """
