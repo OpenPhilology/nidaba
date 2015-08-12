@@ -21,13 +21,13 @@ class StorageFile(io.IOBase):
 
     def __init__(self, jobID, path, *args, **kwargs):
         self.path = get_abs_path(jobID, path)
-        lock(self.path)
-        lock.acquire()
-        self.fd = io.OpenWrapper(path, *args, **kwargs)
+        self.lock = lock(self.path)
+        self.lock.acquire()
+        self.fd = io.OpenWrapper(self.path, *args, **kwargs)
 
     def __del__(self):
-        super(self)
-        lock.release()
+        self.fd.close()
+        self.lock.release()
 
     def readable():
         return self.fd.readable()
@@ -38,8 +38,8 @@ class StorageFile(io.IOBase):
     def seekable():
         return self.fd.seekable()
 
-    def read(self, size):
-        return self.fd
+    def read(self, size=-1):
+        return self.fd.read(size)
 
     def readall(self):
         return self.fd.readall()
