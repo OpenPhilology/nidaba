@@ -15,10 +15,12 @@ import difflib
 from lxml import html
 from pyxdameraulevenshtein import normalized_damerau_levenshtein_distance
 
-from nidaba.algorithms.string import sanitize
-from nidaba.tasks.helper import NidabaTask
-from nidaba.celery import app
 from nidaba import storage
+from nidaba.tei import TEIFacsimile
+from nidaba.celery import app
+from nidaba.tasks.helper import NidabaTask
+from nidaba.algorithms.string import sanitize
+from nidaba.nidabaexceptions import NidabaInvalidParameterException
 
 
 def cleanup(text):
@@ -31,7 +33,7 @@ def cleanup(text):
 
 @app.task(base=NidabaTask, name=u'nidaba.stats.text_diff_ratio')
 def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
-                    hocr_in=True, hocr_gt=False, clean_in=True, clean_gt=True,
+                    xml_in=True, gt_format=u'tei', clean_in=True, clean_gt=True,
                     divert=True):
     """
     Calculates the similarity of the input documents and a given ground truth
@@ -42,8 +44,9 @@ def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
         doc (unicode, unicode): The input document tuple
         method (unicode): The suffix string appended to the output file.
         ground_truth (unicode): Ground truth location tuple
-        hocr_in (bool): Switch to treat input as a hOCR document.
-        hocr_gt (bool): Switch to treat ground truth as a hOCR document.
+        xml_in (bool): Switch to treat input as an TEI-XML document.
+        gt_format (unicode): Switch to select ground truth format. Valid values
+                             are 'tei', 'hocr', and 'text'.
         divert (bool): Switch selecting output diversion. If enabled the output
                        will be added to the tracking arguments and the input
                        document will be returned as the result of the task. Use
@@ -56,12 +59,24 @@ def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
     input_path = storage.get_abs_path(*doc[0])
     output_path = storage.insert_suffix(input_path, method,
                                         os.path.basename(input_path))
-    text = storage.retrieve_text(*doc)[doc[1]]
-    gt = storage.retrieve_text(*ground_truth)[ground_truth[1]]
-    if hocr_in:
-        text = html.fromstring(text.encode('utf-8')).text_content()
-    if hocr_gt:
-        gt = html.fromstring(gt.encode('utf-8')).text_content()
+    with storage.StorageFile(*ground_truth) as fp:
+        if gt_format == 'tei':
+            tei = TEIFacsimile()
+            tei.read(fp)
+            gt = '\n'.join(x[-1] for x in tei.lines)
+        elif gt_format == 'hocr':
+            gt = html.parse(fp).text_content()
+        elif gt_format == 'text':
+            gt = fp.read()
+        else:
+            raise NidabaInvalidParameterException('Input format ' + gt_format + ' unknown.')
+    with storage.StorageFile(*doc) as fp:
+        if xml_in:
+            tei = TEIFacsimile()
+            tei.read(fp)
+            text = '\n'.join(x[-1] for x in tei.lines)
+        else:
+           text = fp.read()
     if clean_in:
         text = cleanup(text)
     if clean_gt:
@@ -77,7 +92,7 @@ def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
 
 @app.task(base=NidabaTask, name=u'nidaba.stats.text_edit_ratio')
 def text_edit_ratio(doc, method=u'text_edit_ratio', ground_truth=None,
-                    hocr_in=True, hocr_gt=False, clean_in=True, clean_gt=True,
+                    xml_in=True, gt_format='tei', clean_in=True, clean_gt=True,
                     divert=True):
     """
     Calculates the similarity of the input documents and a given ground truth
@@ -88,8 +103,9 @@ def text_edit_ratio(doc, method=u'text_edit_ratio', ground_truth=None,
         doc (unicode, unicode): The input document tuple
         method (unicode): The suffix string appended to the output file.
         ground_truth (unicode): Ground truth location tuple
-        hocr_in (bool): Switch to treat input as a hOCR document.
-        hocr_gt (bool): Switch to treat ground truth as a hOCR document.
+        xml_in (bool): Switch to treat input as an TEI-XML document.
+        gt_format (unicode): Switch to select ground truth format. Valid values
+                             are 'tei', 'hocr', and 'text'.
         divert (bool): Switch selecting output diversion. If enabled the output
                        will be added to the tracking arguments and the input
                        document will be returned as the result of the task. Use
@@ -102,12 +118,24 @@ def text_edit_ratio(doc, method=u'text_edit_ratio', ground_truth=None,
     input_path = storage.get_abs_path(*doc[0])
     output_path = storage.insert_suffix(input_path, method,
                                         os.path.basename(input_path))
-    text = storage.retrieve_text(*doc)[doc[1]]
-    gt = storage.retrieve_text(*ground_truth)[ground_truth[1]]
-    if hocr_in:
-        text = html.fromstring(text.encode('utf-8')).text_content()
-    if hocr_gt:
-        gt = html.fromstring(gt.encode('utf-8')).text_content()
+    with storage.StorageFile(*ground_truth) as fp:
+        if gt_format == 'tei':
+            tei = TEIFacsimile()
+            tei.read(fp)
+            gt = '\n'.join(x[-1] for x in tei.lines)
+        elif gt_format == 'hocr':
+            gt = html.parse(fp).text_content()
+        elif gt_format == 'text':
+            gt = fp.read()
+        else:
+            raise NidabaInvalidParameterException('Input format ' + gt_format + ' unknown.')
+    with storage.StorageFile(*doc) as fp:
+        if xml_in:
+            tei = TEIFacsimile()
+            tei.read(fp)
+            text = '\n'.join(x[-1] for x in tei.lines)
+        else:
+           text = fp.read()
     if clean_in:
         text = cleanup(text)
     if clean_gt:
