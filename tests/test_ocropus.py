@@ -56,7 +56,7 @@ class OcropusTests(unittest.TestCase):
         """
         Test that output is placed in the correct directory.
         """
-        ocr = self.ocropus.ocr_ocropus.run((('test', 'image.uzn'),
+        ocr = self.ocropus.ocr_ocropus.run((('test', 'segmentation.xml'),
                                             ('test', 'image_png.png')),
                                            model='ocropus')
         try:
@@ -69,7 +69,7 @@ class OcropusTests(unittest.TestCase):
         """
         Test that ocropus creates hocr output for pngs.
         """
-        ocr = self.ocropus.ocr_ocropus.run((('test', 'image.uzn'),
+        ocr = self.ocropus.ocr_ocropus.run((('test', 'segmentation.xml'),
                                             ('test', 'image_png.png')),
                                            model='ocropus')
         try:
@@ -82,7 +82,7 @@ class OcropusTests(unittest.TestCase):
         """
         Test that ocropus creates hocr output for tiffs.
         """
-        ocr = self.ocropus.ocr_ocropus.run((('test', 'image.uzn'),
+        ocr = self.ocropus.ocr_ocropus.run((('test', 'segmentation.xml'),
                                             ('test', 'image_tiff.tiff')),
                                            model='ocropus')
         try:
@@ -95,7 +95,7 @@ class OcropusTests(unittest.TestCase):
         """
         Test that ocropus creates hocr output for jpgs.
         """
-        ocr = self.ocropus.ocr_ocropus.run((('test', 'image.uzn'),
+        ocr = self.ocropus.ocr_ocropus.run((('test', 'segmentation.xml'),
                                             ('test', 'image_jpg.jpg')),
                                            model='ocropus')
         try:

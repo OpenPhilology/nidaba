@@ -126,7 +126,37 @@ resulting deletion dictionary will be 750Mb large.
 Options and Syntax
 ------------------
 
-.. autofunction:: nidaba.tasks.postprocessing.spell_check(doc, method=u'spell_check', language=u'', filter_punctuation=False, no_ocrx_words=u'auto')
+.. autofunction:: nidaba.tasks.postprocessing.spell_check(doc, method, language, filter_punctuation, no_ocrx_words)
+
+
+.. _merging:
+
+Output Merging
+==============
+
+There is a rudimentary merging algorithm able to combine multiple recognition
+results into a single document if certain conditions are met. The combined
+output can then be used for further postprocessing, e.g manual correction or
+lexicality based weighting. It has been ported from Bruce Robertson's
+`rigaudon <https://github.com/brobertson/rigaudon>`_, an OCR engine for
+polytonic Greek.
+
+Currently, its basic operation is as follows. First (word) bboxes from all
+documents are roughly matched, then all matching bboxes are scored using a
+spell checker. If no spell checker is available all matches will be merged
+without ranking.
+
+.. note::
+
+        The matching is naive, i.e. we just grab the first input document and
+        assume that all other documents have similar segmentation results.
+        Issues like high variance in segmentation, especially word boundaries
+        are not accounted for.
+       
+Options and Syntax
+------------------
+
+.. autofunction:: nidaba.tasks.postprocessing.blend_hocr(doc, method, language)
 
 .. _metrics:
 

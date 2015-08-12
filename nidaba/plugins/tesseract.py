@@ -143,7 +143,7 @@ def segmentation_tesseract(doc, method=u'segment_tesseract'):
         raise NidabaTesseractException('Tesseract initialization failed.')
 
     # only do segmentation and script detection
-    tesseract.TessBaseAPISetPageSegMode(api, 2)
+    tesseract.TessBaseAPISetPageSegMode(api, 4)
     tesseract.TessBaseAPIProcessPages(api, input_path.encode('utf-8'), None, 0, None)
     it = tesseract.TessBaseAPIAnalyseLayout(api)
     x0, y0, x1, y1 = (ctypes.c_int(), ctypes.c_int(), ctypes.c_int(),
@@ -222,10 +222,10 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
 
     if implementation == 'legacy':
         result_path = output_path + '.html'
-        ocr_direct(image_path, output_path, seg, languages)
+        ocr_direct(image_path, output_path, languages)
     elif implementation == 'direct':
         result_path = output_path + '.hocr'
-        ocr_direct(image_path, output_path, seg, languages)
+        ocr_direct(image_path, output_path, languages)
     elif implementation == 'capi':
         result_path = output_path + '.xml'
         ocr_capi(image_path, result_path, seg, languages, extended)
@@ -325,8 +325,9 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                                                       ctypes.byref(y0),
                                                       ctypes.byref(x1),
                                                       ctypes.byref(y1))
+                conf = tesseract.TessResultIteratorConfidence(ri, RIL_WORD)
                 facsimile.add_segment((x0.value, y0.value, x1.value, y1.value),
-                                      lang)
+                                      lang, conf)
             
             conf = tesseract.TessResultIteratorConfidence(ri, RIL_SYMBOL)
             tesseract.TessPageIteratorBoundingBox(pi, RIL_SYMBOL,
@@ -354,7 +355,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
     tesseract.TessBaseAPIDelete(api)
 
 
-def ocr_direct(image_path, output_path, facsimile, languages):
+def ocr_direct(image_path, output_path, languages):
     """
     OCRs an image by calling the tesseract executable directly. Images are read
     using the linked leptonica library and the given output_path WILL be
@@ -363,8 +364,6 @@ def ocr_direct(image_path, output_path, facsimile, languages):
     Args:
         image_path (unicode): Path to the input image
         output_path (unicode): Path to the hOCR output
-        facsimile (nidaba.tei.TEIFacsimile): Facsimile object of the
-                                             segmentation
         languages (list): List of valid tesseract language identifiers
     """
     p = subprocess.Popen(['tesseract', image_path, output_path, '-l',

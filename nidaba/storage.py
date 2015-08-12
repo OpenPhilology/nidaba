@@ -3,14 +3,91 @@
 
 from __future__ import absolute_import
 
+
 from nidaba.lock import lock
 from nidaba.config import nidaba_cfg
 from nidaba.nidabaexceptions import (NidabaStorageViolationException,
                                      NidabaNoSuchStorageBin)
 
+import io
 import os
 import fnmatch
 import re
+
+class StorageFile(io.IOBase):
+    """
+    A file-like interface to a file on the storage medium.
+    """
+
+    def __init__(self, jobID, path, *args, **kwargs):
+        self.path = get_abs_path(jobID, path)
+        self.lock = lock(self.path)
+        self.lock.acquire()
+        self.fd = io.OpenWrapper(self.path, *args, **kwargs)
+
+    def __del__(self):
+        try:
+            self.fd.close()
+            self.lock.release()
+        except:
+            pass
+
+    def readable():
+        return self.fd.readable()
+
+    def writable():
+        return self.fd.writable()
+
+    def seekable():
+        return self.fd.seekable()
+
+    def read(self, size=-1):
+        return self.fd.read(size)
+
+    def readall(self):
+        return self.fd.readall()
+
+    def readinto(self, b):
+        return self.fd.readinto()
+
+    def write(self, msg):
+        self.fd.write(msg)
+
+    def writable(self, lines):
+        self.fd.writelines(lines)
+
+    def seek(self, offset):
+        self.fd.seek(offset)
+
+    def tell(self):
+        return self.fd.tell()
+
+    def close(self):
+        self.fd.close()
+
+    @property
+    def closed(self):
+        return self.fd.closed
+
+    def isatty(self):
+        return self.fd.isatty()
+
+    def flush(self):
+        self.fd.flush()
+
+    def readline(self, limit=-1):
+        return self.fd.readline(limit)
+
+    def readlines(self, hint=-1):
+        return self.fd.readlines(hint)
+
+    @property
+    def abs_path(self):
+        return self.path
+
+    @property
+    def storage_path(self):
+        return get_storage_path(self.path)
 
 
 def _sanitize_path(base_path, *paths):
