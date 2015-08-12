@@ -16,59 +16,41 @@ import glob
 import regex
 import nidaba.algorithms.string as alg
 from collections import Counter
-from bs4 import BeautifulSoup, Tag
 
-def hocr_spellcheck(path, dictionary, deletion_dictionary,
-                    filter_punctuation=False, no_ocrx_words=u'auto'):
+
+def tei_spellcheck(facsimile, dictionary, deletion_dictionary,
+                   filter_punctuation=False):
     """
-    Performs a spell check on an hOCR document.
+    Performs a spell check on an TEI XML document.
 
-    Each ``ocrx_word`` span is treated as a single word and spelling
-    corrections will be inserted using INS, DEL elements inside a span with
-    class ``alternatives``. Correct words are left untouched. The edit distance
-    of each suggestion is specified in an ``x_cost`` property on each element.
+    Each ``seg`` element is treated as a single word and spelling corrections
+    will be inserted using a choice tag. Correct words will be untouched and
+    correction candidates will be sorted by edit distance.
 
     Args:
-        path (unicode): Path to an hOCR file.
+        facsimile (nidaba.tei.TEIFacsimile): TEIFacsimile object.
         dictionary (unicode): Path to a base dictionary.
         deletion_dictionary (unicode): Path to a deletion dictionary.
         filter_punctuation (bool): Switch to filter punctuation inside
-                                   ``ocrx_words``
+                                   segments.
 
     Returns:
-        A unicode string of the new hOCR document.
+        A TEIFacsimile object containing the spelling corrections.
     """
-    doc = BeautifulSoup(open(path, 'rb'))
-    # old tesseract versions contain ocr_word spans instead of ocrx_word
-    tokens = doc.find_all(u'span', [u'ocrx_word', u'ocr_word'])
-    if no_ocrx_words == u'true' or not tokens and no_ocrx_words == u'auto':
-        pass
-    # first calculate all suggestions
-    text_tokens = [x.text for x in tokens]
+    text_tokens = [x[-1] for x in facsimile.segments]
     if filter_punctuation:
         text_tokens = [regex.sub('[^\w]', '', x) for x in text_tokens]
     suggestions = spellcheck(text_tokens, dictionary, deletion_dictionary)
-    for token in tokens:
-        key = token.text
+    facsimile.add_respstmt('spell-checker', 'nidaba-levenshtein')
+    for segment in facsimile.segments:
+        key = segment[-1]
         if filter_punctuation:
-            key = regex.sub('[^\w]', '', token.text)
+            key = regex.sub('[^\w]', '', key)
         if key not in suggestions:
             continue
-        new = Tag(name=u'span')
-        new.attrs = token.attrs
-        new.attrs['class'] = u'alternatives'
-        orig = Tag(name=u'ins')
-        orig.string = token.text
-        orig.attrs['class'] = u'alt'
-        new.append(orig)
         for sugg in suggestions[key]:
-            alt = Tag(name=u'del')
-            alt.attrs['class'] = u'alt'
-            alt.attrs['title'] = u'x_cost ' + unicode(alg.edit_distance(key, sugg))
-            alt.string = sugg
-            new.append(alt)
-        token.replace_with(new)
-    return doc.prettify()
+            facsimile.add_choices(segment[-2], [(sugg, 100 - 10*alg.edit_distance(key, sugg))])
+    return facsimile
 
 
 def spellcheck(tokens, dictionary, deletion_dictionary):
@@ -80,7 +62,7 @@ def spellcheck(tokens, dictionary, deletion_dictionary):
     words.
 
     Args:
-        tokens (iterable): An iterable returning a sequences of unicode
+        tokens (iterable): An iterable returning sequences of unicode
                            characters.
         dictionary (unicode): Path to a base dictionary.
         deletion_dictionary (unicode): Path to a deletion dictionary.

@@ -12,22 +12,22 @@ from __future__ import absolute_import, unicode_literals
 from nidaba import storage
 from nidaba import merge_hocr
 from nidaba import lex
-from nidaba.tasks.helper import NidabaTask
 from nidaba.celery import app
+from nidaba.tei import TEIFacsimile
 from nidaba.config import nidaba_cfg
+from nidaba.tasks.helper import NidabaTask
 
 
 @app.task(base=NidabaTask, name=u'nidaba.postprocessing.spell_check')
 def spell_check(doc, method=u'spell_check', language=u'',
-                filter_punctuation=False, no_ocrx_words=u'auto'):
+                filter_punctuation=False):
     """
-    Adds spelling suggestions to an hOCR document. 
+    Adds spelling suggestions to an TEI XML document. 
 
-    Alternative spellings for each hocr ``ocrx_word`` span are created using
-    the INS-DEL syntax defined for alternative readings in the hOCR
-    specification. Correct words, i.e. words appearing verbatim in the
-    dictionary, are left untouched; words not appearing in the dictionary and
-    without suggestions will still be encoded as a 
+    Alternative spellings for each segment will be included in a choice
+    tagcontaining a series of corr tags with the original segment appearing
+    beneath a sic element.  Correct words, i.e. words appearing verbatim in the
+    dictionary, are left untouched.
 
     Args:
         doc (unicode, unicode): The input document tuple.
@@ -35,22 +35,22 @@ def spell_check(doc, method=u'spell_check', language=u'',
         language (unicode): Identifier defined in the nidaba configuration as a
                             valid dictionary.
         filter_punctuation (bool): Switch to filter punctuation inside
-                                   ``ocrx_words``
-        no_ocrx_words (unicode): Fallback switch to extract words from on hOCR
-                                 document without ``ocrx_word`` elements. May
-                                 be set to ``auto``, ``true``, or ``false``.
-
+                                   ``seg``
     Returns:
         (unicode, unicode): Storage tuple of the output document
     """
     input_path = storage.get_abs_path(*doc)
     output_path = storage.insert_suffix(input_path, method, language,
-                                        unicode(filter_punctuation), no_ocrx_words)
+                                        unicode(filter_punctuation))
     dictionary = storage.get_abs_path(*nidaba_cfg['lang_dicts'][language]['dictionary'])
     del_dictionary = storage.get_abs_path(*nidaba_cfg['lang_dicts'][language]['deletion_dictionary'])
-    ret = lex.hocr_spellcheck(input_path, dictionary, del_dictionary,
-                              filter_punctuation, no_ocrx_words)
-    storage.write_text(*storage.get_storage_path(output_path), text=ret)
+    with storage.StorageFile(*doc) as fp:
+        tei = TEIFacsimile()
+        tei.read(fp)
+        ret = lex.tei_spellcheck(tei, dictionary, del_dictionary,
+                                 filter_punctuation)
+    with storage.StorageFile(*storage.get_storage_path(output_path), mode='wb') as fp:
+        ret.write(fp)
     return storage.get_storage_path(output_path)
 
 
