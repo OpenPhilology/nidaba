@@ -13,6 +13,7 @@ from lxml import etree
 from lxml.etree import Element, SubElement
 
 from collections import OrderedDict
+from functools import partial
 from copy import deepcopy
 
 from nidaba.nidabaexceptions import NidabaTEIException
@@ -44,14 +45,63 @@ def _parse_hocr(title):
 
 
 class TEIFacsimile(object):
-
-    xml_ns = '{http://www.w3.org/XML/1998/namespace}'
-    tei_ns = '{http://www.tei-c.org/ns/1.0}'
-
     """
     A class encapsulating a TEI XML document following the TEI digital
     facsimile guidelines for embedded transcriptions.
     """
+
+    xml_ns = '{http://www.w3.org/XML/1998/namespace}'
+    tei_ns = '{http://www.tei-c.org/ns/1.0}'
+
+    # automatically generated properties and xpath to their location
+    fields = {'title': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns),),
+              'author': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
+              'editor': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
+              'funder': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
+              'principal': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
+              'sponsor': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
+              'meeting': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
+              'edition': ('.//{0}teiHeader//{0}editionStmt'.format(tei_ns),),
+              'availability': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'ref'),
+              'publisher': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'ref'),
+              'distributor': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'ref'),
+              'authority': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'ref'),
+              'idno': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'type'),
+              'pubplace': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns),),
+              'series_title': ('.//{0}teiHeader//{0}seriesStmt'.format(tei_ns),),
+              'note': ('.//{0}teiHeader//{0}notesStmt'.format(tei_ns),),
+              'source_desc': ('.//{0}teiHeader//{0}sourceDesc'.format(tei_ns),),
+             }
+
+    fileDesc = ['titleStmt', 'editionStmt', 'publicationStmt', 'seriesStmt',
+                'notesStmt', 'sourceDesc', ]
+
+    def _generic_getter(self, field):
+        el = self.doc.find(self.fields[field][0] + '/{0}{1}'.format(self.tei_ns, field))
+        if hasattr(el, 'text'):
+            return el.text
+        else:
+            return None
+       
+    def _generic_setter(self, value, field):
+        el = self.doc.find(self.fields[field][0] + '/{0}{1}'.format(self.tei_ns, field))
+        parent = self.doc.find(self.fields[field][0])
+        if parent is None:
+            _, _, stmt = self.fields[field][0].rpartition('}')
+            loc = self.fileDesc.index(stmt)
+            while loc:
+                loc -= 1
+                prev_stmt = self.doc.find('.//{0}{1}'.format(self.tei_ns, self.fileDesc[loc]))
+                if prev_stmt is not None:
+                    break
+            prev_stmt.addnext(Element('{0}{1}'.format(self.tei_ns, stmt)))
+        if el is None:
+            el = SubElement(self.doc.find(self.fields[field][0]), self.tei_ns + field)
+        if isinstance(value, list):
+            el.set(self.fields[field][1], value[1])
+            value = value[0]
+        el.text = value
+
     def __init__(self):
         doc = Element('TEI', nsmap={None: 'http://www.tei-c.org/ns/1.0'},
                       version='5.0')
@@ -76,6 +126,21 @@ class TEIFacsimile(object):
         SubElement(surface, self.tei_ns + 'zone')
 
     @property
+    def lang(self):
+        """
+        The language value of the teiHeader
+        """
+        el = self.doc.find('.//' + self.tei_ns + 'teiHeader')
+        if el is not None:
+            return el.get(self.xml_ns + 'lang')
+        return None
+
+    @lang.setter
+    def lang(self, value):
+        el = self.doc.find('.//' + self.tei_ns + 'teiHeader')
+        el.set(self.xml_ns + 'lang', value)
+
+    @property
     def description(self):
         """
         Returns a tuple containing a source document's path and its dimensions.
@@ -87,80 +152,6 @@ class TEIFacsimile(object):
                 surface.get('lrx'),
                 surface.get('lry'),
                 surface.find(self.tei_ns + 'graphic').get('url'))
-
-    @property
-    def title(self):
-        title = self.doc.find('.//' + self.tei_ns + 'teiHeader//' + self.tei_ns + 'title')
-        if hasattr(title, 'text'):
-            return title.text
-        else:
-            return None
-
-    @title.setter
-    def title(self, value):
-        title = self.doc.find('.//' + self.tei_ns + 'teiHeader//' + self.tei_ns
-                              + 'title')
-        if title is None:
-            title = SubElement(self.doc.find('.//' + self.tei_ns + 'titleStmt'),
-                               self.tei_ns + 'title')
-        title.text = value
-
-    @property
-    def authority(self):
-        authority = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
-                                  self.tei_ns + 'authority')
-        if hasattr(authority, 'text'):
-            return authority.text
-        else:
-            return None
-
-    @authority.setter
-    def authority(self, value):
-        authority = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
-                                  self.tei_ns + 'title')
-        if authority is None:
-            authority = SubElement(self.doc.find('//' + self.tei_ns +
-                                                 'publicationStmt'),
-                                   self.tei_ns + 'authority')
-        authority.text = value
-
-    @property
-    def sourceDesc(self):
-        sourceDesc = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
-                                   self.tei_ns + 'sourceDesc')
-        if hasattr(sourceDesc, 'text'):
-            return sourceDesc.text
-        else:
-            return None
-
-    @sourceDesc.setter
-    def sourceDesc(self, value):
-        sourceDesc = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
-                                   self.tei_ns + 'sourceDesc')
-        if sourceDesc is None:
-            sourceDesc = SubElement(self.doc.find('//' + self.tei_ns +
-                                    'fileDesc'), self.tei_ns + 'sourceDesc')
-        sourceDesc.text = value
-
-    @property
-    def license(self):
-        license = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
-                                self.tei_ns + 'licence')
-        if hasattr(license, 'text'):
-            return license.text
-        else:
-            return None
-
-    @license.setter
-    def license(self, value):
-        license = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
-                                self.tei_ns + 'licence')
-        if license is None:
-            avail = SubElement(self.doc.find('//' + self.tei_ns +
-                               'publicationStmt'), self.tei_ns +
-                               'availability')
-            license = SubElement(avail, self.tei_ns + 'licence')
-        license.text = value
 
     @property
     def respstmt(self):
@@ -516,3 +507,10 @@ class TEIFacsimile(object):
         self.line_cnt = len(list(self.doc.iter(self.tei_ns + 'line'))) - 1
         self.seg_cnt = len(list(self.doc.iter(self.tei_ns + 'seg'))) - 1
         self.grapheme_cnt = len(list(self.doc.iter(self.tei_ns + 'g'))) - 1
+
+
+# populate properties on the class. Note that it operates on the TEIFacsimile
+# class itself.
+for field in TEIFacsimile.fields:
+    setattr(TEIFacsimile, field, property(partial(TEIFacsimile._generic_getter,
+            field=field), partial(TEIFacsimile._generic_setter, field=field)))
