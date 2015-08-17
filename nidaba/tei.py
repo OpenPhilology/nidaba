@@ -469,21 +469,69 @@ class TEIFacsimile(object):
                 if 'bbox' in o:
                     bbox = o['bbox']
                 if 'x_wconf' in o:
-                    confidence = int(o['x_wconf'][0])/100.0
+                    confidence = int(o['x_wconf'][0])
                 self.add_segment(bbox, confidence=confidence)
                 self.add_graphemes(''.join(span.itertext()))
                 if span.tail:
                     self.clear_segment()
-                    self.add_graphemes(span.tail)
+                    # strip trailing whitespace as some engines add it
+                    # arbitrarily or for formatting purposes
+                    self.add_graphemes(span.tail.rstrip())
 
-    def write_hocr(fp):
+    def write_hocr(self, fp):
         """
         Writes the TEI document as an hOCR file.
 
         Args:
             fp (file): File descriptor to write to.
         """
-        pass
+        page = etree.Element('html', xmlns="http://www.w3.org/1999/xhtml")
+        head = SubElement(page, 'head')
+        SubElement(head, 'title').text = self.title
+        SubElement(head, 'meta', name="ocr-system",
+                   content=self.respstmt.values()[-1][self.tei_ns + 'name'])
+        capa = "ocr_page"
+        if self.lines is not None:
+            capa += ", ocr_line"
+        if self.segments is not None:
+            capa += ", ocrx_word"
+        SubElement(head, 'meta', name='ocr-capabilities', content=capa)
+        body = SubElement(page, 'body')
+        ocr_page = SubElement(body, 'div', title='')
+        ocr_page.set('class', 'ocr_page')
+        for line in self.doc.iter(self.tei_ns + 'line'):
+            ocr_line = SubElement(ocr_page, 'span')
+            ocr_line.set('class', 'ocr_line')
+            ocr_line.set('title', 'bbox ' + ' '.join([str(line.get('ulx')),
+                                                      str(line.get('uly')),
+                                                      str(line.get('lrx')),
+                                                      str(line.get('lry'))]))
+            # get text not in word segments interleaved with segments
+            for seg in line.xpath('child::node()'):
+                if isinstance(seg, etree._ElementStringResult):
+                    if ocr_line.text is None:
+                        ocr_line.text = ''
+                    ocr_line.text += seg.text
+                else:
+                    # zone from 
+                    ocrx_word = SubElement(ocr_line, 'span')
+                    ocrx_word.set('class', 'ocrx_word')
+                    title = 'bbox' + ' '.join([str(seg.get('ulx')),
+                                               str(seg.get('uly')),
+                                               str(seg.get('lrx')),
+                                               str(seg.get('lry'))])
+                    cert = seg.find('.//{0}certainty'.format(self.tei_ns))
+                    if cert is not None:
+                        title += '; x_wconf ' + str(int(100.0 *
+                                                    float(cert.get('degree'))))
+                    ocrx_word.set('title', title)
+                    ocrx_word.text = ''.join(seg.itertext())
+            SubElement(ocr_page, 'br')
+        fp.write(etree.tostring(page, pretty_print=True, 
+                 doctype='<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '
+                 'Transitional//EN" '
+                 '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
+                 xml_declaration=True, encoding='utf-8'))
 
     def write(self, fp):
         """
@@ -492,7 +540,8 @@ class TEIFacsimile(object):
         Args:
             fp (file): file object to write to
         """
-        fp.write(etree.tounicode(self.doc).encode('utf-8'))
+        fp.write(etree.tostring(self.doc, pretty_print=True,
+                                xml_declaration=True, encoding='utf-8'))
 
     def read(self, fp):
         """
