@@ -214,8 +214,9 @@ class TEIFacsimile(object):
         lines = []
         for line in self.doc.iter(self.tei_ns + 'line'):
             text = ''.join(line.itertext())
-            lines.append((line.get('ulx'), line.get('uly'), line.get('lrx'),
-                          line.get('lry'), line.get(self.xml_ns + 'id'), text))
+            lines.append((int(line.get('ulx')), int(line.get('uly')),
+                          int(line.get('lrx')), int(line.get('lry')),
+                          line.get(self.xml_ns + 'id'), text))
         return lines
 
     def add_line(self, dim):
@@ -256,19 +257,25 @@ class TEIFacsimile(object):
     def segments(self):
         """
         Returns an reading order sorted list of tuples in the format (x0, y0,
-        x1, y1, id, text).
+        x1, y1, confidence, id, text).
         """
         segments = []
         for seg in self.doc.iter(self.tei_ns + 'seg'):
             text = ''.join(seg.itertext())
             if seg.getparent().get('type') == 'word':
-                bbox = (seg.getparent().get('ulx'),
-                        seg.getparent().get('uly'),
-                        seg.getparent().get('lrx'),
-                        seg.getparent().get('lry'))
+                bbox = (int(seg.getparent().get('ulx')),
+                        int(seg.getparent().get('uly')),
+                        int(seg.getparent().get('lrx')),
+                        int(seg.getparent().get('lry')))
             else:
                 bbox = (None, None, None, None)
-            segments.append(bbox + (seg.get(self.xml_ns + 'id'), text))
+            cert = self.doc.xpath("//*[local-name()='certainty' and @target=$tag]",
+                                  tag = '#' + seg.get(self.xml_ns + 'id'))
+            if len(cert):
+                cert = int(100.0 * float(cert[0].get('degree')))
+            else:
+                cert = None
+            segments.append(bbox + (cert,) + (seg.get(self.xml_ns + 'id'), text))
         return segments
 
     def add_segment(self, dim, lang=None, confidence=None):
@@ -313,13 +320,19 @@ class TEIFacsimile(object):
         for g in self.doc.iter(self.tei_ns + 'g'):
             text = ''.join(g.itertext())
             if g.getparent().get('type') == 'grapheme':
-                bbox = (g.getparent().get('ulx'),
-                        g.getparent().get('uly'),
-                        g.getparent().get('lrx'),
-                        g.getparent().get('lry'))
+                bbox = (int(g.getparent().get('ulx')),
+                        int(g.getparent().get('uly')),
+                        int(g.getparent().get('lrx')),
+                        int(g.getparent().get('lry')))
             else:
                 bbox = (None, None, None, None)
-            graphemes.append(bbox + (g.get(self.xml_ns + 'id'), text))
+            cert = self.doc.xpath("//*[local-name()='certainty' and @target=$tag]",
+                                  tag = '#' + g.get(self.xml_ns + 'id'))
+            if len(cert):
+                cert = int(100.0 * float(cert[0].get('degree')))
+            else:
+                cert = None
+            graphemes.append(bbox + (cert,) + (g.get(self.xml_ns + 'id'), text))
         return graphemes
 
     def add_graphemes(self, it):
@@ -511,12 +524,12 @@ class TEIFacsimile(object):
                 if isinstance(seg, etree._ElementStringResult):
                     if ocr_line.text is None:
                         ocr_line.text = ''
-                    ocr_line.text += seg.text
+                    ocr_line.text += seg
                 else:
                     # zone from 
                     ocrx_word = SubElement(ocr_line, 'span')
                     ocrx_word.set('class', 'ocrx_word')
-                    title = 'bbox' + ' '.join([str(seg.get('ulx')),
+                    title = 'bbox ' + ' '.join([str(seg.get('ulx')),
                                                str(seg.get('uly')),
                                                str(seg.get('lrx')),
                                                str(seg.get('lry'))])
@@ -531,6 +544,33 @@ class TEIFacsimile(object):
                  doctype='<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '
                  'Transitional//EN" '
                  '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
+                 xml_declaration=True, encoding='utf-8'))
+
+    def write_simplexml(self, fp):
+        """
+        Writes the TEI document as a grapheme cloud in a simple XML format. Its basic format is:
+
+        <text>
+        <charParams l="0" r="78" t="6" b="89" charConfidence="76">D</charParams>
+        <charParams l="86" r="111" t="24" b="89" charConfidence="76">e</charParams>
+        ....
+        </text>
+
+        Args:
+            fp (file): File descriptor to write to.
+        """
+        page = etree.Element('text')
+        for g in self.graphemes:
+            el = SubElement(page, 'charParams')
+            el.text = g[-1]
+            if g[0] is not None:
+                el.set('l', str(g[0]))
+                el.set('t', str(g[1]))
+                el.set('r', str(g[2]))
+                el.set('b', str(g[3]))
+            if g[-3] is not None:
+                el.set('charConfidence', str(g[-3]))
+        fp.write(etree.tostring(page, pretty_print=True,
                  xml_declaration=True, encoding='utf-8'))
 
     def write(self, fp):
