@@ -158,6 +158,10 @@ def move_to_storage(id, kwargs):
               callback=validate_definition, help='A configuration for a '
               'single postprocessing task in the format '
               'task:param1,param2;param1;param1...')
+@click.option('--output', '-f', multiple=True,
+              callback=validate_definition, help='A configuration for a '
+              'single output layer transformation in the format'
+              'task:param1,param2;param1;param1...')
 #@click.option('--willitblend', 'blend',  default=False, help='Blend all '
 #              'output files into a single hOCR document.', is_flag=True)
 @click.option('--grayscale', default=False, help='Skip grayscale '
@@ -170,7 +174,7 @@ def move_to_storage(id, kwargs):
               help='Accesses the documentation of all tasks contained in '
               'nidaba itself and in configured plugins.')
 @click.argument('files', type=click.Path(exists=True), nargs=-1, required=True)
-def batch(files, binarize, ocr, segmentation, stats, postprocessing,
+def batch(files, binarize, ocr, segmentation, stats, postprocessing, output,
           grayscale, jobid, help_tasks):
     """
     Add a new job to the pipeline.
@@ -221,6 +225,12 @@ def batch(files, binarize, ocr, segmentation, stats, postprocessing,
     if postprocessing:
         batch.add_tick()
         for alg in postprocessing:
+            for kwargs in alg[1]:
+                kwargs = move_to_storage(id, kwargs)
+                batch.add_task(alg[0], **kwargs)
+    if output:
+        batch.add_tick()
+        for alg in output:
             for kwargs in alg[1]:
                 kwargs = move_to_storage(id, kwargs)
                 batch.add_task(alg[0], **kwargs)

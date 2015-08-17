@@ -13,6 +13,7 @@ from lxml import etree
 from lxml.etree import Element, SubElement
 
 from collections import OrderedDict
+from functools import partial
 from copy import deepcopy
 
 from nidaba.nidabaexceptions import NidabaTEIException
@@ -44,14 +45,63 @@ def _parse_hocr(title):
 
 
 class TEIFacsimile(object):
-
-    xml_ns = '{http://www.w3.org/XML/1998/namespace}'
-    tei_ns = '{http://www.tei-c.org/ns/1.0}'
-
     """
     A class encapsulating a TEI XML document following the TEI digital
     facsimile guidelines for embedded transcriptions.
     """
+
+    xml_ns = '{http://www.w3.org/XML/1998/namespace}'
+    tei_ns = '{http://www.tei-c.org/ns/1.0}'
+
+    # automatically generated properties and xpath to their location
+    fields = {'title': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns),),
+              'author': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
+              'editor': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
+              'funder': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
+              'principal': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
+              'sponsor': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
+              'meeting': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
+              'edition': ('.//{0}teiHeader//{0}editionStmt'.format(tei_ns),),
+              'availability': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'ref'),
+              'publisher': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'ref'),
+              'distributor': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'ref'),
+              'authority': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'ref'),
+              'idno': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'type'),
+              'pubplace': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns),),
+              'series_title': ('.//{0}teiHeader//{0}seriesStmt'.format(tei_ns),),
+              'note': ('.//{0}teiHeader//{0}notesStmt'.format(tei_ns),),
+              'source_desc': ('.//{0}teiHeader//{0}sourceDesc'.format(tei_ns),),
+             }
+
+    fileDesc = ['titleStmt', 'editionStmt', 'publicationStmt', 'seriesStmt',
+                'notesStmt', 'sourceDesc', ]
+
+    def _generic_getter(self, field):
+        el = self.doc.find(self.fields[field][0] + '/{0}{1}'.format(self.tei_ns, field))
+        if hasattr(el, 'text'):
+            return el.text
+        else:
+            return None
+       
+    def _generic_setter(self, value, field):
+        el = self.doc.find(self.fields[field][0] + '/{0}{1}'.format(self.tei_ns, field))
+        parent = self.doc.find(self.fields[field][0])
+        if parent is None:
+            _, _, stmt = self.fields[field][0].rpartition('}')
+            loc = self.fileDesc.index(stmt)
+            while loc:
+                loc -= 1
+                prev_stmt = self.doc.find('.//{0}{1}'.format(self.tei_ns, self.fileDesc[loc]))
+                if prev_stmt is not None:
+                    break
+            prev_stmt.addnext(Element('{0}{1}'.format(self.tei_ns, stmt)))
+        if el is None:
+            el = SubElement(self.doc.find(self.fields[field][0]), self.tei_ns + field)
+        if isinstance(value, list):
+            el.set(self.fields[field][1], value[1])
+            value = value[0]
+        el.text = value
+
     def __init__(self):
         doc = Element('TEI', nsmap={None: 'http://www.tei-c.org/ns/1.0'},
                       version='5.0')
@@ -76,6 +126,21 @@ class TEIFacsimile(object):
         SubElement(surface, self.tei_ns + 'zone')
 
     @property
+    def lang(self):
+        """
+        The language value of the teiHeader
+        """
+        el = self.doc.find('.//' + self.tei_ns + 'teiHeader')
+        if el is not None:
+            return el.get(self.xml_ns + 'lang')
+        return None
+
+    @lang.setter
+    def lang(self, value):
+        el = self.doc.find('.//' + self.tei_ns + 'teiHeader')
+        el.set(self.xml_ns + 'lang', value)
+
+    @property
     def description(self):
         """
         Returns a tuple containing a source document's path and its dimensions.
@@ -87,80 +152,6 @@ class TEIFacsimile(object):
                 surface.get('lrx'),
                 surface.get('lry'),
                 surface.find(self.tei_ns + 'graphic').get('url'))
-
-    @property
-    def title(self):
-        title = self.doc.find('.//' + self.tei_ns + 'teiHeader//' + self.tei_ns + 'title')
-        if hasattr(title, 'text'):
-            return title.text
-        else:
-            return None
-
-    @title.setter
-    def title(self, value):
-        title = self.doc.find('.//' + self.tei_ns + 'teiHeader//' + self.tei_ns
-                              + 'title')
-        if title is None:
-            title = SubElement(self.doc.find('.//' + self.tei_ns + 'titleStmt'),
-                               self.tei_ns + 'title')
-        title.text = value
-
-    @property
-    def authority(self):
-        authority = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
-                                  self.tei_ns + 'authority')
-        if hasattr(authority, 'text'):
-            return authority.text
-        else:
-            return None
-
-    @authority.setter
-    def authority(self, value):
-        authority = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
-                                  self.tei_ns + 'title')
-        if authority is None:
-            authority = SubElement(self.doc.find('//' + self.tei_ns +
-                                                 'publicationStmt'),
-                                   self.tei_ns + 'authority')
-        authority.text = value
-
-    @property
-    def sourceDesc(self):
-        sourceDesc = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
-                                   self.tei_ns + 'sourceDesc')
-        if hasattr(sourceDesc, 'text'):
-            return sourceDesc.text
-        else:
-            return None
-
-    @sourceDesc.setter
-    def sourceDesc(self, value):
-        sourceDesc = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
-                                   self.tei_ns + 'sourceDesc')
-        if sourceDesc is None:
-            sourceDesc = SubElement(self.doc.find('//' + self.tei_ns +
-                                    'fileDesc'), self.tei_ns + 'sourceDesc')
-        sourceDesc.text = value
-
-    @property
-    def license(self):
-        license = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
-                                self.tei_ns + 'licence')
-        if hasattr(license, 'text'):
-            return license.text
-        else:
-            return None
-
-    @license.setter
-    def license(self, value):
-        license = self.doc.find('.//' + self.tei_ns + 'teiHeader//' +
-                                self.tei_ns + 'licence')
-        if license is None:
-            avail = SubElement(self.doc.find('//' + self.tei_ns +
-                               'publicationStmt'), self.tei_ns +
-                               'availability')
-            license = SubElement(avail, self.tei_ns + 'licence')
-        license.text = value
 
     @property
     def respstmt(self):
@@ -223,8 +214,9 @@ class TEIFacsimile(object):
         lines = []
         for line in self.doc.iter(self.tei_ns + 'line'):
             text = ''.join(line.itertext())
-            lines.append((line.get('ulx'), line.get('uly'), line.get('lrx'),
-                          line.get('lry'), line.get(self.xml_ns + 'id'), text))
+            lines.append((int(line.get('ulx')), int(line.get('uly')),
+                          int(line.get('lrx')), int(line.get('lry')),
+                          line.get(self.xml_ns + 'id'), text))
         return lines
 
     def add_line(self, dim):
@@ -265,19 +257,25 @@ class TEIFacsimile(object):
     def segments(self):
         """
         Returns an reading order sorted list of tuples in the format (x0, y0,
-        x1, y1, id, text).
+        x1, y1, confidence, id, text).
         """
         segments = []
         for seg in self.doc.iter(self.tei_ns + 'seg'):
             text = ''.join(seg.itertext())
             if seg.getparent().get('type') == 'word':
-                bbox = (seg.getparent().get('ulx'),
-                        seg.getparent().get('uly'),
-                        seg.getparent().get('lrx'),
-                        seg.getparent().get('lry'))
+                bbox = (int(seg.getparent().get('ulx')),
+                        int(seg.getparent().get('uly')),
+                        int(seg.getparent().get('lrx')),
+                        int(seg.getparent().get('lry')))
             else:
                 bbox = (None, None, None, None)
-            segments.append(bbox + (seg.get(self.xml_ns + 'id'), text))
+            cert = self.doc.xpath("//*[local-name()='certainty' and @target=$tag]",
+                                  tag = '#' + seg.get(self.xml_ns + 'id'))
+            if len(cert):
+                cert = int(100.0 * float(cert[0].get('degree')))
+            else:
+                cert = None
+            segments.append(bbox + (cert,) + (seg.get(self.xml_ns + 'id'), text))
         return segments
 
     def add_segment(self, dim, lang=None, confidence=None):
@@ -322,13 +320,19 @@ class TEIFacsimile(object):
         for g in self.doc.iter(self.tei_ns + 'g'):
             text = ''.join(g.itertext())
             if g.getparent().get('type') == 'grapheme':
-                bbox = (g.getparent().get('ulx'),
-                        g.getparent().get('uly'),
-                        g.getparent().get('lrx'),
-                        g.getparent().get('lry'))
+                bbox = (int(g.getparent().get('ulx')),
+                        int(g.getparent().get('uly')),
+                        int(g.getparent().get('lrx')),
+                        int(g.getparent().get('lry')))
             else:
                 bbox = (None, None, None, None)
-            graphemes.append(bbox + (g.get(self.xml_ns + 'id'), text))
+            cert = self.doc.xpath("//*[local-name()='certainty' and @target=$tag]",
+                                  tag = '#' + g.get(self.xml_ns + 'id'))
+            if len(cert):
+                cert = int(100.0 * float(cert[0].get('degree')))
+            else:
+                cert = None
+            graphemes.append(bbox + (cert,) + (g.get(self.xml_ns + 'id'), text))
         return graphemes
 
     def add_graphemes(self, it):
@@ -478,21 +482,96 @@ class TEIFacsimile(object):
                 if 'bbox' in o:
                     bbox = o['bbox']
                 if 'x_wconf' in o:
-                    confidence = int(o['x_wconf'][0])/100.0
+                    confidence = int(o['x_wconf'][0])
                 self.add_segment(bbox, confidence=confidence)
                 self.add_graphemes(''.join(span.itertext()))
                 if span.tail:
                     self.clear_segment()
-                    self.add_graphemes(span.tail)
+                    # strip trailing whitespace as some engines add it
+                    # arbitrarily or for formatting purposes
+                    self.add_graphemes(span.tail.rstrip())
 
-    def write_hocr(fp):
+    def write_hocr(self, fp):
         """
         Writes the TEI document as an hOCR file.
 
         Args:
             fp (file): File descriptor to write to.
         """
-        pass
+        page = etree.Element('html', xmlns="http://www.w3.org/1999/xhtml")
+        head = SubElement(page, 'head')
+        SubElement(head, 'title').text = self.title
+        SubElement(head, 'meta', name="ocr-system",
+                   content=self.respstmt.values()[-1][self.tei_ns + 'name'])
+        capa = "ocr_page"
+        if self.lines is not None:
+            capa += ", ocr_line"
+        if self.segments is not None:
+            capa += ", ocrx_word"
+        SubElement(head, 'meta', name='ocr-capabilities', content=capa)
+        body = SubElement(page, 'body')
+        ocr_page = SubElement(body, 'div', title='')
+        ocr_page.set('class', 'ocr_page')
+        for line in self.doc.iter(self.tei_ns + 'line'):
+            ocr_line = SubElement(ocr_page, 'span')
+            ocr_line.set('class', 'ocr_line')
+            ocr_line.set('title', 'bbox ' + ' '.join([str(line.get('ulx')),
+                                                      str(line.get('uly')),
+                                                      str(line.get('lrx')),
+                                                      str(line.get('lry'))]))
+            # get text not in word segments interleaved with segments
+            for seg in line.xpath('child::node()'):
+                if isinstance(seg, etree._ElementStringResult):
+                    if ocr_line.text is None:
+                        ocr_line.text = ''
+                    ocr_line.text += seg
+                else:
+                    # zone from 
+                    ocrx_word = SubElement(ocr_line, 'span')
+                    ocrx_word.set('class', 'ocrx_word')
+                    title = 'bbox ' + ' '.join([str(seg.get('ulx')),
+                                               str(seg.get('uly')),
+                                               str(seg.get('lrx')),
+                                               str(seg.get('lry'))])
+                    cert = seg.find('.//{0}certainty'.format(self.tei_ns))
+                    if cert is not None:
+                        title += '; x_wconf ' + str(int(100.0 *
+                                                    float(cert.get('degree'))))
+                    ocrx_word.set('title', title)
+                    ocrx_word.text = ''.join(seg.itertext())
+            SubElement(ocr_page, 'br')
+        fp.write(etree.tostring(page, pretty_print=True, 
+                 doctype='<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '
+                 'Transitional//EN" '
+                 '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
+                 xml_declaration=True, encoding='utf-8'))
+
+    def write_simplexml(self, fp):
+        """
+        Writes the TEI document as a grapheme cloud in a simple XML format. Its basic format is:
+
+        <text>
+        <charParams l="0" r="78" t="6" b="89" charConfidence="76">D</charParams>
+        <charParams l="86" r="111" t="24" b="89" charConfidence="76">e</charParams>
+        ....
+        </text>
+
+        Args:
+            fp (file): File descriptor to write to.
+        """
+        page = etree.Element('text')
+        for g in self.graphemes:
+            el = SubElement(page, 'charParams')
+            el.text = g[-1]
+            if g[0] is not None:
+                el.set('l', str(g[0]))
+                el.set('t', str(g[1]))
+                el.set('r', str(g[2]))
+                el.set('b', str(g[3]))
+            if g[-3] is not None:
+                el.set('charConfidence', str(g[-3]))
+        fp.write(etree.tostring(page, pretty_print=True,
+                 xml_declaration=True, encoding='utf-8'))
 
     def write(self, fp):
         """
@@ -501,7 +580,8 @@ class TEIFacsimile(object):
         Args:
             fp (file): file object to write to
         """
-        fp.write(etree.tounicode(self.doc).encode('utf-8'))
+        fp.write(etree.tostring(self.doc, pretty_print=True,
+                                xml_declaration=True, encoding='utf-8'))
 
     def read(self, fp):
         """
@@ -516,3 +596,10 @@ class TEIFacsimile(object):
         self.line_cnt = len(list(self.doc.iter(self.tei_ns + 'line'))) - 1
         self.seg_cnt = len(list(self.doc.iter(self.tei_ns + 'seg'))) - 1
         self.grapheme_cnt = len(list(self.doc.iter(self.tei_ns + 'g'))) - 1
+
+
+# populate properties on the class. Note that it operates on the TEIFacsimile
+# class itself.
+for field in TEIFacsimile.fields:
+    setattr(TEIFacsimile, field, property(partial(TEIFacsimile._generic_getter,
+            field=field), partial(TEIFacsimile._generic_setter, field=field)))
