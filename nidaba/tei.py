@@ -570,8 +570,18 @@ class TEIFacsimile(object):
                 el.set('b', str(g[3]))
             if g[-3] is not None:
                 el.set('charConfidence', str(g[-3]))
-        fp.write(etree.tostring(page, pretty_print=True,
-                 xml_declaration=True, encoding='utf-8'))
+        fp.write(etree.tostring(page, xml_declaration=True, encoding='utf-8'))
+
+    def write_text(self, fp):
+        """
+        Writes the TEI document as plain text.
+
+        Args:
+            fp (file): File descriptor to write to.
+        """
+        for line in self.lines:
+            fp.write(line[-1].encode('utf-8'))
+            fp.write('\n')
 
     def write(self, fp):
         """
@@ -580,8 +590,8 @@ class TEIFacsimile(object):
         Args:
             fp (file): file object to write to
         """
-        fp.write(etree.tostring(self.doc, pretty_print=True,
-                                xml_declaration=True, encoding='utf-8'))
+        fp.write(etree.tostring(self.doc, xml_declaration=True,
+                                encoding='utf-8'))
 
     def read(self, fp):
         """

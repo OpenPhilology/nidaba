@@ -155,3 +155,22 @@ def tei2hocr(doc, method=u'tei2hocr'):
         tei.write_hocr(fp)
     return (doc[0], output_path)
 
+@app.task(base=NidabaTask, name=u'nidaba.output.tei2txt')
+def tei2hocr(doc, method=u'tei2txt'):
+    """
+    Convert a TEI Facsimile to a plain text file.
+
+    Args:
+        doc (unicode, unicode): Storage tuple of the input document
+
+    Returns:
+        (unicode, unicode): Storage tuple of the output document
+    """
+    with storage.StorageFile(*doc) as fp:
+        tei = TEIFacsimile()
+        tei.read(fp)
+    output_path = storage.insert_suffix(doc[1], method)
+    with storage.StorageFile(doc[0], output_path, 'wb') as fp:
+        tei.write_text(fp)
+    return (doc[0], output_path)
+
