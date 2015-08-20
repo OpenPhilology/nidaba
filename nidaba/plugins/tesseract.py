@@ -214,7 +214,7 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
     with open(splitext(image_path)[0] + '.uzn', 'w') as fp:
         uzn = UZNWriter(fp)
         for line in seg.lines:
-            uzn.writerow(*tuple(int(l) for l in line[:-2]))
+            uzn.writerow(*line[:4])
 
     if isinstance(languages, basestring):
         languages = [languages]
@@ -287,7 +287,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
         tesseract.TessBaseAPIDelete(api)
         raise NidabaTesseractException('Tesseract initialization failed.')
 
-    tesseract.TessBaseAPISetPageSegMode(api, 3)
+    tesseract.TessBaseAPISetPageSegMode(api, 4)
 
     tesseract.TessBaseAPIProcessPages(api, image_path.encode('utf-8'), None, 0, None)
     if tesseract.TessBaseAPIRecognize(api, None):
@@ -315,7 +315,6 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                                                       ctypes.byref(y0),
                                                       ctypes.byref(x1),
                                                       ctypes.byref(y1))
-
                 facsimile.scope_line(lines[i][4])
                 i += 1
             if tesseract.TessPageIteratorIsAtBeginningOf(pi, RIL_WORD):
