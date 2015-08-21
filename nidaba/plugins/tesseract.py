@@ -104,8 +104,9 @@ def setup(*args, **kwargs):
     if implementation == 'capi':
         try:
             ctypes.cdll.LoadLibrary('libtesseract.so.3')
+            ctypes.cdll.LoadLibrary('liblept.so')
         except:
-            raise NidabaPluginException('Loading libtesseract failed.')
+            raise NidabaPluginException('Loading libtesseract/leptonica failed.')
 
 
 @app.task(base=NidabaTask, name=u'nidaba.segmentation.tesseract')
@@ -143,7 +144,7 @@ def segmentation_tesseract(doc, method=u'segment_tesseract'):
         raise NidabaTesseractException('Tesseract initialization failed.')
 
     # only do segmentation and script detection
-    tesseract.TessBaseAPISetPageSegMode(api, 4)
+    tesseract.TessBaseAPISetPageSegMode(api, 2)
     tesseract.TessBaseAPIProcessPages(api, input_path.encode('utf-8'), None, 0, None)
     it = tesseract.TessBaseAPIAnalyseLayout(api)
     x0, y0, x1, y1 = (ctypes.c_int(), ctypes.c_int(), ctypes.c_int(),
@@ -260,6 +261,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
 
     try:
         tesseract = ctypes.cdll.LoadLibrary('libtesseract.so.3')
+        leptonica = ctypes.cdll.LoadLibrary('liblept.so')
     except OSError as e:
         raise NidabaTesseractException('Loading libtesseract failed: ' +
                                        e.message)
@@ -287,62 +289,61 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
         tesseract.TessBaseAPIDelete(api)
         raise NidabaTesseractException('Tesseract initialization failed.')
 
-    tesseract.TessBaseAPISetPageSegMode(api, 4)
-
-    tesseract.TessBaseAPIProcessPages(api, image_path.encode('utf-8'), None, 0, None)
-    if tesseract.TessBaseAPIRecognize(api, None):
-        tesseract.TessBaseAPIDelete(api)
-        raise NidabaTesseractException('Tesseract recognition failed')
+    pix = leptonica.pixRead(image_path.encode('utf-8'))
+    tesseract.TessBaseAPISetImage2(api, pix)
     if extended:
+        # change to single line recognition
+        tesseract.TessBaseAPISetPageSegMode(api, 7)
         facsimile.add_respstmt('tesseract', 'character recognition')
+
         # While tesseract can recognize single words/characters it is extremely
         # slow to do so. We therefore wrote an UZN file containing only lines
         # and clear out segments and graphemes here too.
         facsimile.clear_graphemes()
         facsimile.clear_segments()
-
-        ri = tesseract.TessBaseAPIGetIterator(api)
-        pi = tesseract.TessResultIteratorGetPageIterator(ri)
+        
         w, h = Image.open(image_path).size
         x0, y0, x1, y1 = (ctypes.c_int(), ctypes.c_int(), ctypes.c_int(),
                           ctypes.c_int())
-        i = 0
-        lines = facsimile.lines
-        while True:
-            if tesseract.TessPageIteratorIsAtBeginningOf(pi, RIL_TEXTLINE):
-                tesseract.TessPageIteratorBoundingBox(pi, RIL_TEXTLINE,
+
+        for line in facsimile.lines:
+            tesseract.TessBaseAPISetRectangle(api, line[0], line[1], line[2] - line[0], line[3] - line[1])
+            if tesseract.TessBaseAPIRecognize(api, None):
+                raise NidabaTesseractException('Recognition failed.')
+            ri = tesseract.TessBaseAPIGetIterator(api)
+            pi = tesseract.TessResultIteratorGetPageIterator(ri)
+            facsimile.scope_line(line[4])
+            while True:
+                if tesseract.TessPageIteratorIsAtBeginningOf(pi, RIL_WORD):
+                    lang = tesseract.TessResultIteratorWordRecognitionLanguage(ri, RIL_WORD).decode('utf-8')
+                    tesseract.TessPageIteratorBoundingBox(pi, RIL_WORD,
+                                                          ctypes.byref(x0),
+                                                          ctypes.byref(y0),
+                                                          ctypes.byref(x1),
+                                                          ctypes.byref(y1))
+                    conf = tesseract.TessResultIteratorConfidence(ri, RIL_WORD)
+                    facsimile.add_segment((x0.value, y0.value, x1.value, y1.value),
+                                          lang, conf)
+                
+                conf = tesseract.TessResultIteratorConfidence(ri, RIL_SYMBOL)
+                tesseract.TessPageIteratorBoundingBox(pi, RIL_SYMBOL,
                                                       ctypes.byref(x0),
                                                       ctypes.byref(y0),
                                                       ctypes.byref(x1),
                                                       ctypes.byref(y1))
-                facsimile.scope_line(lines[i][4])
-                i += 1
-            if tesseract.TessPageIteratorIsAtBeginningOf(pi, RIL_WORD):
-                lang = tesseract.TessResultIteratorWordRecognitionLanguage(ri, RIL_WORD).decode('utf-8')
-                tesseract.TessPageIteratorBoundingBox(pi, RIL_WORD,
-                                                      ctypes.byref(x0),
-                                                      ctypes.byref(y0),
-                                                      ctypes.byref(x1),
-                                                      ctypes.byref(y1))
-                conf = tesseract.TessResultIteratorConfidence(ri, RIL_WORD)
-                facsimile.add_segment((x0.value, y0.value, x1.value, y1.value),
-                                      lang, conf)
-            
-            conf = tesseract.TessResultIteratorConfidence(ri, RIL_SYMBOL)
-            tesseract.TessPageIteratorBoundingBox(pi, RIL_SYMBOL,
-                                                  ctypes.byref(x0),
-                                                  ctypes.byref(y0),
-                                                  ctypes.byref(x1),
-                                                  ctypes.byref(y1))
-            grapheme = tesseract.TessResultIteratorGetUTF8Text(ri, RIL_SYMBOL).decode('utf-8')
-            facsimile.add_graphemes([(grapheme, (x0.value, y0.value, x1.value,
-                                      y1.value), conf)])
-            if not tesseract.TessResultIteratorNext(ri, RIL_SYMBOL):
-                break
+                grapheme = tesseract.TessResultIteratorGetUTF8Text(ri, RIL_SYMBOL).decode('utf-8')
+                facsimile.add_graphemes([(grapheme, (x0.value, y0.value, x1.value,
+                                          y1.value), conf)])
+                if not tesseract.TessResultIteratorNext(ri, RIL_SYMBOL):
+                    break
         with open(output_path, 'wb') as fp:
             facsimile.write(fp)
         tesseract.TessResultIteratorDelete(ri)
     else:
+        tesseract.TessBaseAPISetPageSegMode(api, 4)
+        if tesseract.TessBaseAPIRecognize(api, None):
+            tesseract.TessBaseAPIDelete(api)
+            raise NidabaTesseractException('Tesseract recognition failed')
         with open(output_path, 'wb') as fp:
             tp = tesseract.TessBaseAPIGetHOCRText(api)
             hocr = StringIO.StringIO()
