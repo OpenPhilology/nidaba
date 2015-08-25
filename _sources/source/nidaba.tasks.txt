@@ -28,6 +28,14 @@ nidaba.tasks.img module
     :undoc-members:
     :show-inheritance:
 
+nidaba.tasks.output module
+--------------------------
+
+.. automodule:: nidaba.tasks.output
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 nidaba.tasks.postprocessing module
 ----------------------------------
 

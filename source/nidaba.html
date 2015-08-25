@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nidaba package &mdash; nidaba 0.4.1
+    <title>nidaba package &mdash; nidaba 0.5.3
  documentation</title>
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4.1
+        VERSION:     '0.5.3
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.4.1
+    <link rel="top" title="nidaba 0.5.3
  documentation" href="../index.html" />
     <link rel="up" title="nidaba" href="modules.html" />
     <link rel="next" title="nidaba.algorithms package" href="nidaba.algorithms.html" />
@@ -61,6 +61,37 @@
 <li class="toctree-l2"><a class="reference internal" href="nidaba.algorithms.html#module-nidaba.algorithms">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="nidaba.contrib.html">nidaba.contrib package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.contrib.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.contrib.html#module-nidaba.contrib.mkdict">nidaba.contrib.mkdict module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.contrib.html#module-nidaba.contrib">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nidaba.plugins.html">nidaba.plugins package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.plugins.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.plugins.html#module-nidaba.plugins.kraken">nidaba.plugins.kraken module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.plugins.html#nidaba-plugins-kraken">nidaba.plugins.kraken</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.plugins.html#module-nidaba.plugins.leptonica">nidaba.plugins.leptonica module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.plugins.html#nidaba-plugins-leptonica">nidaba.plugins.leptonica</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.plugins.html#module-nidaba.plugins.ocropus">nidaba.plugins.ocropus module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.plugins.html#nidaba-plugins-ocropus">nidaba.plugins.ocropus</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.plugins.html#module-nidaba.plugins.tesseract">nidaba.plugins.tesseract module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.plugins.html#nidaba-plugins-tesseract">nidaba.plugins.tesseract</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.plugins.html#configuration">Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.plugins.html#module-nidaba.plugins">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.plugins.html#nidaba-plugins">nidaba.plugins</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="nidaba.tasks.html">nidaba.tasks package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.binarize">nidaba.tasks.binarize module</a><ul>
@@ -73,6 +104,10 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.img">nidaba.tasks.img module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-img">nidaba.tasks.img</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.output">nidaba.tasks.output module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.tasks.html#nidaba-tasks-output">nidaba.tasks.output</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.tasks.html#module-nidaba.tasks.postprocessing">nidaba.tasks.postprocessing module</a><ul>
@@ -357,7 +392,7 @@ words.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>tokens</strong> (<em>iterable</em>) &#8211; An iterable returning a sequences of unicode
+<li><strong>tokens</strong> (<em>iterable</em>) &#8211; An iterable returning sequences of unicode
 characters.</li>
 <li><strong>dictionary</strong> (<em>unicode</em>) &#8211; Path to a base dictionary.</li>
 <li><strong>deletion_dictionary</strong> (<em>unicode</em>) &#8211; Path to a deletion dictionary.</li>
@@ -377,26 +412,25 @@ the result dictionary.</p>
 
 <dl class="function">
 <dt id="nidaba.lex.tei_spellcheck">
-<code class="descclassname">nidaba.lex.</code><code class="descname">tei_spellcheck</code><span class="sig-paren">(</span><em>path</em>, <em>dictionary</em>, <em>deletion_dictionary</em>, <em>filter_punctuation=False</em>, <em>no_words=u'auto'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.tei_spellcheck" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.lex.</code><code class="descname">tei_spellcheck</code><span class="sig-paren">(</span><em>facsimile</em>, <em>dictionary</em>, <em>deletion_dictionary</em>, <em>filter_punctuation=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.lex.tei_spellcheck" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a spell check on an TEI XML document.</p>
-<p>Each <code class="docutils literal"><span class="pre">ocrx_word</span></code> span is treated as a single word and spelling
-corrections will be inserted using INS, DEL elements inside a span with
-class <code class="docutils literal"><span class="pre">alternatives</span></code>. Correct words are left untouched. The edit distance
-of each suggestion is specified in an <code class="docutils literal"><span class="pre">x_cost</span></code> property on each element.</p>
+<p>Each <code class="docutils literal"><span class="pre">seg</span></code> element is treated as a single word and spelling corrections
+will be inserted using a choice tag. Correct words will be untouched and
+correction candidates will be sorted by edit distance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>path</strong> (<em>unicode</em>) &#8211; Path to an hOCR file.</li>
+<li><strong>facsimile</strong> (<a class="reference internal" href="#nidaba.tei.TEIFacsimile" title="nidaba.tei.TEIFacsimile"><em>nidaba.tei.TEIFacsimile</em></a>) &#8211; TEIFacsimile object.</li>
 <li><strong>dictionary</strong> (<em>unicode</em>) &#8211; Path to a base dictionary.</li>
 <li><strong>deletion_dictionary</strong> (<em>unicode</em>) &#8211; Path to a deletion dictionary.</li>
 <li><strong>filter_punctuation</strong> (<em>bool</em>) &#8211; Switch to filter punctuation inside
-<code class="docutils literal"><span class="pre">ocrx_words</span></code></li>
+segments.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A unicode string of the new hOCR document.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A TEIFacsimile object containing the spelling corrections.</p>
 </td>
 </tr>
 </tbody>
@@ -1036,7 +1070,7 @@ should always define their exceptions here.</p>
 
 <dl class="method">
 <dt id="nidaba.storage.StorageFile.read">
-<code class="descname">read</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.read" title="Permalink to this definition">¶</a></dt>
+<code class="descname">read</code><span class="sig-paren">(</span><em>size=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.storage.StorageFile.read" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1374,6 +1408,28 @@ does not accept unicode objects; use write_text() for that.</p>
 <dt id="nidaba.tei.TEIFacsimile">
 <em class="property">class </em><code class="descclassname">nidaba.tei.</code><code class="descname">TEIFacsimile</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A class encapsulating a TEI XML document following the TEI digital
+facsimile guidelines for embedded transcriptions.</p>
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.add_choices">
+<code class="descname">add_choices</code><span class="sig-paren">(</span><em>id</em>, <em>it</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.add_choices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds alternative interpretations to an element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>unicode</em>) &#8211; </li>
+<li><strong>it</strong> (<em>iterable</em>) &#8211; An iterable returning a tuple containing an
+alternative reading and an optional confidence value
+in the range between 0 and 100.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="nidaba.tei.TEIFacsimile.add_graphemes">
 <code class="descname">add_graphemes</code><span class="sig-paren">(</span><em>it</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.add_graphemes" title="Permalink to this definition">¶</a></dt>
@@ -1383,12 +1439,10 @@ A line or segment has to be created beforehand.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>it</strong> (<em>iterable</em>) &#8211; An iterable returning a tuple containing a glyph</li>
-<li><strong>and optionally the bounding box of this glyph (x0, y0,</strong> (<em>(unicode),</em>) &#8211; </li>
-<li><strong>y1) and a recognition confidence value in the range 0 and 100.</strong> (<em>x1,</em>) &#8211; </li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>it</strong> (<em>iterable</em>) &#8211; An iterable returning a tuple containing a glyph
+(unicode), and optionally the bounding box of this
+glyph (x0, y0, x1, y1) and a recognition confidence
+value in the range 0 and 100.</td>
 </tr>
 </tbody>
 </table>
@@ -1453,9 +1507,25 @@ scope. Most often this correspond to a word recognized by an engine.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.author">
+<code class="descname">author</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.author" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id1"><span class="problematic" id="id2">*</span></a>args, <a href="#id3"><span class="problematic" id="id4">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="nidaba.tei.TEIFacsimile.authority">
 <code class="descname">authority</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.authority" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>partial(func, <a href="#id5"><span class="problematic" id="id6">*</span></a>args, <a href="#id7"><span class="problematic" id="id8">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.availability">
+<code class="descname">availability</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.availability" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id9"><span class="problematic" id="id10">*</span></a>args, <a href="#id11"><span class="problematic" id="id12">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="nidaba.tei.TEIFacsimile.clear_graphemes">
@@ -1493,10 +1563,48 @@ line.</p>
 <dd><p>Returns a tuple containing a source document&#8217;s path and its dimensions.</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.distributor">
+<code class="descname">distributor</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.distributor" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id13"><span class="problematic" id="id14">*</span></a>args, <a href="#id15"><span class="problematic" id="id16">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="nidaba.tei.TEIFacsimile.document">
 <code class="descname">document</code><span class="sig-paren">(</span><em>dim</em>, <em>image_url</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.document" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.edition">
+<code class="descname">edition</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.edition" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id17"><span class="problematic" id="id18">*</span></a>args, <a href="#id19"><span class="problematic" id="id20">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.editor">
+<code class="descname">editor</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.editor" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id21"><span class="problematic" id="id22">*</span></a>args, <a href="#id23"><span class="problematic" id="id24">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.fields">
+<code class="descname">fields</code><em class="property"> = {u'publisher': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}publicationStmt', u'ref'), u'note': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}notesStmt',), u'title': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}titleStmt',), u'series_title': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}seriesStmt',), u'pubplace': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}publicationStmt',), u'author': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}titleStmt', u'ref'), u'authority': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}publicationStmt', u'ref'), u'sponsor': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}titleStmt', u'ref'), u'edition': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}editionStmt',), u'idno': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}publicationStmt', u'type'), u'editor': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}titleStmt', u'ref'), u'distributor': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}publicationStmt', u'ref'), u'source_desc': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}sourceDesc',), u'funder': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}titleStmt', u'ref'), u'meeting': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}titleStmt', u'ref'), u'availability': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}publicationStmt', u'ref'), u'principal': (u'.//{http://www.tei-c.org/ns/1.0}teiHeader//{http://www.tei-c.org/ns/1.0}titleStmt', u'ref')}</em><a class="headerlink" href="#nidaba.tei.TEIFacsimile.fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.fileDesc">
+<code class="descname">fileDesc</code><em class="property"> = [u'titleStmt', u'editionStmt', u'publicationStmt', u'seriesStmt', u'notesStmt', u'sourceDesc']</em><a class="headerlink" href="#nidaba.tei.TEIFacsimile.fileDesc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.funder">
+<code class="descname">funder</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.funder" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id25"><span class="problematic" id="id26">*</span></a>args, <a href="#id27"><span class="problematic" id="id28">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="nidaba.tei.TEIFacsimile.graphemes">
@@ -1506,9 +1614,17 @@ x1, y1, id, text).</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="nidaba.tei.TEIFacsimile.license">
-<code class="descname">license</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.license" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="nidaba.tei.TEIFacsimile.idno">
+<code class="descname">idno</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.idno" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id29"><span class="problematic" id="id30">*</span></a>args, <a href="#id31"><span class="problematic" id="id32">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.lang">
+<code class="descname">lang</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.lang" title="Permalink to this definition">¶</a></dt>
+<dd><p>The language value of the teiHeader</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="nidaba.tei.TEIFacsimile.lines">
@@ -1531,6 +1647,41 @@ it to TEI.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.meeting">
+<code class="descname">meeting</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.meeting" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id33"><span class="problematic" id="id34">*</span></a>args, <a href="#id35"><span class="problematic" id="id36">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.note">
+<code class="descname">note</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.note" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id37"><span class="problematic" id="id38">*</span></a>args, <a href="#id39"><span class="problematic" id="id40">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.principal">
+<code class="descname">principal</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.principal" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id41"><span class="problematic" id="id42">*</span></a>args, <a href="#id43"><span class="problematic" id="id44">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.publisher">
+<code class="descname">publisher</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.publisher" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id45"><span class="problematic" id="id46">*</span></a>args, <a href="#id47"><span class="problematic" id="id48">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.pubplace">
+<code class="descname">pubplace</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.pubplace" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id49"><span class="problematic" id="id50">*</span></a>args, <a href="#id51"><span class="problematic" id="id52">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1593,25 +1744,41 @@ disables the current segment scope.</p>
 <dt id="nidaba.tei.TEIFacsimile.segments">
 <code class="descname">segments</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.segments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an reading order sorted list of tuples in the format (x0, y0,
-x1, y1, id, text).</p>
+x1, y1, confidence, id, text).</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="nidaba.tei.TEIFacsimile.sourceDesc">
-<code class="descname">sourceDesc</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.sourceDesc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="nidaba.tei.TEIFacsimile.series_title">
+<code class="descname">series_title</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.series_title" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id53"><span class="problematic" id="id54">*</span></a>args, <a href="#id55"><span class="problematic" id="id56">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.source_desc">
+<code class="descname">source_desc</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.source_desc" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id57"><span class="problematic" id="id58">*</span></a>args, <a href="#id59"><span class="problematic" id="id60">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nidaba.tei.TEIFacsimile.sponsor">
+<code class="descname">sponsor</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.sponsor" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial(func, <a href="#id61"><span class="problematic" id="id62">*</span></a>args, <a href="#id63"><span class="problematic" id="id64">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="nidaba.tei.TEIFacsimile.tei_ns">
 <code class="descname">tei_ns</code><em class="property"> = u'{http://www.tei-c.org/ns/1.0}'</em><a class="headerlink" href="#nidaba.tei.TEIFacsimile.tei_ns" title="Permalink to this definition">¶</a></dt>
-<dd><p>A class encapsulating a TEI XML document following the TEI digital
-facsimile guidelines for embedded transcriptions.</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="nidaba.tei.TEIFacsimile.title">
 <code class="descname">title</code><a class="headerlink" href="#nidaba.tei.TEIFacsimile.title" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>partial(func, <a href="#id65"><span class="problematic" id="id66">*</span></a>args, <a href="#id67"><span class="problematic" id="id68">**</span></a>keywords) - new function with partial application
+of the given arguments and keywords.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="nidaba.tei.TEIFacsimile.write">
@@ -1631,6 +1798,39 @@ facsimile guidelines for embedded transcriptions.</p>
 <dt id="nidaba.tei.TEIFacsimile.write_hocr">
 <code class="descname">write_hocr</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.write_hocr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the TEI document as an hOCR file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fp</strong> (<em>file</em>) &#8211; File descriptor to write to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.write_simplexml">
+<code class="descname">write_simplexml</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.write_simplexml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the TEI document as a grapheme cloud in a simple XML format. Its basic format is:</p>
+<p>&lt;text&gt;
+&lt;charParams l=&#8221;0&#8221; r=&#8221;78&#8221; t=&#8221;6&#8221; b=&#8221;89&#8221; charConfidence=&#8221;76&#8221;&gt;D&lt;/charParams&gt;
+&lt;charParams l=&#8221;86&#8221; r=&#8221;111&#8221; t=&#8221;24&#8221; b=&#8221;89&#8221; charConfidence=&#8221;76&#8221;&gt;e&lt;/charParams&gt;
+....
+&lt;/text&gt;</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fp</strong> (<em>file</em>) &#8211; File descriptor to write to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nidaba.tei.TEIFacsimile.write_text">
+<code class="descname">write_text</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.write_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the TEI document as plain text.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

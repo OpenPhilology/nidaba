@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Option Groups &mdash; nidaba 0.4.1
+    <title>Option Groups &mdash; nidaba 0.5.3
  documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.4.1
+        VERSION:     '0.5.3
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.4.1
+    <link rel="top" title="nidaba 0.5.3
  documentation" href="index.html" />
     <link rel="next" title="TEI Output" href="tei.html" />
     <link rel="prev" title="Plugins" href="plugins.html" />
@@ -84,7 +84,7 @@ thresholding.</p>
 </dd></dl>
 
 <p>There are also additional, more advanced binarization algorithms available in
-the <a class="reference internal" href="plugins.html#module-nidaba.plugins.leptonica" title="nidaba.plugins.leptonica"><code class="xref py py-mod docutils literal"><span class="pre">leptonica</span></code></a> and <a class="reference internal" href="plugins.html#module-nidaba.plugins.kraken" title="nidaba.plugins.kraken"><code class="xref py py-mod docutils literal"><span class="pre">kraken</span></code></a> plugins.</p>
+the <a class="reference internal" href="source/nidaba.plugins.html#module-nidaba.plugins.leptonica" title="nidaba.plugins.leptonica"><code class="xref py py-mod docutils literal"><span class="pre">leptonica</span></code></a> and <a class="reference internal" href="source/nidaba.plugins.html#module-nidaba.plugins.kraken" title="nidaba.plugins.kraken"><code class="xref py py-mod docutils literal"><span class="pre">kraken</span></code></a> plugins.</p>
 </div>
 </div>
 <div class="section" id="page-segmentation">
@@ -99,7 +99,7 @@ switch:</p>
 <div class="section" id="id2">
 <h3>Options and Syntax<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <p>Segmentation is usually an integral part of an OCR engine, so different
-implementations are situated in their respective plugins. See <a class="reference internal" href="plugins.html#module-nidaba.plugins.tesseract" title="nidaba.plugins.tesseract"><code class="xref py py-mod docutils literal"><span class="pre">tesseract</span></code></a> and <a class="reference internal" href="plugins.html#module-nidaba.plugins.kraken" title="nidaba.plugins.kraken"><code class="xref py py-mod docutils literal"><span class="pre">kraken</span></code></a> for
+implementations are situated in their respective plugins. See <a class="reference internal" href="source/nidaba.plugins.html#module-nidaba.plugins.tesseract" title="nidaba.plugins.tesseract"><code class="xref py py-mod docutils literal"><span class="pre">tesseract</span></code></a> and <a class="reference internal" href="source/nidaba.plugins.html#module-nidaba.plugins.kraken" title="nidaba.plugins.kraken"><code class="xref py py-mod docutils literal"><span class="pre">kraken</span></code></a> for
 additional information.</p>
 </div>
 </div>
@@ -114,8 +114,8 @@ accessed using the <code class="docutils literal"><span class="pre">--ocr</span>
 <div class="section" id="id3">
 <h3>Options and Syntax<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>As OCR engines are usually quite large and sometimes hard to install, all
-functionality is contained in plugins. See <a class="reference internal" href="plugins.html#module-nidaba.plugins.tesseract" title="nidaba.plugins.tesseract"><code class="xref py py-mod docutils literal"><span class="pre">tesseract</span></code></a>, <a class="reference internal" href="plugins.html#module-nidaba.plugins.kraken" title="nidaba.plugins.kraken"><code class="xref py py-mod docutils literal"><span class="pre">kraken</span></code></a>, and
-<a class="reference internal" href="plugins.html#module-nidaba.plugins.ocropus" title="nidaba.plugins.ocropus"><code class="xref py py-mod docutils literal"><span class="pre">ocropus</span></code></a> for additional information,
+functionality is contained in plugins. See <a class="reference internal" href="source/nidaba.plugins.html#module-nidaba.plugins.tesseract" title="nidaba.plugins.tesseract"><code class="xref py py-mod docutils literal"><span class="pre">tesseract</span></code></a>, <a class="reference internal" href="source/nidaba.plugins.html#module-nidaba.plugins.kraken" title="nidaba.plugins.kraken"><code class="xref py py-mod docutils literal"><span class="pre">kraken</span></code></a>, and
+<a class="reference internal" href="source/nidaba.plugins.html#module-nidaba.plugins.ocropus" title="nidaba.plugins.ocropus"><code class="xref py py-mod docutils literal"><span class="pre">ocropus</span></code></a> for additional information,
 configuration keys, etc.</p>
 </div>
 </div>
@@ -161,12 +161,10 @@ resulting deletion dictionary will be 750Mb large.</p>
 <dt id="nidaba.tasks.postprocessing.spell_check">
 <code class="descclassname">nidaba.tasks.postprocessing.</code><code class="descname">spell_check</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>language</em>, <em>filter_punctuation</em>, <em>no_ocrx_words</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.postprocessing.spell_check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds spelling suggestions to an TEI XML document.</p>
-<p>Alternative spellings for each segment
-Alternative spellings for each hocr <code class="docutils literal"><span class="pre">ocrx_word</span></code> span are created using
-the INS-DEL syntax defined for alternative readings in the hOCR
-specification. Correct words, i.e. words appearing verbatim in the
-dictionary, are left untouched; words not appearing in the dictionary and
-without suggestions will still be encoded as a</p>
+<p>Alternative spellings for each segment will be included in a choice
+tagcontaining a series of corr tags with the original segment appearing
+beneath a sic element.  Correct words, i.e. words appearing verbatim in the
+dictionary, are left untouched.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -177,10 +175,7 @@ without suggestions will still be encoded as a</p>
 <li><strong>language</strong> (<em>unicode</em>) &#8211; Identifier defined in the nidaba configuration as a
 valid dictionary.</li>
 <li><strong>filter_punctuation</strong> (<em>bool</em>) &#8211; Switch to filter punctuation inside
-<code class="docutils literal"><span class="pre">ocrx_words</span></code></li>
-<li><strong>no_ocrx_words</strong> (<em>unicode</em>) &#8211; Fallback switch to extract words from on hOCR
-document without <code class="docutils literal"><span class="pre">ocrx_word</span></code> elements. May
-be set to <code class="docutils literal"><span class="pre">auto</span></code>, <code class="docutils literal"><span class="pre">true</span></code>, or <code class="docutils literal"><span class="pre">false</span></code>.</li>
+<code class="docutils literal"><span class="pre">seg</span></code></li>
 </ul>
 </td>
 </tr>
@@ -217,40 +212,206 @@ are not accounted for.</p>
 </div>
 <div class="section" id="id6">
 <h3>Options and Syntax<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="metrics">
+<span id="id7"></span><h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="output-layer">
+<span id="id8"></span><h2>Output Layer<a class="headerlink" href="#output-layer" title="Permalink to this headline">¶</a></h2>
+<p>The output layer handles conversion and extension of nidaba&#8217;s native <a class="reference internal" href="tei.html#tei-output"><span>TEI</span></a> format. It can be used to distill data from the TEI document into
+plain text, hOCR, and a simple XML format. It can also use an external metadata
+file to complete raw TEI output to a valid TEI document.</p>
+<div class="section" id="id9">
+<h3>Options and Syntax<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
-<dt id="nidaba.tasks.postprocessing.blend_hocr">
-<code class="descclassname">nidaba.tasks.postprocessing.</code><code class="descname">blend_hocr</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>language</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.postprocessing.blend_hocr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Blends multiple hOCR files using the algorithm from Bruce Robertsons
-rigaudon. It requires a working spell checking for the input document&#8217;s
-language; otherwise all matched bboxes will be bunched together without any
-scoring.</p>
+<dt id="nidaba.tasks.output.tei_metadata">
+<code class="descclassname">nidaba.tasks.output.</code><code class="descname">tei_metadata</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>metadata</em>, <em>validate</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.output.tei_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enriches a TEI-XML document with various metadata from an user-supplied
+YAML file.</p>
+<p>The following fields may be contained in the metadata file with the bolded
+subset mandatory for a valid TEI-XML file. They are grouped by their place
+in the header. Unknown fields are ignored and input is escaped as to
+disable</p>
+<p>Some element may also be extended by increasing their arity, the second
+value is then usually used as a global identifer/locator, i.e. an URL or
+authority control ID.</p>
+<p>titleStmt:</p>
+<blockquote>
+<div><ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">title</span></code>: Title of the resource</p>
+</li>
+<li><p class="first">author: Name of the author of the resource (may be extended)</p>
+</li>
+<li><dl class="first docutils">
+<dt>editor: Name of the editor, compiler, translator, etc. of the</dt>
+<dd><p class="first last">resource (may be extended)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>funder: Institution responsible for the funding of the text (may be</dt>
+<dd><p class="first last">extended)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>principal: PI responsible for the creation of the text (may be</dt>
+<dd><p class="first last">extended)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">sponsor: Name of the sponsoring institution (may be extended)</p>
+</li>
+<li><p class="first">meeting: Conference/meeting resulting in the text (may be extended)</p>
+</li>
+</ul>
+</div></blockquote>
+<p>editionStmt:</p>
+<blockquote>
+<div><ul class="simple">
+<li>edition: Peculiarities to the underlying edition of the text</li>
+</ul>
+</div></blockquote>
+<p>publicationStmt:</p>
+<blockquote>
+<div><ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">availability</span></code>: Licence of the content (may be extended)</p>
+</li>
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">publisher</span></code>: Person or agency responsible for the publication of</dt>
+<dd><p class="first last">the text (may be extended)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>distributor: Person or agency responsible for the text&#8217;s</dt>
+<dd><p class="first last">distribution (may be extended)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">authority: Authority responsible for making the work available</p>
+</li>
+<li><dl class="first docutils">
+<dt>idno: Identifier of the publication (may be extended with the type of</dt>
+<dd><p class="first last">identifier)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">pubplace: Place of publication</p>
+</li>
+<li><p class="first">date: Date of publication</p>
+</li>
+</ul>
+</div></blockquote>
+<p>seriesStmt:</p>
+<blockquote>
+<div><ul class="simple">
+<li>series_title: Title of the series to which the publication belongs</li>
+</ul>
+</div></blockquote>
+<p>notesStmt:</p>
+<blockquote>
+<div><ul class="simple">
+<li>note: Misc. notes about the text</li>
+</ul>
+</div></blockquote>
+<p>sourceDesc:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">source_desc</span></code>: Description of the source document</li>
+</ul>
+</div></blockquote>
+<p>other:</p>
+<blockquote>
+<div><ul class="simple">
+<li>lang: Abbreviation of the language used in the header</li>
+</ul>
+</div></blockquote>
+<p>There is a sample file from the OpenPhilology project in the example
+directory.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>[(id, path), ...]</strong> (<em>doc</em>) &#8211; A list of storage module tupels that will be</li>
-<li><strong>into a single output document.</strong> (<em>merged</em>) &#8211; </li>
-<li><strong>language</strong> (<em>unicode</em>) &#8211; Language used for spell-checking based scoring. If
-not defined no scoring will be used.</li>
-<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to the output file.</li>
+<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; Storage tuple of the input document</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; </li>
+<li><strong>metadata</strong> (<em>unicode, unicode</em>) &#8211; Storage tuple of the metadata YAML file</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output document</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(unicode, unicode)</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>NidabaTEIException if the resulting document is not TEI compatible and</strong> &#8211;</li>
+<li><strong>validation is enabled.</strong> &#8211;</li>
+</ul>
 </td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
+<dl class="function">
+<dt id="nidaba.tasks.output.tei2simplexml">
+<code class="descclassname">nidaba.tasks.output.</code><code class="descname">tei2simplexml</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.output.tei2simplexml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a TEI Facsimile to hOCR preserving as much metadata as possible.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; Storage tuple of the input document</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Storage tuple of the output document</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">(unicode, unicode)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.tasks.output.tei2hocr">
+<code class="descclassname">nidaba.tasks.output.</code><code class="descname">tei2hocr</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.output.tei2hocr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a TEI Facsimile to hOCR preserving as much metadata as possible.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; Storage tuple of the input document</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Storage tuple of the output document</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">(unicode, unicode)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.tasks.output.tei2txt">
+<code class="descclassname">nidaba.tasks.output.</code><code class="descname">tei2txt</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.output.tei2txt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a TEI Facsimile to a plain text file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; Storage tuple of the input document</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Storage tuple of the output document</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">(unicode, unicode)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
-</div>
-<div class="section" id="metrics">
-<span id="id7"></span><h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -296,6 +457,7 @@ not defined no scoring will be used.</li>
 <li class="toctree-l2"><a class="reference internal" href="#spell-checking">Spell Checking</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#output-merging">Output Merging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#metrics">Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#output-layer">Output Layer</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tei.html">TEI</a></li>
