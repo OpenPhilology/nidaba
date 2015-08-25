@@ -163,4 +163,20 @@ Options and Syntax
 Metrics
 =======
 
+.. _output_layer:
 
+Output Layer
+============
+
+The output layer handles conversion and extension of nidaba's native :ref:`TEI
+<tei_output>` format. It can be used to distill data from the TEI document into
+plain text, hOCR, and a simple XML format. It can also use an external metadata
+file to complete raw TEI output to a valid TEI document.
+
+Options and Syntax
+------------------
+
+.. autofunction:: nidaba.tasks.output.tei_metadata(doc, method, metadata, validate)
+.. autofunction:: nidaba.tasks.output.tei2simplexml(doc, method)
+.. autofunction:: nidaba.tasks.output.tei2hocr(doc, method)
+.. autofunction:: nidaba.tasks.output.tei2txt(doc, method)
