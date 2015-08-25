@@ -156,7 +156,7 @@ def tei2hocr(doc, method=u'tei2hocr'):
     return (doc[0], output_path)
 
 @app.task(base=NidabaTask, name=u'nidaba.output.tei2txt')
-def tei2hocr(doc, method=u'tei2txt'):
+def tei2txt(doc, method=u'tei2txt'):
     """
     Convert a TEI Facsimile to a plain text file.
 

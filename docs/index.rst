@@ -29,6 +29,8 @@ Nidaba does a bunch of things for you:
 - :ref:`Output merging <merging>` 
 - :ref:`Spell-checking <spell-checking>`
 - :ref:`TEI output <tei_output>`
+- :ref:`Format Conversion <output_layer>` 
+
 
 .. _installation:
 

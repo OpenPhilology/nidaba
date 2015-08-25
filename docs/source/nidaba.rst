@@ -7,6 +7,8 @@ Subpackages
 .. toctree::
 
     nidaba.algorithms
+    nidaba.contrib
+    nidaba.plugins
     nidaba.tasks
 
 Submodules

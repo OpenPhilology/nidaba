@@ -157,12 +157,9 @@ class Batch(object):
         except Exception:
             return None
 
-        if self.get_state() != 'SUCCESS':
-            return None
-
         outfiles = []
         for subtask in batch.itervalues():
-            if len(subtask['children']) == 0 and not subtask['housekeeping']:
+            if len(subtask['children']) == 0 and not subtask['housekeeping'] and subtask['result'] is not None:
                 outfiles.append((subtask['result'], subtask['root_document']))
         return outfiles
 

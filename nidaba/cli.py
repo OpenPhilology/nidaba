@@ -281,37 +281,40 @@ def status(verbose, job_id):
     """
     batch = Batch(job_id)
     state = batch.get_state()
-    print(state)
-    if state == 'SUCCESS':
-        ret = batch.get_results()
-        if ret is None:
-            print('Something somewhere went wrong.')
-            print('Please contact your friendly nidaba support technician.')
-        else:
-            for doc in ret:
-                click.echo(doc[1][1].encode('utf-8') + u' \u2192 ' +
-                           storage.get_abs_path(*doc[0]).encode('utf-8'))
-    elif state == 'PENDING':
-        ret = batch.get_extended_state()
-        done = 0
-        running = 0
-        pending = 0
-        for subtask in ret.itervalues():
-            if subtask['state'] == 'SUCCESS':
-                done += 1
-            elif subtask['state'] == 'RUNNING':
-                running += 1
-            elif subtask['state'] == 'PENDING':
-                pending += 1
-        click.echo(u'\u25cf' * done, nl=False)
-        click.echo(u'\u25f5' * running, nl=False)
-        click.echo(u'\u25cb' * pending)
-    elif state == 'FAILURE':
-        ret = batch.get_errors()
-        if ret is None:
-            click.echo('Something somewhere went wrong.')
-        else:
-            for task in ret:
-                print(task['task'][0].encode('utf-8'),
-                      'failed. root document: ',
-                      task['root_document'][1].encode('utf-8'))
+
+
+    click.secho('Status:', underline=True, nl=False)
+    if state == 'NONE':
+     click.echo(' UNKNOWN')
+     return
+    click.echo(' {0}\n'.format(state))
+
+    ext = batch.get_extended_state()
+    results = batch.get_results()
+
+    done = 0
+    running = 0
+    pending = 0
+    for subtask in ext.itervalues():
+        if subtask['state'] == 'SUCCESS':
+            done += 1
+        elif subtask['state'] == 'RUNNING':
+            running += 1
+        elif subtask['state'] == 'PENDING':
+            pending += 1
+    click.echo('{0}/{1} tasks completed. {2} running.\n'.format(done, len(ext), running))
+
+    if len(results):
+        click.secho('Output files:\n', underline=True)
+        for doc in results:
+            output = click.format_filename(storage.get_abs_path(*doc[0]))
+            click.echo(doc[1][1] + u' \u2192 ' + output)
+
+    if state == 'FAILURE':
+        click.secho('\nErrors:\n', underline=True)
+
+        errors = batch.get_errors()
+        for task in errors:
+            click.echo('{0} ({1}): {2}'.format(task['task'][0],
+                                            task['root_document'][1],
+                                            task['errors'][-1]))

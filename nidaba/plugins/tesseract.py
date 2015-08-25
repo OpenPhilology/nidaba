@@ -269,6 +269,8 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
     # set up all return types
     tesseract.TessVersion.restype = ctypes.c_char_p
     tesseract.TessBaseAPICreate.restype = ctypes.POINTER(TessBaseAPI)
+    leptonica.pixRead.restype = ctypes.POINTER(TessBaseAPI)
+    tesseract.TessBaseAPIRecognize.restype = ctypes.c_int
     if extended:
         try:
             tesseract.TessResultIteratorConfidence.restype = ctypes.c_float
@@ -309,6 +311,8 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
         for line in facsimile.lines:
             tesseract.TessBaseAPISetRectangle(api, line[0], line[1], line[2] - line[0], line[3] - line[1])
             if tesseract.TessBaseAPIRecognize(api, None):
+                leptonica.pixDestroy(ctypes.byref(pix))
+                tesseract.TessBaseAPIDelete(api)
                 raise NidabaTesseractException('Recognition failed.')
             ri = tesseract.TessBaseAPIGetIterator(api)
             pi = tesseract.TessResultIteratorGetPageIterator(ri)
@@ -331,7 +335,9 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                                                       ctypes.byref(y0),
                                                       ctypes.byref(x1),
                                                       ctypes.byref(y1))
-                grapheme = tesseract.TessResultIteratorGetUTF8Text(ri, RIL_SYMBOL).decode('utf-8')
+                grapheme = tesseract.TessResultIteratorGetUTF8Text(ri, RIL_SYMBOL)
+                if grapheme is not None:
+                    grapheme = grapheme.decode('utf-8')
                 facsimile.add_graphemes([(grapheme, (x0.value, y0.value, x1.value,
                                           y1.value), conf)])
                 if not tesseract.TessResultIteratorNext(ri, RIL_SYMBOL):
@@ -342,6 +348,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
     else:
         tesseract.TessBaseAPISetPageSegMode(api, 4)
         if tesseract.TessBaseAPIRecognize(api, None):
+            leptonica.pixDestroy(ctypes.byref(pix))
             tesseract.TessBaseAPIDelete(api)
             raise NidabaTesseractException('Tesseract recognition failed')
         with open(output_path, 'wb') as fp:
