@@ -124,7 +124,7 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
         # scope the current line and add all graphemes recognized by kraken to
         # it.
         tei.scope_line(lines[i][4])
-        tei.add_graphemes(rec)
+        tei.add_graphemes([(x[0], x[1], int(x[2] * 100)) for x in rec])
         i += 1
     with open(storage.get_abs_path(*output_path), 'w') as fp:
         tei.write(fp)
