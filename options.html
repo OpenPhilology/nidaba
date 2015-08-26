@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Option Groups &mdash; nidaba 0.5.3
+    <title>Option Groups &mdash; nidaba 0.5.4
  documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.5.3
+        VERSION:     '0.5.4
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.5.3
+    <link rel="top" title="nidaba 0.5.4
  documentation" href="index.html" />
     <link rel="next" title="TEI Output" href="tei.html" />
     <link rel="prev" title="Plugins" href="plugins.html" />
@@ -214,16 +214,18 @@ are not accounted for.</p>
 <h3>Options and Syntax<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 </div>
 </div>
-<div class="section" id="metrics">
-<span id="id7"></span><h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
-</div>
 <div class="section" id="output-layer">
-<span id="id8"></span><h2>Output Layer<a class="headerlink" href="#output-layer" title="Permalink to this headline">¶</a></h2>
+<span id="id7"></span><h2>Output Layer<a class="headerlink" href="#output-layer" title="Permalink to this headline">¶</a></h2>
 <p>The output layer handles conversion and extension of nidaba&#8217;s native <a class="reference internal" href="tei.html#tei-output"><span>TEI</span></a> format. It can be used to distill data from the TEI document into
 plain text, hOCR, and a simple XML format. It can also use an external metadata
 file to complete raw TEI output to a valid TEI document.</p>
-<div class="section" id="id9">
-<h3>Options and Syntax<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>An example adding metadata from an external file using the <code class="docutils literal"><span class="pre">file:</span></code> syntax to
+copy it to the storage medium on task invocation:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ...  -f metadata:file:openphilology_meta.yaml -- *.tif
+</pre></div>
+</div>
+<div class="section" id="id8">
+<h3>Options and Syntax<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="nidaba.tasks.output.tei_metadata">
 <code class="descclassname">nidaba.tasks.output.</code><code class="descname">tei_metadata</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>metadata</em>, <em>validate</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.output.tei_metadata" title="Permalink to this definition">¶</a></dt>
@@ -413,6 +415,91 @@ directory.</p>
 
 </div>
 </div>
+<div class="section" id="metrics">
+<span id="id9"></span><h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
+<p>It is possible to calculate metrics on the textual output to assess its
+deviation from a given ground truth. The ground truth may be in one of several
+supported formats including plain text and hOCR. Currently two schemes for
+calculating character edit distances are included; one using a variant of the
+well-known <code class="docutils literal"><span class="pre">diff</span></code> algorithm and a task calculating the global minimal edit
+distance:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -s text_edit_ratio:file:14.gt.txt,gt_format<span class="o">=</span>text -- 14.tif
+</pre></div>
+</div>
+<div class="section" id="id10">
+<h3>Options and Syntax<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="nidaba.tasks.stats.text_diff_ratio">
+<code class="descclassname">nidaba.tasks.stats.</code><code class="descname">text_diff_ratio</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>ground_truth</em>, <em>xml_in</em>, <em>gt_format</em>, <em>clean_in</em>, <em>clean_gt</em>, <em>divert</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.stats.text_diff_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the similarity of the input documents and a given ground truth
+using the algorithm of python&#8217;s difflib SequenceMatcher. The result is a
+value between 0.0 (no commonality) and 1.0 (identical strings).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to the output file.</li>
+<li><strong>ground_truth</strong> (<em>unicode</em>) &#8211; Ground truth location tuple</li>
+<li><strong>xml_in</strong> (<em>bool</em>) &#8211; Switch to treat input as an TEI-XML document.</li>
+<li><strong>gt_format</strong> (<em>unicode</em>) &#8211; Switch to select ground truth format. Valid values
+are &#8216;tei&#8217;, &#8216;hocr&#8217;, and &#8216;text&#8217;.</li>
+<li><strong>divert</strong> (<em>bool</em>) &#8211; Switch selecting output diversion. If enabled the output
+will be added to the tracking arguments and the input
+document will be returned as the result of the task. Use
+this to insert a statistical measure into a chain
+without affecting the results.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output document</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.tasks.stats.text_edit_ratio">
+<code class="descclassname">nidaba.tasks.stats.</code><code class="descname">text_edit_ratio</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>ground_truth</em>, <em>xml_in</em>, <em>gt_format</em>, <em>clean_in</em>, <em>clean_gt</em>, <em>divert</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.stats.text_edit_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the similarity of the input documents and a given ground truth
+using the Damerau-Levenshtein distance. The result is a value between 0.0
+(no commonality) and 1.0 (identical strings).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to the output file.</li>
+<li><strong>ground_truth</strong> (<em>unicode</em>) &#8211; Ground truth location tuple</li>
+<li><strong>xml_in</strong> (<em>bool</em>) &#8211; Switch to treat input as an TEI-XML document.</li>
+<li><strong>gt_format</strong> (<em>unicode</em>) &#8211; Switch to select ground truth format. Valid values
+are &#8216;tei&#8217;, &#8216;hocr&#8217;, and &#8216;text&#8217;.</li>
+<li><strong>divert</strong> (<em>bool</em>) &#8211; Switch selecting output diversion. If enabled the output
+will be added to the tracking arguments and the input
+document will be returned as the result of the task. Use
+this to insert a statistical measure into a chain
+without affecting the results.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output document</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
 </div>
 
 
@@ -456,8 +543,8 @@ directory.</p>
 <li class="toctree-l2"><a class="reference internal" href="#optical-character-recognition">Optical Character Recognition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spell-checking">Spell Checking</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#output-merging">Output Merging</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#metrics">Metrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#output-layer">Output Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#metrics">Metrics</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tei.html">TEI</a></li>

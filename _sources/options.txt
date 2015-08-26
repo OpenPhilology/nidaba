@@ -158,11 +158,6 @@ Options and Syntax
 
 .. autofunction:: nidaba.tasks.postprocessing.blend_hocr(doc, method, language)
 
-.. _metrics:
-
-Metrics
-=======
-
 .. _output_layer:
 
 Output Layer
@@ -173,6 +168,13 @@ The output layer handles conversion and extension of nidaba's native :ref:`TEI
 plain text, hOCR, and a simple XML format. It can also use an external metadata
 file to complete raw TEI output to a valid TEI document.
 
+An example adding metadata from an external file using the ``file:`` syntax to
+copy it to the storage medium on task invocation:
+
+.. code-block:: console
+
+    $ nidaba batch ...  -f metadata:file:openphilology_meta.yaml -- *.tif
+
 Options and Syntax
 ------------------
 
@@ -180,3 +182,26 @@ Options and Syntax
 .. autofunction:: nidaba.tasks.output.tei2simplexml(doc, method)
 .. autofunction:: nidaba.tasks.output.tei2hocr(doc, method)
 .. autofunction:: nidaba.tasks.output.tei2txt(doc, method)
+
+.. _metrics:
+
+Metrics
+=======
+
+It is possible to calculate metrics on the textual output to assess its
+deviation from a given ground truth. The ground truth may be in one of several
+supported formats including plain text and hOCR. Currently two schemes for
+calculating character edit distances are included; one using a variant of the
+well-known ``diff`` algorithm and a task calculating the global minimal edit
+distance:
+
+.. code-block:: console
+
+   $ nidaba batch ... -s text_edit_ratio:file:14.gt.txt,gt_format=text -- 14.tif
+
+Options and Syntax
+------------------
+
+.. autofunction:: nidaba.tasks.stats.text_diff_ratio(doc, method, ground_truth, xml_in, gt_format, clean_in, clean_gt, divert)
+.. autofunction:: nidaba.tasks.stats.text_edit_ratio(doc, method, ground_truth, xml_in, gt_format, clean_in, clean_gt, divert)
+
