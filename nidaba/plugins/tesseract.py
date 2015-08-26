@@ -327,7 +327,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                                                           ctypes.byref(y1))
                     conf = tesseract.TessResultIteratorConfidence(ri, RIL_WORD)
                     facsimile.add_segment((x0.value, y0.value, x1.value, y1.value),
-                                          lang, int(conf * 100))
+                                          lang, conf)
                 
                 conf = tesseract.TessResultIteratorConfidence(ri, RIL_SYMBOL)
                 tesseract.TessPageIteratorBoundingBox(pi, RIL_SYMBOL,
@@ -339,7 +339,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                 if grapheme is not None:
                     grapheme = grapheme.decode('utf-8')
                 facsimile.add_graphemes([(grapheme, (x0.value, y0.value, x1.value,
-                                          y1.value), int(conf * 100))])
+                                          y1.value), conf)])
                 if not tesseract.TessResultIteratorNext(ri, RIL_SYMBOL):
                     break
         with open(output_path, 'wb') as fp:
