@@ -55,7 +55,7 @@ def tei_metadata(doc, method=u'metadata', metadata=None, validate=True):
 
     publicationStmt:
 
-        * ``availability``: Licence of the content (may be extended)
+        * ``licence``: Licence of the content (may be extended)
         * ``publisher``: Person or agency responsible for the publication of
                      the text (may be extended)
         * distributor: Person or agency responsible for the text's
@@ -63,7 +63,7 @@ def tei_metadata(doc, method=u'metadata', metadata=None, validate=True):
         * authority: Authority responsible for making the work available
         * idno: Identifier of the publication (may be extended with the type of
                 identifier)
-        * pubplace: Place of publication
+        * pub_place: Place of publication
         * date: Date of publication
 
     seriesStmt:
@@ -102,12 +102,9 @@ def tei_metadata(doc, method=u'metadata', metadata=None, validate=True):
         tei.read(fp)
     with storage.StorageFile(*metadata) as fp:
         meta = yaml.safe_load(fp)
-    validFields = ['author', 'editor', 'funder', 'principal', 'sponsor',
-                   'meeting', 'edition', 'availability', 'publisher',
-                   'distributor', 'authority', 'idno', 'pubplace',
-                   'series_title', 'note', 'source_desc', 'lang']
-    for field in filter(lambda x: x in validFields, meta):
-        setattr(tei, field, meta[field])
+    for field in tei.fields:
+        if field in meta:
+            setattr(tei, field, meta[field])
     if validate:
         pass
     output_path = storage.insert_suffix(doc[1], method, metadata[1])

@@ -282,7 +282,6 @@ def status(verbose, job_id):
     batch = Batch(job_id)
     state = batch.get_state()
 
-
     click.secho('Status:', underline=True, nl=False)
     if state == 'NONE':
      click.echo(' UNKNOWN')

@@ -3,9 +3,10 @@ editor: ['Henry Barclay Swete', 'https://viaf.org/viaf/39504606/']
 funder: 'European Social Fund Saxony'
 principal: 'Gregory Crane'
 sponsor: 'University of Leipzig'
-availability: ['Available under CC-BY 4.0', 'https://creativecommons.org/licenses/by/4.0/legalcode']
+licence: ['Available under CC-BY 4.0', 'https://creativecommons.org/licenses/by/4.0/legalcode']
 publisher: 'University of Leipzig'
-pubplace: 'Leipzig, Germany'
+pub_place: 'Leipzig, Germany'
+authority: 'None to be found'
 date: '2014'
 source_desc: 'The Old Testament in Greek'
 lang: 'eng'

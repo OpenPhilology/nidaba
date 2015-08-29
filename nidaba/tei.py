@@ -53,52 +53,59 @@ class TEIFacsimile(object):
     xml_ns = '{http://www.w3.org/XML/1998/namespace}'
     tei_ns = '{http://www.tei-c.org/ns/1.0}'
 
-    # automatically generated properties and xpath to their location
-    fields = {'title': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns),),
-              'author': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
-              'editor': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
-              'funder': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
-              'principal': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
-              'sponsor': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
-              'meeting': ('.//{0}teiHeader//{0}titleStmt'.format(tei_ns), 'ref'),
-              'edition': ('.//{0}teiHeader//{0}editionStmt'.format(tei_ns),),
-              'availability': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'ref'),
-              'publisher': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'ref'),
-              'distributor': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'ref'),
-              'authority': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'ref'),
-              'idno': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns), 'type'),
-              'pubplace': ('.//{0}teiHeader//{0}publicationStmt'.format(tei_ns),),
-              'series_title': ('.//{0}teiHeader//{0}seriesStmt'.format(tei_ns),),
-              'note': ('.//{0}teiHeader//{0}notesStmt'.format(tei_ns),),
-              'source_desc': ('.//{0}teiHeader//{0}sourceDesc'.format(tei_ns),),
-             }
+    # automatically generated properties in the fileDesc element and xpath to their location
+    fields = OrderedDict([('title', ('titleStmt', '/{0}title'.format(tei_ns),)),
+              ('author', ('titleStmt', '/{0}author'.format(tei_ns), 'ref')),
+              ('editor', ('titleStmt', '/{0}editor'.format(tei_ns), 'ref')),
+              ('funder', ('titleStmt', '/{0}funder'.format(tei_ns), 'ref')),
+              ('principal', ('titleStmt', '/{0}principal'.format(tei_ns), 'ref')),
+              ('sponsor', ('titleStmt', '/{0}sponsor'.format(tei_ns), 'ref')),
+              ('meeting', ('titleStmt', '/{0}meeting'.format(tei_ns), 'meeting')),
+              ('edition', ('editionStmt', '/{0}edition'.format(tei_ns),)),
+              ('publisher', ('publicationStmt', '/{0}publisher'.format(tei_ns), 'target')),
+              ('distributor', ('publicationStmt', '/{0}distributor'.format(tei_ns), 'target')),
+              ('authority', ('publicationStmt', '/{0}authority'.format(tei_ns), 'target')),
+              ('idno', ('publicationStmt', '/{0}idno'.format(tei_ns), 'type')),
+              ('pub_place', ('publicationStmt', '/{0}pubPlace'.format(tei_ns),)),
+              ('licence', ('publicationStmt', '/{0}availability/{0}licence'.format(tei_ns), 'target')),
+              ('series_title', ('seriesStmt', '/{0}p'.format(tei_ns),)),
+              ('note', ('notesStmt', '/{0}notes'.format(tei_ns),)),
+              ('source_desc', ('sourceDesc', '/{0}p'.format(tei_ns),)),
+             ])
 
     fileDesc = ['titleStmt', 'editionStmt', 'publicationStmt', 'seriesStmt',
                 'notesStmt', 'sourceDesc', ]
 
     def _generic_getter(self, field):
-        el = self.doc.find(self.fields[field][0] + '/{0}{1}'.format(self.tei_ns, field))
+        el = self.doc.find('.//{0}teiHeader//{0}{1}{2}'.format(self.tei_ns,
+                                                               self.fields[field][0],
+                                                               self.fields[field][1]))
         if hasattr(el, 'text'):
             return el.text
         else:
             return None
        
     def _generic_setter(self, value, field):
-        el = self.doc.find(self.fields[field][0] + '/{0}{1}'.format(self.tei_ns, field))
-        parent = self.doc.find(self.fields[field][0])
+        entry = self.fields[field]
+        el = self.doc.find('.//{0}teiHeader//{0}{1}{2}'.format(self.tei_ns,
+                                                               entry[0],
+                                                               entry[1]))
+        # create *Stmt in correct order
+        parent = self.doc.find('.//{0}teiHeader//{0}{1}'.format(self.tei_ns, entry[0]))
         if parent is None:
-            _, _, stmt = self.fields[field][0].rpartition('}')
-            loc = self.fileDesc.index(stmt)
-            while loc:
-                loc -= 1
+            for loc in xrange(self.fileDesc.index(entry[0]), -1, -1):
                 prev_stmt = self.doc.find('.//{0}{1}'.format(self.tei_ns, self.fileDesc[loc]))
                 if prev_stmt is not None:
                     break
-            prev_stmt.addnext(Element('{0}{1}'.format(self.tei_ns, stmt)))
+            parent = Element('{0}{1}'.format(self.tei_ns, entry[0]))
+            prev_stmt.addnext(parent)
+        # create all nodes along xpath in field[1]
         if el is None:
-            el = SubElement(self.doc.find(self.fields[field][0]), self.tei_ns + field)
+            el = parent
+            for node in entry[1].split('/{')[1:]:
+                el = SubElement(el, '{' + node)
         if isinstance(value, list):
-            el.set(self.fields[field][1], value[1])
+            el.set(entry[2], value[1])
             value = value[0]
         el.text = value
 
@@ -226,8 +233,8 @@ class TEIFacsimile(object):
         Args:
             dim (tuple): A tuple containing the bounding box (x0, y0, x1, y1)
         """
-        zone = self.doc.find('.//' + self.tei_ns + 'zone')
-        self.line_scope = SubElement(zone, self.tei_ns + 'line',
+        surface = self.doc.find('.//' + self.tei_ns + 'surface')
+        self.line_scope = SubElement(surface, self.tei_ns + 'line',
                                      ulx=str(dim[0]), uly=str(dim[1]),
                                      lrx=str(dim[2]), lry=str(dim[3]))
         self.line_cnt += 1
@@ -260,15 +267,12 @@ class TEIFacsimile(object):
         x1, y1, confidence, id, text).
         """
         segments = []
-        for seg in self.doc.iter(self.tei_ns + 'seg'):
+        for seg in self.doc.iterfind(self.tei_ns + "zone[@type='segment']"):
             text = ''.join(seg.itertext())
-            if seg.getparent().get('type') == 'word':
-                bbox = (int(seg.getparent().get('ulx')),
-                        int(seg.getparent().get('uly')),
-                        int(seg.getparent().get('lrx')),
-                        int(seg.getparent().get('lry')))
-            else:
-                bbox = (None, None, None, None)
+            bbox = (int(seg.get('ulx')),
+                    int(seg.get('uly')),
+                    int(seg.get('lrx')),
+                    int(seg.get('lry')))
             cert = self.doc.xpath("//*[local-name()='certainty' and @target=$tag]",
                                   tag = '#' + seg.get(self.xml_ns + 'id'))
             if len(cert):
@@ -290,8 +294,8 @@ class TEIFacsimile(object):
         """
         zone = SubElement(self.line_scope, self.tei_ns + 'zone', 
                           ulx=str(dim[0]), uly=str(dim[1]), lrx=str(dim[2]),
-                          lry=str(dim[3]), type='word')
-        self.word_scope = SubElement(zone, self.tei_ns + 'seg')
+                          lry=str(dim[3]), type='segment')
+        self.word_scope = zone
         self.seg_cnt += 1
         self.word_scope.set(self.xml_ns + 'id', 'seg_' + str(self.seg_cnt))
         if confidence:
@@ -319,11 +323,11 @@ class TEIFacsimile(object):
         graphemes = []
         for g in self.doc.iter(self.tei_ns + 'g'):
             text = ''.join(g.itertext())
-            if g.getparent().get('type') == 'grapheme':
-                bbox = (int(g.getparent().get('ulx')),
-                        int(g.getparent().get('uly')),
-                        int(g.getparent().get('lrx')),
-                        int(g.getparent().get('lry')))
+            if g.getparent().getparent().get('type') == 'grapheme':
+                bbox = (int(g.getparent().getparent().get('ulx')),
+                        int(g.getparent().getparent().get('uly')),
+                        int(g.getparent().getparent().get('lrx')),
+                        int(g.getparent().getparent().get('lry')))
             else:
                 bbox = (None, None, None, None)
             cert = self.doc.xpath("//*[local-name()='certainty' and @target=$tag]",
@@ -361,7 +365,10 @@ class TEIFacsimile(object):
                 zone = SubElement(scope, self.tei_ns + 'zone', ulx=str(ulx),
                                   uly=str(uly), lrx=str(lrx), lry=str(lry),
                                   type='grapheme', resp= '#' + self.resp)
-            glyph = SubElement(zone, self.tei_ns + 'g')
+            # insert <seg> before <g> as TEI forbids a <g> directly beneath a
+            # <zone>
+            glyph = SubElement(SubElement(zone, self.tei_ns + 'seg'),
+                               self.tei_ns + 'g')
             self.grapheme_cnt += 1
             glyph.set(self.xml_ns + 'id', 'grapheme_' + str(self.grapheme_cnt))
             glyph.text = g
@@ -424,27 +431,27 @@ class TEIFacsimile(object):
 
     def clear_graphemes(self):
         """
-        Deletes all <g> nodes from the document. Mainly used when combining
-        page segmentation algorithms extracting graphemes and OCR engines
-        operating on lexemes. Also resets the current scope to the first line
-        (and if applicable its first segment).
+        Deletes all grapheme zone nodes from the document. Mainly used when
+        combining page segmentation algorithms extracting graphemes and OCR
+        engines operating on lexemes. Also resets the current scope to the
+        first line (and if applicable its first segment).
         """
         for zone in self.doc.iterfind('.//' + self.tei_ns +
                                       "zone[@type='grapheme']"):
             zone.getparent().remove(zone)
         self.line_scope = self.doc.find('.//' + self.tei_ns + 'line')
-        self.word_scope = self.doc.find('.//' + self.tei_ns + 'seg')
+        self.word_scope = self.doc.find('.//' + self.tei_ns + "zone[@type='segment']")
         self.grapheme_cnt = -1
 
     def clear_segments(self):
         """
-        Deletes all <seg> nodes from the document. Mainly used when combining
-        page segmentation algorithms extracting lexemes (and graphemes) and OCR
-        engines operating on lines. Also resets the current scope to the first
-        line.
+        Deletes all word zone nodes from the document. Mainly used when
+        combining page segmentation algorithms extracting lexemes (and
+        graphemes) and OCR engines operating on lines. Also resets the current
+        scope to the first line.
         """
         for zone in self.doc.iterfind('.//' + self.tei_ns +
-                                      "zone[@type='word']"):
+                                      "zone[@type='segment']"):
             zone.getparent().remove(zone)
         self.line_scope = self.doc.find('.//' + self.tei_ns + 'line')
         self.word_scope = None
@@ -590,7 +597,7 @@ class TEIFacsimile(object):
         Args:
             fp (file): file object to write to
         """
-        fp.write(etree.tostring(self.doc, xml_declaration=True,
+        fp.write(etree.tostring(self.doc, xml_declaration=True, pretty_print=True,
                                 encoding='utf-8'))
 
     def read(self, fp):
@@ -604,7 +611,7 @@ class TEIFacsimile(object):
         """
         self.doc = etree.parse(fp).getroot()
         self.line_cnt = len(list(self.doc.iter(self.tei_ns + 'line'))) - 1
-        self.seg_cnt = len(list(self.doc.iter(self.tei_ns + 'seg'))) - 1
+        self.seg_cnt = len(list(self.doc.iterfind(self.tei_ns + "zone[@type='segment']"))) - 1
         self.grapheme_cnt = len(list(self.doc.iter(self.tei_ns + 'g'))) - 1
 
 
