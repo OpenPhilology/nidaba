@@ -64,6 +64,7 @@ class StorageFile(io.IOBase):
 
     def close(self):
         self.fd.close()
+        self.lock.release()
 
     @property
     def closed(self):
