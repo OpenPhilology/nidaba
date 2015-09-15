@@ -50,7 +50,7 @@ tessdata (default='/usr/share/tesseract-ocr/')
     directory level upwards from the actual tessdata directory
 """
 
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 import subprocess
 import StringIO
@@ -59,7 +59,6 @@ import os
 
 from PIL import Image
 from ctypes import POINTER
-from shutil import copyfile
 from distutils import spawn
 from os.path import splitext
 from celery.utils.log import get_task_logger
@@ -82,19 +81,23 @@ tessdata = u'/usr/share/tesseract-ocr/'
 logger = get_task_logger(__name__)
 
 
-class TessBaseAPI(ctypes.Structure): 
+class TessBaseAPI(ctypes.Structure):
     pass
 
-class Pix(ctypes.Structure): 
+
+class Pix(ctypes.Structure):
     pass
 
-class TessResultIterator(ctypes.Structure): 
+
+class TessResultIterator(ctypes.Structure):
     pass
 
-class TessPageIterator(ctypes.Structure): 
+
+class TessPageIterator(ctypes.Structure):
     pass
 
-class TessResultRenderer(ctypes.Structure): 
+
+class TessResultRenderer(ctypes.Structure):
     pass
 
 
@@ -125,48 +128,61 @@ def setup(*args, **kwargs):
 
         tesseract.TessBaseAPIDelete.argtypes = [POINTER(TessBaseAPI)]
         tesseract.TessBaseAPIDelete.restype = None
-       
+
         tesseract.TessBaseAPIInit3.argtypes = [POINTER(TessBaseAPI),
-                                               ctypes.c_char_p, 
+                                               ctypes.c_char_p,
                                                ctypes.c_char_p]
         tesseract.TessBaseAPIInit3.restype = ctypes.c_int
 
         tesseract.TessBaseAPISetImage2.restype = None
         tesseract.TessBaseAPISetImage2.argtypes = [POINTER(TessBaseAPI),
                                                    POINTER(Pix)]
-        
+
         tesseract.TessBaseAPIRecognize.argtypes = [POINTER(TessBaseAPI), POINTER(TessBaseAPI)]
         tesseract.TessBaseAPIRecognize.restype = ctypes.c_int
 
         tesseract.TessResultIteratorGetUTF8Text.restype = ctypes.c_char_p
-        tesseract.TessResultIteratorGetUTF8Text.argtypes = [POINTER(TessResultIterator), ctypes.c_int]
-        
-        tesseract.TessResultIteratorConfidence.argtypes = [POINTER(TessResultIterator), ctypes.c_int]
+        tesseract.TessResultIteratorGetUTF8Text.argtypes = [POINTER(TessResultIterator),
+                                                            ctypes.c_int]
+
+        tesseract.TessResultIteratorConfidence.argtypes = [POINTER(TessResultIterator),
+                                                           ctypes.c_int]
         tesseract.TessResultIteratorConfidence.restype = ctypes.c_float
-        
+
         tesseract.TessResultIteratorWordRecognitionLanguage.argtypes = [POINTER(TessResultIterator)]
         tesseract.TessResultIteratorWordRecognitionLanguage.restype = ctypes.c_char_p
-        
+
         tesseract.TessVersion.restype = ctypes.c_char_p
-        
-        tesseract.TessBaseAPISetPageSegMode.argtypes = [POINTER(TessBaseAPI), ctypes.c_int]
+
+        tesseract.TessBaseAPISetPageSegMode.argtypes = [POINTER(TessBaseAPI),
+                                                        ctypes.c_int]
         tesseract.TessBaseAPISetPageSegMode.restype = None
-        
-        tesseract.TessBaseAPIProcessPages.argtypes = [POINTER(TessBaseAPI), ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int, POINTER(TessResultRenderer)]
+
+        tesseract.TessBaseAPIProcessPages.argtypes = [POINTER(TessBaseAPI),
+                                                      ctypes.c_char_p,
+                                                      ctypes.c_char_p,
+                                                      ctypes.c_int,
+                                                      POINTER(TessResultRenderer)]
         tesseract.TessBaseAPIProcessPages.restype = ctypes.c_int
-        
+
         tesseract.TessBaseAPIAnalyseLayout.argtypes = [POINTER(TessBaseAPI)]
         tesseract.TessBaseAPIAnalyseLayout.restype = POINTER(TessPageIterator)
-        
-        tesseract.TessPageIteratorIsAtBeginningOf.argtypes = [POINTER(TessPageIterator), ctypes.c_int]
+
+        tesseract.TessPageIteratorIsAtBeginningOf.argtypes = [POINTER(TessPageIterator),
+                                                              ctypes.c_int]
         tesseract.TessPageIteratorIsAtBeginningOf.restype = ctypes.c_int
-        
-        tesseract.TessPageIteratorBoundingBox.argtypes = [POINTER(TessPageIterator), ctypes.c_int, POINTER(ctypes.c_int), POINTER(ctypes.c_int), POINTER(ctypes.c_int), POINTER(ctypes.c_int)]
+
+        tesseract.TessPageIteratorBoundingBox.argtypes = [POINTER(TessPageIterator),
+                                                          ctypes.c_int,
+                                                          POINTER(ctypes.c_int),
+                                                          POINTER(ctypes.c_int),
+                                                          POINTER(ctypes.c_int),
+                                                          POINTER(ctypes.c_int)]
         tesseract.TessPageIteratorBoundingBox.restype = ctypes.c_int
-        
+
         tesseract.TessBaseAPIGetIterator.argtypes = [POINTER(TessBaseAPI)]
         tesseract.TessBaseAPIGetIterator.restype = POINTER(TessResultIterator)
-        
+
         tesseract.TessResultIteratorGetPageIterator.argtypes = [POINTER(TessResultIterator)]
         tesseract.TessResultIteratorGetPageIterator.restype = POINTER(TessPageIterator)
 
@@ -175,16 +191,16 @@ def setup(*args, **kwargs):
 
         tesseract.TessResultIteratorDelete.argtypes = [POINTER(TessResultIterator)]
         tesseract.TessResultIteratorDelete.restype = None
-        
+
         tesseract.TessPageIteratorDelete.argtypes = [POINTER(TessPageIterator)]
         tesseract.TessPageIteratorDelete.restype = None
-        
+
         leptonica.pixRead.argtypes = [ctypes.c_char_p]
         leptonica.pixRead.restype = POINTER(Pix)
-        
-        leptonica.pixDestroy.argtypes = [POINTER(Pix)]
+
+        leptonica.pixDestroy.argtypes = [POINTER(POINTER(Pix))]
         leptonica.pixDestroy.restype = None
-        
+
         tesseract.TessBaseAPIGetHOCRText.argtypes = [POINTER(TessBaseAPI), ctypes.c_int]
         tesseract.TessBaseAPIGetHOCRText.restype = ctypes.c_char_p
 
@@ -218,8 +234,10 @@ def segmentation_tesseract(doc, method=u'segment_tesseract'):
 
     # only do segmentation and script detection
     tesseract.TessBaseAPISetPageSegMode(api, 2)
-    tesseract.TessBaseAPIProcessPages(api, input_path.encode('utf-8'), None, 0, None)
+    pix = leptonica.pixRead(input_path.encode('utf-8'))
+    tesseract.TessBaseAPISetImage2(api, pix)
     it = tesseract.TessBaseAPIAnalyseLayout(api)
+    leptonica.pixDestroy(ctypes.byref(pix))
     x0, y0, x1, y1 = (ctypes.c_int(), ctypes.c_int(), ctypes.c_int(),
                       ctypes.c_int())
 
@@ -284,9 +302,9 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
 
     # rewrite the segmentation file to lines in UZN format
     seg = TEIFacsimile()
-    with open(storage.get_abs_path(*doc[0])) as fp:
+    with storage.StorageFile(*doc[0]) as fp:
         seg.read(fp)
-    with open(splitext(image_path)[0] + '.uzn', 'w') as fp:
+    with storage.StorageFile(doc[1][0], splitext(doc[1][1])[0] + '.uzn', mode='wb') as fp:
         uzn = UZNWriter(fp)
         for line in seg.lines:
             uzn.writerow(*line[:4])
@@ -332,6 +350,22 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
         extended (bool): Switch to select extended hOCR output containing
                          character cuts and confidences values
     """
+    # tesseract has a tendency to crash arbitrarily on some inputs
+    # necessitating execution in a separate process to ensure the worker
+    # doesn't just die. We use fork as the multiprocessing module thinks
+    # programmers are too stupid to reap their children.
+    # pid = os.fork()
+    # if pid != 0:
+    #     try:
+    #         _, status = os.waitpid(pid, 0)
+    #     except OSError as e:
+    #         if e.errno not in (errno.EINTR, errno.ECHILD):
+    #             raise
+    #         return
+    #     if os.WIFSIGNALED(status):
+    #         raise NidabaTesseractException('Tesseract killed by signal: {0}'.format( os.WTERMSIG(status)))
+    #     return
+
     # ensure we've loaded a tesseract object newer than 3.02
     ver = tesseract.TessVersion()
     if int(ver.split('.')[0]) < 3 or int(ver.split('.')[1]) < 2:
@@ -356,7 +390,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
         # and clear out segments and graphemes here too.
         facsimile.clear_graphemes()
         facsimile.clear_segments()
-        
+
         w, h = Image.open(image_path).size
         x0, y0, x1, y1 = (ctypes.c_int(), ctypes.c_int(), ctypes.c_int(),
                           ctypes.c_int())
@@ -381,7 +415,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                     conf = tesseract.TessResultIteratorConfidence(ri, RIL_WORD)
                     facsimile.add_segment((x0.value, y0.value, x1.value, y1.value),
                                           lang, conf)
-                
+
                 conf = tesseract.TessResultIteratorConfidence(ri, RIL_SYMBOL)
                 tesseract.TessPageIteratorBoundingBox(pi, RIL_SYMBOL,
                                                       ctypes.byref(x0),
@@ -406,7 +440,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
             tesseract.TessBaseAPIDelete(api)
             raise NidabaTesseractException('Tesseract recognition failed')
         with open(output_path, 'wb') as fp:
-            tp = tesseract.TessBaseAPIGetHOCRText(api)
+            tp = tesseract.TessBaseAPIGetHOCRText(api, 0)
             hocr = StringIO.StringIO()
             hocr.write(ctypes.string_at(tp))
             hocr.seek(0)
@@ -415,6 +449,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
             tesseract.TessDeleteText(tp)
     tesseract.TessBaseAPIEnd(api)
     tesseract.TessBaseAPIDelete(api)
+    #os._exit(os.EX_OK)
 
 def ocr_direct(image_path, output_path, languages):
     """
@@ -430,8 +465,7 @@ def ocr_direct(image_path, output_path, languages):
     p = subprocess.Popen(['tesseract', image_path, output_path, '-l',
                           '+'.join(languages), '-psm', '4', '--tessdata-dir',
                           tessdata, 'hocr'], stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE)
+                         stderr=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode:
         raise NidabaTesseractException(err)
-
