@@ -7,7 +7,7 @@ The public API of nidaba. External applications should exclusively use the
 objects and methods defined here.
 """
 
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 from nidaba import tasks
 from nidaba import plugins
@@ -21,12 +21,10 @@ from nidaba.nidabaexceptions import (NidabaInputException,
 from itertools import product
 from celery import chain
 from celery import group
-from celery.result import AsyncResult
-from celery.states import state
 
 import json
 import uuid
-import redis
+
 
 class Batch(object):
 
@@ -265,8 +263,8 @@ class Batch(object):
             groups.append(tasks.util.sync.s())
             for tset in self.batch_def[1:]:
                 for sequence in product(*tset):
-                    method = celery.app.tasks[
-                            'nidaba.' + sequence[0]['method']]
+                    method = celery.app.tasks['nidaba.' +
+                                              sequence[0]['method']]
                     ch = chain(method.s(**(sequence[0])))
                     for seq in sequence[1:]:
                         method = celery.app.tasks['nidaba.' + seq['method']]

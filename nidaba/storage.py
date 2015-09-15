@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
-# This module contains all file handling/storage management/ID mapping methods
+"""
+nidaba.storage
+~~~~~~~~~~~~~~
 
-from __future__ import absolute_import
+This module contains all file handling/storage management/ID mapping methods.
+"""
+
+from __future__ import unicode_literals, print_function, absolute_import
 
 
 from nidaba.lock import lock
@@ -13,6 +18,7 @@ import io
 import os
 import fnmatch
 import re
+
 
 class StorageFile(io.IOBase):
     """
@@ -32,13 +38,13 @@ class StorageFile(io.IOBase):
         except:
             pass
 
-    def readable():
+    def readable(self):
         return self.fd.readable()
 
-    def writable():
+    def writable(self):
         return self.fd.writable()
 
-    def seekable():
+    def seekable(self):
         return self.fd.seekable()
 
     def read(self, size=-1):
@@ -53,7 +59,7 @@ class StorageFile(io.IOBase):
     def write(self, msg):
         self.fd.write(msg)
 
-    def writable(self, lines):
+    def writelines(self, lines):
         self.fd.writelines(lines)
 
     def seek(self, offset):

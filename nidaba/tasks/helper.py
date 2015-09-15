@@ -7,15 +7,15 @@ A helper class that all nidaba tasks should inherit from to ensure accurate
 logging of errors.
 """
 
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 from celery import Task
 from inspect import getargspec
 from redis import WatchError
-from nidaba.celery import app
 from nidaba.config import Redis
 
 import json
+
 
 def _redis_set_atomically(batch_id, subtask, key, val):
     """
@@ -58,7 +58,6 @@ class NidabaTask(Task):
             # subsequent tasks.
             if isinstance(kwargs['doc'][0], dict):
                 docs = []
-                root = set()
                 for o in kwargs['doc']:
                     docs.append(tuple(o['doc']))
                 kwargs['doc'] = docs

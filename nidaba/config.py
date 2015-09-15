@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 import yaml
 import sys
@@ -9,6 +9,7 @@ import redis
 from os import path
 
 from nidaba.nidabaexceptions import NidabaConfigException
+
 
 def reload_config():
     """

@@ -16,7 +16,7 @@ It should be able to utilize any model trained for ocropus and is configured
 using the same global configuration options.
 """
 
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 import os
 import shutil
@@ -99,7 +99,6 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
                                                                      method,
                                                                      model))[0]
                    + '.xml')
-    segmentation = storage.get_abs_path(*doc[0])
     if model in nidaba_cfg['kraken_models']:
         model = storage.get_abs_path(*(nidaba_cfg['kraken_models'][model]))
     elif model in nidaba_cfg['ocropus_models']:
@@ -109,7 +108,7 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
                                               'configuration')
     img = Image.open(input_path)
     tei = TEIFacsimile()
-    with open(segmentation, 'r') as seg:
+    with storage.StorageFile(*doc[0]) as seg:
         tei.read(seg)
     # kraken is a line recognizer
     tei.clear_graphemes()
@@ -126,7 +125,7 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
         tei.scope_line(lines[i][4])
         tei.add_graphemes([(x[0], x[1], int(x[2] * 100)) for x in rec])
         i += 1
-    with open(storage.get_abs_path(*output_path), 'w') as fp:
+    with storage.StorageFile(*output_path, mode='wb') as fp:
         tei.write(fp)
     return output_path
 

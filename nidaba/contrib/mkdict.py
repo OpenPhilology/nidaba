@@ -1,9 +1,12 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals, print_function, absolute_import
+
 import click
 
 from nidaba import lex
+
 
 @click.command()
 @click.option('--input', help='Input text', type=click.Path(exists=True,

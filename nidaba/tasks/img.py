@@ -8,7 +8,7 @@ packages (e.g. binarization).
 
 """
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals, print_function, absolute_import
 
 from nidaba import storage
 from nidaba import image

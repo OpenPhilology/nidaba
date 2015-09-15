@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 from celery import Celery
 from nidaba.config import celery_cfg

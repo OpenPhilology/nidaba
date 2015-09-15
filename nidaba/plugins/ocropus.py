@@ -16,7 +16,7 @@ at the website for installation instructions.
     generally more well-behaved than ocropus.
 """
 
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 import os
 import numpy as np
@@ -132,8 +132,8 @@ def ocr(image_path, segmentation_path, output_path, model_path):
     for box in tei.lines:
         ib = tuple(int(x) for x in box[:-2])
         line = ocrolib.pil2array(im.crop(ib))
-        temp = np.amax(line)-line
-        temp = temp*1.0/np.amax(temp)
+        temp = np.amax(line) - line
+        temp = temp * 1.0 / np.amax(temp)
         lnorm.measure(temp)
         line = lnorm.normalize(line, cval=np.amax(line))
         if line.ndim == 3:
