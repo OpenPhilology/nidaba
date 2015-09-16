@@ -404,6 +404,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
             ri = tesseract.TessBaseAPIGetIterator(api)
             pi = tesseract.TessResultIteratorGetPageIterator(ri)
             facsimile.scope_line(line[4])
+            last_word = None
             while True:
                 if tesseract.TessPageIteratorIsAtBeginningOf(pi, RIL_WORD):
                     lang = tesseract.TessResultIteratorWordRecognitionLanguage(ri, RIL_WORD).decode('utf-8')
@@ -413,6 +414,15 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                                                           ctypes.byref(x1),
                                                           ctypes.byref(y1))
                     conf = tesseract.TessResultIteratorConfidence(ri, RIL_WORD)
+                    # insert space between word boundaries as they don't get
+                    # returned by GetUTF8Text
+                    if last_word is not None:
+                        facsimile.clear_segment()
+                        facsimile.add_graphemes([(u' ', (last_word, 
+                                                       y0.value,
+                                                       x0.value, 
+                                                       y1.value), 100.0)])
+                    last_word = x1.value
                     facsimile.add_segment((x0.value, y0.value, x1.value, y1.value),
                                           lang, conf)
 
