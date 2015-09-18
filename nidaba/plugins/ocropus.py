@@ -16,12 +16,13 @@ at the website for installation instructions.
     generally more well-behaved than ocropus.
 """
 
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 import os
 import numpy as np
 
 from PIL import Image
+from celery.utils.log import get_task_logger
 
 from nidaba import storage
 from nidaba.tei import TEIFacsimile
@@ -30,6 +31,8 @@ from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
 from nidaba.nidabaexceptions import NidabaOcropusException
 from nidaba.nidabaexceptions import NidabaPluginException
+
+logger = get_task_logger(__name__)
 
 
 def setup(*args, **kwargs):
@@ -114,26 +117,30 @@ def ocr(image_path, segmentation_path, output_path, model_path):
     """
 
     try:
+        logger.debug('Loading pyrnn from {}'.format(model_path))
         network = ocrolib.load_object(model_path, verbose=0)
         lnorm = getattr(network, "lnorm")
     except Exception as e:
         raise NidabaOcropusException('Something somewhere broke: ' + e.msg)
     im = Image.open(image_path)
 
+    logger.debug('Loading TEI segmentation {}'.format(segmentation_path))
     tei = TEIFacsimile()
     with open(segmentation_path, 'r') as seg_fp:
         tei.read(seg_fp)
 
+    logger.debug('Clearing out word/grapheme boxes')
     # ocropus is a line recognizer
     tei.clear_graphemes()
     tei.clear_segments()
     # add and scope new responsibility statement
     tei.add_respstmt('ocropus', 'character recognition')
     for box in tei.lines:
+        logger.debug('Recognizing line {}'.format(box[4]))
         ib = tuple(int(x) for x in box[:-2])
         line = ocrolib.pil2array(im.crop(ib))
-        temp = np.amax(line)-line
-        temp = temp*1.0/np.amax(temp)
+        temp = np.amax(line) - line
+        temp = temp * 1.0 / np.amax(temp)
         lnorm.measure(temp)
         line = lnorm.normalize(line, cval=np.amax(line))
         if line.ndim == 3:
@@ -141,8 +148,11 @@ def ocr(image_path, segmentation_path, output_path, model_path):
         line = ocrolib.lstm.prepare_line(line, 16)
         pred = network.predictString(line)
         pred = ocrolib.normalize_text(pred)
+        logger.debug('Scoping line {}'.format(box[4]))
         tei.scope_line(box[4])
+        logger.debug('Adding graphemes: {}'.format(pred))
         tei.add_graphemes(pred)
     with open(output_path, 'wb') as fp:
+        logger.debug('Writing TEI to {}'.format(fp.name))
         tei.write(fp)
     return output_path

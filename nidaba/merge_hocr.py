@@ -1,6 +1,12 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""
+nidaba.merge_hocr
+~~~~~~~~~~~~~~~~~
 
-from __future__ import absolute_import
+A naive algorithm merging multiple hOCR output documents into one.
+"""
+
+from __future__ import unicode_literals, print_function, absolute_import
 
 from lxml import etree
 from operator import attrgetter
@@ -209,7 +215,7 @@ def merge(docs, lang, output):
             lines_2, words_2 = get_hocr_lines_for_tree(tree2)
             other_words = other_words + words_2
         except Exception as e:
-            print e
+            print(e)
 
     sort_words_bbox(other_words)
     positional_lists = []
@@ -258,9 +264,9 @@ def merge(docs, lang, output):
                 word.element.text = replacement_word.text
 
         for positional_list in positional_lists:
-            print "##"
+            print("##")
             for word in positional_list:
-                print word.bbox, word.text
+                print(word.bbox, word.text)
 
     storage.write_text(*output, text=etree.tostring(tree1.getroot(),
                                                     encoding='unicode'))

@@ -8,11 +8,9 @@ conversion, metadata enrichment, ...
 
 """
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals, print_function, absolute_import
 
 import yaml
-
-from lxml import etree
 
 from nidaba import storage
 from nidaba.celery import app
@@ -20,17 +18,20 @@ from nidaba.tei import TEIFacsimile
 from nidaba.nidabaexceptions import NidabaTEIException
 from nidaba.tasks.helper import NidabaTask
 
+from celery.utils.log import get_task_logger
+
+logger = get_task_logger(__name__)
 
 @app.task(base=NidabaTask, name=u'nidaba.output.metadata')
-def tei_metadata(doc, method=u'metadata', metadata=None, validate=True):
+def tei_metadata(doc, method=u'metadata', metadata=None, validate=False):
     """
     Enriches a TEI-XML document with various metadata from an user-supplied
-    YAML file. 
+    YAML file.
 
     The following fields may be contained in the metadata file with the bolded
     subset mandatory for a valid TEI-XML file. They are grouped by their place
     in the header. Unknown fields are ignored and input is escaped as to
-    disable 
+    disable injection.
 
     Some element may also be extended by increasing their arity, the second
     value is then usually used as a global identifer/locator, i.e. an URL or
@@ -71,13 +72,13 @@ def tei_metadata(doc, method=u'metadata', metadata=None, validate=True):
         * series_title: Title of the series to which the publication belongs
 
     notesStmt:
-        
+
         * note: Misc. notes about the text
 
     sourceDesc:
 
         * ``source_desc``: Description of the source document
-   
+
     other:
 
         * lang: Abbreviation of the language used in the header
@@ -99,18 +100,23 @@ def tei_metadata(doc, method=u'metadata', metadata=None, validate=True):
     """
     with storage.StorageFile(*doc) as fp:
         tei = TEIFacsimile()
+        logger.debug('Reading TEI ({}/{})'.format(*doc))
         tei.read(fp)
+    logger.debug('Reading metadata file ({}/{})'.format(*metadata))
     with storage.StorageFile(*metadata) as fp:
         meta = yaml.safe_load(fp)
     for field in tei.fields:
         if field in meta:
+            logger.debug('Adding field {} ({})'.format(field, meta[field]))
             setattr(tei, field, meta[field])
     if validate:
-        pass
+        raise NidabaTEIException('Validation not yet implemented.')
     output_path = storage.insert_suffix(doc[1], method, metadata[1])
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
+        logger.debug('Writing TEI to {}'.format(fp.name))
         tei.write(fp)
     return (doc[0], output_path)
+
 
 @app.task(base=NidabaTask, name=u'nidaba.output.tei2simplexml')
 def tei2simplexml(doc, method=u'simplexml'):
@@ -125,12 +131,13 @@ def tei2simplexml(doc, method=u'simplexml'):
     """
     with storage.StorageFile(*doc) as fp:
         tei = TEIFacsimile()
+        logger.debug('Reading TEI ({}/{})'.format(*doc))
         tei.read(fp)
     output_path = storage.insert_suffix(doc[1], method)
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
+        logger.debug('Writing simplexml to {}'.format(fp.name))
         tei.write_simplexml(fp)
     return (doc[0], output_path)
-   
 
 
 @app.task(base=NidabaTask, name=u'nidaba.output.tei2hocr')
@@ -146,11 +153,14 @@ def tei2hocr(doc, method=u'tei2hocr'):
     """
     with storage.StorageFile(*doc) as fp:
         tei = TEIFacsimile()
+        logger.debug('Reading TEI ({}/{})'.format(*doc))
         tei.read(fp)
     output_path = storage.insert_suffix(doc[1], method)
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
+        logger.debug('Writing hOCR to {}'.format(fp.name))
         tei.write_hocr(fp)
     return (doc[0], output_path)
+
 
 @app.task(base=NidabaTask, name=u'nidaba.output.tei2txt')
 def tei2txt(doc, method=u'tei2txt'):
@@ -165,9 +175,10 @@ def tei2txt(doc, method=u'tei2txt'):
     """
     with storage.StorageFile(*doc) as fp:
         tei = TEIFacsimile()
+        logger.debug('Reading TEI ({}/{})'.format(*doc))
         tei.read(fp)
     output_path = storage.insert_suffix(doc[1], method)
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
+        logger.debug('Writing text to {}'.format(fp.name))
         tei.write_text(fp)
     return (doc[0], output_path)
-

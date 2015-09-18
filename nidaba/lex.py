@@ -8,7 +8,7 @@ extracting words from texts, normalizing encodings, building symmetric deletion
 dictionaries, etc.
 """
 
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 import os
 import codecs
@@ -49,7 +49,8 @@ def tei_spellcheck(facsimile, dictionary, deletion_dictionary,
         if key not in suggestions:
             continue
         for sugg in suggestions[key]:
-            facsimile.add_choices(segment[-2], [(sugg, 100 - 10*alg.edit_distance(key, sugg))])
+            facsimile.add_choices(segment[-2], [(sugg, 100 - 10 *
+                                  alg.edit_distance(key, sugg))])
     return facsimile
 
 
@@ -78,7 +79,7 @@ def spellcheck(tokens, dictionary, deletion_dictionary):
     for tok in tokens:
         tok = alg.sanitize(tok)
         if alg.mmap_bin_search(tok, dictionary,
-                           entryparser_fn=alg.key_for_single_word):
+                               entryparser_fn=alg.key_for_single_word):
             continue
         if tok in suggestions:
             continue

@@ -12,7 +12,7 @@ Additional tasks depending on external or complex dependencies are contained in
 plugins found in the plugins directory.
 """
 
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 from nidaba.tasks import util
 from nidaba.tasks import img

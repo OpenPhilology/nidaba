@@ -8,7 +8,7 @@ a kind.
 
 """
 
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 from nidaba.tasks.helper import NidabaTask
 from nidaba.celery import app

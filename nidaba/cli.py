@@ -10,6 +10,7 @@ from nidaba import storage
 from nidaba.nidaba import Batch
 from nidaba.config import nidaba_cfg
 from nidaba import celery
+from nidaba.nidabaexceptions import NidabaStorageViolationException
 from pprint import pprint
 from inspect import getcallargs, getdoc
 
@@ -145,7 +146,7 @@ def move_to_storage(id, kwargs):
               help='A configuration for a single binarization algorithm in '
               'the format algorithm:param1,param2;param1,param2;...')
 @click.option('--segmentation', '-l', multiple=True,
-               callback=validate_definition,
+              callback=validate_definition,
               help='A configuration for a single page segmentation algorithm in '
               'the format algorithm:param1,param2;param1,param2;...')
 @click.option('--ocr', '-o', multiple=True, callback=validate_definition,
@@ -162,7 +163,7 @@ def move_to_storage(id, kwargs):
               callback=validate_definition, help='A configuration for a '
               'single output layer transformation in the format'
               'task:param1,param2;param1;param1...')
-#@click.option('--willitblend', 'blend',  default=False, help='Blend all '
+# @click.option('--willitblend', 'blend',  default=False, help='Blend all '
 #              'output files into a single hOCR document.', is_flag=True)
 @click.option('--grayscale', default=False, help='Skip grayscale '
               'conversion using the ITU-R 601-2 luma transform if the input '
@@ -284,8 +285,8 @@ def status(verbose, job_id):
 
     click.secho('Status:', underline=True, nl=False)
     if state == 'NONE':
-     click.echo(' UNKNOWN')
-     return
+        click.echo(' UNKNOWN')
+        return
     click.echo(' {0}\n'.format(state))
 
     ext = batch.get_extended_state()
@@ -315,5 +316,5 @@ def status(verbose, job_id):
         errors = batch.get_errors()
         for task in errors:
             click.echo('{0} ({1}): {2}'.format(task['task'][0],
-                                            task['root_document'][1],
-                                            task['errors'][-1]))
+                                               task['root_document'][1],
+                                               task['errors'][-1]))

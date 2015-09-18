@@ -7,7 +7,7 @@ Various postprocessing tasks that operate upon recognized texts.
 
 """
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals, print_function, absolute_import
 
 from nidaba import storage
 from nidaba import merge_hocr
@@ -17,12 +17,16 @@ from nidaba.tei import TEIFacsimile
 from nidaba.config import nidaba_cfg
 from nidaba.tasks.helper import NidabaTask
 
+from celery.utils.log import get_task_logger
+
+logger = get_task_logger(__name__)
+
 
 @app.task(base=NidabaTask, name=u'nidaba.postprocessing.spell_check')
 def spell_check(doc, method=u'spell_check', language=u'',
                 filter_punctuation=False):
     """
-    Adds spelling suggestions to an TEI XML document. 
+    Adds spelling suggestions to an TEI XML document.
 
     Alternative spellings for each segment will be included in a choice
     tagcontaining a series of corr tags with the original segment appearing
@@ -45,35 +49,38 @@ def spell_check(doc, method=u'spell_check', language=u'',
     dictionary = storage.get_abs_path(*nidaba_cfg['lang_dicts'][language]['dictionary'])
     del_dictionary = storage.get_abs_path(*nidaba_cfg['lang_dicts'][language]['deletion_dictionary'])
     with storage.StorageFile(*doc) as fp:
+        logger.debug('Reading TEI ({})'.format(fp.name))
         tei = TEIFacsimile()
         tei.read(fp)
+        logger.debug('Performing spell check')
         ret = lex.tei_spellcheck(tei, dictionary, del_dictionary,
                                  filter_punctuation)
     with storage.StorageFile(*storage.get_storage_path(output_path), mode='wb') as fp:
+        logger.debug('Writing TEI ({})'.format(fp.name))
         ret.write(fp)
     return storage.get_storage_path(output_path)
 
 
-#@app.task(base=NidabaTask, name=u'nidaba.postprocessing.blend_hocr')
-#def blend_hocr(doc, method=u'blend_hocr', language=u''):
-#    """
-#    Blends multiple hOCR files using the algorithm from Bruce Robertsons
-#    rigaudon. It requires a working spell checking for the input document's
-#    language; otherwise all matched bboxes will be bunched together without any
-#    scoring.
+# @app.task(base=NidabaTask, name=u'nidaba.postprocessing.blend_hocr')
+# def blend_hocr(doc, method=u'blend_hocr', language=u''):
+#     """
+#     Blends multiple hOCR files using the algorithm from Bruce Robertsons
+#     rigaudon. It requires a working spell checking for the input document's
+#     language; otherwise all matched bboxes will be bunched together without any
+#     scoring.
 #
-#    Args:
-#        doc [(id, path), ...]: A list of storage module tupels that will be
-#        merged into a single output document.
-#        language (unicode): Language used for spell-checking based scoring. If
-#                            not defined no scoring will be used.
-#        method (unicode): The suffix string appended to the output file.
+#     Args:
+#         doc [(id, path), ...]: A list of storage module tupels that will be
+#         merged into a single output document.
+#         language (unicode): Language used for spell-checking based scoring. If
+#                             not defined no scoring will be used.
+#         method (unicode): The suffix string appended to the output file.
 #
-#    Returns:
-#        (unicode, unicode): Storage tuple of the output document
-#    """
-#    # create the output document path from the first input document
-#    input_path = storage.get_abs_path(*doc[0])
-#    output_path = storage.insert_suffix(input_path, method)
-#    return merge_hocr.merge(doc, language,
-#                            storage.get_storage_path(output_path))
+#     Returns:
+#         (unicode, unicode): Storage tuple of the output document
+#     """
+#     # create the output document path from the first input document
+#     input_path = storage.get_abs_path(*doc[0])
+#     output_path = storage.insert_suffix(input_path, method)
+#     return merge_hocr.merge(doc, language,
+#                             storage.get_storage_path(output_path))

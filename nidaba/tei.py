@@ -55,23 +55,43 @@ class TEIFacsimile(object):
 
     # automatically generated properties in the fileDesc element and xpath to their location
     fields = OrderedDict([('title', ('titleStmt', '/{0}title'.format(tei_ns),)),
-              ('author', ('titleStmt', '/{0}author'.format(tei_ns), 'ref')),
-              ('editor', ('titleStmt', '/{0}editor'.format(tei_ns), 'ref')),
-              ('funder', ('titleStmt', '/{0}funder'.format(tei_ns), 'ref')),
-              ('principal', ('titleStmt', '/{0}principal'.format(tei_ns), 'ref')),
-              ('sponsor', ('titleStmt', '/{0}sponsor'.format(tei_ns), 'ref')),
-              ('meeting', ('titleStmt', '/{0}meeting'.format(tei_ns), 'meeting')),
-              ('edition', ('editionStmt', '/{0}edition'.format(tei_ns),)),
-              ('publisher', ('publicationStmt', '/{0}publisher'.format(tei_ns), 'target')),
-              ('distributor', ('publicationStmt', '/{0}distributor'.format(tei_ns), 'target')),
-              ('authority', ('publicationStmt', '/{0}authority'.format(tei_ns), 'target')),
-              ('idno', ('publicationStmt', '/{0}idno'.format(tei_ns), 'type')),
-              ('pub_place', ('publicationStmt', '/{0}pubPlace'.format(tei_ns),)),
-              ('licence', ('publicationStmt', '/{0}availability/{0}licence'.format(tei_ns), 'target')),
-              ('series_title', ('seriesStmt', '/{0}p'.format(tei_ns),)),
-              ('note', ('notesStmt', '/{0}notes'.format(tei_ns),)),
-              ('source_desc', ('sourceDesc', '/{0}p'.format(tei_ns),)),
-             ])
+                          ('author', ('titleStmt', '/{0}author'.format(tei_ns),
+                                      'ref')),
+                          ('editor', ('titleStmt', '/{0}editor'.format(tei_ns),
+                                      'ref')),
+                          ('funder', ('titleStmt', '/{0}funder'.format(tei_ns),
+                                      'ref')),
+                          ('principal', ('titleStmt',
+                                         '/{0}principal'.format(tei_ns),
+                                         'ref')),
+                          ('sponsor', ('titleStmt',
+                                       '/{0}sponsor'.format(tei_ns), 'ref')),
+                          ('meeting', ('titleStmt',
+                                       '/{0}meeting'.format(tei_ns),
+                                       'meeting')),
+                          ('edition', ('editionStmt',
+                                       '/{0}edition'.format(tei_ns),)),
+                          ('publisher', ('publicationStmt',
+                                         '/{0}publisher'.format(tei_ns),
+                                         'target')),
+                          ('distributor', ('publicationStmt',
+                                           '/{0}distributor'.format(tei_ns),
+                                           'target')),
+                          ('authority', ('publicationStmt',
+                                         '/{0}authority'.format(tei_ns),
+                                         'target')),
+                          ('idno', ('publicationStmt',
+                                    '/{0}idno'.format(tei_ns), 'type')),
+                          ('pub_place', ('publicationStmt',
+                                         '/{0}pubPlace'.format(tei_ns),)),
+                          ('licence', ('publicationStmt',
+                                       '/{0}availability/{0}licence'.format(tei_ns),
+                                       'target')),
+                          ('series_title', ('seriesStmt',
+                                            '/{0}p'.format(tei_ns),)),
+                          ('note', ('notesStmt', '/{0}notes'.format(tei_ns),)),
+                          ('source_desc', ('sourceDesc',
+                                           '/{0}p'.format(tei_ns),))])
 
     fileDesc = ['titleStmt', 'editionStmt', 'publicationStmt', 'seriesStmt',
                 'notesStmt', 'sourceDesc', ]
@@ -84,7 +104,7 @@ class TEIFacsimile(object):
             return el.text
         else:
             return None
-       
+
     def _generic_setter(self, value, field):
         entry = self.fields[field]
         el = self.doc.find('.//{0}teiHeader//{0}{1}{2}'.format(self.tei_ns,
@@ -274,7 +294,7 @@ class TEIFacsimile(object):
                     int(seg.get('lrx')),
                     int(seg.get('lry')))
             cert = self.doc.xpath("//*[local-name()='certainty' and @target=$tag]",
-                                  tag = '#' + seg.get(self.xml_ns + 'id'))
+                                  tag='#' + seg.get(self.xml_ns + 'id'))
             if len(cert):
                 cert = int(100.0 * float(cert[0].get('degree')))
             else:
@@ -292,7 +312,7 @@ class TEIFacsimile(object):
             lang (unicode): Optional identifier of the segment language.
             confidence (float): Optional confidence value between 0 and 100.
         """
-        zone = SubElement(self.line_scope, self.tei_ns + 'zone', 
+        zone = SubElement(self.line_scope, self.tei_ns + 'zone',
                           ulx=str(dim[0]), uly=str(dim[1]), lrx=str(dim[2]),
                           lry=str(dim[3]), type='segment')
         self.word_scope = zone
@@ -300,9 +320,9 @@ class TEIFacsimile(object):
         self.word_scope.set(self.xml_ns + 'id', 'seg_' + str(self.seg_cnt))
         if confidence:
             cert = SubElement(self.word_scope, self.tei_ns + 'certainty',
-                              degree = u'{0:.2f}'.format(confidence/100.0),
-                              locus = 'value',
-                              target = '#' + 'seg_' + str(self.seg_cnt))
+                              degree=u'{0:.2f}'.format(confidence / 100.0),
+                              locus='value',
+                              target='#' + 'seg_' + str(self.seg_cnt))
             if self.resp:
                 cert.set('resp', '#' + self.resp)
         if self.resp:
@@ -331,7 +351,7 @@ class TEIFacsimile(object):
             else:
                 bbox = (None, None, None, None)
             cert = self.doc.xpath("//*[local-name()='certainty' and @target=$tag]",
-                                  tag = '#' + g.get(self.xml_ns + 'id'))
+                                  tag='#' + g.get(self.xml_ns + 'id'))
             if len(cert):
                 cert = int(100.0 * float(cert[0].get('degree')))
             else:
@@ -364,7 +384,7 @@ class TEIFacsimile(object):
                 ulx, uly, lrx, lry = box
                 zone = SubElement(scope, self.tei_ns + 'zone', ulx=str(ulx),
                                   uly=str(uly), lrx=str(lrx), lry=str(lry),
-                                  type='grapheme', resp= '#' + self.resp)
+                                  type='grapheme', resp='#' + self.resp)
             # insert <seg> before <g> as TEI forbids a <g> directly beneath a
             # <zone>
             glyph = SubElement(SubElement(zone, self.tei_ns + 'seg'),
@@ -374,26 +394,26 @@ class TEIFacsimile(object):
             glyph.text = g
             if conf:
                 cert = SubElement(zone, self.tei_ns + 'certainty',
-                                  degree=u'{0:.2f}'.format(conf/100.0),
-                                  locus = 'value',
-                                  target = '#' + 'grapheme_' +
+                                  degree=u'{0:.2f}'.format(conf / 100.0),
+                                  locus='value',
+                                  target='#' + 'grapheme_' +
                                   str(self.grapheme_cnt))
                 if self.resp:
                     cert.set('resp', '#' + self.resp)
             if self.resp:
                 glyph.set('resp', '#' + self.resp)
-    
+
     def add_choices(self, id, it):
         """
         Adds alternative interpretations to an element.
 
         Args:
-            id (unicode): 
+            id (unicode): Globally unique XML id of the element.
             it (iterable): An iterable returning a tuple containing an
                            alternative reading and an optional confidence value
                            in the range between 0 and 100.
         """
-        el = self.doc.xpath("//*[@xml:id=$tagid]", tagid = id)[0]
+        el = self.doc.xpath("//*[@xml:id=$tagid]", tagid=id)[0]
         # remove old tree only if not already part of an choice segment.
         parent = el.getparent()
         if parent.tag == self.tei_ns + 'sic':
@@ -411,8 +431,8 @@ class TEIFacsimile(object):
             corr.text = alt[0]
             if len(alt) == 2:
                 cert = SubElement(corr, self.tei_ns + 'certainty',
-                                  degree = u'{0:.2f}'.format(alt[1]/100.0),
-                                  locus = 'value')
+                                  degree=u'{0:.2f}'.format(alt[1] / 100.0),
+                                  locus='value')
                 if self.resp:
                     cert.set('resp', '#' + self.resp)
 
@@ -527,13 +547,16 @@ class TEIFacsimile(object):
                                                       str(line.get('lrx')),
                                                       str(line.get('lry'))]))
             # get text not in word segments interleaved with segments
+            ocrx_word = None
             for seg in line.xpath('child::node()'):
+                if ocrx_word is not None:
+                    ocrx_word.text += ' '
                 if isinstance(seg, etree._ElementStringResult):
                     if ocr_line.text is None:
                         ocr_line.text = ''
                     ocr_line.text += seg
                 else:
-                    # zone from 
+                    # zone from
                     ocrx_word = SubElement(ocr_line, 'span')
                     ocrx_word.set('class', 'ocrx_word')
                     title = 'bbox ' + ' '.join([str(seg.get('ulx')),
@@ -547,10 +570,10 @@ class TEIFacsimile(object):
                     ocrx_word.set('title', title)
                     ocrx_word.text = ''.join(seg.itertext())
             SubElement(ocr_page, 'br')
-        fp.write(etree.tostring(page, pretty_print=True, 
+        fp.write(etree.tostring(page, pretty_print=True,
                  doctype='<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '
-                 'Transitional//EN" '
-                 '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
+                         'Transitional//EN" '
+                         '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
                  xml_declaration=True, encoding='utf-8'))
 
     def write_simplexml(self, fp):

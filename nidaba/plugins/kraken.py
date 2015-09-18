@@ -16,7 +16,7 @@ It should be able to utilize any model trained for ocropus and is configured
 using the same global configuration options.
 """
 
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 import os
 import shutil
@@ -31,6 +31,9 @@ from nidaba.nidabaexceptions import NidabaPluginException
 from nidaba.tasks.helper import NidabaTask
 
 from PIL import Image
+from celery.utils.log import get_task_logger
+
+logger = get_task_logger(__name__)
 
 
 def setup(*args, **kwargs):
@@ -67,15 +70,20 @@ def segmentation_kraken(doc, method=u'segment_kraken', black_colseps=False):
     input_path = storage.get_abs_path(*doc)
     output_path, ext = os.path.splitext(storage.insert_suffix(input_path,
                                         method))
+    logger.debug('Copying input image {} to {}'.format(input_path, output_path))
     shutil.copy2(input_path, output_path + ext)
+    logger.debug('Reading image using PIL')
     img = Image.open(input_path)
     with open(output_path + '.xml', 'w') as fp:
+        logger.debug('Initializing TEI with {} ({} {})'.format(doc[1], *img.size))
         tei = TEIFacsimile()
         tei.document(img.size, os.path.join(*doc))
         tei.title = os.path.basename(doc[1])
         tei.add_respstmt('kraken', 'page segmentation')
         for seg in pageseg.segment(img, black_colseps):
+            logger.debug('Found line at {} {} {} {}'.format(*seg))
             tei.add_line(seg)
+        logger.debug('Write segmentation to {}'.format(fp.name))
         tei.write(fp)
     return (storage.get_storage_path(output_path + '.xml'),
             storage.get_storage_path(output_path + ext))
@@ -99,7 +107,7 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
                                                                      method,
                                                                      model))[0]
                    + '.xml')
-    segmentation = storage.get_abs_path(*doc[0])
+    logger.debug('Searching for model {}'.format(model))
     if model in nidaba_cfg['kraken_models']:
         model = storage.get_abs_path(*(nidaba_cfg['kraken_models'][model]))
     elif model in nidaba_cfg['ocropus_models']:
@@ -108,9 +116,12 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
         raise NidabaInvalidParameterException('Model not defined in '
                                               'configuration')
     img = Image.open(input_path)
+    logger.debug('Reading TEI segmentation from {}'.format(doc[1]))
     tei = TEIFacsimile()
-    with open(segmentation, 'r') as seg:
+    with storage.StorageFile(*doc[0]) as seg:
         tei.read(seg)
+
+    logger.debug('Clearing out word/grapheme boxes')
     # kraken is a line recognizer
     tei.clear_graphemes()
     tei.clear_segments()
@@ -118,15 +129,20 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     tei.add_respstmt('kraken', 'character recognition')
     lines = tei.lines
 
+    logger.debug('Loading model {}'.format(model))
     rnn = models.load_any(model)
     i = 0
+    logger.debug('Start recognizing characters')
     for rec in rpred.rpred(rnn, img, [(int(x[0]), int(x[1]), int(x[2]), int(x[3])) for x in lines]):
         # scope the current line and add all graphemes recognized by kraken to
         # it.
+        logger.debug('Scoping line {}'.format(line[i][4]))
         tei.scope_line(lines[i][4])
+        logger.debug('Adding graphemes: {}'.format(rec.prediction))
         tei.add_graphemes([(x[0], x[1], int(x[2] * 100)) for x in rec])
         i += 1
-    with open(storage.get_abs_path(*output_path), 'w') as fp:
+    with storage.StorageFile(*output_path, mode='wb') as fp:
+        logger.debug('Writing TEI to {}'.format(fp.name))
         tei.write(fp)
     return output_path
 

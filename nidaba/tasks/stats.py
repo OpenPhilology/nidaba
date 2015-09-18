@@ -7,7 +7,7 @@ Various tasks calculating metrics on documents.
 
 """
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals, print_function, absolute_import
 
 import os
 import difflib
@@ -76,7 +76,7 @@ def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
             tei.read(fp)
             text = '\n'.join(x[-1] for x in tei.lines)
         else:
-           text = fp.read()
+            text = fp.read()
     if clean_in:
         text = cleanup(text)
     if clean_gt:
@@ -84,7 +84,8 @@ def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
     sm = difflib.SequenceMatcher()
     sm.set_seqs(text, gt)
     if not divert:
-        storage.write_text(*get_storage_path(output_path), text=unicode(sm.ratio()))
+        storage.write_text(*storage.get_storage_path(output_path),
+                           text=unicode(sm.ratio()))
         return output_path
     else:
         return {'diff_ratio': sm.ratio(), 'doc': doc}
@@ -135,14 +136,15 @@ def text_edit_ratio(doc, method=u'text_edit_ratio', ground_truth=None,
             tei.read(fp)
             text = '\n'.join(x[-1] for x in tei.lines)
         else:
-           text = fp.read()
+            text = fp.read()
     if clean_in:
         text = cleanup(text)
     if clean_gt:
         gt = cleanup(gt)
     edist = 1.0 - normalized_damerau_levenshtein_distance(text, gt)
     if not divert:
-        storage.write_text(*get_storage_path(output_path), text=unicode(edit))
+        storage.write_text(*storage.get_storage_path(output_path),
+                           text=unicode(edit))
         return output_path
     else:
         return {'edit_ratio': edist, 'doc': doc}

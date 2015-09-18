@@ -18,7 +18,7 @@ dying without discernable cause please submit a bug report including your
 leptonica version.
 """
 
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 import ctypes
 

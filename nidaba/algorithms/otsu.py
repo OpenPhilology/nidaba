@@ -6,6 +6,8 @@ Module implementing variants of Otsu's method.
 
 """
 
+from __future__ import unicode_literals, print_function, absolute_import
+
 import numpy as np
 
 
@@ -40,8 +42,8 @@ def otsu(im):
             break
         sb += i * hist[i]
         mb = sb / wb
-        mf = (st - sb)/wf
-        bcv = wb * wf * (mb-mf)**2
+        mf = (st - sb) / wf
+        bcv = wb * wf * (mb - mf) ** 2
         if bcv > mvar:
             mvar = bcv
             thresh = i

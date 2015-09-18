@@ -5,7 +5,7 @@ nidaba.plugins
 
 """
 
-from __future__ import absolute_import, print_function
+from __future__ import unicode_literals, print_function, absolute_import
 
 from nidaba.config import nidaba_cfg
 

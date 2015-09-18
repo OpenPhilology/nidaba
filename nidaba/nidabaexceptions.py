@@ -7,6 +7,9 @@ All custom exceptions raised by various nidaba modules and packages. Packages
 should always define their exceptions here.
 """
 
+from __future__ import unicode_literals, print_function, absolute_import
+
+
 class NidabaConfigException(Exception):
 
     def __init__(self, message=None):
@@ -102,13 +105,6 @@ class NidabaStorageViolationException(Exception):
 
 
 class NidabaNoSuchStorageBin(Exception):
-
-    def __init__(self, status_code):
-        self.status_code = status_code
-        Exception.__init__(self, status_code)
-
-
-class NidabaTEIException(Exception):
 
     def __init__(self, status_code):
         self.status_code = status_code

@@ -6,7 +6,7 @@ Common image processing functions encapsulating the PIL or pythonica image
 interface to absolute file paths.
 """
 
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 from PIL import Image
 

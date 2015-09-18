@@ -7,7 +7,7 @@ This module contains an NFS-safe locking method that is hopefully interoperable
 with anything anybody is going to encounter out there.
 """
 
-from __future__ import absolute_import
+from __future__ import unicode_literals, print_function, absolute_import
 
 import os
 import time
