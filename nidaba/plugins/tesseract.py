@@ -385,17 +385,19 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
     # necessitating execution in a separate process to ensure the worker
     # doesn't just die. We use fork as the multiprocessing module thinks
     # programmers are too stupid to reap their children.
-    # pid = os.fork()
-    # if pid != 0:
-    #     try:
-    #         _, status = os.waitpid(pid, 0)
-    #     except OSError as e:
-    #         if e.errno not in (errno.EINTR, errno.ECHILD):
-    #             raise
-    #         return
-    #     if os.WIFSIGNALED(status):
-    #         raise NidabaTesseractException('Tesseract killed by signal: {0}'.format( os.WTERMSIG(status)))
-    #     return
+    logger.info('Forking before entering unstable ctypes code')
+    pid = os.fork()
+    if pid != 0:
+        try:
+            logger.info('Waiting for child to complete')
+            _, status = os.waitpid(pid, 0)
+        except OSError as e:
+            if e.errno not in (errno.EINTR, errno.ECHILD):
+                raise
+            return
+        if os.WIFSIGNALED(status):
+            raise NidabaTesseractException('Tesseract killed by signal: {0}'.format( os.WTERMSIG(status)))
+        return
 
     # ensure we've loaded a tesseract object newer than 3.02
     ver = tesseract.TessVersion()
@@ -520,7 +522,8 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
     logger.debug('Deleting base API')
     tesseract.TessBaseAPIEnd(api)
     tesseract.TessBaseAPIDelete(api)
-    # os._exit(os.EX_OK)
+    logger.info('Quitting child process')
+    os._exit(os.EX_OK)
 
 
 def ocr_direct(image_path, output_path, languages):
