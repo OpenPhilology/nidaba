@@ -17,6 +17,10 @@ from nidaba.tei import TEIFacsimile
 from nidaba.config import nidaba_cfg
 from nidaba.tasks.helper import NidabaTask
 
+from celery.utils.log import get_task_logger
+
+logger = get_task_logger(__name__)
+
 
 @app.task(base=NidabaTask, name=u'nidaba.postprocessing.spell_check')
 def spell_check(doc, method=u'spell_check', language=u'',
@@ -45,11 +49,14 @@ def spell_check(doc, method=u'spell_check', language=u'',
     dictionary = storage.get_abs_path(*nidaba_cfg['lang_dicts'][language]['dictionary'])
     del_dictionary = storage.get_abs_path(*nidaba_cfg['lang_dicts'][language]['deletion_dictionary'])
     with storage.StorageFile(*doc) as fp:
+        logger.debug('Reading TEI ({})'.format(fp.name))
         tei = TEIFacsimile()
         tei.read(fp)
+        logger.debug('Performing spell check')
         ret = lex.tei_spellcheck(tei, dictionary, del_dictionary,
                                  filter_punctuation)
     with storage.StorageFile(*storage.get_storage_path(output_path), mode='wb') as fp:
+        logger.debug('Writing TEI ({})'.format(fp.name))
         ret.write(fp)
     return storage.get_storage_path(output_path)
 

@@ -18,6 +18,9 @@ from nidaba.tei import TEIFacsimile
 from nidaba.nidabaexceptions import NidabaTEIException
 from nidaba.tasks.helper import NidabaTask
 
+from celery.utils.log import get_task_logger
+
+logger = get_task_logger(__name__)
 
 @app.task(base=NidabaTask, name=u'nidaba.output.metadata')
 def tei_metadata(doc, method=u'metadata', metadata=None, validate=False):
@@ -97,16 +100,20 @@ def tei_metadata(doc, method=u'metadata', metadata=None, validate=False):
     """
     with storage.StorageFile(*doc) as fp:
         tei = TEIFacsimile()
+        logger.debug('Reading TEI ({}/{})'.format(*doc))
         tei.read(fp)
+    logger.debug('Reading metadata file ({}/{})'.format(*metadata))
     with storage.StorageFile(*metadata) as fp:
         meta = yaml.safe_load(fp)
     for field in tei.fields:
         if field in meta:
+            logger.debug('Adding field {} ({})'.format(field, meta[field]))
             setattr(tei, field, meta[field])
     if validate:
         raise NidabaTEIException('Validation not yet implemented.')
     output_path = storage.insert_suffix(doc[1], method, metadata[1])
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
+        logger.debug('Writing TEI to {}'.format(fp.name))
         tei.write(fp)
     return (doc[0], output_path)
 
@@ -124,9 +131,11 @@ def tei2simplexml(doc, method=u'simplexml'):
     """
     with storage.StorageFile(*doc) as fp:
         tei = TEIFacsimile()
+        logger.debug('Reading TEI ({}/{})'.format(*doc))
         tei.read(fp)
     output_path = storage.insert_suffix(doc[1], method)
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
+        logger.debug('Writing simplexml to {}'.format(fp.name))
         tei.write_simplexml(fp)
     return (doc[0], output_path)
 
@@ -144,9 +153,11 @@ def tei2hocr(doc, method=u'tei2hocr'):
     """
     with storage.StorageFile(*doc) as fp:
         tei = TEIFacsimile()
+        logger.debug('Reading TEI ({}/{})'.format(*doc))
         tei.read(fp)
     output_path = storage.insert_suffix(doc[1], method)
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
+        logger.debug('Writing hOCR to {}'.format(fp.name))
         tei.write_hocr(fp)
     return (doc[0], output_path)
 
@@ -164,8 +175,10 @@ def tei2txt(doc, method=u'tei2txt'):
     """
     with storage.StorageFile(*doc) as fp:
         tei = TEIFacsimile()
+        logger.debug('Reading TEI ({}/{})'.format(*doc))
         tei.read(fp)
     output_path = storage.insert_suffix(doc[1], method)
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
+        logger.debug('Writing text to {}'.format(fp.name))
         tei.write_text(fp)
     return (doc[0], output_path)
