@@ -9,3 +9,5 @@ numpy
 Pillow
 PyYAML
 beautifulsoup4
+gunicorn
+Flask
