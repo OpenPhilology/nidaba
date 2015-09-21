@@ -31,7 +31,13 @@ def cleanup(text):
     return '\n'.join([s for s in text.splitlines() if len(s.strip())])
 
 
-@app.task(base=NidabaTask, name=u'nidaba.stats.text_diff_ratio')
+@app.task(base=NidabaTask, name=u'nidaba.stats.text_diff_ratio',
+          arg_values={'ground_truth': 'file',
+                      'xml_in': [True, False],
+                      'gt_format': ['tei', 'hocr', 'text'],
+                      'clean_in': [True, False],
+                      'clean_gt': [True, False],
+                      'divert': [True, False]})
 def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
                     xml_in=True, gt_format=u'tei', clean_in=True, clean_gt=True,
                     divert=True):
@@ -91,7 +97,13 @@ def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
         return {'diff_ratio': sm.ratio(), 'doc': doc}
 
 
-@app.task(base=NidabaTask, name=u'nidaba.stats.text_edit_ratio')
+@app.task(base=NidabaTask, name=u'nidaba.stats.text_edit_ratio',
+          arg_values={'ground_truth': 'file',
+                      'xml_in': [True, False],
+                      'gt_format': ['tei', 'hocr', 'text'],
+                      'clean_in': [True, False],
+                      'clean_gt': [True, False],
+                      'divert': [True, False]})
 def text_edit_ratio(doc, method=u'text_edit_ratio', ground_truth=None,
                     xml_in=True, gt_format='tei', clean_in=True, clean_gt=True,
                     divert=True):

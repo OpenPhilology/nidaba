@@ -22,7 +22,8 @@ from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
 
-@app.task(base=NidabaTask, name=u'nidaba.output.metadata')
+@app.task(base=NidabaTask, name=u'nidaba.output.metadata',
+          arg_values={'metadata': 'file', 'validate': [True, False]})
 def tei_metadata(doc, method=u'metadata', metadata=None, validate=False):
     """
     Enriches a TEI-XML document with various metadata from an user-supplied
@@ -113,7 +114,7 @@ def tei_metadata(doc, method=u'metadata', metadata=None, validate=False):
         raise NidabaTEIException('Validation not yet implemented.')
     output_path = storage.insert_suffix(doc[1], method, metadata[1])
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
-        logger.debug('Writing TEI to {}'.format(fp.name))
+        logger.debug('Writing TEI to {}'.format(fp.abs_path))
         tei.write(fp)
     return (doc[0], output_path)
 
@@ -135,7 +136,7 @@ def tei2simplexml(doc, method=u'simplexml'):
         tei.read(fp)
     output_path = storage.insert_suffix(doc[1], method)
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
-        logger.debug('Writing simplexml to {}'.format(fp.name))
+        logger.debug('Writing simplexml to {}'.format(fp.abs_path))
         tei.write_simplexml(fp)
     return (doc[0], output_path)
 
@@ -157,7 +158,7 @@ def tei2hocr(doc, method=u'tei2hocr'):
         tei.read(fp)
     output_path = storage.insert_suffix(doc[1], method)
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
-        logger.debug('Writing hOCR to {}'.format(fp.name))
+        logger.debug('Writing hOCR to {}'.format(fp.abs_path))
         tei.write_hocr(fp)
     return (doc[0], output_path)
 
@@ -179,6 +180,6 @@ def tei2txt(doc, method=u'tei2txt'):
         tei.read(fp)
     output_path = storage.insert_suffix(doc[1], method)
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
-        logger.debug('Writing text to {}'.format(fp.name))
+        logger.debug('Writing text to {}'.format(fp.abs_path))
         tei.write_text(fp)
     return (doc[0], output_path)

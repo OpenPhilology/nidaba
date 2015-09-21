@@ -83,13 +83,15 @@ def segmentation_kraken(doc, method=u'segment_kraken', black_colseps=False):
         for seg in pageseg.segment(img, black_colseps):
             logger.debug('Found line at {} {} {} {}'.format(*seg))
             tei.add_line(seg)
-        logger.debug('Write segmentation to {}'.format(fp.name))
+        logger.debug('Write segmentation to {}'.format(fp.abs_path))
         tei.write(fp)
     return (storage.get_storage_path(output_path + '.xml'),
             storage.get_storage_path(output_path + ext))
 
 
-@app.task(base=NidabaTask, name=u'nidaba.ocr.kraken')
+@app.task(base=NidabaTask, name=u'nidaba.ocr.kraken',
+          arg_values={'model': nidaba_cfg['ocropus_models'].keys() +
+                               nidaba_cfg['kraken_models'].keys()})
 def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     """
     Runs kraken on an input document and writes a TEI file.
@@ -136,18 +138,26 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     for rec in rpred.rpred(rnn, img, [(int(x[0]), int(x[1]), int(x[2]), int(x[3])) for x in lines]):
         # scope the current line and add all graphemes recognized by kraken to
         # it.
-        logger.debug('Scoping line {}'.format(line[i][4]))
+        logger.debug('Scoping line {}'.format(lines[i][4]))
         tei.scope_line(lines[i][4])
         logger.debug('Adding graphemes: {}'.format(rec.prediction))
         tei.add_graphemes([(x[0], x[1], int(x[2] * 100)) for x in rec])
         i += 1
     with storage.StorageFile(*output_path, mode='wb') as fp:
-        logger.debug('Writing TEI to {}'.format(fp.name))
+        logger.debug('Writing TEI to {}'.format(fp.abs_path))
         tei.write(fp)
     return output_path
 
 
-@app.task(base=NidabaTask, name=u'nidaba.binarize.nlbin')
+@app.task(base=NidabaTask, name=u'nidaba.binarize.nlbin',
+          arg_values={'threshold': (0.0, 1.0),
+                                      'zoom': (0.0, 1.0),
+                                      'escale': 'float',
+                                      'border': 'float',
+                                      'perc': (0, 100),
+                                      'range': (0, 100),
+                                      'low': (0, 100),
+                                      'high': (0, 100)})
 def nlbin(doc, method=u'nlbin', threshold=0.5, zoom=0.5, escale=1.0,
           border=0.1, perc=80, range=20, low=5, high=90):
     """

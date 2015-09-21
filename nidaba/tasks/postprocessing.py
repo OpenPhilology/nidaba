@@ -22,7 +22,9 @@ from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
 
-@app.task(base=NidabaTask, name=u'nidaba.postprocessing.spell_check')
+@app.task(base=NidabaTask, name=u'nidaba.postprocessing.spell_check', 
+          arg_values={'language': nidaba_cfg['lang_dicts'].keys(),
+                      'filter_punctuation': [True, False]})
 def spell_check(doc, method=u'spell_check', language=u'',
                 filter_punctuation=False):
     """
@@ -49,14 +51,14 @@ def spell_check(doc, method=u'spell_check', language=u'',
     dictionary = storage.get_abs_path(*nidaba_cfg['lang_dicts'][language]['dictionary'])
     del_dictionary = storage.get_abs_path(*nidaba_cfg['lang_dicts'][language]['deletion_dictionary'])
     with storage.StorageFile(*doc) as fp:
-        logger.debug('Reading TEI ({})'.format(fp.name))
+        logger.debug('Reading TEI ({})'.format(fp.abs_path))
         tei = TEIFacsimile()
         tei.read(fp)
         logger.debug('Performing spell check')
         ret = lex.tei_spellcheck(tei, dictionary, del_dictionary,
                                  filter_punctuation)
     with storage.StorageFile(*storage.get_storage_path(output_path), mode='wb') as fp:
-        logger.debug('Writing TEI ({})'.format(fp.name))
+        logger.debug('Writing TEI ({})'.format(fp.abs_path))
         ret.write(fp)
     return storage.get_storage_path(output_path)
 

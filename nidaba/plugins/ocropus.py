@@ -67,7 +67,8 @@ class micro_hocr(object):
         self.output = self.output.strip()
 
 
-@app.task(base=NidabaTask, name=u'nidaba.ocr.ocropus')
+@app.task(base=NidabaTask, name=u'nidaba.ocr.ocropus',
+          arg_values={'model': nidaba_cfg['ocropus_models'].keys()})
 def ocr_ocropus(doc, method=u'ocr_ocropus', model=None):
     """
     Runs ocropus on an input document.
@@ -153,6 +154,6 @@ def ocr(image_path, segmentation_path, output_path, model_path):
         logger.debug('Adding graphemes: {}'.format(pred))
         tei.add_graphemes(pred)
     with open(output_path, 'wb') as fp:
-        logger.debug('Writing TEI to {}'.format(fp.name))
+        logger.debug('Writing TEI to {}'.format(fp.abs_path))
         tei.write(fp)
     return output_path
