@@ -44,6 +44,13 @@ class NidabaTask(Task):
     """
     abstract = True
     acks_late = True
+    
+    # a dictionary containing all keyword arguments to the task including valid
+    # values
+    arg_values = {}
+
+    def get_valid_args(self):
+        return self.arg_values
 
     def __call__(self, *args, **kwargs):
 

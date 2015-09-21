@@ -204,6 +204,12 @@ def setup(*args, **kwargs):
         tesseract.TessBaseAPIGetHOCRText.argtypes = [POINTER(TessBaseAPI), ctypes.c_int]
         tesseract.TessBaseAPIGetHOCRText.restype = ctypes.c_char_p
 
+        tesseract.TessBaseAPIGetAvailableLanguagesAsVector.argtypes = [POINTER(TessBaseAPI)]
+        tesseract.TessBaseAPIGetAvailableLanguagesAsVector.restype = POINTER(ctypes.c_char_p)
+
+        # fill in available tesseract classifiers as they are only determinable
+        # after setting the tessdata directory.
+        ocr_tesseract.arg_values['languages'] = _get_available_classifiers()
 
 @app.task(base=NidabaTask, name=u'nidaba.segmentation.tesseract')
 def segmentation_tesseract(doc, method=u'segment_tesseract'):
@@ -304,7 +310,22 @@ def segmentation_tesseract(doc, method=u'segment_tesseract'):
     return storage.get_storage_path(output_path), doc
 
 
-@app.task(base=NidabaTask, name=u'nidaba.ocr.tesseract')
+def _get_available_classifiers():
+    api = tesseract.TessBaseAPICreate()
+    tesseract.TessBaseAPIInit3(api, tessdata.encode('utf-8'), None)
+    classifiers = tesseract.TessBaseAPIGetAvailableLanguagesAsVector(api)
+    ret = []
+    for cls in classifiers:
+        if cls is None:
+            break
+        ret.append(cls)
+    tesseract.TessDeleteTextArray(classifiers)
+    return ret
+
+
+@app.task(base=NidabaTask, name=u'nidaba.ocr.tesseract',
+          arg_values={'languages': None, # is filled by the setup function
+                      'extended': [False, True]})
 def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
                   extended=False):
     """
@@ -396,7 +417,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                 raise
             return
         if os.WIFSIGNALED(status):
-            raise NidabaTesseractException('Tesseract killed by signal: {0}'.format( os.WTERMSIG(status)))
+            raise NidabaTesseractException('Tesseract killed by signal: {0}'.format(os.WTERMSIG(status)))
         return
 
     # ensure we've loaded a tesseract object newer than 3.02
