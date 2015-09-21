@@ -9,10 +9,12 @@ from __future__ import absolute_import, print_function, unicode_literals
 from nidaba import storage
 from nidaba.nidaba import Batch
 from nidaba.config import nidaba_cfg
+from nidaba import api
 from nidaba import celery
 from nidaba.nidabaexceptions import NidabaStorageViolationException
 from pprint import pprint
 from inspect import getcallargs, getdoc
+from gunicorn.six import iteritems
 
 import uuid
 import shutil
@@ -20,6 +22,7 @@ import os.path
 import sys
 import click
 import stevedore
+import gunicorn.app.base
 
 
 @click.group(epilog='This nidaba may or may not have Super Cow Powers')
@@ -247,6 +250,34 @@ def worker():
     Starts a celery worker.
     """
     celery.app.worker_main(argv=sys.argv[:1])
+
+
+@main.command()
+@click.option('-b', '--bind', default='127.0.0.1:8080', type=str)
+@click.option('-w', '--workers', default=1, type=click.INT)
+def api_server(**kwargs):
+    """
+    Starts the nidaba API server using gunicorn.
+    """
+    api.get_flask()
+
+    class APIServer(gunicorn.app.base.BaseApplication):
+
+        def __init__(self, app, options=None):
+            self.options = options or {}
+            self.application = app
+            super(APIServer, self).__init__()
+
+        def load_config(self):
+            config = dict([(key, value) for key, value in iteritems(self.options)
+                           if key in self.cfg.settings and value is not None])
+            for key, value in iteritems(config):
+                self.cfg.set(key.lower(), value)
+
+        def load(self):
+            return self.application
+
+    APIServer(api.get_flask(), options=kwargs).run()
 
 
 @main.command()
