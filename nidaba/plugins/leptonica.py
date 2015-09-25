@@ -41,7 +41,7 @@ def setup(*args, **kwargs):
 
 
 @app.task(base=NidabaTask, name=u'nidaba.binarize.sauvola',
-          arg_values={'whsize': int, 'factor': (0.0, 1.0)})
+          arg_values={'whsize': 'int', 'factor': (0.0, 1.0)})
 def sauvola(doc, method=u'sauvola', whsize=10, factor=0.35):
     """
     Binarizes an input document utilizing Sauvola thresholding as described in
