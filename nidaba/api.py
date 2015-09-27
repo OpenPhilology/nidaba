@@ -21,7 +21,6 @@ from flask import send_file
 from flask_restful import abort, Api, Resource, url_for, reqparse
 
 from nidaba import storage
-from nidaba import celery
 from nidaba.nidaba import SimpleBatch
 from nidaba.nidabaexceptions import NidabaStorageViolationException
 
@@ -145,9 +144,18 @@ class BatchTasks(Resource):
         except:
             return {'message': 'Batch Not Found: {}'.format(batch_id)}, 404
         try:
-            batch.add_task(group, task, **request.form.to_dict(flat=True))
+            # JSON does not support booleans
+            def to_bool(s):
+                if s in ['True', 'true']:
+                    return True
+                elif s in ['False', 'false']:
+                    return False
+                else:
+                    return s
+            kwargs = {k: to_bool(v) for k, v in request.form.to_dict(flat=True).iteritems()}
+            batch.add_task(group, task, **kwargs)
         except Exception as e:
-            log.debug('Adding task {} to {} failed: {}'.format(task, specificBatch, str(e)))
+            log.debug('Adding task {} to {} failed: {}'.format(task, batch_id, str(e)))
             return {'message': str(e)}, 400
 
 

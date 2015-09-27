@@ -9,9 +9,6 @@ objects and methods defined here.
 
 from __future__ import unicode_literals, print_function, absolute_import
 
-from nidaba import tasks
-from nidaba import plugins
-from nidaba import celery
 from nidaba import storage
 from nidaba import config
 from nidaba.nidabaexceptions import (NidabaInputException,
@@ -137,7 +134,11 @@ class Batch(object):
     """
 
     def __init__(self, id):
-
+        from nidaba import tasks
+        from nidaba import plugins
+        from nidaba import celery
+        self.tasks = tasks
+        self.celery = celery
         self.id = id
         self.docs = []
         self.batch_def = []
@@ -305,7 +306,7 @@ class Batch(object):
         """
         if self.cur_tick is None:
             raise NidabaTickException('No tick to add task to.')
-        if u'nidaba.' + method not in celery.app.tasks:
+        if u'nidaba.' + method not in self.celery.app.tasks:
             raise NidabaNoSuchAlgorithmException('No such task in registry')
         kwargs[u'method'] = method
         self.cur_tick.append(kwargs)
@@ -377,18 +378,18 @@ class Batch(object):
         # We first expand the tasks starting from the second step as these are
         # the same for each input document.
         if len(self.batch_def) > 1:
-            groups.append(tasks.util.sync.s())
+            groups.append(self.tasks.util.sync.s())
             for tset in self.batch_def[1:]:
                 for sequence in product(*tset):
-                    method = celery.app.tasks['nidaba.' +
-                                              sequence[0]['method']]
+                    method = self.celery.app.tasks['nidaba.' +
+                                                   sequence[0]['method']]
                     ch = chain(method.s(**(sequence[0])))
                     for seq in sequence[1:]:
-                        method = celery.app.tasks['nidaba.' + seq['method']]
+                        method = self.celery.app.tasks['nidaba.' + seq['method']]
                         ch |= method.s(**seq)
                     tick.append(ch)
                 groups.append(group(tick))
-                groups.append(tasks.util.sync.s())
+                groups.append(self.tasks.util.sync.s())
 
         # The expansion steps described above is redone for each input document
         chains = []
@@ -397,11 +398,11 @@ class Batch(object):
             # the first step is handled differently as the input document has
             # to be added explicitely.
             for sequence in product([doc], *self.batch_def[0]):
-                method = celery.app.tasks['nidaba.' + sequence[1]['method']]
+                method = self.celery.app.tasks['nidaba.' + sequence[1]['method']]
                 root = sequence[0]
                 ch = chain(method.s(doc=root, **(sequence[1])))
                 for seq in sequence[2:]:
-                    method = celery.app.tasks['nidaba.' + seq['method']]
+                    method = self.celery.app.tasks['nidaba.' + seq['method']]
                     ch |= method.s(**seq)
                 tick.append(ch)
             doc_group = group(tick)
@@ -473,6 +474,11 @@ class SimpleBatch(Batch):
     automatically).
     """
     def __init__(self, id=None):
+        from nidaba import tasks
+        from nidaba import plugins
+        from nidaba import celery
+        self.celery = celery
+
         if id is None:
             id = unicode(uuid.uuid4())
             storage.prepare_filestore(id)
@@ -556,7 +562,7 @@ class SimpleBatch(Batch):
         argument values.
         """
         tasks = OrderedDict()
-        for task, fun in celery.app.tasks.iteritems():
+        for task, fun in self.celery.app.tasks.iteritems():
             try:
                 _, group, method = task.split('.')
             except:
@@ -600,9 +606,9 @@ class SimpleBatch(Batch):
         # validate that the task exists
         if group not in self.tasks:
             raise NidabaNoSuchAlgorithmException('Unknown task group')
-        if u'nidaba.{}.{}'.format(group, method) not in celery.app.tasks:
+        if u'nidaba.{}.{}'.format(group, method) not in self.celery.app.tasks:
             raise NidabaNoSuchAlgorithmException('Unknown task')
-        task = celery.app.tasks[u'nidaba.{}.{}'.format(group, method)]
+        task = self.celery.app.tasks[u'nidaba.{}.{}'.format(group, method)]
         # validate arguments first against getcallargs
         try:
             getcallargs(task.run, ('', ''), **kwargs)
@@ -694,6 +700,74 @@ class NetworkSimpleBatch(object):
             self.lock = False
             return False
 
+    def get_state(self):
+        """
+        Retrieves the current state of a batch.
+
+        Returns:
+            (unicode): A string containing one of the following states:
+
+                NONE: The batch ID is not registered in the backend.
+                FAILURE: Batch execution has failed.
+                PENDING: The batch is currently running.
+                SUCCESS: The batch has completed successfully.
+        """
+        if not self.id:
+            raise NidabaInputException('Object not attached to batch.')
+        r = requests.get('{}/batch/{}'.format(self.host, self.id))
+        r.raise_for_status()
+        batch = r.json()
+        if 'scratchpad' in batch:
+            return u'NONE'
+        elif 'chains' in batch:
+            self.lock = True
+            batch = batch['chains']
+            st = u'SUCCESS'
+            for subtask in batch.itervalues():
+                if subtask['state'] == 'PENDING' or subtask['state'] == 'RUNNING':
+                    st = u'PENDING'
+                if subtask['state'] == 'FAILURE':
+                    return u'FAILURE'
+            return st
+        else:
+            return u'NONE'
+
+    def get_extended_state(self):
+        """
+        Returns the extended batch state.
+
+        Raises:
+            NidabaInputException if the batch hasn't been executed yet.
+        """
+        if not self.id:
+            raise NidabaInputException('Object not attached to batch.')
+        r = requests.get('{}/batch/{}'.format(self.host, self.id))
+        r.raise_for_status()
+        if 'chains' in r.json():
+            self.lock = True
+            return r.json()['chains']
+
+    def get_results(self):
+        """
+        Retrieves the storage tuples of a successful batch.
+
+        Returns:
+        """
+        if not self.id:
+            raise NidabaInputException('Object not attached to batch.')
+        r = requests.get('{}/batch/{}'.format(self.host, self.id))
+        r.raise_for_status()
+        if 'chains' in r.json():
+            self.lock = True
+            batch = r.json()['chains']
+            outfiles = []
+            for subtask in batch.itervalues():
+                if len(subtask['children']) == 0 and not subtask['housekeeping'] and subtask['result'] is not None:
+                    outfiles.append((subtask['result'], subtask['root_document']))
+            return outfiles
+        else:
+            return None
+
     def get_tasks(self):
         """
         Returns the task tree either from the scratchpad or from the pipeline
@@ -779,21 +853,6 @@ class NetworkSimpleBatch(object):
                                                            group, method),
                           data=kwargs)  
         r.raise_for_status()
-
-    def get_extended_state(self):
-        """
-        Returns the extended batch state.
-
-        Raises:
-            NidabaInputException if the batch hasn't been executed yet.
-        """
-        if not self.id:
-            raise NidabaInputException('Object not attached to batch.')
-        r = requests.get('{}/batch/{}'.format(self.host, self.id))
-        r.raise_for_status()
-        if 'chains' in r.json():
-            self.lock = True
-            return r.json()['chains']
 
     def run(self):
         """
