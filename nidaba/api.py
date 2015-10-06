@@ -42,6 +42,31 @@ def get_flask():
 class Page(Resource):
 
     def get(self, batch, file):
+        """
+        Retrieves the file at *file* in batch *batch*.
+    
+        ** Request **
+    
+        .. sourcecode:: http
+    
+            GET /pages/:batch/:path
+    
+        ** Response **
+    
+        .. sourcecode:: http
+    
+            HTTP/1.1 200 OK
+            Content-Type: application/octet-stream
+    
+            ...
+    
+        :param batch: batch's unique id
+        :type batch: str
+        :param file: path to the batch's file
+        :type file: path
+        :status 200: No error
+        :status 404: File not found
+        """
         log.debug('routing to pages with URN: {}/{}'.format(batch, file))
         try:
             fp = storage.StorageFile(batch, file, 'rb')
@@ -52,8 +77,121 @@ class Page(Resource):
 
 @api.resource('/tasks', '/tasks/<group>', '/tasks/<group>/<task>')
 class Task(Resource):
-
     def get(self, group=None, task=None):
+        """
+        Retrieves the list of available tasks, their arguments and valid values
+        for those arguments.
+
+        ** Request **
+    
+        .. sourcecode:: http
+    
+            GET /tasks
+    
+        ** Response **
+    
+        .. sourcecode:: http
+    
+            HTTP/1.1 200 OK
+
+            {
+                "img": {
+                    "deskew": {}, 
+                    "dewarp": {}, 
+                    "rgb_to_gray": {}
+                },
+                "binarize": {
+                    "nlbin": {
+                        "border": "float", 
+                        "escale": "float", 
+                        "high": [
+                            0, 
+                            100
+                        ], 
+                        "low": [
+                            0, 
+                            100
+                        ], 
+                        "perc": [
+                            0, 
+                            100
+                        ], 
+                        "range": [
+                            0, 
+                            100
+                        ], 
+                        "threshold": [
+                            0.0, 
+                            1.0
+                        ], 
+                        "zoom": [
+                            0.0, 
+                            1.0
+                        ]
+                    }, 
+                    "otsu": {}, 
+                    "sauvola": {
+                        "factor": [
+                            0.0, 
+                            1.0
+                        ], 
+                        "whsize": "int"
+                    }
+                },
+                "segmentation": {
+                    "kraken": {}, 
+                    "tesseract": {}
+                },
+                "ocr": {
+                    "kraken": {
+                        "model": [
+                            "fraktur.pyrnn.gz", 
+                            "default", 
+                            "teubner"
+                        ]
+                    }, 
+                    "tesseract": {
+                        "extended": [
+                            false, 
+                            true
+                        ], 
+                        "languages": [
+                            "chr", 
+                            "chi_tra", 
+                            "ita_old", 
+                            "ceb", 
+                            "mya", 
+                            "hrv"
+                        ]
+                    }
+                }, 
+                "postprocessing": {
+                    "spell_check": {
+                        "filter_punctuation": [
+                            true, 
+                            false
+                        ], 
+                        "language": [
+                            "latin", 
+                            "polytonic_greek"
+                        ]
+                    }
+                },
+                "output": {
+                    "metadata": {
+                        "metadata": "file", 
+                        "validate": [
+                            true, 
+                            false
+                        ]
+                    }, 
+                    "tei2hocr": {}, 
+                    "tei2simplexml": {}, 
+                    "tei2txt": {}
+                }
+            }
+
+        """
         log.debug('Routing to tasks with group {}, method {}'.format(group, task))
         tasks = SimpleBatch.get_available_tasks()
         if group and group not in tasks:
@@ -67,10 +205,30 @@ class Task(Resource):
         return tasks, 200
 
 
-@api.resource('/batch/<string:batch_id>')
+@api.resource('/batch/<batch_id>')
 class Batch(Resource):
 
     def get(self, batch_id):
+        """
+        Retrieves the state of batch *batch_id*.
+    
+        ** Request **
+    
+        .. sourcecode:: http
+    
+            GET /batch/:batch_id
+    
+        ** Response **
+    
+        .. sourcecode:: http
+    
+            HTTP/1.1 200 OK
+
+        :param batch_id: batch identifier
+        :type batch_id: string
+        :status 200: No error
+        :status 404: No such batch
+        """
         log.debug('Routing to batch {} (GET)'.format(batch_id))
         res = {}
         try:
@@ -98,6 +256,28 @@ class Batch(Resource):
         return res, 200
 
     def post(self, batch_id):
+        """
+        Executes batch with identifier *batch_id*
+    
+        ** Request **
+    
+        .. sourcecode:: http
+    
+            POST /batch/:batch_id
+    
+        ** Response **
+    
+        .. sourcecode:: http
+    
+            HTTP/1.1 202 ACCEPTED
+   
+        :param batch_id: batch's unique id
+        :type batch_id: string 
+        :status 202: Successfully executed
+        :status 400: Batch could not be executed
+        :status 404: No such batch
+        :status 409: Trying to reexecute an already executed batch
+        """
         log.debug('Routing to batch {} (POST)'.format(batch_id))
         try:
             batch = SimpleBatch(batch_id)
@@ -120,18 +300,59 @@ class Batch(Resource):
 class BatchCreator(Resource):
 
     def post(self):
+        """
+        Creates a new batch and returns it identifier.
+
+        ** Request **
+    
+        .. sourcecode:: http
+    
+            POST /batch
+    
+        ** Response **
+    
+        .. sourcecode:: http
+    
+            HTTP/1.1 201 CREATED
+
+            {
+                "id": "78a1f1e4-cc76-40ce-8a98-77b54362a00e", 
+                "url": "/batch/78a1f1e4-cc76-40ce-8a98-77b54362a00e"
+            }
+    
+        :status 201: Successfully created
+        """
         log.debug('Routing to batch with POST')
         batch = SimpleBatch()
         data = {'id': batch.id, 'url': url_for('batch', batch_id=batch.id)}
         log.debug('Created batch {}'.format(batch.id))
         return data, 201
 
-@api.resource('/batch/<string:batch_id>/tasks',
-              '/batch/<string:batch_id>/tasks/<group>',
-              '/batch/<string:batch_id>/tasks/<group>/<task>')
+@api.resource('/batch/<batch_id>/tasks',
+              '/batch/<batch_id>/tasks/<group>',
+              '/batch/<batch_id>/tasks/<group>/<task>')
 class BatchTasks(Resource):
 
     def get(self, batch_id, group=None, task=None):
+        """
+        Retrieves the list of tasks and their argument values associated with a
+        batch, optionally limited to a specific group or task.
+
+        ** Request **
+    
+        .. sourcecode:: http
+
+            GET /batch/:batch_id/tasks    
+    
+        ** Response **
+    
+        .. sourcecode:: http
+    
+            HTTP/1.1 200 OK
+    
+        :status 200: success
+        :status 404: batch, group, or task not found.
+        """
         log.debug('Routing to task {}.{} of {} (GET)'.format(group, task, batch_id))
         try:
             batch = SimpleBatch(batch_id)
@@ -152,6 +373,13 @@ class BatchTasks(Resource):
         return tasks, 200
 
     def post(self, batch_id, group=None, task=None):
+        """
+        Adds a particular configuration of a task to the batch identified by
+        *batch_id*.
+
+        :status 201: task created
+        :status 404: batch, group, or task not found.
+        """
         log.debug('Routing to task {}.{} of {} (POST)'.format(group, task, batch_id))
         try:
             batch = SimpleBatch(batch_id)
@@ -170,10 +398,11 @@ class BatchTasks(Resource):
             batch.add_task(group, task, **kwargs)
         except Exception as e:
             log.debug('Adding task {} to {} failed: {}'.format(task, batch_id, str(e)))
-            return {'message': str(e)}, 400
+            return {'message': str(e)}, 422
+        return {}, 201
 
 
-@api.resource('/batch/<string:batch_id>/pages')
+@api.resource('/batch/<batch_id>/pages')
 class BatchPages(Resource):
 
     parser = reqparse.RequestParser(bundle_errors=True)
@@ -184,6 +413,39 @@ class BatchPages(Resource):
                         location='files', action='append', required=True)
 
     def get(self, batch_id):
+        """
+        Returns the list of pages associated with the batch with *batch_id*.
+
+        ** Request **
+    
+        .. sourcecode:: http
+    
+            GET /batch/:batch/pages
+    
+        ** Response **
+    
+        .. sourcecode:: http
+    
+            HTTP/1.1 200 OK
+
+            [
+                {
+                    "name": "0033.tif", 
+                    "url": "/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0033.tif"
+                }, 
+                {
+                    "name": "0072.tif", 
+                    "url": "/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0072.tif"
+                }, 
+                {
+                    "name": "0014.tif", 
+                    "url": "/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0014.tif"
+                }
+            ]
+
+        :status 200: success
+        :status 404: batch not found
+        """
         log.debug('Routing to pages of {} (GET)'.format(batch_id))
         try:
             batch = SimpleBatch(batch_id)
@@ -196,6 +458,35 @@ class BatchPages(Resource):
         return data, 200
 
     def post(self, batch_id):
+        """
+        Adds a page (really any type of file) to the batch identified by
+        *batch_id*.
+
+        ** Request **
+
+            POST /batch/:batch/pages
+
+        ** Response **
+
+            HTTP/1.1 200 OK
+            
+            [
+                {
+                    "name": "0033.tif", 
+                    "url": "/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0033.tif"
+                }, 
+                {
+                    "name": "0072.tif", 
+                    "url": "/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0072.tif"
+                }
+            ]
+
+        :form scans: file(s) to add to the batch
+
+        :status 201: task created
+        :status 403: file couldn't be created
+        :status 404: batch not found
+        """
         args = self.parser.parse_args()
         log.debug('Routing to pages {} of {} (POST)'.format(
                     [x.filename for x in args['scans']], batch_id))

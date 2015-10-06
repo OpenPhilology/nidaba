@@ -802,7 +802,8 @@ class NetworkSimpleBatch(object):
         return r.json()
 
     def add_document(self, path, callback, auxiliary=False):
-        """Add a document to the batch.
+        """
+        Add a document to the batch.
 
         Uploads a document to the API server and adds it to the batch.
 

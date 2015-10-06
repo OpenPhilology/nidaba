@@ -9,6 +9,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'celery.contrib.sphinx',
+    'sphinxcontrib.httpdomain',
+    'sphinxcontrib.autohttp.flask',
 ]
 
 templates_path = ['_templates']

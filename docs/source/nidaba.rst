@@ -14,6 +14,14 @@ Subpackages
 Submodules
 ----------
 
+nidaba.api module
+-----------------
+
+.. automodule:: nidaba.api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 nidaba.celery module
 --------------------
 
