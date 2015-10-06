@@ -41,7 +41,7 @@ def get_flask():
 @api.resource('/pages/<batch>/<path:file>', methods=['GET'])
 class Page(Resource):
 
-    def get(self, batch, path):
+    def get(self, batch, file):
         log.debug('routing to pages with URN: {}/{}'.format(batch, file))
         try:
             fp = storage.StorageFile(batch, file, 'rb')
@@ -81,6 +81,20 @@ class Batch(Resource):
         res['tasks'] = url_for('batchtasks', batch_id=batch_id)
         if batch.is_running():
             res['chains'] = batch.get_extended_state()
+            # replace all document tuples with URLs to the page resource
+            def replace_docs(state):
+                for k in state.keys():
+                    if k in ['root_document', 'result', 'doc']:
+                        if state[k] is not None and isinstance(state[k][0], list):
+                            docs = []
+                            for doc in state[k]:
+                                docs.append(url_for('page', batch=doc[0], file=doc[1]))
+                            state[k] = docs
+                        elif state[k] is not None:
+                            state[k] = url_for('page', batch=state[k][0], file=state[k][1])
+                    if isinstance(state[k], dict):
+                        replace_docs(state[k])
+            replace_docs(res['chains'])
         return res, 200
 
     def post(self, batch_id):
