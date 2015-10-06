@@ -7,6 +7,7 @@ from __future__ import absolute_import, print_function
 
 from inspect import getcallargs, getdoc
 from gunicorn.six import iteritems
+from itertools import cycle
 from pprint import pprint
 
 from nidaba.nidaba import NetworkSimpleBatch, SimpleBatch
@@ -19,6 +20,11 @@ import click
 import stevedore
 import logging
 import gunicorn.app.base
+
+spinner = cycle([u'⣾', u'⣽', u'⣻', u'⢿', u'⡿', u'⣟', u'⣯', u'⣷'])
+
+def spin(msg):
+    click.echo(u'\r\033[?25l{}\t\t{}'.format(msg, next(spinner)), nl=False)
 
 
 @click.group(epilog='This nidaba may or may not have Super Cow Powers')
@@ -185,8 +191,10 @@ def batch(files, host, binarize, ocr, segmentation, stats, postprocessing, outpu
         click.echo(']')
         for doc in files:
             def callback(monitor):
-                click.echo(monitor.bytes_read)
+                spin(u'Uploading {}'.format(doc))
             batch.add_document(doc, callback)
+            click.secho(u'\b\u2713', fg='green', nl=False)
+            click.echo('\033[?25h\n', nl=False)
     else:
         from nidaba import storage
         click.echo(u'Preparing filestore\t\t[', nl=False)
