@@ -9,8 +9,6 @@ objects and methods defined here.
 
 from __future__ import unicode_literals, print_function, absolute_import
 
-from nidaba import storage
-from nidaba import config
 from nidaba.nidabaexceptions import (NidabaInputException,
                                      NidabaNoSuchAlgorithmException,
                                      NidabaTickException, NidabaStepException)
@@ -134,11 +132,18 @@ class Batch(object):
     """
 
     def __init__(self, id):
+        # stuff depending on a valid configuration
+        from nidaba import storage
+        from nidaba import config
+        self.storage = storage
+
+        # slowly importing stuff
         from nidaba import tasks
         from nidaba import plugins
         from nidaba import celery
         self.tasks = tasks
         self.celery = celery
+
         self.id = id
         self.docs = []
         self.batch_def = []
@@ -282,7 +287,7 @@ class Batch(object):
             NidabaInputException: The document tuple does not refer to a file.
         """
 
-        if not storage.is_file(*doc):
+        if not self.storage.is_file(*doc):
             raise NidabaInputException('Input document is not a file.')
         self.docs.append(doc)
         if self.scratchpad:
@@ -474,6 +479,12 @@ class SimpleBatch(Batch):
     automatically).
     """
     def __init__(self, id=None):
+        # stuff depending on a valid configuration
+        from nidaba import storage
+        self.storage = storage
+
+        # slowly importing stuff (tasks and plugins also needed so the task
+        # registry is complete)
         from nidaba import tasks
         from nidaba import plugins
         from nidaba import celery
@@ -481,8 +492,8 @@ class SimpleBatch(Batch):
 
         if id is None:
             id = unicode(uuid.uuid4())
-            storage.prepare_filestore(id)
-        if not storage.is_valid_job(id):
+            self.storage.prepare_filestore(id)
+        if not self.storage.is_valid_job(id):
             raise NidabaInputException('Storage not prepared for task')
         super(SimpleBatch, self).__init__(id)
         self.lock = False
