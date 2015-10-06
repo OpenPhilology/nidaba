@@ -95,7 +95,7 @@ def validate_definition(ctx, param, value):
                 if '=' in arg:
                     k, v = arg.split('=')
                     kwargs[k] = int_float_bool_or_str(v)
-                else:
+                elif arg:
                     raise click.BadParameter('Positional arguments are deprecated!')
             configurations.append(kwargs)
         definitions.append([task, configurations])
