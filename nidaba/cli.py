@@ -3,16 +3,13 @@
 This module encapsulates all shell callable functions of nidaba.
 """
 
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, print_function
 
 from inspect import getcallargs, getdoc
 from gunicorn.six import iteritems
 from pprint import pprint
 
 from nidaba.nidaba import NetworkSimpleBatch, SimpleBatch
-from nidaba import storage
-from nidaba import api
-from nidaba.config import nidaba_cfg
 
 import uuid
 import shutil
@@ -62,8 +59,6 @@ def int_float_bool_or_str(s):
 
 
 def help_tasks(ctx, param, value):
-
-
     if not value or ctx.resilient_parsing:
         return
     from nidaba import celery
@@ -116,6 +111,8 @@ def move_to_storage(batch, kwargs):
 
     It is assumed that the filestore is already created.
     """
+    from nidaba import storage
+
     nkwargs = {}
     def do_move(batch, src):
         if isinstance(batch, NetworkSimpleBatch):
@@ -191,6 +188,7 @@ def batch(files, host, binarize, ocr, segmentation, stats, postprocessing, outpu
                 click.echo(monitor.bytes_read)
             batch.add_document(doc, callback)
     else:
+        from nidaba import storage
         click.echo(u'Preparing filestore\t\t[', nl=False)
         try:
             batch = SimpleBatch()
@@ -252,15 +250,21 @@ def worker():
 
 
 @main.command()
+@click.pass_context
 @click.option('-b', '--bind', default='127.0.0.1:8080', 
               help='Address and port to bind the application worker to.')
 @click.option('-w', '--workers', default=1, type=click.INT, 
               help='Number of request workers')
-def api_server(**kwargs):
+def api_server(ctx, **kwargs):
     """
     Starts the nidaba API server using gunicorn.
     """
-
+    try:
+        from nidaba import api
+    except IOError as e:
+        if e.errno == 2:
+            click.echo('No configuration file found at {}'.format(e.filename))
+            ctx.exit()
 
     logging.basicConfig(level=logging.DEBUG)
 
@@ -285,19 +289,33 @@ def api_server(**kwargs):
 
 
 @main.command()
-def config():
+@click.pass_context
+def config(ctx):
     """
     Displays the current configuration.
     """
-
+    try:
+        from nidaba.config import nidaba_cfg
+    except IOError as e:
+        if e.errno == 2:
+            click.echo('No configuration file found at {}'.format(e.filename))
+            ctx.exit()
     pprint(nidaba_cfg)
 
 
 @main.command()
-def plugins():
+@click.pass_context
+def plugins(ctx):
     """
     Displays available plugins and if they're enabled.
     """
+    try:
+        from nidaba.config import nidaba_cfg
+    except IOError as e:
+        if e.errno == 2:
+            click.echo('plugins command only available for local installations.')
+            ctx.exit()
+
     mgr = stevedore.ExtensionManager(namespace='nidaba.plugins')
     enabled = set(nidaba_cfg['plugins_load'].keys()).intersection(set(mgr.names()))
     disabled = set(mgr.names()) - enabled
@@ -355,10 +373,14 @@ def status(verbose, host, job_id):
         if len(subtask['children']) == 0 and not subtask['housekeeping'] and subtask['result'] is not None:
             results.append((subtask['result'], subtask['root_document']))
 
-    click.echo(' {0}\n'.format(bs))
-    click.echo('{0}/{1} tasks completed. {2} running.\n'.format(done, len(state), running))
-    if results:
-        click.secho('Output files:\n', underline=True)
+    click.echo(' {}\n'.format(bs))
+    click.echo('{}/{} tasks completed. {} running.\n'.format(done, len(state), running))
+    click.secho('Output files:\n', underline=True)
+    if results and host:
+        for doc in results:
+            click.echo(doc[1] + u' \u2192 ' + doc[0])
+    elif results:
+        from nidaba import storage
         for doc in results:
             output = click.format_filename(storage.get_abs_path(*doc[0]))
             click.echo(doc[1][1] + u' \u2192 ' + output)
