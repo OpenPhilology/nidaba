@@ -573,7 +573,8 @@ class SimpleBatch(Batch):
         argument values.
         """
         tasks = OrderedDict()
-        for task, fun in self.celery.app.tasks.iteritems():
+        from nidaba import celery
+        for task, fun in celery.app.tasks.iteritems():
             try:
                 _, group, method = task.split('.')
             except:
