@@ -647,7 +647,6 @@ class SimpleBatch(Batch):
 
         self.add_step()
         for group, btasks in self.tasks.iteritems():
-            print('Adding tasks in group {}'.format(group))
             self.add_tick()
             for task in btasks:
                 super(SimpleBatch, self).add_task('{}.{}'.format(group,
