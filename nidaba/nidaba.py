@@ -497,13 +497,13 @@ class SimpleBatch(Batch):
             raise NidabaInputException('Storage not prepared for task')
         super(SimpleBatch, self).__init__(id)
         self.lock = False
-        self.tasks = OrderedDict({'img': [], 
-                                  'binarize': [],
-                                  'segmentation': [], 
-                                  'ocr': [],
-                                  'stats': [], 
-                                  'postprocessing': [],
-                                  'output': []})
+        self.tasks = OrderedDict([('img', []), 
+                                  ('binarize', []),
+                                  ('segmentation', []), 
+                                  ('ocr', []),
+                                  ('stats', []), 
+                                  ('postprocessing', []),
+                                  ('output', [])])
 
         try:
             self.add_scratchpad()
@@ -534,13 +534,13 @@ class SimpleBatch(Batch):
             return scratch['scratchpad']['tasks']
         else:
             state = super(SimpleBatch, self).get_extended_state()
-            tasks = OrderedDict({'img': [], 
-                                 'binarize': [],
-                                 'segmentation': [], 
-                                 'ocr': [],
-                                 'stats': [], 
-                                 'postprocessing': [],
-                                 'output': []})
+            tasks = OrderedDict([('img', []), 
+                                 ('binarize', []),
+                                 ('segmentation', []), 
+                                 ('ocr', []),
+                                 ('stats', []), 
+                                 ('postprocessing', []),
+                                 ('output', [])])
             for task in state.itervalues():
                 _, group, method = task['task'][0].split('.')
                 if group in tasks:
@@ -612,7 +612,6 @@ class SimpleBatch(Batch):
             method (unicode): Name of the task
             kwargs: Arguments to the task
         """
-
         if self.lock:
             raise NidabaInputException('Executed batch may not be modified')
         # validate that the task exists
@@ -628,7 +627,7 @@ class SimpleBatch(Batch):
             raise NidabaInputException(str(e))
         # validate against arg_values field of the task
         task_arg_validator(task.get_valid_args(), **kwargs)
-        self.tasks[group].append((u'{}.{}'.format(group, method), kwargs))
+        self.tasks[group].append((method, kwargs))
         self.scratchpad['scratchpad']['tasks'] = self.tasks
         self.redis.set(self.id, json.dumps(self.scratchpad))
 
@@ -647,10 +646,13 @@ class SimpleBatch(Batch):
             raise NidabaInputException('Executed batch may not be modified')
 
         self.add_step()
-        for _, btasks in self.tasks.iteritems():
+        for group, btasks in self.tasks.iteritems():
+            print('Adding tasks in group {}'.format(group))
             self.add_tick()
             for task in btasks:
-                super(SimpleBatch, self).add_task(task[0], **task[1])
+                super(SimpleBatch, self).add_task('{}.{}'.format(group,
+                                                                 task[0]),
+                                                  **task[1])
         self.lock = True
         return super(SimpleBatch, self).run()
 
