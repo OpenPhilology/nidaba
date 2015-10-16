@@ -581,8 +581,8 @@ class TEIFacsimile(object):
         Writes the TEI document as a grapheme cloud in a simple XML format. Its basic format is:
 
         <text>
-        <charParams l="0" r="78" t="6" b="89" charConfidence="76">D</charParams>
-        <charParams l="86" r="111" t="24" b="89" charConfidence="76">e</charParams>
+        <charParams l="0" r="78" t="6" b="89" charConfidence="76" wordStart="true">D</charParams>
+        <charParams l="86" r="111" t="24" b="89" charConfidence="76" wordStart="false">e</charParams>
         ....
         </text>
 
@@ -590,16 +590,28 @@ class TEIFacsimile(object):
             fp (file): File descriptor to write to.
         """
         page = etree.Element('text')
-        for g in self.graphemes:
+        last_seg_id = None
+        for g in self.doc.iter(self.tei_ns + 'g'):
             el = SubElement(page, 'charParams')
-            el.text = g[-1]
-            if g[0] is not None:
-                el.set('l', str(g[0]))
-                el.set('t', str(g[1]))
-                el.set('r', str(g[2]))
-                el.set('b', str(g[3]))
-            if g[-3] is not None:
-                el.set('charConfidence', str(g[-3]))
+
+            seg = g.xpath("ancestor::*[@type='segment']")
+            if seg and seg[0].get(self.xml_ns  + 'id') != last_seg_id:
+                el.set('wordStart', 'true')
+                last_seg_id = seg[0].get(self.xml_ns + 'id')
+            else:
+                el.set('wordStart', 'false')
+            el.text = ''.join(g.itertext())
+            if g.getparent().getparent().get('type') == 'grapheme':
+                el.set('l', g.getparent().getparent().get('ulx'))
+                el.set('t', g.getparent().getparent().get('uly'))
+                el.set('r', g.getparent().getparent().get('lrx'))
+                el.set('b', g.getparent().getparent().get('lry'))
+            cert = self.doc.xpath("//*[local-name()='certainty' and @target=$tag]",
+                                  tag='#' + g.get(self.xml_ns + 'id'))
+            if len(cert):
+               el.set('charConfidence', str(100.0 * float(cert[0].get('degree'))))
+
+
         fp.write(etree.tostring(page, xml_declaration=True, encoding='utf-8'))
 
     def write_text(self, fp):
