@@ -287,7 +287,7 @@ class TEIFacsimile(object):
         x1, y1, confidence, id, text).
         """
         segments = []
-        for seg in self.doc.iterfind(self.tei_ns + "zone[@type='segment']"):
+        for seg in self.doc.iterfind('.//' + self.tei_ns + "zone[@type='segment']"):
             text = ''.join(seg.itertext())
             bbox = (int(seg.get('ulx')),
                     int(seg.get('uly')),
@@ -634,7 +634,7 @@ class TEIFacsimile(object):
         """
         self.doc = etree.parse(fp).getroot()
         self.line_cnt = len(list(self.doc.iter(self.tei_ns + 'line'))) - 1
-        self.seg_cnt = len(list(self.doc.iterfind(self.tei_ns + "zone[@type='segment']"))) - 1
+        self.seg_cnt = len(list(self.doc.iterfind('.//' + self.tei_ns + "zone[@type='segment']"))) - 1
         self.grapheme_cnt = len(list(self.doc.iter(self.tei_ns + 'g'))) - 1
 
 
