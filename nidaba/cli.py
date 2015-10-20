@@ -9,6 +9,7 @@ from inspect import getcallargs, getdoc
 from gunicorn.six import iteritems
 from itertools import cycle
 from pprint import pprint
+from flask import Flask
 
 from nidaba.nidaba import NetworkSimpleBatch, SimpleBatch
 
@@ -122,8 +123,12 @@ def move_to_storage(batch, kwargs):
     nkwargs = {}
     def do_move(batch, src):
         if isinstance(batch, NetworkSimpleBatch):
-             batch.add_document(src, auxiliary=True)
-             dst = os.path.basename(src)
+            dst = os.path.basename(src)
+            def callback(monitor):
+                spin(u'Uploading {}'.format(dst))
+            batch.add_document(src, callback, auxiliary=True)
+            click.secho(u'\b\u2713', fg='green', nl=False)
+            click.echo('\033[?25h\n', nl=False)
         else:
             suffix = uuid.uuid4()
             dst = unicode(suffix) + '_' + os.path.basename(src)
@@ -215,32 +220,32 @@ def batch(files, host, binarize, ocr, segmentation, stats, postprocessing, outpu
     if binarize:
         for alg in binarize:
             for kwargs in alg[1]:
-                kwargs = move_to_storage(id, kwargs)
+                kwargs = move_to_storage(batch, kwargs)
                 batch.add_task('binarize', alg[0], **kwargs)
     if segmentation:
         for alg in segmentation:
             for kwargs in alg[1]:
-                kwargs = move_to_storage(id, kwargs)
+                kwargs = move_to_storage(batch, kwargs)
                 batch.add_task('segmentation', alg[0], **kwargs)
     if ocr:
         for alg in ocr:
             for kwargs in alg[1]:
-                kwargs = move_to_storage(id, kwargs)
+                kwargs = move_to_storage(batch, kwargs)
                 batch.add_task('ocr', alg[0], **kwargs)
     if stats:
         for alg in stats:
             for kwargs in alg[1]:
-                kwargs = move_to_storage(id, kwargs)
+                kwargs = move_to_storage(batch, kwargs)
                 batch.add_task('stats', alg[0], **kwargs)
     if postprocessing:
         for alg in postprocessing:
             for kwargs in alg[1]:
-                kwargs = move_to_storage(id, kwargs)
+                kwargs = move_to_storage(batch, kwargs)
                 batch.add_task('postprocessing', alg[0], **kwargs)
     if output:
         for alg in output:
             for kwargs in alg[1]:
-                kwargs = move_to_storage(id, kwargs)
+                kwargs = move_to_storage(batch, kwargs)
                 batch.add_task('output', alg[0], **kwargs)
     batch.run()
     click.secho(u'\u2713', fg='green', nl=False)
@@ -267,8 +272,10 @@ def api_server(ctx, **kwargs):
     """
     Starts the nidaba API server using gunicorn.
     """
+
     try:
         from nidaba import api
+        from nidaba import web
     except IOError as e:
         if e.errno == 2:
             click.echo('No configuration file found at {}'.format(e.filename))
@@ -276,7 +283,10 @@ def api_server(ctx, **kwargs):
 
     logging.basicConfig(level=logging.DEBUG)
 
-    api.get_flask()
+    app = Flask('nidaba')
+    app.register_blueprint(api.get_blueprint())
+    app.register_blueprint(web.get_blueprint())
+
     class APIServer(gunicorn.app.base.BaseApplication):
 
         def __init__(self, app, options=None):
@@ -293,7 +303,7 @@ def api_server(ctx, **kwargs):
         def load(self):
             return self.application
 
-    APIServer(api.get_flask(), options=kwargs).run()
+    APIServer(app, options=kwargs).run()
 
 
 @main.command()

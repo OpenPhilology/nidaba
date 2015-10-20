@@ -16,13 +16,14 @@ import uuid
 import werkzeug
 import json
 
-from flask import Flask, request
+from flask import Flask, Blueprint, request
 from flask import send_file
 from flask_restful import abort, Api, Resource, url_for, reqparse
 
 from nidaba import storage
 from nidaba.nidaba import SimpleBatch
 from nidaba.nidabaexceptions import NidabaStorageViolationException
+
 
 log = logging.getLogger(__name__)
 log.propagate = False
@@ -32,11 +33,11 @@ formatter = logging.Formatter('%(asctime)s [%(process)d] [%(levelname)s] %(messa
 ch.setFormatter(formatter)
 log.addHandler(ch)
 
-nidaba = Flask('nidaba')
-api = Api(nidaba)
+api_v1 = Blueprint('api', __name__, url_prefix='/api/v1')
+api = Api(api_v1)
 
-def get_flask():
-    return nidaba
+def get_blueprint():
+    return api_v1
 
 @api.resource('/pages/<batch>/<path:file>', methods=['GET'])
 class Page(Resource):
@@ -112,22 +113,6 @@ class Task(Resource):
                             0, 
                             100
                         ], 
-                        "perc": [
-                            0, 
-                            100
-                        ], 
-                        "range": [
-                            0, 
-                            100
-                        ], 
-                        "threshold": [
-                            0.0, 
-                            1.0
-                        ], 
-                        "zoom": [
-                            0.0, 
-                            1.0
-                        ]
                     }, 
                     "otsu": {}, 
                     "sauvola": {
@@ -160,8 +145,6 @@ class Task(Resource):
                             "chi_tra", 
                             "ita_old", 
                             "ceb", 
-                            "mya", 
-                            "hrv"
                         ]
                     }
                 }, 
@@ -191,6 +174,38 @@ class Task(Resource):
                 }
             }
 
+        It is also possible to retrieve only a subset of task definitions by
+        adding to the request a task group and/or the task name:
+
+        ** Request **
+
+        .. sourcecode:: http
+    
+            GET /tasks/segmentation
+
+        ** Response **
+
+        .. sourcecode:: http
+
+            HTTP/1.1 200 OK
+            
+            {
+                "segmentation": {
+                    "kraken": {}, 
+                    "tesseract": {}
+                }
+            }
+
+        Currently there are 4 different argument types:
+
+            * "int": An integer
+            * "float": A float (floats serialized to integers, i.e. 1.0 to 1
+                       are also accepted)
+            * "str": An UTF-8 encoded string
+            * "file": A file on the storage medium, referenced by its URL
+
+        Finally there are lists of valid argument values where one or more
+        values out of the list may be picked and value ranges
         """
         log.debug('Routing to tasks with group {}, method {}'.format(group, task))
         tasks = SimpleBatch.get_available_tasks()
@@ -235,8 +250,8 @@ class Batch(Resource):
             batch = SimpleBatch(batch_id)
         except:
             return {'message': 'Batch Not Found: {}'.format(batch_id)}, 404
-        res['pages'] = url_for('batchpages', batch_id=batch_id)
-        res['tasks'] = url_for('batchtasks', batch_id=batch_id)
+        res['pages'] = url_for('api.batchpages', batch_id=batch_id)
+        res['tasks'] = url_for('api.batchtasks', batch_id=batch_id)
         if batch.is_running():
             res['chains'] = batch.get_extended_state()
             # replace all document tuples with URLs to the page resource
@@ -246,10 +261,10 @@ class Batch(Resource):
                         if state[k] is not None and isinstance(state[k][0], list):
                             docs = []
                             for doc in state[k]:
-                                docs.append(url_for('page', batch=doc[0], file=doc[1]))
+                                docs.append(url_for('api.page', batch=doc[0], file=doc[1]))
                             state[k] = docs
                         elif state[k] is not None:
-                            state[k] = url_for('page', batch=state[k][0], file=state[k][1])
+                            state[k] = url_for('api.page', batch=state[k][0], file=state[k][1])
                     if isinstance(state[k], dict):
                         replace_docs(state[k])
             replace_docs(res['chains'])
@@ -287,9 +302,9 @@ class Batch(Resource):
         if batch.get_state() == 'NONE':
             try:
                 batch.run()
-                return {'id': batch_id, 'url': url_for('batch', batch_id=batch_id)}, 202
+                return {'id': batch_id, 'url': url_for('api.batch', batch_id=batch_id)}, 202
             except:
-                log.debug('Batch {} could not be executed'.format(batch_id))
+                log.debug('Batch {} could not be executed'.format(batch_id), exc_info=True)
                 return {'message': 'Batch could not be executed'}, 400
         else:
             log.debug('Batch {} already executed'.format(batch_id))
@@ -324,7 +339,7 @@ class BatchCreator(Resource):
         """
         log.debug('Routing to batch with POST')
         batch = SimpleBatch()
-        data = {'id': batch.id, 'url': url_for('batch', batch_id=batch.id)}
+        data = {'id': batch.id, 'url': url_for('api.batch', batch_id=batch.id)}
         log.debug('Created batch {}'.format(batch.id))
         return data, 201
 
@@ -336,7 +351,7 @@ class BatchTasks(Resource):
     def get(self, batch_id, group=None, task=None):
         """
         Retrieves the list of tasks and their argument values associated with a
-        batch, optionally limited to a specific group or task.
+        batch, optionally limited to a specific group.
 
         ** Request **
     
@@ -349,7 +364,43 @@ class BatchTasks(Resource):
         .. sourcecode:: http
     
             HTTP/1.1 200 OK
-    
+            
+            {
+                "segmentation": [
+                    ["tesseract", {}]
+                ],
+                "ocr": [
+                    ["kraken", 
+                        {
+                            "model": "teubner", 
+                        }
+                    ]
+                ]
+            }
+
+
+        To limit output to a specific group of tasks, e.g. segmentation or
+        binarization append the group to the URL:
+
+        ** Request **
+
+        .. sourcecode:: http
+
+            GET /batch/:batch_id/tasks/:group
+
+        ** Response **
+
+        .. sourcecode:: http
+
+            HTTP/1.1 200 OK
+
+            {
+                'group': [
+                    ["tesseract", {}],
+                    ["kraken", {}]
+                ]
+            }
+
         :status 200: success
         :status 404: batch, group, or task not found.
         """
@@ -377,6 +428,28 @@ class BatchTasks(Resource):
         Adds a particular configuration of a task to the batch identified by
         *batch_id*.
 
+        ** Request **
+
+            POST /batch/:batch_id/:group/:task
+
+            {
+                kwarg_1: "value",
+                kwarg_2: 10,
+                kwarg_3: 'true',
+                kwarg_4: ["a", "b"],
+                kwarg_5: '/pages/:batch_id/path'
+            }
+
+        ** Response **
+
+        .. sourcecode:: http
+
+            HTTP/1.1 201 CREATED
+
+        To post files as arguments use their URL returned by the call that
+        created them on the batch. Booleans are strings containing either the
+        values 'True'/'true' or 'False'/'false'.
+
         :status 201: task created
         :status 404: batch, group, or task not found.
         """
@@ -386,17 +459,22 @@ class BatchTasks(Resource):
         except:
             return {'message': 'Batch Not Found: {}'.format(batch_id)}, 404
         try:
-            # JSON does not support booleans
-            def to_bool(s):
+            def arg_conversion(s):
+                # JSON does not support booleans
                 if s in ['True', 'true']:
                     return True
                 elif s in ['False', 'false']:
                     return False
-                else:
-                    return s
-            kwargs = {k: to_bool(v) for k, v in request.form.to_dict(flat=True).iteritems()}
+                # XXX: find a nicer way to rewrite page URLs
+                base_url = url_for('api.page', batch=batch_id, file='')
+                if isinstance(s, str) and s.startswith(base_url):
+                    rem = s.replace(base_url, '', 1)
+                    return (batch_id, rem)
+                return s
+            kwargs = {k: arg_conversion(v) for k, v in request.get_json().iteritems()}
             batch.add_task(group, task, **kwargs)
         except Exception as e:
+            raise
             log.debug('Adding task {} to {} failed: {}'.format(task, batch_id, str(e)))
             return {'message': str(e)}, 422
         return {}, 201
@@ -454,7 +532,7 @@ class BatchPages(Resource):
         data = []
         for doc in batch.get_documents():
             data.append({'name': doc[1],
-                         'url': url_for('page', batch=doc[0], file=doc[1])})
+                         'url': url_for('api.page', batch=doc[0], file=doc[1])})
         return data, 200
 
     def post(self, batch_id):
@@ -468,16 +546,12 @@ class BatchPages(Resource):
 
         ** Response **
 
-            HTTP/1.1 200 OK
+            HTTP/1.1 201 OK
             
             [
                 {
                     "name": "0033.tif", 
                     "url": "/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0033.tif"
-                }, 
-                {
-                    "name": "0072.tif", 
-                    "url": "/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0072.tif"
                 }
             ]
 
@@ -499,6 +573,8 @@ class BatchPages(Resource):
             try:
                 fp = storage.StorageFile(batch_id, file.filename, 'wb')
             except NidabaStorageViolationException as e:
+                log.debug('Failed to write file {}'.format(file.filename),
+                          exc_info=True)
                 return {'message': str(e)}, 403
             else:
                 with fp:
@@ -510,5 +586,5 @@ class BatchPages(Resource):
                                                               batch_id))
                         batch.add_document(fp.storage_path)
             data.append({'name': file.filename,
-                         'url': url_for('page', batch=batch_id, file=file.filename)})
+                         'url': url_for('api.page', batch=batch_id, file=file.filename)})
         return data, 201
