@@ -17,7 +17,7 @@ from celery import chain
 from celery import group
 from itertools import product
 from inspect import getcallargs
-from collections import OrderedDict
+from collections import OrderedDict, Iterable
 from requests_toolbelt.multipart import encoder
 
 import os
@@ -38,7 +38,7 @@ def task_arg_validator(arg_values, **kwargs):
 
     def _val_single_arg(arg, type):
         if type == 'float':
-            if not isinstance(val, float):
+            if not isinstance(val, float) and not isinstance(val, int):
                 raise NidabaInputException('{} is not a float'.format(val))
         elif type == 'int':
             if not isinstance(val, int):
@@ -46,6 +46,9 @@ def task_arg_validator(arg_values, **kwargs):
         elif type == 'str':
             if not isinstance(val, basestring):
                 raise NidabaInputException('{} is not a string'.format(val))
+        # XXX: Add file checker for local case
+        elif type == 'file':
+            pass
         else:
             raise NidabaInputException('Argument type {} unknown'.format(type))
 
@@ -55,12 +58,16 @@ def task_arg_validator(arg_values, **kwargs):
         except:
             raise NidabaInputException('Missing argument: {}'.format(k))
         if isinstance(v, tuple):
-            if not isinstance(val, v[0]):
+            if not isinstance(val, type(v[0])):
                 raise NidabaInputException('{} of different type than range fields'.format(val))
             if val < v[0] or val > v[1]:
                 raise NidabaInputException('{} outside of allowed range {}-{}'.format(val, *v))
         elif isinstance(v, list):
-            if val not in v:
+            if isinstance(val, Iterable):
+                va = set(val)
+            else:
+                va = set([val])
+            if not set(v).issuperset(va):
                 raise NidabaInputException('{} not in list of valid values'.format(val))
         else:
             _val_single_arg(val, v)
@@ -497,14 +504,9 @@ class SimpleBatch(Batch):
             raise NidabaInputException('Storage not prepared for task')
         super(SimpleBatch, self).__init__(id)
         self.lock = False
-        self.tasks = OrderedDict([('img', []), 
-                                  ('binarize', []),
-                                  ('segmentation', []), 
-                                  ('ocr', []),
-                                  ('stats', []), 
-                                  ('postprocessing', []),
-                                  ('output', [])])
-
+        
+        keys = ['img', 'binarize', 'segmentation', 'ocr', 'stats', 'postprocessing', 'output']
+        self.tasks = OrderedDict([(key, []) for key in keys])
         try:
             self.add_scratchpad()
             self.scratchpad['scratchpad']['tasks'] = self.tasks
@@ -512,6 +514,8 @@ class SimpleBatch(Batch):
         except:
             try:
                 self.restore_scratchpad()
+                # reorder the tasks dictionary
+                self.tasks = OrderedDict([(key, self.tasks[key]) for key in  keys])
             except NidabaInputException:
                 # no scratchpad in database means batch is running and may not
                 # be modified.
@@ -865,7 +869,7 @@ class NetworkSimpleBatch(object):
         task_arg_validator(args, **kwargs)
         r = requests.post('{}/batch/{}/tasks/{}/{}'.format(self.host, self.id,
                                                            group, method),
-                          data=kwargs)  
+                          json=kwargs)  
         r.raise_for_status()
 
     def run(self):
