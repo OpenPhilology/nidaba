@@ -481,7 +481,6 @@ class BatchTasks(Resource):
             kwargs = {k: arg_conversion(v) for k, v in request.get_json().iteritems()}
             batch.add_task(group, task, **kwargs)
         except Exception as e:
-            raise
             log.debug('Adding task {} to {} failed: {}'.format(task, batch_id, str(e)))
             return {'message': str(e)}, 422
         return {}, 201
