@@ -1,0 +1,627 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>RESTful API &mdash; nidaba 0.9
+ documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.9
+',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="nidaba 0.9
+ documentation" href="index.html" />
+    <link rel="next" title="nidaba" href="source/modules.html" />
+    <link rel="prev" title="TEI Output" href="tei.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="restful-api">
+<span id="api"></span><h1>RESTful API<a class="headerlink" href="#restful-api" title="Permalink to this headline">¶</a></h1>
+<p>Nidaba includes a RESTful API server and an experimental web user interface. To
+start up the server locally just run:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba api_server
+</pre></div>
+</div>
+<p>To create batches remotely you can use the normal <code class="docutils literal"><span class="pre">nidaba</span></code> commands by adding
+the <code class="docutils literal"><span class="pre">-h/--host</span></code> option:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch -h http://127.0.0.1:8080/api/v1 --grayscale -l tesseract -o tesseract:languages<span class="o">=</span>eng,extended<span class="o">=</span>True -- input.tif
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba status -h http://127.0.0.1:8000/api/v1 cf644c49-01b9-44e3-82fc-a4073f0980ef
+</pre></div>
+</div>
+<div class="section" id="schema">
+<h2>Schema<a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h2>
+<p>All data is sent and received as JSON.</p>
+</div>
+<div class="section" id="client-errors">
+<h2>Client Errors<a class="headerlink" href="#client-errors" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="http-verbs">
+<h2>HTTP Verbs<a class="headerlink" href="#http-verbs" title="Permalink to this headline">¶</a></h2>
+<p>Where possible, the API strives to use appropriate HTTP verbs for each action.</p>
+</div>
+<div class="section" id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
+<dl class="get">
+<dt id="get--api-v1-tasks-(group)-(task)">
+<code class="descname">GET </code><code class="descname">/api/v1/tasks/</code><span class="sig-paren">(</span><em>group</em><span class="sig-paren">)</span><code class="descname">/</code><span class="sig-paren">(</span><em>task</em><span class="sig-paren">)</span><a class="headerlink" href="#get--api-v1-tasks-(group)-(task)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="get">
+<dt id="get--api-v1-tasks-(group)">
+<code class="descname">GET </code><code class="descname">/api/v1/tasks/</code><span class="sig-paren">(</span><em>group</em><span class="sig-paren">)</span><a class="headerlink" href="#get--api-v1-tasks-(group)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="get">
+<dt id="get--api-v1-tasks">
+<code class="descname">GET </code><code class="descname">/api/v1/tasks</code><a class="headerlink" href="#get--api-v1-tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the list of available tasks, their arguments and valid values
+for those arguments.</p>
+<p>** Request **</p>
+<div class="highlight-http"><div class="highlight"><pre>GET /tasks
+</pre></div>
+</div>
+<p>** Response **</p>
+<div class="highlight-http"><div class="highlight"><pre><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+
+{
+    &quot;img&quot;: {
+        &quot;deskew&quot;: {}, 
+        &quot;dewarp&quot;: {}, 
+        &quot;rgb_to_gray&quot;: {}
+    },
+    &quot;binarize&quot;: {
+        &quot;nlbin&quot;: {
+            &quot;border&quot;: &quot;float&quot;, 
+            &quot;escale&quot;: &quot;float&quot;, 
+            &quot;high&quot;: [
+                0, 
+                100
+            ], 
+            &quot;low&quot;: [
+                0, 
+                100
+            ], 
+        }, 
+        &quot;otsu&quot;: {}, 
+        &quot;sauvola&quot;: {
+            &quot;factor&quot;: [
+                0.0, 
+                1.0
+            ], 
+            &quot;whsize&quot;: &quot;int&quot;
+        }
+    },
+    &quot;segmentation&quot;: {
+        &quot;kraken&quot;: {}, 
+        &quot;tesseract&quot;: {}
+    },
+    &quot;ocr&quot;: {
+        &quot;kraken&quot;: {
+            &quot;model&quot;: [
+                &quot;fraktur.pyrnn.gz&quot;, 
+                &quot;default&quot;, 
+                &quot;teubner&quot;
+            ]
+        }, 
+        &quot;tesseract&quot;: {
+            &quot;extended&quot;: [
+                false, 
+                true
+            ], 
+            &quot;languages&quot;: [
+                &quot;chr&quot;, 
+                &quot;chi_tra&quot;, 
+                &quot;ita_old&quot;, 
+                &quot;ceb&quot;, 
+            ]
+        }
+    }, 
+    &quot;postprocessing&quot;: {
+        &quot;spell_check&quot;: {
+            &quot;filter_punctuation&quot;: [
+                true, 
+                false
+            ], 
+            &quot;language&quot;: [
+                &quot;latin&quot;, 
+                &quot;polytonic_greek&quot;
+            ]
+        }
+    },
+    &quot;output&quot;: {
+        &quot;metadata&quot;: {
+            &quot;metadata&quot;: &quot;file&quot;, 
+            &quot;validate&quot;: [
+                true, 
+                false
+            ]
+        }, 
+        &quot;tei2hocr&quot;: {}, 
+        &quot;tei2simplexml&quot;: {}, 
+        &quot;tei2txt&quot;: {}
+    }
+}
+</pre></div>
+</div>
+<p>It is also possible to retrieve only a subset of task definitions by
+adding to the request a task group and/or the task name:</p>
+<p>** Request **</p>
+<div class="highlight-http"><div class="highlight"><pre>GET /tasks/segmentation
+</pre></div>
+</div>
+<p>** Response **</p>
+<div class="highlight-http"><div class="highlight"><pre><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+
+{
+    &quot;segmentation&quot;: {
+        &quot;kraken&quot;: {}, 
+        &quot;tesseract&quot;: {}
+    }
+}
+</pre></div>
+</div>
+<p>Currently there are 4 different argument types:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">&#8220;int&#8221;: An integer</p>
+</li>
+<li><dl class="first docutils">
+<dt>&#8220;float&#8221;: A float (floats serialized to integers, i.e. 1.0 to 1</dt>
+<dd><p class="first last">are also accepted)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">&#8220;str&#8221;: An UTF-8 encoded string</p>
+</li>
+<li><p class="first">&#8220;file&#8221;: A file on the storage medium, referenced by its URL</p>
+</li>
+</ul>
+</div></blockquote>
+<p>Finally there are lists of valid argument values where one or more
+values out of the list may be picked and value ranges</p>
+</dd></dl>
+
+<dl class="post">
+<dt id="post--api-v1-batch">
+<code class="descname">POST </code><code class="descname">/api/v1/batch</code><a class="headerlink" href="#post--api-v1-batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new batch and returns it identifier.</p>
+<p>** Request **</p>
+<div class="highlight-http"><div class="highlight"><pre>POST /batch
+</pre></div>
+</div>
+<p>** Response **</p>
+<div class="highlight-http"><div class="highlight"><pre><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">CREATED</span>
+
+{
+    &quot;id&quot;: &quot;78a1f1e4-cc76-40ce-8a98-77b54362a00e&quot;, 
+    &quot;url&quot;: &quot;/batch/78a1f1e4-cc76-40ce-8a98-77b54362a00e&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Status Codes:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.2">201 Created</a> &#8211; Successfully created</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="post">
+<dt id="post--api-v1-batch-(batch_id)-tasks-(group)-(task)">
+<code class="descname">POST </code><code class="descname">/api/v1/batch/</code><span class="sig-paren">(</span><em>batch_id</em><span class="sig-paren">)</span><code class="descname">/tasks/</code><span class="sig-paren">(</span><em>group</em><span class="sig-paren">)</span><code class="descname">/</code><span class="sig-paren">(</span><em>task</em><span class="sig-paren">)</span><a class="headerlink" href="#post--api-v1-batch-(batch_id)-tasks-(group)-(task)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="post">
+<dt id="post--api-v1-batch-(batch_id)-tasks-(group)">
+<code class="descname">POST </code><code class="descname">/api/v1/batch/</code><span class="sig-paren">(</span><em>batch_id</em><span class="sig-paren">)</span><code class="descname">/tasks/</code><span class="sig-paren">(</span><em>group</em><span class="sig-paren">)</span><a class="headerlink" href="#post--api-v1-batch-(batch_id)-tasks-(group)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="post">
+<dt id="post--api-v1-batch-(batch_id)-tasks">
+<code class="descname">POST </code><code class="descname">/api/v1/batch/</code><span class="sig-paren">(</span><em>batch_id</em><span class="sig-paren">)</span><code class="descname">/tasks</code><a class="headerlink" href="#post--api-v1-batch-(batch_id)-tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a particular configuration of a task to the batch identified by
+<em>batch_id</em>.</p>
+<p>** Request **</p>
+<blockquote>
+<div><p>POST /batch/:batch_id/:group/:task</p>
+<dl class="docutils">
+<dt>{</dt>
+<dd>kwarg_1: &#8220;value&#8221;,
+kwarg_2: 10,
+kwarg_3: &#8216;true&#8217;,
+kwarg_4: [&#8220;a&#8221;, &#8220;b&#8221;],
+kwarg_5: &#8216;/pages/:batch_id/path&#8217;</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>** Response **</p>
+<div class="highlight-http"><div class="highlight"><pre><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">CREATED</span>
+</pre></div>
+</div>
+<p>To post files as arguments use their URL returned by the call that
+created them on the batch. Booleans are strings containing either the
+values &#8216;True&#8217;/&#8217;true&#8217; or &#8216;False&#8217;/&#8217;false&#8217;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Status Codes:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.2">201 Created</a> &#8211; task created</li>
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404 Not Found</a> &#8211; batch, group, or task not found.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--api-v1-batch-(batch_id)-tasks-(group)-(task)">
+<code class="descname">GET </code><code class="descname">/api/v1/batch/</code><span class="sig-paren">(</span><em>batch_id</em><span class="sig-paren">)</span><code class="descname">/tasks/</code><span class="sig-paren">(</span><em>group</em><span class="sig-paren">)</span><code class="descname">/</code><span class="sig-paren">(</span><em>task</em><span class="sig-paren">)</span><a class="headerlink" href="#get--api-v1-batch-(batch_id)-tasks-(group)-(task)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="get">
+<dt id="get--api-v1-batch-(batch_id)-tasks-(group)">
+<code class="descname">GET </code><code class="descname">/api/v1/batch/</code><span class="sig-paren">(</span><em>batch_id</em><span class="sig-paren">)</span><code class="descname">/tasks/</code><span class="sig-paren">(</span><em>group</em><span class="sig-paren">)</span><a class="headerlink" href="#get--api-v1-batch-(batch_id)-tasks-(group)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="get">
+<dt id="get--api-v1-batch-(batch_id)-tasks">
+<code class="descname">GET </code><code class="descname">/api/v1/batch/</code><span class="sig-paren">(</span><em>batch_id</em><span class="sig-paren">)</span><code class="descname">/tasks</code><a class="headerlink" href="#get--api-v1-batch-(batch_id)-tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the list of tasks and their argument values associated with a
+batch, optionally limited to a specific group.</p>
+<p>** Request **</p>
+<div class="highlight-http"><div class="highlight"><pre>GET /batch/:batch_id/tasks    
+</pre></div>
+</div>
+<p>** Response **</p>
+<div class="highlight-http"><div class="highlight"><pre><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+
+{
+    &quot;segmentation&quot;: [
+        [&quot;tesseract&quot;, {}]
+    ],
+    &quot;ocr&quot;: [
+        [&quot;kraken&quot;, 
+            {
+                &quot;model&quot;: &quot;teubner&quot;, 
+            }
+        ]
+    ]
+}
+</pre></div>
+</div>
+<p>To limit output to a specific group of tasks, e.g. segmentation or
+binarization append the group to the URL:</p>
+<p>** Request **</p>
+<div class="highlight-http"><div class="highlight"><pre>GET /batch/:batch_id/tasks/:group
+</pre></div>
+</div>
+<p>** Response **</p>
+<div class="highlight-http"><div class="highlight"><pre><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+
+{
+    &#39;group&#39;: [
+        [&quot;tesseract&quot;, {}],
+        [&quot;kraken&quot;, {}]
+    ]
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Status Codes:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a> &#8211; success</li>
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404 Not Found</a> &#8211; batch, group, or task not found.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="post">
+<dt id="post--api-v1-batch-(batch_id)-pages">
+<code class="descname">POST </code><code class="descname">/api/v1/batch/</code><span class="sig-paren">(</span><em>batch_id</em><span class="sig-paren">)</span><code class="descname">/pages</code><a class="headerlink" href="#post--api-v1-batch-(batch_id)-pages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a page (really any type of file) to the batch identified by
+<em>batch_id</em>.</p>
+<p>** Request **</p>
+<blockquote>
+<div>POST /batch/:batch/pages</div></blockquote>
+<p>** Response **</p>
+<blockquote>
+<div><p>HTTP/1.1 201 OK</p>
+<dl class="docutils">
+<dt>[</dt>
+<dd><dl class="first docutils">
+<dt>{</dt>
+<dd>&#8220;name&#8221;: &#8220;0033.tif&#8221;, 
+&#8220;url&#8221;: &#8220;/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0033.tif&#8221;</dd>
+</dl>
+<p class="last">}</p>
+</dd>
+</dl>
+<p>]</p>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Form Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first simple">
+<li><strong>scans</strong> &#8211; file(s) to add to the batch</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Status Codes:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.2">201 Created</a> &#8211; task created</li>
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a> &#8211; file couldn&#8217;t be created</li>
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404 Not Found</a> &#8211; batch not found</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--api-v1-batch-(batch_id)-pages">
+<code class="descname">GET </code><code class="descname">/api/v1/batch/</code><span class="sig-paren">(</span><em>batch_id</em><span class="sig-paren">)</span><code class="descname">/pages</code><a class="headerlink" href="#get--api-v1-batch-(batch_id)-pages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the list of pages associated with the batch with <em>batch_id</em>.</p>
+<p>** Request **</p>
+<div class="highlight-http"><div class="highlight"><pre>GET /batch/:batch/pages
+</pre></div>
+</div>
+<p>** Response **</p>
+<div class="highlight-http"><div class="highlight"><pre><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+
+[
+    {
+        &quot;name&quot;: &quot;0033.tif&quot;, 
+        &quot;url&quot;: &quot;/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0033.tif&quot;
+    }, 
+    {
+        &quot;name&quot;: &quot;0072.tif&quot;, 
+        &quot;url&quot;: &quot;/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0072.tif&quot;
+    }, 
+    {
+        &quot;name&quot;: &quot;0014.tif&quot;, 
+        &quot;url&quot;: &quot;/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0014.tif&quot;
+    }
+]
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Status Codes:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a> &#8211; success</li>
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404 Not Found</a> &#8211; batch not found</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--api-v1-pages-(batch)-(path-file)">
+<code class="descname">GET </code><code class="descname">/api/v1/pages/</code><span class="sig-paren">(</span><em>batch</em><span class="sig-paren">)</span><code class="descname">/</code><span class="sig-paren">(</span><em class="property">path: </em><em>file</em><span class="sig-paren">)</span><a class="headerlink" href="#get--api-v1-pages-(batch)-(path-file)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the file at <em>file</em> in batch <em>batch</em>.</p>
+<p>** Request **</p>
+<div class="highlight-http"><div class="highlight"><pre>GET /pages/:batch/:path
+</pre></div>
+</div>
+<p>** Response **</p>
+<div class="highlight-http"><div class="highlight"><pre><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/octet-stream</span>
+
+...
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>batch</strong> (<em>str</em>) &#8211; batch&#8217;s unique id</li>
+<li><strong>file</strong> (<em>path</em>) &#8211; path to the batch&#8217;s file</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Status Codes:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a> &#8211; No error</li>
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404 Not Found</a> &#8211; File not found</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="post">
+<dt id="post--api-v1-batch-(batch_id)">
+<code class="descname">POST </code><code class="descname">/api/v1/batch/</code><span class="sig-paren">(</span><em>batch_id</em><span class="sig-paren">)</span><a class="headerlink" href="#post--api-v1-batch-(batch_id)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes batch with identifier <em>batch_id</em></p>
+<p>** Request **</p>
+<div class="highlight-http"><div class="highlight"><pre>POST /batch/:batch_id
+</pre></div>
+</div>
+<p>** Response **</p>
+<div class="highlight-http"><div class="highlight"><pre><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">202</span> <span class="ne">ACCEPTED</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>batch_id</strong> (<em>string</em>) &#8211; batch&#8217;s unique id</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Status Codes:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.3">202 Accepted</a> &#8211; Successfully executed</li>
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a> &#8211; Batch could not be executed</li>
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404 Not Found</a> &#8211; No such batch</li>
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.10">409 Conflict</a> &#8211; Trying to reexecute an already executed batch</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--api-v1-batch-(batch_id)">
+<code class="descname">GET </code><code class="descname">/api/v1/batch/</code><span class="sig-paren">(</span><em>batch_id</em><span class="sig-paren">)</span><a class="headerlink" href="#get--api-v1-batch-(batch_id)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the state of batch <em>batch_id</em>.</p>
+<p>** Request **</p>
+<div class="highlight-http"><div class="highlight"><pre>GET /batch/:batch_id
+</pre></div>
+</div>
+<p>** Response **</p>
+<div class="highlight-http"><div class="highlight"><pre><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>batch_id</strong> (<em>string</em>) &#8211; batch identifier</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Status Codes:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a> &#8211; No error</li>
+<li><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404 Not Found</a> &#8211; No such batch</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">nidaba</a></h1>
+
+
+
+<p class="blurb">An expandable and scalable OCR pipeline</p>
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=openphilology&repo=nidaba&type=watch&count=true&size=large"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+    
+
+<p>
+<a href="https://travis-ci.org/OpenPhilology/nidaba">
+    <img
+        alt="https://secure.travis-ci.org/OpenPhilology/nidaba.png?branch=master"
+        src="https://secure.travis-ci.org/OpenPhilology/nidaba.png?branch=master"
+    >
+</a>
+</p>
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">Option Groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tei.html">TEI</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Web API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#schema">Schema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#client-errors">Client Errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#http-verbs">HTTP Verbs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api-reference">API Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source/modules.html">API Docs</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2014-2015, Open Greek and Latin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/api.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

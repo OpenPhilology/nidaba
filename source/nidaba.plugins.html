@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nidaba.plugins package &mdash; nidaba 0.5.4
+    <title>nidaba.plugins package &mdash; nidaba 0.9
  documentation</title>
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.5.4
+        VERSION:     '0.9
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.5.4
+    <link rel="top" title="nidaba 0.9
  documentation" href="../index.html" />
     <link rel="up" title="nidaba package" href="nidaba.html" />
     <link rel="next" title="nidaba.tasks package" href="nidaba.tasks.html" />
@@ -310,11 +310,33 @@ hOCR output with .hocr extension), or <cite>legacy</cite> (tesseract hOCR output
 directory level upwards from the actual tessdata directory</dd>
 </dl>
 <dl class="class">
+<dt id="nidaba.plugins.tesseract.Pix">
+<em class="property">class </em><code class="descclassname">nidaba.plugins.tesseract.</code><code class="descname">Pix</code><a class="headerlink" href="#nidaba.plugins.tesseract.Pix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ctypes.Structure</span></code></p>
+</dd></dl>
+
+<dl class="class">
 <dt id="nidaba.plugins.tesseract.TessBaseAPI">
 <em class="property">class </em><code class="descclassname">nidaba.plugins.tesseract.</code><code class="descname">TessBaseAPI</code><a class="headerlink" href="#nidaba.plugins.tesseract.TessBaseAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ctypes.Structure</span></code></p>
-<p>Dummy class encapsulating the TessBaseAPI struct returned by
-TessBaseAPICreate().</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nidaba.plugins.tesseract.TessPageIterator">
+<em class="property">class </em><code class="descclassname">nidaba.plugins.tesseract.</code><code class="descname">TessPageIterator</code><a class="headerlink" href="#nidaba.plugins.tesseract.TessPageIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ctypes.Structure</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nidaba.plugins.tesseract.TessResultIterator">
+<em class="property">class </em><code class="descclassname">nidaba.plugins.tesseract.</code><code class="descname">TessResultIterator</code><a class="headerlink" href="#nidaba.plugins.tesseract.TessResultIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ctypes.Structure</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nidaba.plugins.tesseract.TessResultRenderer">
+<em class="property">class </em><code class="descclassname">nidaba.plugins.tesseract.</code><code class="descname">TessResultRenderer</code><a class="headerlink" href="#nidaba.plugins.tesseract.TessResultRenderer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ctypes.Structure</span></code></p>
 </dd></dl>
 
 <dl class="function">
@@ -419,6 +441,7 @@ modified by tesseract.</p>
 <li class="toctree-l1"><a class="reference internal" href="../plugins.html">Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../options.html">Option Groups</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tei.html">TEI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Web API</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Docs</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="nidaba.html">nidaba package</a></li>
 </ul>

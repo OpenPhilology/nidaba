@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nidaba.algorithms package &mdash; nidaba 0.5.4
+    <title>nidaba.algorithms package &mdash; nidaba 0.9
  documentation</title>
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.5.4
+        VERSION:     '0.9
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.5.4
+    <link rel="top" title="nidaba 0.9
  documentation" href="../index.html" />
     <link rel="up" title="nidaba package" href="nidaba.html" />
     <link rel="next" title="nidaba.contrib package" href="nidaba.contrib.html" />
@@ -84,12 +84,12 @@ e.g. alignment, edit distances, and symmetric deletion searches.</p>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.edit_distance">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em>, <em>alignment_type='global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.edit_distance" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em>, <em>alignment_type=u'global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.edit_distance" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.full_edit_distance">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">full_edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>ins_func=None</em>, <em>iargs=[]</em>, <em>ikwargs={}</em>, <em>del_func=None</em>, <em>dargs=[]</em>, <em>dkwargs={}</em>, <em>sub_func=None</em>, <em>sargs=[]</em>, <em>skwargs={}</em>, <em>charmatrix={}</em>, <em>alignment_type='global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.full_edit_distance" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">full_edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>ins_func=None</em>, <em>iargs=[]</em>, <em>ikwargs={}</em>, <em>del_func=None</em>, <em>dargs=[]</em>, <em>dkwargs={}</em>, <em>sub_func=None</em>, <em>sargs=[]</em>, <em>skwargs={}</em>, <em>charmatrix={}</em>, <em>alignment_type=u'global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.full_edit_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>A version of the modified Wagner-Fischer algorithm that accepts user
 defined scoreing functions. These functions should be of the form
 fname(token1, token2, args*, kwargs**) and return an integer
@@ -221,7 +221,7 @@ at the index 0,0.</p>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.native_full_edit_distance">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">native_full_edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em>, <em>alignment_type='global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.native_full_edit_distance" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">native_full_edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em>, <em>alignment_type=u'global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.native_full_edit_distance" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -258,7 +258,7 @@ at the index 0,0.</p>
 
 <dl class="function">
 <dt id="nidaba.algorithms.string.np_full_edit_distance">
-<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">np_full_edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em>, <em>alignment_type='global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.np_full_edit_distance" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.algorithms.string.</code><code class="descname">np_full_edit_distance</code><span class="sig-paren">(</span><em>str1</em>, <em>str2</em>, <em>substitutionscore=1</em>, <em>insertscore=1</em>, <em>deletescore=1</em>, <em>charmatrix={}</em>, <em>alignment_type=u'global'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.string.np_full_edit_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>A modified implenmentation of the Wagner-Fischer algorithm using
 numpy. Unlike the minimal and optimized version in the
 &#8220;edit_distance&#8221; function, this returns the entire scoring matrix,
@@ -399,6 +399,7 @@ starting with &#8216;start&#8217; (inclusive) and ending with end (inclusive).</
 <li class="toctree-l1"><a class="reference internal" href="../plugins.html">Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../options.html">Option Groups</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tei.html">TEI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Web API</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Docs</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="nidaba.html">nidaba package</a></li>
 </ul>

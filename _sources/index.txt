@@ -17,6 +17,7 @@ distribute the execution of this software to multiple machines.
         Plugins <plugins>
         Option Groups <options>
         TEI <tei>
+        Web API <api>
         API Docs <source/modules>
 
 Nidaba does a bunch of things for you:
@@ -26,7 +27,6 @@ Nidaba does a bunch of things for you:
 - `Deskewing <http://www.leptonica.com/skew-measurement.html>`_
 - `Dewarping <http://www.leptonica.com/dewarping.html>`_
 - `OCR <http://en.wikipedia.org/wiki/Optical_character_recognition>`_
-- :ref:`Output merging <merging>` 
 - :ref:`Spell-checking <spell-checking>`
 - :ref:`TEI output <tei_output>`
 - :ref:`Format Conversion <output_layer>` 
@@ -254,6 +254,8 @@ is equivalent to:
 
         $ celery -A nidaba worker
 
+except that the latter will accept additional command line parameters.
+
 Batches
 ~~~~~~~
 
@@ -262,7 +264,7 @@ invocation looks like this:
 
 .. code-block:: console
 
-        $ nidaba batch --binarize nlbin -b sauvola -l tesseract -o tesseract:eng -- input.png
+        $ nidaba batch --binarize nlbin -b sauvola -l tesseract -o tesseract:languages=eng -- input.png
         90ae699a-7172-44ce-a8bf-5464bccd34d0
 
 It converts the input file ``input.png`` to grayscale, binarizes it using the
@@ -278,13 +280,12 @@ options. All paths through this tree will then be executed by the workers in
 the cluster.
 
 Each option must follow the same format
-``algorithm:val,named_param2=val2,...,paramN=N;param1=val1,param2=val2,...``
+``algorithm:param1=val1,param2=val2,...,paramN=N;param1=val1,param2=val2,...``
 where configurations of the same algorithm are divided by ``;`` and the
-parameters are divided by ``,``. Parameters may either be named or unnamed,
-although unnamed parameters may not appear after named ones. Additionally,
-there is a helper preamble ``file:`` which must be followed by a valid path to
-a file. This file will be copied to the common storage medium and its new
-location will be used instead of the path when executing the function.
+parameters are divided by ``,``. Additionally, there is a helper preamble
+``file:`` which must be followed by a valid path to a file. This file will be
+copied to the common storage medium and its new location will be used instead
+of the path when executing the function.
 
 Available option groups in order of processing are:
 
@@ -308,12 +309,9 @@ Available option groups in order of processing are:
         Defines parameters of metrics. See the :ref:`metrics` documentation for
         more details.
 
-There are two more options that are technically part of of other option groups
-but can't be included in other groups for several reasons.
+There is one additional option which is technically part of another option
+group but can't be included in other groups for several reasons:
 
-\-\-willitblend
-        Blends all output hOCR files into a single hOCR document using the
-        dummy scoring algorithm
 \-\-grayscale
         A switch to indicate that input files are already 8bpp grayscale and
         conversion to grayscale is unnecessary.

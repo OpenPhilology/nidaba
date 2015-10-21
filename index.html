@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Nidaba &mdash; nidaba 0.5.4
+    <title>Nidaba &mdash; nidaba 0.9
  documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.5.4
+        VERSION:     '0.9
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.5.4
+    <link rel="top" title="nidaba 0.9
  documentation" href="#" />
     <link rel="next" title="Plugins" href="plugins.html" />
    
@@ -57,7 +57,6 @@ distribute the execution of this software to multiple machines.</p>
 <li><a class="reference external" href="http://www.leptonica.com/skew-measurement.html">Deskewing</a></li>
 <li><a class="reference external" href="http://www.leptonica.com/dewarping.html">Dewarping</a></li>
 <li><a class="reference external" href="http://en.wikipedia.org/wiki/Optical_character_recognition">OCR</a></li>
-<li><a class="reference internal" href="options.html#merging"><span>Output merging</span></a></li>
 <li><a class="reference internal" href="options.html#spell-checking"><span>Spell-checking</span></a></li>
 <li><a class="reference internal" href="tei.html#tei-output"><span>TEI output</span></a></li>
 <li><a class="reference internal" href="options.html#output-layer"><span>Format Conversion</span></a></li>
@@ -229,12 +228,13 @@ utility. It is automatically installed during the installation procedure.</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> celery -A nidaba worker
 </pre></div>
 </div>
+<p>except that the latter will accept additional command line parameters.</p>
 </div>
 <div class="section" id="batches">
 <h4>Batches<a class="headerlink" href="#batches" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal"><span class="pre">batch</span></code> subcommand is used to add a job to the pipeline. A rather minimal
 invocation looks like this:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch --binarize nlbin -b sauvola -l tesseract -o tesseract:eng -- input.png
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch --binarize nlbin -b sauvola -l tesseract -o tesseract:languages<span class="o">=</span>eng -- input.png
 <span class="go">90ae699a-7172-44ce-a8bf-5464bccd34d0</span>
 </pre></div>
 </div>
@@ -249,13 +249,12 @@ tree where each leaf is one result of the, logically, preceding group of
 options. All paths through this tree will then be executed by the workers in
 the cluster.</p>
 <p>Each option must follow the same format
-<code class="docutils literal"><span class="pre">algorithm:val,named_param2=val2,...,paramN=N;param1=val1,param2=val2,...</span></code>
+<code class="docutils literal"><span class="pre">algorithm:param1=val1,param2=val2,...,paramN=N;param1=val1,param2=val2,...</span></code>
 where configurations of the same algorithm are divided by <code class="docutils literal"><span class="pre">;</span></code> and the
-parameters are divided by <code class="docutils literal"><span class="pre">,</span></code>. Parameters may either be named or unnamed,
-although unnamed parameters may not appear after named ones. Additionally,
-there is a helper preamble <code class="docutils literal"><span class="pre">file:</span></code> which must be followed by a valid path to
-a file. This file will be copied to the common storage medium and its new
-location will be used instead of the path when executing the function.</p>
+parameters are divided by <code class="docutils literal"><span class="pre">,</span></code>. Additionally, there is a helper preamble
+<code class="docutils literal"><span class="pre">file:</span></code> which must be followed by a valid path to a file. This file will be
+copied to the common storage medium and its new location will be used instead
+of the path when executing the function.</p>
 <p>Available option groups in order of processing are:</p>
 <dl class="docutils">
 <dt>&#8211;binarize / -b</dt>
@@ -272,12 +271,9 @@ for more details.</dd>
 <dd>Defines parameters of metrics. See the <a class="reference internal" href="options.html#metrics"><span>Metrics</span></a> documentation for
 more details.</dd>
 </dl>
-<p>There are two more options that are technically part of of other option groups
-but can&#8217;t be included in other groups for several reasons.</p>
+<p>There is one additional option which is technically part of another option
+group but can&#8217;t be included in other groups for several reasons:</p>
 <dl class="docutils">
-<dt>&#8211;willitblend</dt>
-<dd>Blends all output hOCR files into a single hOCR document using the
-dummy scoring algorithm</dd>
 <dt>&#8211;grayscale</dt>
 <dd>A switch to indicate that input files are already 8bpp grayscale and
 conversion to grayscale is unnecessary.</dd>
@@ -386,6 +382,7 @@ the <a class="reference external" href="https://www.dh.uni-leipzig.de">Humboldt 
 <li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="options.html">Option Groups</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tei.html">TEI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Web API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source/modules.html">API Docs</a></li>
 </ul>
 
