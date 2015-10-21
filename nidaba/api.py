@@ -15,6 +15,7 @@ import logging
 import uuid
 import werkzeug
 import json
+import mimetypes
 
 from flask import Flask, Blueprint, request
 from flask import send_file
@@ -74,7 +75,7 @@ class Page(Resource):
         except:
             log.debug('File {} not found in {}'.format(file, batch))
             return {'message': 'File not found'}, 404
-        return send_file(fp)
+        return send_file(fp, mimetype=mimetypes.guess_type(file)[0])
 
 @api.resource('/tasks', '/tasks/<group>', '/tasks/<group>/<task>')
 class Task(Resource):
