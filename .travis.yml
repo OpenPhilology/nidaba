@@ -28,7 +28,7 @@ install:
   # ---------------------------------
   - conda install pbr nose pip
   - sed
-    '/gunicorn|Flask|Flask-RESTful|requests-toolbelt\|stevedore\|pluginbase\|click\|dominate\|regex\|celery\|redis\|pyxDamerauLevenshtein\|beautifulsoup4/d'
+    '/gunicorn|Flask|flask-restful|requests-toolbelt\|stevedore\|pluginbase\|click\|dominate\|regex\|celery\|redis\|pyxDamerauLevenshtein\|beautifulsoup4/d'
     requirements.txt | xargs conda install
   # we have to install some kraken dependencies using conda, too
   - conda install numpy Pillow scipy Cython h5py
