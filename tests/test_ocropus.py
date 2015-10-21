@@ -29,6 +29,7 @@ class OcropusTests(unittest.TestCase):
         storage_path = unicode(tempfile.mkdtemp())
         self.config_mock.nidaba_cfg = {
             'storage_path': storage_path,
+            'lang_dicts': {},
             'ocropus_models': {'ocropus': ('test', 'en-default.pyrnn.gz')},
             'plugins_load': {}
         }

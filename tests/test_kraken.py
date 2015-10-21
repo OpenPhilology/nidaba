@@ -24,6 +24,7 @@ class KrakenTests(unittest.TestCase):
             storage_path = unicode(tempfile.mkdtemp())
             config_mock.nidaba_cfg = {
                 'storage_path': storage_path,
+                'lang_dicts': {},
                 'kraken_models': {'default': ('test', 'en-default.hdf5')},
                 'ocropus_models': {'ocropus': ('test', 'en-default.pyrnn.gz')},
                 'plugins_load': {}
