@@ -40,6 +40,12 @@ api = Api(api_v1)
 def get_blueprint():
     return api_v1
 
+# helper so autodoc finds endpoints
+def create_app():
+    app = Flask('nidaba')
+    app.register_blueprint(get_blueprint())
+    return app
+
 @api.resource('/pages/<batch>/<path:file>', methods=['GET'])
 class Page(Resource):
 

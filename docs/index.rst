@@ -17,6 +17,7 @@ distribute the execution of this software to multiple machines.
         Plugins <plugins>
         Option Groups <options>
         TEI <tei>
+        Web API <api>
         API Docs <source/modules>
 
 Nidaba does a bunch of things for you:
