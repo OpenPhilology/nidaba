@@ -63,7 +63,7 @@ def task_arg_validator(arg_values, **kwargs):
             if val < v[0] or val > v[1]:
                 raise NidabaInputException('{} outside of allowed range {}-{}'.format(val, *v))
         elif isinstance(v, list):
-            if isinstance(val, Iterable):
+            if isinstance(val, Iterable) and not isinstance(val, basestring):
                 va = set(val)
             else:
                 va = set([val])
