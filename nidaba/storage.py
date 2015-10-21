@@ -29,7 +29,11 @@ class StorageFile(io.IOBase):
         self.path = get_abs_path(jobID, path)
         self.lock = lock(self.path)
         self.lock.acquire()
-        self.fd = io.OpenWrapper(self.path, *args, **kwargs)
+        try:
+            self.fd = io.OpenWrapper(self.path, *args, **kwargs)
+        except:
+            self.lock.release()
+            raise
 
     def __del__(self):
         try:
@@ -242,12 +246,12 @@ def prepare_filestore(jobID):
         NidabaStorageViolationException if the job ID already exists.
     """
     if is_valid_job(jobID):
-        return NidabaStorageViolationException(jobID + ' already exists')
+        raise NidabaStorageViolationException(jobID + ' already exists')
     try:
         jobPath = _sanitize_path(nidaba_cfg['storage_path'], jobID)
         os.mkdir(jobPath)
     except Exception:
-        return NidabaStorageViolationException(jobID + ' already exists')
+        raise NidabaStorageViolationException(jobID + ' already exists')
 
 
 def list_content(jobID, pattern=u'*'):

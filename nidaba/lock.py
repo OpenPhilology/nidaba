@@ -13,6 +13,7 @@ import os
 import time
 import random
 
+from nidaba.nidabaexceptions import NidabaStorageViolationException
 
 class lock(object):
     """
@@ -34,13 +35,16 @@ class lock(object):
     def acquire(self):
         """
         Acquires a lock on the selected file. Waits until the lock can be
-        acquired.
+        acquired except when the directory components of the path does not
+        exist.
         """
+        if not os.path.isdir(os.path.dirname(self._locked_file)):
+            raise NidabaStorageViolationException('Path to locked file does not exist.')
         while True:
             try:
                 os.symlink(self._lock_file, self._locked_file)
                 break
-            except:
+            except Exception as e:
                 if os.path.islink(self._locked_file) and \
                    os.readlink(self._locked_file) == self._lock_file:
                     break

@@ -1,0 +1,484 @@
+/* Javascript that deals with the OCR upload, pre-processing, and post-processing */
+
+// Namespacing!
+var Iris = {
+	Views: {},							// View Objects
+	panes: {}							// Instances of view objects
+
+};
+
+Iris.Task = Backbone.Model.extend();
+Iris.Tasks = Backbone.Collection.extend({
+	initialize: function(models, args) {
+		this.url = function() { return args.batch_url() + '/tasks'; };
+	},
+	model: Iris.Task
+});
+
+Iris.Doc = Backbone.Model.extend();
+Iris.Docs = Backbone.Collection.extend({
+	initialize: function(models, args) {
+		this.url = function() { return args.batch_url() + '/pages'; };
+	},
+	model: Iris.Doc
+});
+
+Iris.Batch = Backbone.Model.extend({
+	initialize: function() {
+		this.docs = new Iris.Docs([], {batch_url: this.url.bind(this)});
+		this.tasks = new Iris.Tasks([], {batch_url: this.url.bind(this)});
+		this.metadata = {};
+		this.metadata_url;
+	},
+	urlRoot: '/api/v1/batch',
+	// backbone isn't really compatible with a model just being a file on
+	// the server.
+	save_metadata: function() {
+		data = YAML.stringify(this.metadata);
+		form_data = new FormData;
+		blob = new Blob([data])
+		form_data.append('scans', blob, 'metadata.yaml');
+		var that = this;
+		$.ajax({
+			url: this.url() + '/pages?auxiliary=1',
+			data: form_data,
+			processData: false,
+			contentType: false,
+			type: 'POST',
+			success: function(data) {
+				that.metadata_url = data[0]['url'];
+			}
+		});
+	},
+	// adds a task to the current batch. XXX: manage tasks using backbone
+	// methods.
+	add_task: function(group, task, args) {
+		var that = this;
+		$.ajax({
+			url: this.url() + '/tasks/' + group + '/' + task,
+			data: JSON.stringify(args),
+			contentType: "application/json",
+			dataType: 'json',
+			type: 'POST',
+			success: function() {
+				// sync task list
+				that.tasks.fetch();
+			},
+		});
+	},
+	// execute the batch.
+	execute: function() {
+		$.ajax({
+			url: this.url(),
+			type: 'POST'
+		});
+	}
+});
+
+Iris.Router = Backbone.Router.extend({
+	routes: {
+		"": 'main',
+		"prescan": 'prescan',			// Step 1: Pre-Scan 
+		"preupload": 'preupload',		// Step 2: Pre-Upload
+		"upload(/:id)": 'upload',			// Step 3: Upload
+		"metadata/:id": 'metadata',		// Step 4: User-provided Metadata
+		"preprocess/:id": 'preprocess',		// Step 5: Information used by OCR Engine
+		"status/:id": 'status'			// Step 6: Status information
+	}, 
+	main: function() {
+		this.showPane('body', 'Main');
+	},
+	prescan: function() {
+		this.showPane('#prescan', 'PreScan');
+	},
+	preupload: function() {
+		this.showPane('#preupload', 'PreUpload');
+	},
+	upload: function(id) {
+		if(!id) {
+			Iris.batch.save(null, {
+				success: function (model, response) {
+					Iris.app.navigate('#upload/'+model.id, {replace: true});
+				},
+				error: function (model, response) {
+					new Bootstrap.alert({ el: $('#page') }).render(response, 'error');
+				}
+			});
+		}
+		this.showPane('#upload', 'Upload');
+	},
+	metadata: function(id) {
+		this.showPane('#metadata', 'Metadata');
+	},
+	preprocess: function(id) {
+		this.showPane('#preprocess', 'PreProcess');
+	},
+	'status': function(id) {
+		Iris.batch = new Iris.Batch({id: id});
+		Iris.batch.fetch();
+		this.showPane('#status', 'Status');
+	},
+	showPane: function(id, paneName) {
+		var that = this;
+		$('.pane').hide();
+
+		// Create or show appropriate pane
+		if (!Iris.panes[paneName]) {
+			Iris.panes[paneName] = new Iris.Views[paneName]({
+				el: id
+			});
+			Iris.panes[paneName].render().$el.show();
+		}
+		else {
+			Iris.panes[paneName].$el.show();
+		}
+
+		// Bind app-wide navigation here, since direct route nav skips 'Main'
+		$('body').on('click', '.pane-footer button', function(e) { that.showNextPane(e) });
+		$('body').on('click', '.pane-footer a', function(e) { that.showPrevPane(e) });
+		$('body').on('click', '#intro-text .btn', function(e) { that.showNextPane(e) });
+
+		// Set selected value as text of dropdown
+		$('body').on('click', '.dropdown-menu li a', function(){
+			var selText = $(this).text();
+			$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
+		});
+
+		// Don't navigate to main on page load, just display 
+		if (paneName != 'Main') {
+			$('#intro-text').hide();
+			$('#step-progress').show();
+
+			// Determine how many progress bars to fill in
+			var steps = ['PreScan', 'PreUpload', 'Upload', 'Metadata', 'PreProcess', 'Status'];
+			var completed = steps.indexOf(paneName); 
+			for (var i = 0; i < steps.length; i++) {
+				if (i < completed)
+					$('#step-progress .step-bar').eq(i).addClass('complete');
+				else
+					$('#step-progress .step-bar').eq(i).removeClass('complete');
+			}
+		}
+		else {
+			$('#step-progress').hide();
+			$('#intro-text').show();
+		}
+	},
+	showNextPane: function(e) {
+		var currentPane = $(e.target).closest('.pane');
+		if (currentPane.length == 0)
+			currentPane = $(e.target).closest('#intro-text');	
+
+		var nextPane = currentPane.next('.pane');
+		var id = nextPane.attr('id');
+		// everything after preupload is stateful and requires a batch id.
+		if(Iris.batch.id && id != 'prescan' && id != 'preupload') {
+			Iris.app.navigate('#' + id + '/' + Iris.batch.id, {trigger: true});
+		} else {
+			Iris.app.navigate(id, {trigger: true});
+		}
+	},
+	showPrevPane: function(e) {
+		var currentPane = $(e.target).closest('.pane');
+		if (!currentPane.length)
+			currentPane = $(e.target).closest('#intro-text');	
+
+		var prevPane = currentPane.prev('.pane');
+		if (!prevPane.length)
+			prevPane = $(e.target).closest('#intro-text');
+		var id = prevPane.attr('id');
+		// everything after preupload is stateful and requires a batch id.
+		if(Iris.batch.id && id != 'prescan' && id != 'preupload') {
+			Iris.app.navigate('#' + id + '/' + Iris.batch.id, {trigger: true});
+		} else {
+			Iris.app.navigate(id, {trigger: true});
+		}
+	}
+});
+
+/* Displays the main, informational section */
+Iris.Views.Main = Backbone.View.extend({
+	events: {
+	},
+	initialize: function() {
+		console.log("main being initialized");
+	},
+	render: function() {
+		return this;
+	}
+});
+
+/* Pre-Scan information for user */
+Iris.Views.PreScan = Backbone.View.extend({
+	events: {
+	},
+	render: function() {
+		$('#step-progress').show();
+		return this;
+	},
+});
+
+Iris.Views.PreUpload = Backbone.View.extend({
+	events: {
+	},
+	render: function() {
+		return this;
+	},
+});
+
+Iris.Views.Upload = Backbone.View.extend({
+	events: {
+	},
+	initialize: function() {
+		this.listenTo(Iris.batch, "change", this.render);
+		this.$el.find('#upload-area').dropzone({
+			paramName: 'scans',
+			acceptedFiles: 'image/*',
+			autoProcessQueue: false,
+			url: function(files) { return '/api/v1/batch/' + Iris.batch.id + '/pages'; },
+			init: function () {
+				$('#submit-scans').prop('disabled', true);
+			        dz = this;
+				$('#submit-scans').on("click", function() {
+					dz.options.autoProcessQueue = true;
+					dz.processQueue(); 
+				});
+				this.on("addedfile", function(file) {
+					$('#submit-scans').prop('disabled', false);
+				});
+				this.on("complete", function(file) {
+					this.removeFile(file);
+				});
+				this.on("totaluploadprogress", function(uploadProgress) {
+					if (uploadProgress > 0) {
+						$("#upload-progress").css("width", uploadProgress + '%');
+					}
+				});
+			this.on("queuecomplete", function() {
+					Iris.batch.docs.fetch();
+				});
+			}
+		});
+	},
+	render: function() {
+		$('#step-progress .step-bar').eq(1).addClass('complete');
+		return this;
+	},
+	showMessage: function(message) {
+		this.$el.find('#upload-area .message').html(message);
+	}
+});
+
+Iris.Views.Metadata = Backbone.View.extend({
+	events: {
+	},
+	initialize: function() {
+		this.listenTo(Iris.batch, 'change', this.render);
+	},
+	render: function() {
+		$('#step-progress .step-bar').eq(2).addClass('complete');
+		$('#submit-metadata').prop('disabled', true);
+		// only enable the next step button if the form is complete.
+		$('#metadata-form').change(function() {
+			var empty = false;
+			$('#metadata-form input').each(function() {
+				if($(this).val() == '') {
+					empty = true;
+				}
+				var name = $(this).attr('name');
+
+				// I'm sure there is an entirely obvious way to
+				// write this that just doesn't fit into my
+				// puny C programmer mind.
+				if($(this).attr('type') == 'radio') {
+					sel = $("input:radio[name='" + name + "']:checked");
+					if(sel.length > 0) {
+						Iris.batch.metadata[name] = sel.val();
+					} else {
+						empty = true;
+					}
+				} else {
+					Iris.batch.metadata[name] = $(this).val()
+				}
+			});
+			if (empty) {
+				$('#submit-metadata').prop('disabled', true);
+			} else {
+				$('#submit-metadata').removeAttr('disabled');
+			}
+		});
+		$('#submit-metadata').on('click', function(e) {
+			console.log('submitting metadata');
+			Iris.batch.save_metadata();
+		});
+		return this;
+	},
+});
+
+Iris.Views.PreProcess = Backbone.View.extend({
+	events: {
+	},
+	initialize: function() {
+		this.listenTo(Iris.batch, 'change', this.render);
+	},
+	render: function() {
+		$('#step-progress .step-bar').eq(3).addClass('complete');
+		$('#submit-batch').prop('disabled', true);
+		// language selector/script
+		var checked_opts = 0;
+		var blacklisted_scripts = false;
+		var show_greek_fonts = false;
+
+		$('#languages').multiselect({
+			onChange: function(option, checked) {
+				blacklisted_scripts = false;
+				show_greek_fonts = false;
+
+				// font selection enabler/disabler
+				lang_whitelist = ['lat', 'eng', 'grc']
+				$('#languages option:selected').each(function(idx, sel) {
+					if(lang_whitelist.indexOf(sel.value) === -1) {
+						blacklisted_scripts = true;
+					}
+					if(sel.value == 'grc') {
+						show_greek_fonts = true;
+					}
+				});
+				if(show_greek_fonts && !blacklisted_scripts) {
+					$('#greek-fonts').show();
+				} else {
+					$('#greek-fonts').hide();
+				}
+				
+				// submit button enabler/disabler
+				if(checked) {
+					checked_opts += 1;
+				} else if(checked_opts) {
+					checked_opts -= 1;
+				}
+
+				if(checked_opts) {
+					$('#submit-batch').removeAttr('disabled');			
+				} else {
+					$('#submit-batch').prop('disabled', true);
+				}
+			}
+		});
+		$('#submit-batch').on('click', function(e) {
+			console.log('submitting batch');
+			if(Iris.batch.tasks.length == 0) {
+				Iris.batch.add_task('binarize', 'nlbin', {threshold: 0.5, 
+									  zoom: 0.5, 
+									  escale: 1.0, 
+									  border: 0.1, 
+									  perc: 80, 
+									  range: 20, 
+									  low: 5, 
+									  high: 90});
+				Iris.batch.add_task('segmentation', 'tesseract', {});
+				var font = $("input[type='radio'][name='greek-font']:checked");
+				if(show_greek_fonts && !blacklisted_scripts && font.val() != 'none') {
+					Iris.batch.add_task('ocr', 'kraken', {model: font.val()});
+				} else {
+					var langs = []
+					$('#languages option:selected').each(function(idx, sel) {
+						langs.push(sel.value);
+					});
+					Iris.batch.add_task('ocr', 'tesseract', {languages: langs, extended: true});
+				}
+				Iris.batch.add_task('output', 'metadata', {metadata: Iris.batch.metadata_url, 
+									   validate: false});
+				Iris.batch.execute();
+			}
+		});
+		return this;
+	},
+});
+
+Iris.Views.Status = Backbone.View.extend({
+	events: {
+	},
+	initialize: function() {
+		this.listenTo(Iris.batch, 'change', this.render);
+	},
+	render: function() {
+		$('#step-progress .step-bar').eq(4).addClass('complete');
+		if(!Iris.fetch_interval_id) {
+			Iris.fetch_interval_id = setInterval(function() {
+				Iris.batch.fetch();
+			}, 5000);
+		}
+
+		if(Iris.batch.attributes['chains']) {
+			var done = 0;
+			var running = 0;
+			var tasks = 0;
+			$('#task-output').empty();
+			$.each(Iris.batch.attributes['chains'], function(i, value) {
+				tasks += 1;
+				if(value['state'] === 'SUCCESS') {
+					done += 1;
+				} else if(value['state'] === 'RUNNING') {
+					running += 1;
+				} else if(value['state'] === 'FAILURE') {
+					alert = $('<a>').attr('class', 'list-group-item list-group-item-success')
+							.attr('href', value['root_document'])
+							.text(value['errors'][value['errors'].length - 1]);
+					$('#task-errors').append(alert);
+				}
+				// leaf nodes are results
+				if(!value['children'].length && !value['housekeeping']) {
+					res = $('<a>').attr('href', value['result'])
+						      .attr('class', 'list-group-item')
+						      .text(_.last(value['root_document'].split('/')));
+					if(value['result']) {
+						res.append($('<span>').attr('class', 'glyphicon glyphicon-ok pull-right'));
+					}
+					// look for failures up the chain and
+					// reduce expected task count
+					// correspondingly. Also add a failure
+					// glyphicon. 
+					parent = value;
+					var parent_counter = 1;
+					while(parent) {
+						if(parent['state'] == 'FAILURE') {
+							res.append($('<span>').attr('class', 'glyphicon glyphicon-remove pull-right'));
+							tasks -= parent_counter;
+						}
+						parent_counter++;
+						if(!parent['parents']) {
+							break;
+						}
+						parent = parent['parents'][0];
+					}
+					$('#task-output').append(res);
+				}
+			});
+			// sort output names lexicographically
+			$results = $('#task-output').children('a');
+			$results.sort(function(a, b) {
+				return a.text.localeCompare(b.text);
+			});
+			$results.detach().appendTo('#task-output');
+
+			$("#tasks-done").css("width", (done/tasks)*100 + '%');
+			$("#tasks-progress").css("width",  (running/tasks)*100 + '%');
+			// everything is done so don't check state periodically anymore.
+			if(tasks == done) {
+				clearInterval(Iris.fetch_interval_id);
+			}
+		}
+		return this;
+	}
+});
+
+$(function() {
+	Iris.app = new Iris.Router();
+	Iris.batch = new Iris.Batch();
+	Iris.hist = Backbone.history.start({pushState: true});
+
+	// Trigger Bootstrap
+	$('#step-progress .step-bar').tooltip();
+
+	window.Iris = Iris; 
+});

@@ -9,21 +9,71 @@ objects and methods defined here.
 
 from __future__ import unicode_literals, print_function, absolute_import
 
-from nidaba import tasks
-from nidaba import plugins
-from nidaba import celery
-from nidaba import storage
-from nidaba import config
 from nidaba.nidabaexceptions import (NidabaInputException,
                                      NidabaNoSuchAlgorithmException,
                                      NidabaTickException, NidabaStepException)
 
-from itertools import product
 from celery import chain
 from celery import group
+from itertools import product
+from inspect import getcallargs
+from collections import OrderedDict, Iterable
+from requests_toolbelt.multipart import encoder
 
+import os
 import json
 import uuid
+import requests
+
+
+def task_arg_validator(arg_values, **kwargs):
+    """
+    Validates keyword arguments against the list of valid argument values
+    contained in the task definition.
+
+    Raises:
+        NidabaInputException if validation failed.
+    """
+    kwc = kwargs.copy()
+
+    def _val_single_arg(arg, type):
+        if type == 'float':
+            if not isinstance(val, float) and not isinstance(val, int):
+                raise NidabaInputException('{} is not a float'.format(val))
+        elif type == 'int':
+            if not isinstance(val, int):
+                raise NidabaInputException('{} is not an int'.format(val))
+        elif type == 'str':
+            if not isinstance(val, basestring):
+                raise NidabaInputException('{} is not a string'.format(val))
+        # XXX: Add file checker for local case
+        elif type == 'file':
+            pass
+        else:
+            raise NidabaInputException('Argument type {} unknown'.format(type))
+
+    for k, v in arg_values.iteritems():
+        try:
+            val = kwc.pop(k)
+        except:
+            raise NidabaInputException('Missing argument: {}'.format(k))
+        if isinstance(v, tuple):
+            if not isinstance(val, type(v[0])):
+                raise NidabaInputException('{} of different type than range fields'.format(val))
+            if val < v[0] or val > v[1]:
+                raise NidabaInputException('{} outside of allowed range {}-{}'.format(val, *v))
+        elif isinstance(v, list):
+            if isinstance(val, Iterable) and not isinstance(val, basestring):
+                va = set(val)
+            else:
+                va = set([val])
+            if not set(v).issuperset(va):
+                raise NidabaInputException('{} not in list of valid values'.format(val))
+        else:
+            _val_single_arg(val, v)
+
+    if kwc:
+        raise NidabaInputException('Superfluous arguments present')
 
 
 class Batch(object):
@@ -89,15 +139,72 @@ class Batch(object):
     """
 
     def __init__(self, id):
+        # stuff depending on a valid configuration
+        from nidaba import storage
+        from nidaba import config
+        self.storage = storage
+
+        # slowly importing stuff
+        from nidaba import tasks
+        from nidaba import plugins
+        from nidaba import celery
+        self.tasks = tasks
+        self.celery = celery
 
         self.id = id
         self.docs = []
         self.batch_def = []
         self.cur_step = None
         self.cur_tick = None
+        self.scratchpad = {}
+        self.redis = config.Redis
+
+
+    def add_scratchpad(self):
+        """
+        Adds a scratchpad to the database that allows suspending and resuming
+        task assembly. 
+        
+        All added documents and tasks will be stored persistently;
+        reinstantiating the Batch object and calling restore_scratchpad will
+        restore the object to the previous state.
+
+        The scratchpad will be destroyed on task execution.
+
+        Raises:
+            NidabaInputException if a scratchpad is already attached or the
+            batch has been executed.
+        """
+        if self.redis.get(self.id) is not None:
+            raise NidabaInputException('Batch already has scratchpad or been '
+                                       'executed.')
+        else:
+            self.scratchpad = {'scratchpad': {'docs': self.docs, 
+                                              'batch_def': self.batch_def,
+                                              'cur_step': self.cur_step,
+                                              'cur_tick': self.cur_tick}}
+            self.redis.set(self.id, json.dumps(self.scratchpad))
+
+    def restore_scratchpad(self):
+        """
+        Retrieves the scratchpad from the database and restores its contents
+        to the current Batch object overwriting any information defined in it.
+
+        Raises:
+            NidabaInputException if no scratchpad can be found either because
+            none has been attached or the batch has already been executed.
+        """
+        scratch = json.loads(self.redis.get(self.id))
+        if scratch and 'scratchpad' in scratch:
+            self.scratchpad = scratch
+            for k, v in self.scratchpad['scratchpad'].iteritems():
+                setattr(self, k, v)
+        else:
+            raise NidabaInputException('No scratchpad in database')
 
     def get_state(self):
-        """Retrieves the current state of a batch.
+        """
+        Retrieves the current state of a batch.
 
         Returns:
             (unicode): A string containing one of the following states:
@@ -107,11 +214,12 @@ class Batch(object):
                 PENDING: The batch is currently running.
                 SUCCESS: The batch has completed successfully.
         """
-        r = config.Redis
-        batch = r.get(self.id)
+        batch = self.redis.get(self.id)
         try:
             batch = json.loads(batch)
         except Exception:
+            return u'NONE'
+        if 'scratchpad' in batch:
             return u'NONE'
         st = 'SUCCESS'
         for subtask in batch.itervalues():
@@ -132,7 +240,7 @@ class Batch(object):
             arguments to the underlying function), and the exception message of
             the failure.
         """
-        batch = celery.app.backend.get(self.id)
+        batch = self.redis.get(self.id)
         try:
             batch = json.loads(batch)
         except:
@@ -149,7 +257,7 @@ class Batch(object):
 
         Returns:
         """
-        batch = config.Redis.get(self.id)
+        batch = self.redis.get(self.id)
         try:
             batch = json.loads(batch)
         except Exception:
@@ -168,7 +276,11 @@ class Batch(object):
         Returns:
             A dictionary containing an entry for each subtask.
         """
-        return json.loads(config.Redis.get(self.id))
+        state = json.loads(self.redis.get(self.id))
+        if 'scratchpad' in state:
+            return []
+        else:
+            return state
 
     def add_document(self, doc):
         """Add a document to the batch.
@@ -182,9 +294,12 @@ class Batch(object):
             NidabaInputException: The document tuple does not refer to a file.
         """
 
-        if not storage.is_file(*doc):
+        if not self.storage.is_file(*doc):
             raise NidabaInputException('Input document is not a file.')
         self.docs.append(doc)
+        if self.scratchpad:
+            self.scratchpad['scratchpad']['docs'] = self.docs
+            self.redis.set(self.id, json.dumps(self.scratchpad))
 
     def add_task(self, method, **kwargs):
         """Add a task to the current tick.
@@ -203,10 +318,14 @@ class Batch(object):
         """
         if self.cur_tick is None:
             raise NidabaTickException('No tick to add task to.')
-        if u'nidaba.' + method not in celery.app.tasks:
+        if u'nidaba.' + method not in self.celery.app.tasks:
             raise NidabaNoSuchAlgorithmException('No such task in registry')
         kwargs[u'method'] = method
         self.cur_tick.append(kwargs)
+        if self.scratchpad:
+            self.scratchpad['scratchpad']['cur_tick'].append(kwargs)
+            self.redis.set(self.id, json.dumps(self.scratchpad))
+
 
     def add_tick(self):
         """Add a new tick to the current step.
@@ -222,6 +341,11 @@ class Batch(object):
         if self.cur_tick:
             self.cur_step.append(self.cur_tick)
         self.cur_tick = []
+        if self.scratchpad:
+            self.scratchpad['scratchpad']['cur_step'] = self.cur_step
+            self.scratchpad['scratchpad']['cur_tick'] = []
+            self.redis.set(self.id, json.dumps(self.scratchpad))
+
 
     def add_step(self):
         """Add a new step to the batch definition.
@@ -237,6 +361,12 @@ class Batch(object):
         if self.cur_step:
             self.batch_def.append(self.cur_step)
         self.cur_step = []
+        if self.scratchpad:
+            self.scratchpad['scratchpad']['cur_step'] = self.cur_step
+            self.scratchpad['scratchpad']['cur_tick'] = self.cur_tick
+            self.scratchpad['scratchpad']['batch_def'] = self.batch_def
+            self.redis.set(self.id, json.dumps(self.scratchpad))
+
 
     def run(self):
         """Executes the current batch definition.
@@ -260,18 +390,18 @@ class Batch(object):
         # We first expand the tasks starting from the second step as these are
         # the same for each input document.
         if len(self.batch_def) > 1:
-            groups.append(tasks.util.sync.s())
+            groups.append(self.tasks.util.sync.s())
             for tset in self.batch_def[1:]:
                 for sequence in product(*tset):
-                    method = celery.app.tasks['nidaba.' +
-                                              sequence[0]['method']]
+                    method = self.celery.app.tasks['nidaba.' +
+                                                   sequence[0]['method']]
                     ch = chain(method.s(**(sequence[0])))
                     for seq in sequence[1:]:
-                        method = celery.app.tasks['nidaba.' + seq['method']]
+                        method = self.celery.app.tasks['nidaba.' + seq['method']]
                         ch |= method.s(**seq)
                     tick.append(ch)
                 groups.append(group(tick))
-                groups.append(tasks.util.sync.s())
+                groups.append(self.tasks.util.sync.s())
 
         # The expansion steps described above is redone for each input document
         chains = []
@@ -280,11 +410,11 @@ class Batch(object):
             # the first step is handled differently as the input document has
             # to be added explicitely.
             for sequence in product([doc], *self.batch_def[0]):
-                method = celery.app.tasks['nidaba.' + sequence[1]['method']]
+                method = self.celery.app.tasks['nidaba.' + sequence[1]['method']]
                 root = sequence[0]
                 ch = chain(method.s(doc=root, **(sequence[1])))
                 for seq in sequence[2:]:
-                    method = celery.app.tasks['nidaba.' + seq['method']]
+                    method = self.celery.app.tasks['nidaba.' + seq['method']]
                     ch |= method.s(**seq)
                 tick.append(ch)
             doc_group = group(tick)
@@ -334,7 +464,429 @@ class Batch(object):
                     }
                     group_list[step[0]].kwargs['task_id'] = task_id
                     group_list[step[0]].kwargs['batch_id'] = self.id
-        r = config.Redis
-        r.set(self.id, json.dumps(result_data))
+        # also deletes the scratchpad 
+        self.redis.set(self.id, json.dumps(result_data))
         [x.apply_async() for x in chains]
+        return self.id
+
+
+class SimpleBatch(Batch):
+    """
+    A simpler interface to the batch functionality that is more amenable to
+    RESTful task assembly and prevents some incidences of
+    bullet-in-foot-syndrome.
+
+    A SimpleBatch contains only a list of input documents and a series of
+    tasks. The order of task execution depends on a predefined order, similar
+    to the ``nidaba`` command-line util. 
+
+    If no batch identifier is given a new batch will be created.
+
+    SimpleBatches always contain a scratchpad (which will be restored
+    automatically).
+    """
+    def __init__(self, id=None):
+        # stuff depending on a valid configuration
+        from nidaba import storage
+        self.storage = storage
+
+        # slowly importing stuff (tasks and plugins also needed so the task
+        # registry is complete)
+        from nidaba import tasks
+        from nidaba import plugins
+        from nidaba import celery
+        self.celery = celery
+
+        if id is None:
+            id = unicode(uuid.uuid4())
+            self.storage.prepare_filestore(id)
+        if not self.storage.is_valid_job(id):
+            raise NidabaInputException('Storage not prepared for task')
+        super(SimpleBatch, self).__init__(id)
+        self.lock = False
+        
+        keys = ['img', 'binarize', 'segmentation', 'ocr', 'stats', 'postprocessing', 'output']
+        self.tasks = OrderedDict([(key, []) for key in keys])
+        try:
+            self.add_scratchpad()
+            self.scratchpad['scratchpad']['tasks'] = self.tasks
+            self.redis.set(self.id, json.dumps(self.scratchpad))
+        except:
+            try:
+                self.restore_scratchpad()
+                # reorder the tasks dictionary
+                self.tasks = OrderedDict([(key, self.tasks[key]) for key in  keys])
+            except NidabaInputException:
+                # no scratchpad in database means batch is running and may not
+                # be modified.
+                self.lock = True
+
+    def is_running(self):
+        """
+        Returns True if the batch's run() method has been successfully called, otherwise False.
+        """
+        return self.lock
+
+    def get_tasks(self):
+        """
+        Returns the simplified task definition either from the scratchpad or
+        from the pipeline when already in execution.
+        """
+        entry = json.loads(self.redis.get(self.id))
+        if 'scratchpad' in entry:
+            scratch = json.loads(self.redis.get(self.id))
+            return scratch['scratchpad']['tasks']
+        else:
+            state = super(SimpleBatch, self).get_extended_state()
+            tasks = OrderedDict([('img', []), 
+                                 ('binarize', []),
+                                 ('segmentation', []), 
+                                 ('ocr', []),
+                                 ('stats', []), 
+                                 ('postprocessing', []),
+                                 ('output', [])])
+            for task in state.itervalues():
+                _, group, method = task['task'][0].split('.')
+                if group in tasks:
+                    tasks[group].append(('{}.{}'.format(group, method),
+                                         task['task'][1]))
+            return tasks
+
+    def get_documents(self):
+        """
+        Returns the list of input document for this task.
+        """
+        entry = json.loads(self.redis.get(self.id))
+        if 'scratchpad' in entry:
+            return entry['scratchpad']['docs']
+        else:
+            state = super(SimpleBatch, self).get_extended_state()
+            docs = []
+            for task in state.itervalues():
+                if task['root_document'] not in docs:
+                    docs.append(task['root_document'])
+            return docs
+
+    @staticmethod
+    def get_available_tasks():
+        """
+        Returns all available tasks and their valid argument values.
+
+        The return value is an ordered dictionary containing an entry for each
+        group with a sub-dictionary containing the task identifiers and valid
+        argument values.
+        """
+        tasks = OrderedDict()
+        from nidaba import celery
+        for task, fun in celery.app.tasks.iteritems():
+            try:
+                _, group, method = task.split('.')
+            except:
+                continue
+            if group not in tasks:
+                tasks[group] = {}
+            kwargs = fun.get_valid_args()
+            tasks[group][method] = kwargs
+        return tasks
+
+    def add_document(self, doc):
+        """Add a document to the batch.
+
+        Adds a document tuple to the batch and checks if it exists.
+
+        Args:
+            doc (tuple): A standard document tuple.
+
+        Raises:
+            NidabaInputException: The document tuple does not refer to a file
+                                  or the batch is locked because the run()
+                                  method has been called.
+        """
+        if self.lock:
+            raise NidabaInputException('Executed batch may not be modified')
+        super(SimpleBatch, self).add_document(doc)
+
+
+    def add_task(self, group, method, **kwargs):
+        """
+        Add a particular task configuration to a task group.
+
+        Args:
+            group (unicode): Group the task belongs to
+            method (unicode): Name of the task
+            kwargs: Arguments to the task
+        """
+        if self.lock:
+            raise NidabaInputException('Executed batch may not be modified')
+        # validate that the task exists
+        if group not in self.tasks:
+            raise NidabaNoSuchAlgorithmException('Unknown task group')
+        if u'nidaba.{}.{}'.format(group, method) not in self.celery.app.tasks:
+            raise NidabaNoSuchAlgorithmException('Unknown task')
+        task = self.celery.app.tasks[u'nidaba.{}.{}'.format(group, method)]
+        # validate arguments first against getcallargs
+        try:
+            getcallargs(task.run, ('', ''), **kwargs)
+        except TypeError as e:
+            raise NidabaInputException(str(e))
+        # validate against arg_values field of the task
+        task_arg_validator(task.get_valid_args(), **kwargs)
+        self.tasks[group].append((method, kwargs))
+        self.scratchpad['scratchpad']['tasks'] = self.tasks
+        self.redis.set(self.id, json.dumps(self.scratchpad))
+
+
+    def run(self):
+        """Executes the current batch definition.
+
+        Expands the current batch definition to a series of celery chains and
+        executes them asynchronously. Additionally a batch record is written to
+        the celery result backend.
+
+        Returns:
+            (unicode): Batch identifier.
+        """
+        if self.lock:
+            raise NidabaInputException('Executed batch may not be modified')
+
+        self.add_step()
+        for group, btasks in self.tasks.iteritems():
+            self.add_tick()
+            for task in btasks:
+                super(SimpleBatch, self).add_task('{}.{}'.format(group,
+                                                                 task[0]),
+                                                  **task[1])
+        self.lock = True
+        return super(SimpleBatch, self).run()
+
+
+class NetworkSimpleBatch(object):
+    """
+    A SimpleBatch object providing the same interface as a SimpleBatch.
+
+    It does some basic error checking to minimize network traffic but it won't
+    catch all errors before issuing API requests, especially if the batch is
+    modified by another process. In these cases exceptions will be raised by
+    the ``requests`` module.
+    """
+    def __init__(self, host, id=None):
+        self.id = id
+        self.host = host
+        self.lock = False
+        self.allowed_tasks = {}
+        if id is not None:
+            r = requests.get('{}/batch/{}'.format(host, id))
+            r.raise_for_status()
+
+
+    def create_batch(self):
+        """
+        Creates a batch on the server. Also synchronizes the list of available
+        tasks and their parameters.
+        """
+        if self.id is not None:
+            raise NidabaInputException('SimpleBatch object already initialized')
+        r = requests.post('{}/batch'.format(self.host))
+        r.raise_for_status()
+        self.id = r.json()['id']
+        self.lock = False
+        self.get_available_tasks()
+        return self.id
+
+    def get_available_tasks(self):
+        """
+        Synchronizes the local task/parameter list with the remote server.
+        """
+        r = requests.get('{}/tasks'.format(self.host))
+        r.raise_for_status()
+        self.allowed_tasks = r.json()
+
+    def is_running(self):
+        """
+        Returns True if the batch's run() method has been successfully called, otherwise False.
+        """
+        if not self.id:
+            raise NidabaInputException('Object not attached to batch.')
+        r = requests.get('{}/batch/{}'.format(self.host, self.id))
+        r.raise_for_status()
+        self.lock = True
+        if r.json():
+            self.lock = True
+            return True
+        else:
+            self.lock = False
+            return False
+
+    def get_state(self):
+        """
+        Retrieves the current state of a batch.
+
+        Returns:
+            (unicode): A string containing one of the following states:
+
+                NONE: The batch ID is not registered in the backend.
+                FAILURE: Batch execution has failed.
+                PENDING: The batch is currently running.
+                SUCCESS: The batch has completed successfully.
+        """
+        if not self.id:
+            raise NidabaInputException('Object not attached to batch.')
+        r = requests.get('{}/batch/{}'.format(self.host, self.id))
+        r.raise_for_status()
+        batch = r.json()
+        if 'scratchpad' in batch:
+            return u'NONE'
+        elif 'chains' in batch:
+            self.lock = True
+            batch = batch['chains']
+            st = u'SUCCESS'
+            for subtask in batch.itervalues():
+                if subtask['state'] == 'PENDING' or subtask['state'] == 'RUNNING':
+                    st = u'PENDING'
+                if subtask['state'] == 'FAILURE':
+                    return u'FAILURE'
+            return st
+        else:
+            return u'NONE'
+
+    def get_extended_state(self):
+        """
+        Returns the extended batch state.
+
+        Raises:
+            NidabaInputException if the batch hasn't been executed yet.
+        """
+        if not self.id:
+            raise NidabaInputException('Object not attached to batch.')
+        r = requests.get('{}/batch/{}'.format(self.host, self.id))
+        r.raise_for_status()
+        if 'chains' in r.json():
+            self.lock = True
+            return r.json()['chains']
+
+    def get_results(self):
+        """
+        Retrieves the storage tuples of a successful batch.
+
+        Returns:
+        """
+        if not self.id:
+            raise NidabaInputException('Object not attached to batch.')
+        r = requests.get('{}/batch/{}'.format(self.host, self.id))
+        r.raise_for_status()
+        if 'chains' in r.json():
+            self.lock = True
+            batch = r.json()['chains']
+            outfiles = []
+            for subtask in batch.itervalues():
+                if len(subtask['children']) == 0 and not subtask['housekeeping'] and subtask['result'] is not None:
+                    outfiles.append((subtask['result'], subtask['root_document']))
+            return outfiles
+        else:
+            return None
+
+    def get_tasks(self):
+        """
+        Returns the task tree either from the scratchpad or from the pipeline
+        when already in execution.
+        """
+        if not self.id:
+            raise NidabaInputException('Object not attached to batch.')
+        r = requests.get('{}/batch/{}/tasks'.format(self.host, self.id))
+        r.raise_for_status()
+        return r.json()
+
+    def get_documents(self):
+        """
+        Returns the list of input document for this task.
+        """
+        if not self.id:
+            raise NidabaInputException('Object not attached to batch.')
+        r = requests.get('{}/batch/{}/pages'.format(self.host, self.id))
+        r.raise_for_status()
+        return r.json()
+
+    def add_document(self, path, callback, auxiliary=False):
+        """
+        Add a document to the batch.
+
+        Uploads a document to the API server and adds it to the batch.
+
+        ..note::
+            Note that this function accepts a standard file system path and NOT
+            a storage tuple as a client using the web API is not expected to
+            keep a separate, local storage medium.
+
+        Args:
+            path (unicode): Path to the document
+            callback (function): A function that is called with a
+                                 ``requests_toolbelt.multipart.encoder.MultipartEncoderMonitor`` 
+                                instance.
+            auxiliary (bool): Switch to disable setting the file as an input
+                              document. May be used to upload ground truths,
+                              metadata, and other ancillary files..
+
+        Raises:
+            NidabaInputException: The document does not refer to a file or the
+                                  batch is locked because the run() method has
+                                  been called.
+        """
+        if not self.id:
+            raise NidabaInputException('Object not attached to batch.')
+        if self.lock:
+            raise NidabaInputException('Executed batch may not be modified')
+        if auxiliary:
+            params = {'auxiliary': True}
+        else:
+            params = {}
+        m = encoder.MultipartEncoderMonitor.from_fields(
+            fields={'scans': (os.path.basename(path), open(path, 'rb'))},
+            callback=callback)
+        r = requests.post('{}/batch/{}/pages'.format(self.host, self.id),
+                          data=m, headers={'Content-Type': m.content_type},
+                          params=params)
+        r.raise_for_status()
+        return r.json()[0]['url']
+
+    def add_task(self, group, method, *args, **kwargs):
+        """
+        Add a particular task configuration to a task group.
+
+        Args:
+            group (unicode): Group the task belongs to
+            method (unicode): Name of the task
+            kwargs: Arguments to the task
+        """
+        if not self.id:
+            raise NidabaInputException('Object not attached to batch.')
+        if self.lock:
+            raise NidabaInputException('Executed batch may not be modified')
+        # validate that the task exists
+        if group not in self.allowed_tasks or method not in self.allowed_tasks[group]:
+            raise NidabaInputException('Unknown task {}'.format(method))
+        args = self.allowed_tasks[group][method]
+        # validate against arg_values field of the task
+        task_arg_validator(args, **kwargs)
+        r = requests.post('{}/batch/{}/tasks/{}/{}'.format(self.host, self.id,
+                                                           group, method),
+                          json=kwargs)  
+        r.raise_for_status()
+
+    def run(self):
+        """
+        Executes the current batch definition.
+
+        Expands the current batch definition to a series of celery chains and
+        executes them asynchronously. Additionally a batch record is written to
+        the celery result backend.
+
+        Returns:
+            (unicode): Batch identifier.
+        """
+        if not self.id:
+            raise NidabaInputException('Object not attached to batch.')
+        if self.lock:
+            raise NidabaInputException('Executed batch may not be reexecuted')
+        r = requests.post('{}/batch/{}'.format(self.host, self.id))
+        r.raise_for_status()
         return self.id

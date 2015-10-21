@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Open Philology - OCR Pipeline</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta charset="utf-8">
+
+		<link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css" media="screen">
+		<link rel="stylesheet" href="/static/bootstrap/css/bootstrap-glyphicons.css" media="screen">
+		<link rel="stylesheet" href="/static/css/bootstrap-multiselect.css" type="text/css"/>
+		<link rel="stylesheet" href="/static/css/style.css" media="screen">
+
+		<script src="/static/js/jquery-1.11.3.min.js"></script>
+		<script src="/static/bootstrap/js/bootstrap.js"></script>
+		<script src="/static/js/bootstrap-multiselect.js"></script>
+		<script src="/static/js/dropzone.js"></script>
+		<script src="/static/js/underscore-min.js"></script>
+		<script src="/static/js/backbone-min.js"></script>
+		<script src="/static/js/json2.js"></script>
+		<script src="/static/js/yaml.js"></script>
+		<script src="/static/js/ocr.js"></script>
+    </head>
+
+    <body>
+
+	<!-- Belongs in a header template -->
+
+	<div class="container">
+		<div class="row" id="header">
+			<div class="col-lg-5 logo-container">
+				<img src="/static/images/opp-logo.png">
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-lg-3 side-menu">
+				<ul>
+					<li class="active">OCR a Book</li>
+				</ul>
+			</div>
+			<div class="col-lg-9 main">
+
+				<div class="helper-links">
+					<a href="#"><span class="glyphicon glyphicon-question-sign"></span> OCR FAQ</a> 
+					<a href="/ocr_tutorial.html"><span class="glyphicon glyphicon-file"></span> OCR Tutorial</a> 
+				</div>
+
+				<h2>Optical Character Recognition <small>Use a Scanned Book with Perseus Tools</small></h2>
+
+				<div id="step-progress" style="display: none">
+					<div class="step-bar" title="Scan Preparation"></div> <!-- 1: Pre-Scan complete -->
+					<div class="step-bar" title="Upload Preparation"></div> <!-- 2: Pre-Upload complete -->
+					<div class="step-bar" title="Upload Your Scans"></div> <!-- 3: Upload complete -->
+					<div class="step-bar" title="Provide Metadata"></div> <!-- 4: Record metadata complete -->
+					<div class="step-bar" title="Complete Processing"></div> <!-- 5: Pre-Processing complete --> 
+				</div>
+
+				<!-- Begin Intro Text -->
+				<div id="intro-text">
+					<hr>
+					<p class="lead">Can't find what you are looking for? Is there a particular edition you think we should have? Now you can add it yourself! All you need to do is provide us with the page-scans and a little information about the volume you wish to digitise.</p>
+					<p>Your edition will be added to our collection, <em>Scaife Digital Library</em>, and made openly available for collaborative annotation and download. While we accept volumes in all languages, some may take longer to process than others (e.g. Non-Roman scripts like Arabic, Syriac, Hebrew, Chinese, etc.)</p>
+
+					<hr>
+
+					<div class="row">
+						<div class="col-lg-4 col-sm-4 scan-dir-sect">
+							<img src="/static/images/step-scan.png" alt="Scan a Book" class="img-circle">
+							<h4>Scan a Book</h4>
+							<p>You can scan the book yourself or request that we scan it.</p>
+						</div>
+						<div class="col-lg-4 col-sm-4 scan-dir-sect">
+							<img src="/static/images/step-process.png" alt="Upload and Process" class="img-circle">
+							<h4>Upload and Process</h4>
+							<p>Transfer your scans to our service for processing.</p>
+						</div>
+						<div class="col-lg-4 col-sm-4 scan-dir-sect">
+							<img src="/static/images/step-results.png" alt="Approve the Results" class="img-circle">
+							<h4>Approve the Results</h4>
+							<p>Check for errors, then get to work on your text!</p>
+						</div>
+					</div>
+
+					<div class="row" style="text-align: center; padding-bottom: 30px">
+
+						<hr>
+
+						<button class="btn btn-error btn-lg">Get Started</button>
+
+						<p style="margin-top: 10px">
+							<strong class="error">Before you scan!</strong> Please check our <a href="#" id="scan-reqs">scanning requirements</a> to ensure that your scans can undergo OCR.
+						</p>
+
+					</div>
+				</div>
+
+				<!-- End Intro Text -->
+
+				<!-- Pane 1: Pre-Scan -->
+
+				<div id="prescan" class="pane" style="display: none">
+					<h3>Before you Scan!</h3>
+					<p class="lead">Make sure your scanner is set to create images that meet the following criteria:</p>
+					<ul>
+						<li> Resolution before 400 - 600 DPI</li>
+						<li> Greyscale or Color mode (<strong>not</strong> black and white)</li>
+						<li> TIFF or PNG format (<strong>not</strong> JPG)</li>
+						<li> Images are not compressed in any way.</li>
+						<li> If available, scan in <em>Document format</em> rather than <em>Image format</em></li>
+					</ul>
+
+					<hr>
+
+					<p><strong class="error">Important Copyright Notice:</strong> In order to avoid copyright violations, we can only accept scans of books whose author or editor was deceased before or in 1942. When there are multiple authors, all must have been deceased before or in 1942 for us to publish the book online.</p>
+
+					<hr>
+
+					<div class="pane-footer">
+						<a href="#">Go Back</a>
+						<button class="btn">Next Step</button> 
+					</div>
+				</div>
+
+				<div id="preupload" class="pane" style="display: none">
+					<h3>Before you Upload!</h3>
+					<p>Your scans must: </p>
+					<ul>
+						<li> Be in portrait orient, rather than landscape.</li>
+						<li> Have facing pages split into their own files.</li>
+						<li> Be named or numbered so that they can be processed in order.</li>
+						<li> Make lines of text on the scans as level as possible (deskewed).</li> 
+					</ul>
+
+					<hr>
+
+					<div class="pane-footer">
+						<a href="#">Go Back</a>
+						<button class="btn">Next Step</button>
+					</div>
+				</div>
+
+				<div id="upload" class="pane" style="display: none">
+					<h3>Upload your Scans</h3>
+                                        <div id="upload-area">
+						<div class="message">
+                                                Drop images here to upload, 
+                                                <br>
+                                                or upload from your computer.</div>
+
+                                                <input type="file">
+                                        </div>
+					<div class="pane-footer">
+						<a href="#">Go Back</a>
+						<button class="btn" id="submit-scans">Upload Scans</button>
+					</div>
+				</div>
+
+				<div id="metadata" class="pane" style="display: none">
+					<div class="progress">
+						<div class="progress-bar" id="upload-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+						</div>
+					</div>
+
+					<h3>Provide Metadata</h3>
+					<p>While your files upload, please
+					share what you know about them so they
+					can be properly catalogued.</p>
+
+					<form id="metadata-form">
+						<div class="form-group">
+							<label for="title">Unique Collection Name</label>
+							<input type="text" class="form-control" name="title" />
+							<p class="help-block">A human-readable name for the collection of scans.</p>
+						</div>
+
+						<div class="form-group">
+							<label for="authority">Authority</label>
+							<input type="text" class="form-control" name="authority" />
+							<p class="help-block">Authority responsible for making the text available</p>
+						</div>
+
+						<div class="form-group">
+							<label for="notes">Notes</label>
+							<input type="text" class="form-control" name="notes"/>
+							<p class="help-block">Misc. notes about the text</p>
+						</div>
+	
+						<div class="form-group">
+							<label for="licence">Rights Applicable to this Collection</label>
+							<div class="radio">
+								<label>
+									<input type="radio" name="licence" value="Available under CC Zero 1.0"/>
+									<a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank">Creative Commons Zero</a>
+								</label>
+							</div>
+							<div class="radio">
+								<label>
+									<input type="radio" name="licence" value="Available under CC Attribution 4.0"/>
+									<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution</a>
+								</label>
+							</div>
+							<div class="radio">
+								<label>
+									<input type="radio" name="licence" value="Available under CC Attribution-ShareAlike 4.0"/>
+									<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution ShareAlike</a>
+								</label>
+							</div>
+							<p class="help-block">Please select one of the offered 
+								<a href="https://okfn.org/opendata/">libre</a> licences. 
+								To help you select one have a look at <a href="https://creativecommons.org/licenses/">Creative Commons</a>.
+						</div>
+					</form>
+					<Hr>
+					<div class="pane-footer">
+						<a href="#">Go Back</a>
+						<button type="submit" class="btn btn-default" id="submit-metadata">Next Step</button>
+					</div>
+				</div>
+
+				<div id="preprocess" class="pane" style="display: none">
+					<h3>Pre-Process your Scans</h3>
+					<p>Most of this information is not mandatory but will improve the recognition results.</p>
+					<hr>
+					<h4>Which language are your scans in?</h4>
+					<p>Select one or more target languages. If your language is not present try one using the same script.</p>
+					<form id="task-form">
+						<div class="form-group">
+							<select id="languages" class="languages" multiple="multiple">
+								<option value="grc">Polytonic Greek</option>
+								<option value="lat">Latin</option>
+								<option value="chi_tra">Chinese (Traditional)</option>
+								<option value="ara">Arabic</option>
+								<option value="heb">Hebrew</option>
+								<option value="syr">Syriac</option>
+							</select>
+						</div>
+					</form>
+					<hr>
+					<div id="greek-fonts" style="display: none">
+						<h4>Which font is your text in?</h4>
+						<p>If none of these look like the font of your text, skip this section.</p>
+
+						<form id="greek-font-form">
+							<div class="form-group">
+								<div class="radio">
+									<label>
+										<input type="radio" name="greek-font" value="teubner"/>
+										<img src="/static/images/tutorial-font-porsongreek.png" class="img-thumbnail" data-font="porson">
+										Porson (also called "Teubner")
+									</label>
+								</div>
+								<div class="radio">
+									<label>
+										<input type="radio" name="greek-font" value="omnibus"/>
+										<img src="/static/images/tutorial-font-griechische-antiquagreek.png" class="img-thumbnail" data-font="griechische antiqua">
+										Griechische Antiqua
+									</label>
+								</div>
+								<div class="radio">
+									<label>
+										<input type="radio" name="greek-font" value="omnibus"/>
+										<img src="/static/images/tutorial-font-zephgreek.png" class="img-thumbnail" data-font="zephgreek">
+										ZephGreek
+									</label>
+								</div>
+								<div class="radio">
+									<label>
+										<input type="radio" name="greek-font" value="none" checked="checked"/>
+										None of these or cannot tell.
+									</label>
+								</div>
+							</div>
+						</form>
+						<hr>
+					</div>
+					<div class="pane-footer">
+						<a href="#">Go Back</a>
+						<button type="submit" class="btn btn-default" id="submit-batch">Process Scans</button>
+					</div>
+				</div>
+
+				<div id="status" class="pane" style="display: none">
+					<h3>All done!</h3>
+					<p>Your scans have been placed in our OCR processing queue.</p>
+
+					<p><strong>Bookmark this page to check the progress of your collection!</strong></p>
+					<hr>
+					<h3>Status</h3>
+					<div class="progress">
+						<div class="progress-bar progress-bar-success progress-bar-striped" id="tasks-done" role="progressbar" style="width: 0%;"></div>
+						<div class="progress-bar progress-bar-warning progress-bar-striped" id="tasks-progress" style="width: 0%"/></div>
+					</div>
+					<hr>
+					<ul class="list-group" id="task-errors">
+					</ul>
+					<hr>
+					<h3>Output</h3>
+					<ul class="list-group" id="task-output">
+					</ul>
+					<p><a href="/">Return to Open Philology homepage</a></p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- end header -->
+
+    </body>
+</html>
