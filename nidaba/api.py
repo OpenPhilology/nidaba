@@ -467,7 +467,7 @@ class BatchTasks(Resource):
                     return False
                 # XXX: find a nicer way to rewrite page URLs
                 base_url = url_for('api.page', batch=batch_id, file='')
-                if isinstance(s, str) and s.startswith(base_url):
+                if isinstance(s, basestring) and s.startswith(base_url):
                     rem = s.replace(base_url, '', 1)
                     return (batch_id, rem)
                 return s
