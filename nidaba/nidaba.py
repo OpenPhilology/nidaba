@@ -283,7 +283,7 @@ class Batch(object):
 
         if not self.storage.is_file(*doc):
             raise NidabaInputException('Input document is not a file.')
-
+        
         with self.redis.pipeline() as pipe:
             while(1):
                 try:
@@ -323,7 +323,6 @@ class Batch(object):
                     if self.cur_tick is None:
                         raise NidabaTickException('No tick to add task to.')
                     kwargs[u'method'] = method
-                    self.cur_tick.append(kwargs)
                     self.scratchpad['scratchpad']['cur_tick'].append(kwargs)
                     pipe.set(self.id, json.dumps(self.scratchpad))
                     pipe.execute()
@@ -670,7 +669,6 @@ class SimpleBatch(Batch):
                     break
                 except WatchError:
                     continue
-        print(self.tasks)
 
     def run(self):
         """Executes the current batch definition.
