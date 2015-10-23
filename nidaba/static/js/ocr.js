@@ -414,6 +414,7 @@ Iris.Views.Status = Backbone.View.extend({
 			var running = 0;
 			var tasks = 0;
 			$('#task-output').empty();
+			$('#task-errors').empty();
 			$.each(Iris.batch.attributes['chains'], function(i, value) {
 				tasks += 1;
 				if(value['state'] === 'SUCCESS') {
