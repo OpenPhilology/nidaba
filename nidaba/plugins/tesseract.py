@@ -232,6 +232,25 @@ def segmentation_tesseract(doc, method=u'segment_tesseract'):
     if int(ver.split('.')[0]) < 3 or int(ver.split('.')[1]) < 2:
         raise NidabaTesseractException('libtesseract version is too old. Set '
                                        'implementation to direct.')
+
+    # tesseract has a tendency to crash arbitrarily on some inputs
+    # necessitating execution in a separate process to ensure the worker
+    # doesn't just die. We use fork as the multiprocessing module thinks
+    # programmers are too stupid to reap their children.
+    logger.info('Forking before entering unstable ctypes code')
+    pid = os.fork()
+    if pid != 0:
+        try:
+            logger.info('Waiting for child to complete')
+            _, status = os.waitpid(pid, 0)
+        except OSError as e:
+            if e.errno not in (errno.EINTR, errno.ECHILD):
+                raise
+            return storage.get_storage_path(output_path), doc
+        if os.WIFSIGNALED(status):
+            raise NidabaTesseractException('Tesseract killed by signal: {0}'.format(os.WTERMSIG(status)))
+        return storage.get_storage_path(output_path), doc
+
     api = tesseract.TessBaseAPICreate()
     rc = tesseract.TessBaseAPIInit3(api, tessdata.encode('utf-8'), None)
     if (rc):
@@ -307,6 +326,8 @@ def segmentation_tesseract(doc, method=u'segment_tesseract'):
     logger.info('Writing segmentation to {}'.format(output_path))
     with open(output_path, 'w') as fp:
         tei.write(fp)
+    logger.info('Quitting child process')
+    os._exit(os.EX_OK)
     return storage.get_storage_path(output_path), doc
 
 
