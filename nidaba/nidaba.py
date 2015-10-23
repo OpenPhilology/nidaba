@@ -15,6 +15,7 @@ from nidaba.nidabaexceptions import (NidabaInputException,
 
 from celery import chain
 from celery import group
+from redis import WatchError
 from itertools import product
 from inspect import getcallargs
 from collections import OrderedDict, Iterable
@@ -159,48 +160,34 @@ class Batch(object):
         self.scratchpad = {}
         self.redis = config.Redis
 
+        with self.redis.pipeline() as pipe:
+            while(1):
+                try:
+                    pipe.watch(self.id)
+                    self._restore_and_create_scratchpad(pipe)
+                    pipe.execute()
+                    break
+                except WatchError:
+                    continue
 
-    def add_scratchpad(self):
+    def _restore_and_create_scratchpad(self, pipe):
         """
-        Adds a scratchpad to the database that allows suspending and resuming
-        task assembly. 
-        
-        All added documents and tasks will be stored persistently;
-        reinstantiating the Batch object and calling restore_scratchpad will
-        restore the object to the previous state.
-
-        The scratchpad will be destroyed on task execution.
-
-        Raises:
-            NidabaInputException if a scratchpad is already attached or the
-            batch has been executed.
+        Restores the scratchpad or creates one if none exists. Does not create
+        a scratchpad on an already executed task.
         """
-        if self.redis.get(self.id) is not None:
-            raise NidabaInputException('Batch already has scratchpad or been '
-                                       'executed.')
+        scratch = pipe.get(self.id)
+        if scratch is not None:
+            scratch = json.loads(scratch)
+            if 'scratchpad' in scratch:
+                self.scratchpad = scratch
+                for k, v in self.scratchpad['scratchpad'].iteritems():
+                    setattr(self, k, v)
         else:
             self.scratchpad = {'scratchpad': {'docs': self.docs, 
                                               'batch_def': self.batch_def,
                                               'cur_step': self.cur_step,
                                               'cur_tick': self.cur_tick}}
-            self.redis.set(self.id, json.dumps(self.scratchpad))
-
-    def restore_scratchpad(self):
-        """
-        Retrieves the scratchpad from the database and restores its contents
-        to the current Batch object overwriting any information defined in it.
-
-        Raises:
-            NidabaInputException if no scratchpad can be found either because
-            none has been attached or the batch has already been executed.
-        """
-        scratch = json.loads(self.redis.get(self.id))
-        if scratch and 'scratchpad' in scratch:
-            self.scratchpad = scratch
-            for k, v in self.scratchpad['scratchpad'].iteritems():
-                setattr(self, k, v)
-        else:
-            raise NidabaInputException('No scratchpad in database')
+            pipe.set(self.id, json.dumps(self.scratchpad))
 
     def get_state(self):
         """
@@ -296,10 +283,19 @@ class Batch(object):
 
         if not self.storage.is_file(*doc):
             raise NidabaInputException('Input document is not a file.')
-        self.docs.append(doc)
-        if self.scratchpad:
-            self.scratchpad['scratchpad']['docs'] = self.docs
-            self.redis.set(self.id, json.dumps(self.scratchpad))
+
+        with self.redis.pipeline() as pipe:
+            while(1):
+                try:
+                    pipe.watch(self.id)
+                    self._restore_and_create_scratchpad(pipe)
+                    self.docs.append(doc)
+                    self.scratchpad['scratchpad']['docs'] = self.docs
+                    pipe.set(self.id, json.dumps(self.scratchpad))
+                    pipe.execute()
+                    break
+                except WatchError:
+                    continue
 
     def add_task(self, method, **kwargs):
         """Add a task to the current tick.
@@ -316,16 +312,24 @@ class Batch(object):
             NidabaTickException: There is no tick to add a task to.
             NidabaNoSuchAlgorithmException: Invalid method given.
         """
-        if self.cur_tick is None:
-            raise NidabaTickException('No tick to add task to.')
         if u'nidaba.' + method not in self.celery.app.tasks:
             raise NidabaNoSuchAlgorithmException('No such task in registry')
-        kwargs[u'method'] = method
-        self.cur_tick.append(kwargs)
-        if self.scratchpad:
-            self.scratchpad['scratchpad']['cur_tick'].append(kwargs)
-            self.redis.set(self.id, json.dumps(self.scratchpad))
 
+        with self.redis.pipeline() as pipe:
+            while(1):
+                try:
+                    pipe.watch(self.id)
+                    self._restore_and_create_scratchpad(pipe)
+                    if self.cur_tick is None:
+                        raise NidabaTickException('No tick to add task to.')
+                    kwargs[u'method'] = method
+                    self.cur_tick.append(kwargs)
+                    self.scratchpad['scratchpad']['cur_tick'].append(kwargs)
+                    pipe.set(self.id, json.dumps(self.scratchpad))
+                    pipe.execute()
+                    break
+                except WatchError:
+                    continue
 
     def add_tick(self):
         """Add a new tick to the current step.
@@ -336,16 +340,23 @@ class Batch(object):
         Raises:
             NidabaStepException: There is no step to add a tick to.
         """
-        if self.cur_step is None:
-            raise NidabaStepException('No step to add tick to.')
-        if self.cur_tick:
-            self.cur_step.append(self.cur_tick)
-        self.cur_tick = []
-        if self.scratchpad:
-            self.scratchpad['scratchpad']['cur_step'] = self.cur_step
-            self.scratchpad['scratchpad']['cur_tick'] = []
-            self.redis.set(self.id, json.dumps(self.scratchpad))
-
+        with self.redis.pipeline() as pipe:
+            while(1):
+                try:
+                    pipe.watch(self.id)
+                    self._restore_and_create_scratchpad(pipe)
+                    if self.cur_step is None:
+                        raise NidabaStepException('No step to add tick to.')
+                    if self.cur_tick:
+                        self.cur_step.append(self.cur_tick)
+                    self.cur_tick = []
+                    self.scratchpad['scratchpad']['cur_step'] = self.cur_step
+                    self.scratchpad['scratchpad']['cur_tick'] = []
+                    pipe.set(self.id, json.dumps(self.scratchpad))
+                    pipe.execute()
+                    break
+                except WatchError:
+                    continue
 
     def add_step(self):
         """Add a new step to the batch definition.
@@ -355,18 +366,25 @@ class Batch(object):
         a single list and used as the input of the first tick of the following
         step.
         """
-        if self.cur_tick:
-            self.cur_step.append(self.cur_tick)
-            self.cur_tick = []
-        if self.cur_step:
-            self.batch_def.append(self.cur_step)
-        self.cur_step = []
-        if self.scratchpad:
-            self.scratchpad['scratchpad']['cur_step'] = self.cur_step
-            self.scratchpad['scratchpad']['cur_tick'] = self.cur_tick
-            self.scratchpad['scratchpad']['batch_def'] = self.batch_def
-            self.redis.set(self.id, json.dumps(self.scratchpad))
-
+        with self.redis.pipeline() as pipe:
+            while(1):
+                try:
+                    pipe.watch(self.id)
+                    self._restore_and_create_scratchpad(pipe)
+                    if self.cur_tick:
+                        self.cur_step.append(self.cur_tick)
+                        self.cur_tick = []
+                    if self.cur_step:
+                        self.batch_def.append(self.cur_step)
+                    self.cur_step = []
+                    self.scratchpad['scratchpad']['cur_step'] = self.cur_step
+                    self.scratchpad['scratchpad']['cur_tick'] = self.cur_tick
+                    self.scratchpad['scratchpad']['batch_def'] = self.batch_def
+                    pipe.set(self.id, json.dumps(self.scratchpad))
+                    pipe.execute()
+                    break
+                except WatchError:
+                    continue
 
     def run(self):
         """Executes the current batch definition.
@@ -378,94 +396,102 @@ class Batch(object):
         Returns:
             (unicode): Batch identifier.
         """
-        # flush most recent tick/step onto the batch definition
-        self.add_tick()
-        self.add_step()
-
-        groups = []
-        tick = []
-
-        result_data = {}
-
-        # We first expand the tasks starting from the second step as these are
-        # the same for each input document.
-        if len(self.batch_def) > 1:
-            groups.append(self.tasks.util.sync.s())
-            for tset in self.batch_def[1:]:
-                for sequence in product(*tset):
-                    method = self.celery.app.tasks['nidaba.' +
-                                                   sequence[0]['method']]
-                    ch = chain(method.s(**(sequence[0])))
-                    for seq in sequence[1:]:
-                        method = self.celery.app.tasks['nidaba.' + seq['method']]
-                        ch |= method.s(**seq)
-                    tick.append(ch)
-                groups.append(group(tick))
-                groups.append(self.tasks.util.sync.s())
-
-        # The expansion steps described above is redone for each input document
-        chains = []
-        for doc in self.docs:
-            tick = []
-            # the first step is handled differently as the input document has
-            # to be added explicitely.
-            for sequence in product([doc], *self.batch_def[0]):
-                method = self.celery.app.tasks['nidaba.' + sequence[1]['method']]
-                root = sequence[0]
-                ch = chain(method.s(doc=root, **(sequence[1])))
-                for seq in sequence[2:]:
-                    method = self.celery.app.tasks['nidaba.' + seq['method']]
-                    ch |= method.s(**seq)
-                tick.append(ch)
-            doc_group = group(tick)
-            parents = []
-            group_list = [doc_group] + groups
-            chains.append(chain(group_list))
-
-            # Now we give out another set of unique task identifiers and save
-            # them to the database. Presetting the celery task ID does not work
-            # as our chains get automagically upgraded to chords by celery,
-            # erasing the ID fields in the process.
-            for step in enumerate(group_list):
-                if hasattr(step[1], 'tasks'):
-                    for tick in enumerate(step[1].tasks):
-                        if step[0]:
-                            parents = parent_step
-                        else:
-                            parents = []
-                        for task in enumerate(tick[1].tasks):
-                            task_id = uuid.uuid4().get_hex()
-                            result_data[task_id] = {
-                                'children': [],
-                                'parents': parents,
-                                'housekeeping': False,
-                                'root_document': doc,
-                                'state': 'PENDING',
-                                'result': None,
-                                'task': (task[1]['task'], task[1]['kwargs']),
-                            }
-                            for parent in parents:
-                                result_data[parent]['children'] = task_id
-                            group_list[step[0]].tasks[tick[0]].tasks[task[0]].kwargs['task_id'] = task_id
-                            group_list[step[0]].tasks[tick[0]].tasks[task[0]].kwargs['batch_id'] = self.id
-                            parents = [task_id]
-                    parent_step = [x.tasks[-1].kwargs['task_id'] for x in
-                                   step[1].tasks]
-                else:
-                    task_id = uuid.uuid4().get_hex()
-                    result_data[task_id] = {
-                        'children': [],
-                        'parents': [],
-                        'housekeeping': True,
-                        'root_document': doc,
-                        'state': 'PENDING',
-                        'result': None,
-                        'task': (task[1]['task'], task[1]['kwargs']),
-                    }
-                    group_list[step[0]].kwargs['task_id'] = task_id
-                    group_list[step[0]].kwargs['batch_id'] = self.id
-        # also deletes the scratchpad 
-        self.redis.set(self.id, json.dumps(result_data))
+        with self.redis.pipeline() as pipe:
+            while(1):
+                try:
+                    pipe.watch(self.id)
+                    self._restore_and_create_scratchpad(pipe)
+                    # flush most recent tick/step onto the batch definition
+                    self.add_tick()
+                    self.add_step()
+            
+                    groups = []
+                    tick = []
+            
+                    result_data = {}
+                    # We first expand the tasks starting from the second step as these are
+                    # the same for each input document.
+                    if len(self.batch_def) > 1:
+                        groups.append(self.tasks.util.sync.s())
+                        for tset in self.batch_def[1:]:
+                            for sequence in product(*tset):
+                                method = self.celery.app.tasks['nidaba.' +
+                                                               sequence[0]['method']]
+                                ch = chain(method.s(**(sequence[0])))
+                                for seq in sequence[1:]:
+                                    method = self.celery.app.tasks['nidaba.' + seq['method']]
+                                    ch |= method.s(**seq)
+                                tick.append(ch)
+                            groups.append(group(tick))
+                            groups.append(self.tasks.util.sync.s())
+            
+                    # The expansion steps described above is redone for each input document
+                    chains = []
+                    for doc in self.docs:
+                        tick = []
+                        # the first step is handled differently as the input document has
+                        # to be added explicitely.
+                        for sequence in product([doc], *self.batch_def[0]):
+                            method = self.celery.app.tasks['nidaba.' + sequence[1]['method']]
+                            root = sequence[0]
+                            ch = chain(method.s(doc=root, **(sequence[1])))
+                            for seq in sequence[2:]:
+                                method = self.celery.app.tasks['nidaba.' + seq['method']]
+                                ch |= method.s(**seq)
+                            tick.append(ch)
+                        doc_group = group(tick)
+                        parents = []
+                        group_list = [doc_group] + groups
+                        chains.append(chain(group_list))
+            
+                        # Now we give out another set of unique task identifiers and save
+                        # them to the database. Presetting the celery task ID does not work
+                        # as our chains get automagically upgraded to chords by celery,
+                        # erasing the ID fields in the process.
+                        for step in enumerate(group_list):
+                            if hasattr(step[1], 'tasks'):
+                                for tick in enumerate(step[1].tasks):
+                                    if step[0]:
+                                        parents = parent_step
+                                    else:
+                                        parents = []
+                                    for task in enumerate(tick[1].tasks):
+                                        task_id = uuid.uuid4().get_hex()
+                                        result_data[task_id] = {
+                                            'children': [],
+                                            'parents': parents,
+                                            'housekeeping': False,
+                                            'root_document': doc,
+                                            'state': 'PENDING',
+                                            'result': None,
+                                            'task': (task[1]['task'], task[1]['kwargs']),
+                                        }
+                                        for parent in parents:
+                                            result_data[parent]['children'] = task_id
+                                        group_list[step[0]].tasks[tick[0]].tasks[task[0]].kwargs['task_id'] = task_id
+                                        group_list[step[0]].tasks[tick[0]].tasks[task[0]].kwargs['batch_id'] = self.id
+                                        parents = [task_id]
+                                parent_step = [x.tasks[-1].kwargs['task_id'] for x in
+                                               step[1].tasks]
+                            else:
+                                task_id = uuid.uuid4().get_hex()
+                                result_data[task_id] = {
+                                    'children': [],
+                                    'parents': [],
+                                    'housekeeping': True,
+                                    'root_document': doc,
+                                    'state': 'PENDING',
+                                    'result': None,
+                                    'task': (task[1]['task'], task[1]['kwargs']),
+                                }
+                                group_list[step[0]].kwargs['task_id'] = task_id
+                                group_list[step[0]].kwargs['batch_id'] = self.id
+                    # also deletes the scratchpad 
+                    pipe.set(self.id, json.dumps(result_data))
+                    pipe.execute()
+                    break
+                except WatchError:
+                    continue
         [x.apply_async() for x in chains]
         return self.id
 
@@ -497,6 +523,7 @@ class SimpleBatch(Batch):
         from nidaba import celery
         self.celery = celery
 
+
         if id is None:
             id = unicode(uuid.uuid4())
             self.storage.prepare_filestore(id)
@@ -504,22 +531,22 @@ class SimpleBatch(Batch):
             raise NidabaInputException('Storage not prepared for task')
         super(SimpleBatch, self).__init__(id)
         self.lock = False
-        
-        keys = ['img', 'binarize', 'segmentation', 'ocr', 'stats', 'postprocessing', 'output']
-        self.tasks = OrderedDict([(key, []) for key in keys])
-        try:
-            self.add_scratchpad()
-            self.scratchpad['scratchpad']['tasks'] = self.tasks
-            self.redis.set(self.id, json.dumps(self.scratchpad))
-        except:
-            try:
-                self.restore_scratchpad()
-                # reorder the tasks dictionary
-                self.tasks = OrderedDict([(key, self.tasks[key]) for key in  keys])
-            except NidabaInputException:
-                # no scratchpad in database means batch is running and may not
-                # be modified.
-                self.lock = True
+        with self.redis.pipeline() as pipe:
+            while(1):
+                try:
+                    pipe.watch(self.id)
+                    keys = ['img', 'binarize', 'segmentation', 'ocr', 'stats', 'postprocessing', 'output']
+                    self.tasks = OrderedDict([(key, []) for key in keys])
+                    self._restore_and_create_scratchpad(pipe)
+                    if 'scratchpad' in self.scratchpad:
+                        self.scratchpad['scratchpad']['tasks'] = self.tasks
+                        pipe.set(self.id, json.dumps(self.scratchpad))
+                    else:
+                        self.lock = True
+                    pipe.execute()
+                    break
+                except WatchError:
+                    continue
 
     def is_running(self):
         """
@@ -631,10 +658,19 @@ class SimpleBatch(Batch):
             raise NidabaInputException(str(e))
         # validate against arg_values field of the task
         task_arg_validator(task.get_valid_args(), **kwargs)
-        self.tasks[group].append((method, kwargs))
-        self.scratchpad['scratchpad']['tasks'] = self.tasks
-        self.redis.set(self.id, json.dumps(self.scratchpad))
-
+        with self.redis.pipeline() as pipe:
+            while(1):
+                try:
+                    pipe.watch(self.id)
+                    self._restore_and_create_scratchpad(pipe)
+                    self.tasks[group].append((method, kwargs))
+                    self.scratchpad['scratchpad']['tasks'] = self.tasks
+                    pipe.set(self.id, json.dumps(self.scratchpad))
+                    pipe.execute()
+                    break
+                except WatchError:
+                    continue
+        print(self.tasks)
 
     def run(self):
         """Executes the current batch definition.
@@ -648,7 +684,6 @@ class SimpleBatch(Batch):
         """
         if self.lock:
             raise NidabaInputException('Executed batch may not be modified')
-
         self.add_step()
         for group, btasks in self.tasks.iteritems():
             self.add_tick()
