@@ -149,7 +149,7 @@ class Batch(object):
         from nidaba import tasks
         from nidaba import plugins
         from nidaba import celery
-        self.tasks = tasks
+        self.task_reg = tasks
         self.celery = celery
 
         self.id = id
@@ -182,6 +182,7 @@ class Batch(object):
                 self.scratchpad = scratch
                 for k, v in self.scratchpad['scratchpad'].iteritems():
                     setattr(self, k, v)
+                # reorder task definitions
         else:
             self.scratchpad = {'scratchpad': {'docs': self.docs, 
                                               'batch_def': self.batch_def,
@@ -411,7 +412,7 @@ class Batch(object):
                     # We first expand the tasks starting from the second step as these are
                     # the same for each input document.
                     if len(self.batch_def) > 1:
-                        groups.append(self.tasks.util.sync.s())
+                        groups.append(self.task_reg.util.sync.s())
                         for tset in self.batch_def[1:]:
                             for sequence in product(*tset):
                                 method = self.celery.app.tasks['nidaba.' +
@@ -422,7 +423,7 @@ class Batch(object):
                                     ch |= method.s(**seq)
                                 tick.append(ch)
                             groups.append(group(tick))
-                            groups.append(self.tasks.util.sync.s())
+                            groups.append(self.task_reg.util.sync.s())
             
                     # The expansion steps described above is redone for each input document
                     chains = []
@@ -522,6 +523,13 @@ class SimpleBatch(Batch):
         from nidaba import celery
         self.celery = celery
 
+        self.tasks = OrderedDict([('img', []), 
+                                  ('binarize', []),
+                                  ('segmentation', []), 
+                                  ('ocr', []),
+                                  ('stats', []), 
+                                  ('postprocessing', []),
+                                  ('output', [])])
 
         if id is None:
             id = unicode(uuid.uuid4())
@@ -534,13 +542,8 @@ class SimpleBatch(Batch):
             while(1):
                 try:
                     pipe.watch(self.id)
-                    keys = ['img', 'binarize', 'segmentation', 'ocr', 'stats', 'postprocessing', 'output']
-                    self.tasks = OrderedDict([(key, []) for key in keys])
                     self._restore_and_create_scratchpad(pipe)
-                    if 'scratchpad' in self.scratchpad:
-                        self.scratchpad['scratchpad']['tasks'] = self.tasks
-                        pipe.set(self.id, json.dumps(self.scratchpad))
-                    else:
+                    if 'scratchpad' not in self.scratchpad:
                         self.lock = True
                     pipe.execute()
                     break
@@ -682,8 +685,11 @@ class SimpleBatch(Batch):
         """
         if self.lock:
             raise NidabaInputException('Executed batch may not be modified')
+        # reorder task definitions
+        keys = ['img', 'binarize', 'segmentation', 'ocr', 'stats', 'postprocessing', 'output']
+        tasks = OrderedDict((key, self.tasks[key]) for key in keys)
         self.add_step()
-        for group, btasks in self.tasks.iteritems():
+        for group, btasks in tasks.iteritems():
             self.add_tick()
             for task in btasks:
                 super(SimpleBatch, self).add_task('{}.{}'.format(group,
@@ -897,9 +903,6 @@ class NetworkSimpleBatch(object):
         # validate that the task exists
         if group not in self.allowed_tasks or method not in self.allowed_tasks[group]:
             raise NidabaInputException('Unknown task {}'.format(method))
-        args = self.allowed_tasks[group][method]
-        # validate against arg_values field of the task
-        task_arg_validator(args, **kwargs)
         r = requests.post('{}/batch/{}/tasks/{}/{}'.format(self.host, self.id,
                                                            group, method),
                           json=kwargs)  
