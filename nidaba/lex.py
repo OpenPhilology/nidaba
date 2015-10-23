@@ -43,7 +43,7 @@ def tei_spellcheck(facsimile, dictionary, deletion_dictionary,
     suggestions = spellcheck(text_tokens, dictionary, deletion_dictionary)
     facsimile.add_respstmt('spell-checker', 'nidaba-levenshtein')
     for segment in facsimile.segments:
-        key = segment[-1]
+        key = alg.sanitize(segment[-1])
         if filter_punctuation:
             key = regex.sub('[^\w]', '', key)
         if key not in suggestions:
