@@ -20,6 +20,7 @@ from __future__ import unicode_literals, print_function, absolute_import
 
 import os
 import shutil
+import regex
 
 from nidaba import uzn
 from nidaba import storage
@@ -31,6 +32,7 @@ from nidaba.nidabaexceptions import NidabaPluginException
 from nidaba.tasks.helper import NidabaTask
 
 from PIL import Image
+from itertools import izip_longest
 from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
@@ -48,6 +50,21 @@ def setup(*args, **kwargs):
         from kraken.lib import models
     except ImportError as e:
         raise NidabaPluginException(e.message)
+
+
+def max_bbox(boxes):
+    """ 
+    Calculates the minimal bounding box containing all boxes contained in an
+    iterator.
+
+    Args:
+        boxes (iterator): An iterator returning tuples of the format (x0, y0,
+                          x1, y1)
+    Returns:
+        A box covering all bounding boxes in the input argument
+    """
+    sbox = list(map(sorted, list(zip(*boxes))))
+    return (sbox[0][0], sbox[1][0], sbox[2][-1], sbox[3][-1])
 
 
 @app.task(base=NidabaTask, name=u'nidaba.segmentation.kraken')
@@ -140,9 +157,24 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
         # it.
         logger.debug('Scoping line {}'.format(lines[i][4]))
         tei.scope_line(lines[i][4])
-        logger.debug('Adding graphemes: {}'.format(rec.prediction))
-        tei.add_graphemes([(x[0], x[1], int(x[2] * 100)) for x in rec])
         i += 1
+
+        splits = regex.split(u'(\s+)', rec.prediction)
+        line_offset = 0
+        for segment, whitespace in izip_longest(splits[0::2], splits[1::2]):
+            if len(segment):
+                seg_bbox = max_bbox(rec.cuts[line_offset:line_offset + len(segment)])
+                logger.debug('Creating new segment at {} {} {} {}'.format(*seg_bbox))
+                tei.add_segment(seg_bbox)
+                logger.debug('Adding graphemes (segment): {}'.format(rec.prediction[line_offset:line_offset+len(segment)]))
+                tei.add_graphemes([(x[0], x[1], int(x[2] * 100)) for x in rec[line_offset:line_offset+len(segment)]])
+                line_offset += len(segment)
+            if whitespace:
+                tei.clear_segment()
+                logger.debug('Adding graphemes (whitespace): {}'.format(rec.prediction[line_offset:line_offset+len(whitespace)]))
+
+                tei.add_graphemes([(x[0], x[1], int(x[2] * 100)) for x in rec[line_offset:line_offset+len(whitespace)]])
+                line_offset += len(whitespace)
     with storage.StorageFile(*output_path, mode='wb') as fp:
         logger.debug('Writing TEI to {}'.format(fp.abs_path))
         tei.write(fp)
