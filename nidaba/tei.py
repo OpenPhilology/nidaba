@@ -420,8 +420,10 @@ class TEIFacsimile(object):
             choice = parent.find('..')
         else:
             sic = deepcopy(el)
+            idx = parent.index(el)
             parent.remove(el)
-            choice = SubElement(parent, self.tei_ns + 'choice')
+            choice = Element(self.tei_ns + 'choice')
+            parent.insert(idx, choice)
             # reinsert beneath sic element
             SubElement(choice, self.tei_ns + 'sic').append(sic)
         for alt in it:
