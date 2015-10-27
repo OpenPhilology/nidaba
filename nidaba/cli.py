@@ -36,10 +36,11 @@ def main():
     """
 
 
-def int_float_bool_or_str(s):
+def conv_arg_string(s):
     """
     A small helper function intended to coerce an input string to types in the
-    order int -> float -> bool -> unicode -> input.
+    order int -> float -> bool -> unicode -> input. Also resolves lists of
+    these values.
 
     Args:
         s (unicode):
@@ -48,7 +49,6 @@ def int_float_bool_or_str(s):
         int or float or unicode or original input type: Input variable coerced
         to the highest data type in the ordering.
     """
-
     try:
         return int(s)
     except ValueError:
@@ -60,6 +60,8 @@ def int_float_bool_or_str(s):
             elif s in ['False', 'false']:
                 return False
             try:
+                if s[0] == '[' and s[-1] == ']':
+                    return [conv_arg_string(x) for x in s[1:-1].split(',')]
                 return unicode(s)
             except UnicodeDecodeError:
                 return s
@@ -98,12 +100,16 @@ def validate_definition(ctx, param, value):
         configurations = []
         for conf in params.split(u';'):
             kwargs = {}
-            for arg in conf.split(u','):
-                if '=' in arg:
-                    k, v = arg.split('=')
-                    kwargs[k] = int_float_bool_or_str(v)
-                elif arg:
-                    raise click.BadParameter('Positional arguments are deprecated!')
+            vals = conf.split(u'=')
+            key = None
+            for args in vals:
+                head, sep, tail = args.rpartition(',')
+                if head:
+                    kwargs[key] = conv_arg_string(head)
+                elif not sep and key:
+                    kwargs[key] = conv_arg_string(tail)
+                if tail:
+                    key = tail
             configurations.append(kwargs)
         definitions.append([task, configurations])
     return definitions
