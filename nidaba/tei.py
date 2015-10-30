@@ -578,42 +578,55 @@ class TEIFacsimile(object):
                          '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
                  xml_declaration=True, encoding='utf-8'))
 
-    def write_simplexml(self, fp):
+    def write_abbyyxml(self, fp):
         """
-        Writes the TEI document as a grapheme cloud in a simple XML format. Its basic format is:
+        Writes the TEI document in a format reminiscent of Abbyy FineReader's
+        XML output. Its basic format is:
 
         <text>
+        <line l="0" r="111" t="6" b="89">
         <charParams l="0" r="78" t="6" b="89" charConfidence="76" wordStart="true">D</charParams>
         <charParams l="86" r="111" t="24" b="89" charConfidence="76" wordStart="false">e</charParams>
+        </line>
         ....
         </text>
 
         Args:
             fp (file): File descriptor to write to.
         """
-        page = etree.Element('text')
+        page = etree.Element('document')
+        p = etree.SubElement(page, 'page')
+        surface = self.doc.find('.//' + self.tei_ns + 'sourceDoc/' + self.tei_ns
+                                + 'surface')
+        p.set('width', surface.get('lrx'))
+        p.set('height', surface.get('lry'))
+        p.set('originalCoords', '1')
+        text = etree.SubElement(page, 'text')
         last_seg_id = None
-        for g in self.doc.iter(self.tei_ns + 'g'):
-            el = SubElement(page, 'charParams')
-
-            seg = g.xpath("ancestor::*[@type='segment']")
-            if seg and seg[0].get(self.xml_ns  + 'id') != last_seg_id:
-                el.set('wordStart', 'true')
-                last_seg_id = seg[0].get(self.xml_ns + 'id')
-            else:
-                el.set('wordStart', 'false')
-            el.text = ''.join(g.itertext())
-            if g.getparent().getparent().get('type') == 'grapheme':
-                el.set('l', g.getparent().getparent().get('ulx'))
-                el.set('t', g.getparent().getparent().get('uly'))
-                el.set('r', g.getparent().getparent().get('lrx'))
-                el.set('b', g.getparent().getparent().get('lry'))
-            cert = self.doc.xpath("//*[local-name()='certainty' and @target=$tag]",
-                                  tag='#' + g.get(self.xml_ns + 'id'))
-            if len(cert):
-               el.set('charConfidence', str(100.0 * float(cert[0].get('degree'))))
-
-
+        for line in self.doc.iter(self.tei_ns + 'line'):
+            lel = SubElement(text, 'line')
+            lel.set('l', line.get('ulx'))
+            lel.set('t', line.get('uly'))
+            lel.set('r', line.get('lrx'))
+            lel.set('b', line.get('lry'))
+            for g in line.iter(self.tei_ns + 'g'):
+                el = SubElement(lel, 'charParams')
+                seg = g.xpath("ancestor::*[@type='segment']")
+                if seg and seg[0].get(self.xml_ns  + 'id') != last_seg_id:
+                    el.set('wordStart', 'true')
+                    last_seg_id = seg[0].get(self.xml_ns + 'id')
+                else:
+                    el.set('wordStart', 'false')
+                el.text = ''.join(g.itertext())
+                if g.getparent().getparent().get('type') == 'grapheme':
+                    el.set('l', g.getparent().getparent().get('ulx'))
+                    el.set('t', g.getparent().getparent().get('uly'))
+                    el.set('r', g.getparent().getparent().get('lrx'))
+                    el.set('b', g.getparent().getparent().get('lry'))
+                cert = self.doc.xpath("//*[local-name()='certainty' and @target=$tag]",
+                                      tag='#' + g.get(self.xml_ns + 'id'))
+                if len(cert):
+                   el.set('charConfidence', str(100.0 * float(cert[0].get('degree'))))
         fp.write(etree.tostring(page, xml_declaration=True, encoding='utf-8'))
 
     def write_text(self, fp):

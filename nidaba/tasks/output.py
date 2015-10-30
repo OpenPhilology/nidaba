@@ -119,10 +119,11 @@ def tei_metadata(doc, method=u'metadata', metadata=None, validate=False):
     return (doc[0], output_path)
 
 
-@app.task(base=NidabaTask, name=u'nidaba.output.tei2simplexml')
-def tei2simplexml(doc, method=u'simplexml'):
+@app.task(base=NidabaTask, name=u'nidaba.output.tei2abbyyxml')
+def tei2abbyyxml(doc, method=u'abbyyxml'):
     """
-    Convert a TEI Facsimile to hOCR preserving as much metadata as possible.
+    Convert a TEI Facsimile to a format similar to Abbyy FineReader's XML
+    output.
 
     Args:
         doc (unicode, unicode): Storage tuple of the input document
@@ -136,8 +137,8 @@ def tei2simplexml(doc, method=u'simplexml'):
         tei.read(fp)
     output_path = storage.insert_suffix(doc[1], method)
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
-        logger.debug('Writing simplexml to {}'.format(fp.abs_path))
-        tei.write_simplexml(fp)
+        logger.debug('Writing abbyyxml to {}'.format(fp.abs_path))
+        tei.write_abbyyxml(fp)
     return (doc[0], output_path)
 
 
