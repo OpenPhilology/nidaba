@@ -594,10 +594,17 @@ class TEIFacsimile(object):
         Args:
             fp (file): File descriptor to write to.
         """
-        page = etree.Element('text')
+        page = etree.Element('document')
+        p = etree.SubElement(page, 'page')
+        surface = self.doc.find('.//' + self.tei_ns + 'sourceDoc/' + self.tei_ns
+                                + 'surface')
+        p.set('width', surface.get('lrx'))
+        p.set('height', surface.get('lry'))
+        p.set('originalCoords', '1')
+        text = etree.SubElement(page, 'text')
         last_seg_id = None
         for line in self.doc.iter(self.tei_ns + 'line'):
-            lel = SubElement(page, 'line')
+            lel = SubElement(text, 'line')
             lel.set('l', line.get('ulx'))
             lel.set('t', line.get('uly'))
             lel.set('r', line.get('lrx'))
