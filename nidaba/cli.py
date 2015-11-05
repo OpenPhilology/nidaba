@@ -5,6 +5,7 @@ This module encapsulates all shell callable functions of nidaba.
 
 from __future__ import absolute_import, print_function
 
+from signal import signal, SIGPIPE, SIG_DFL
 from inspect import getcallargs, getdoc
 from gunicorn.six import iteritems
 from itertools import cycle
@@ -21,6 +22,9 @@ import click
 import stevedore
 import logging
 import gunicorn.app.base
+
+# ignore SIGPIPE
+signal(SIGPIPE,SIG_DFL) 
 
 spinner = cycle([u'⣾', u'⣽', u'⣻', u'⢿', u'⡿', u'⣟', u'⣯', u'⣷'])
 
