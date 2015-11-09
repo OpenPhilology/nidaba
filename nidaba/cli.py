@@ -11,6 +11,7 @@ from gunicorn.six import iteritems
 from itertools import cycle
 from pprint import pprint
 from flask import Flask
+from glob import glob
 
 from nidaba.nidaba import NetworkSimpleBatch, SimpleBatch
 
@@ -128,7 +129,6 @@ def move_to_storage(batch, kwargs):
 
     It is assumed that the filestore is already created.
     """
-    from nidaba import storage
 
     nkwargs = {}
     def do_move(batch, src):
@@ -140,14 +140,18 @@ def move_to_storage(batch, kwargs):
             click.secho(u'\b\u2713', fg='green', nl=False)
             click.echo('\033[?25h\n', nl=False)
         else:
+            from nidaba import storage
             suffix = uuid.uuid4()
-            dst = unicode(suffix) + '_' + os.path.basename(src)
+            dst = os.path.basename(src) + '_' + unicode(suffix)
             shutil.copy2(src, storage.get_abs_path(batch.id, dst))
         return (batch.id, dst)
     for k, v in kwargs.iteritems():
         if isinstance(v, basestring) and v.startswith('file:'):
             v = v.replace('file:', '', 1)
-            nkwargs[k] = do_move(batch, v)
+            # unglobulate input files
+            nkwargs[k] = [do_move(batch, f) for f in glob(v)]
+            if len(nkwargs[k]) == 1:
+                nkwargs[k] = nkwargs[k][0]
         else:
             nkwargs[k] = v
     return nkwargs
@@ -384,7 +388,7 @@ def status(verbose, host, job_id):
     failed = 0
     results = []
     errors = []
-    for subtask in state.itervalues():
+    for task_id, subtask in state.iteritems():
         if subtask['state'] == 'SUCCESS':
             done += 1
         elif subtask['state'] == 'RUNNING':
@@ -399,19 +403,42 @@ def status(verbose, host, job_id):
             bs = 'failed'
 
         if len(subtask['children']) == 0 and not subtask['housekeeping'] and subtask['result'] is not None:
-            results.append((subtask['result'], subtask['root_document']))
+            # try to find statistics results
+            parents = [task_id] + subtask['parents']
+            misc = None
+            for parent in parents:
+                parents.extend(state[parent]['parents'])
+                if 'misc' in state[parent]:
+                    misc = state[parent]['misc']
+                    break
+            results.append((subtask['result'], subtask['root_document'], misc))
 
     click.echo(' {}\n'.format(bs))
     click.echo('{}/{} tasks completed. {} running.\n'.format(done, len(state), running))
     click.secho('Output files:\n', underline=True)
+    results = sorted(results, key=lambda x: x[0][1])
     if results and host:
         for doc in results:
-            click.echo(doc[1] + u' \u2192 ' + doc[0])
+            if len(doc) == 3:
+                click.echo(u'{} \u2192 {} ({:.1f}% / {})'.format(doc[1], 
+                                                                 doc[0],
+                                                                 100 *
+                                                                 doc[2]['edit_ratio'],
+                                                                 doc[2]['ground_truth'][1]))
+            else:
+                click.echo(u'{} \u2192 {}'.format(doc[1], doc[0]))
     elif results:
         from nidaba import storage
         for doc in results:
             output = click.format_filename(storage.get_abs_path(*doc[0]))
-            click.echo(doc[1][1] + u' \u2192 ' + output)
+            if len(doc) == 3:
+                click.echo(u'{} \u2192 {} ({:.1f}% / {})'.format(doc[1][1], 
+                                                                 output,
+                                                                 100 *
+                                                                 doc[2]['edit_ratio'],
+                                                                 doc[2]['ground_truth'][1]))
+            else:
+                click.echo(u'{} \u2192 {}'.format(doc[1][1], output))
     if errors:
         click.secho('\nErrors:\n', underline=True)
         for task in errors:
