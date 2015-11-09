@@ -47,8 +47,10 @@ def task_arg_validator(arg_values, **kwargs):
         elif type == 'str':
             if not isinstance(val, basestring):
                 raise NidabaInputException('{} is not a string'.format(val))
-        # XXX: Add file checker for local case
+        # XXX: Add file/files checker for local case
         elif type == 'file':
+            pass
+        elif type == 'files':
             pass
         else:
             raise NidabaInputException('Argument type {} unknown'.format(type))

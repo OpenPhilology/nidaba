@@ -7,7 +7,6 @@ A module for interfacing TEI OCR output
 """
 
 from __future__ import absolute_import, division, print_function
-from __future__ import unicode_literals
 
 from lxml import etree
 from lxml.etree import Element, SubElement
@@ -637,7 +636,7 @@ class TEIFacsimile(object):
             fp (file): File descriptor to write to.
         """
         for line in self.lines:
-            fp.write(line[-1].encode('utf-8'))
+            fp.write(line[-1].encode('utf-8').strip())
             fp.write('\n')
 
     def write(self, fp):
