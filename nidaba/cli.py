@@ -388,6 +388,8 @@ def status(verbose, host, job_id):
     failed = 0
     results = []
     errors = []
+    expected = len(state)
+    failed_children = set()
     for task_id, subtask in state.iteritems():
         if subtask['state'] == 'SUCCESS':
             done += 1
@@ -401,6 +403,10 @@ def status(verbose, host, job_id):
                 bs = 'pending'
         elif subtask['state'] == 'FAILURE':
             failed += 1
+            children = []
+            for child in subtask['children']:
+                children.extend(state[child]['children'])
+                failed_children.add(child)
             errors.append(subtask)
             bs = 'failed'
 
@@ -415,7 +421,8 @@ def status(verbose, host, job_id):
                     break
             results.append((subtask['result'], subtask['root_document'], misc))
 
-    click.echo(' {}\n'.format(bs))
+    final = '(final)' if not expected - failed - done - len(failed_children) else ''
+    click.echo(' {} {}\n'.format(bs, final))
     click.echo('{}/{} tasks completed. {} running.\n'.format(done, len(state), running))
     click.secho('Output files:\n', underline=True)
     results = sorted(results, key=lambda x: x[0][1])
