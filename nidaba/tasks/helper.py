@@ -16,6 +16,8 @@ from nidaba.config import Redis
 from celery.utils.log import get_task_logger
 
 import json
+import traceback
+import sys
 
 logger = get_task_logger(__name__)
 
@@ -87,9 +89,11 @@ class NidabaTask(Task):
         try:
             _redis_set_atomically(batch_id, task_id, 'state', 'RUNNING')
             ret = super(NidabaTask, self).__call__(*args, **nkwargs)
-        except Exception as e:
-            logger.error(e)
-            _redis_set_atomically(batch_id, task_id, 'errors', (nkwargs, e.message))
+        except:
+            exc_info = sys.exc_info()
+            exc = traceback.format_exception_only(*exc_info[:2])[-1].strip()
+            tb = ''.join(traceback.format_tb(exc_info[-1]))
+            _redis_set_atomically(batch_id, task_id, 'errors', (nkwargs, exc, tb))
             _redis_set_atomically(batch_id, task_id, 'state', 'FAILURE')
             raise
         _redis_set_atomically(batch_id, task_id, 'state', 'SUCCESS')

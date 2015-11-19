@@ -419,7 +419,7 @@ def status(verbose, host, job_id):
     results = sorted(results, key=lambda x: x[0][1])
     if results and host:
         for doc in results:
-            if doc[2] is not None:
+            if len(doc) == 3:
                 click.echo(u'{} \u2192 {} ({:.1f}% / {})'.format(doc[1], 
                                                                  doc[0],
                                                                  100 *
@@ -431,7 +431,7 @@ def status(verbose, host, job_id):
         from nidaba import storage
         for doc in results:
             output = click.format_filename(storage.get_abs_path(*doc[0]))
-            if doc[2] is not None:
+            if len(doc) == 3:
                 click.echo(u'{} \u2192 {} ({:.1f}% / {})'.format(doc[1][1], 
                                                                  output,
                                                                  100 *
@@ -442,6 +442,15 @@ def status(verbose, host, job_id):
     if errors:
         click.secho('\nErrors:\n', underline=True)
         for task in errors:
-            click.echo('{0} ({1}): {2}'.format(task['task'][0],
-                                               task['root_document'][1],
-                                               task['errors'][-1]))
+            tb = ''
+            args = ''
+            if verbose > 0:
+                tb = task['errors'][2]
+            if verbose > 1:
+                task['errors'][0].pop('method')
+                args = ', ' + str(task['errors'][0])
+            click.echo('{0} ({1}{2}): {3}{4}'.format(task['task'][0],
+                                                     task['root_document'][1],
+                                                     args,
+                                                     tb,
+                                                     task['errors'][1]))
