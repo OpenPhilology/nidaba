@@ -11,6 +11,8 @@
 		<link rel="stylesheet" href="/static/css/bootstrap-multiselect.css" type="text/css"/>
 		<link rel="stylesheet" href="/static/css/style.css" media="screen">
 
+		<link id="tei_stylesheet" href="/static/xslt/tei_facsimile.xsl" type="application/xslt+xml"/> 
+
 		<script src="/static/js/jquery-1.11.3.min.js"></script>
 		<script src="/static/bootstrap/js/bootstrap.js"></script>
 		<script src="/static/js/bootstrap-multiselect.js"></script>
@@ -23,6 +25,22 @@
     </head>
 
     <body>
+
+	<!-- modal for simplified result display -->
+
+	<div class="modal fade" id="tei_modal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div id="tei_modal_content">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<!-- Belongs in a header template -->
 

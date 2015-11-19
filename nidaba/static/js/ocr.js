@@ -424,16 +424,35 @@ Iris.Views.Status = Backbone.View.extend({
 				} else if(value['state'] === 'FAILURE') {
 					alert = $('<a>').attr('class', 'list-group-item list-group-item-success')
 							.attr('href', value['root_document'])
-							.text(value['errors'][value['errors'].length - 1]);
+							.text(value['errors'][value['errors'].length - 2]);
 					$('#task-errors').append(alert);
 				}
 				// leaf nodes are results
 				if(!value['children'].length && !value['housekeeping']) {
-					res = $('<a>').attr('href', value['result'])
-						      .attr('class', 'list-group-item')
+					res = $('<a>').attr('class', 'list-group-item clearfix')
+						      .attr('href', value['result'])
 						      .text(_.last(value['root_document'].split('/')));
+					file_buttons = $('<span>').attr('class', 'pull-right');
 					if(value['result']) {
-						res.append($('<span>').attr('class', 'glyphicon glyphicon-ok pull-right'));
+						res.on('click', function(e) {
+							e.preventDefault();
+							$.get(this.href, function(data) {
+								var fragment = Iris.xsltProcessor.transformToFragment(data, document);
+								Iris.fragment = fragment;
+								$('#tei_modal_content').replaceWith(fragment);
+								$('#tei_modal').modal('show');
+							});
+						});
+
+						var link_el = $('<a>').attr('href', value['result'])
+								      .attr('class', 'btn btn-xs btn-success')
+								      .attr('download', _.last(value['result'].split('/')));
+						link_el.append($('<span>').attr('class', 'glyphicon glyphicon-save'));
+						link_el.on('click', function(e) {
+							e.stopPropagation();
+						});
+
+						file_buttons.append(link_el);
 					}
 					// look for failures up the chain and
 					// reduce expected task count
@@ -443,7 +462,7 @@ Iris.Views.Status = Backbone.View.extend({
 					var parent_counter = 1;
 					while(parent) {
 						if(parent['state'] == 'FAILURE') {
-							res.append($('<span>').attr('class', 'glyphicon glyphicon-remove pull-right'));
+							file_buttons.append($('<span>').attr('class', 'glyphicon glyphicon-remove'));
 							tasks -= parent_counter;
 						}
 						parent_counter++;
@@ -452,6 +471,7 @@ Iris.Views.Status = Backbone.View.extend({
 						}
 						parent = parent['parents'][0];
 					}
+					res.append(file_buttons);
 					$('#task-output').append(res);
 				}
 			});
@@ -480,6 +500,11 @@ $(function() {
 
 	// Trigger Bootstrap
 	$('#step-progress .step-bar').tooltip();
+
+	$.get($('#tei_stylesheet').attr('href'), '', function(data) {
+		Iris.xsltProcessor = new XSLTProcessor();
+		Iris.xsltProcessor.importStylesheet(data);
+	});
 
 	window.Iris = Iris; 
 });
