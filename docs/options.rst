@@ -20,7 +20,7 @@ Binarization is an own group of tasks and functions can be accessed using the
 
 .. code-block:: console
 
-    $ nidaba batch ... -b otsu -b sauvola ... -- *.tif
+    $ nidaba batch ... -b otsu -b sauvola:... -- *.tif
 
 Options and Syntax
 ------------------
@@ -44,7 +44,7 @@ switch:
 
 .. code-block:: console
 
-    # nidaba batch ... -l kraken -l tesseract ... -- *.tif
+    # nidaba batch ... -l tesseract ... -- *.tif
 
 Options and Syntax
 ------------------
@@ -53,7 +53,6 @@ Segmentation is usually an integral part of an OCR engine, so different
 implementations are situated in their respective plugins. See :mod:`tesseract
 <nidaba.plugins.tesseract>` and :mod:`kraken <nidaba.plugins.kraken>` for
 additional information.
-
 
 .. _ocr_heading:
 
@@ -66,7 +65,7 @@ accessed using the ``--ocr`` group of task:
 
 .. code-block:: console
 
-    $ nidaba batch ... -o tesseract:eng -o kraken:en-default ... -- *.tif
+    $ nidaba batch ... -o tesseract:languages=\[eng\] -o kraken:model=en-default ... -- *.tif
 
 Options and Syntax
 ------------------
@@ -100,7 +99,7 @@ accessed be the name ``spell_check``, e.g.:
 
 .. code-block:: console
 
-    $ nidaba batch ... -p spell_check:polytonic_greek ... -- *.tif
+    $ nidaba batch ... -p spell_check:language=polytonic_greek,filter_punctuation=False ... -- *.tif
 
 Creating Dictionaries
 ---------------------
@@ -173,13 +172,13 @@ copy it to the storage medium on task invocation:
 
 .. code-block:: console
 
-    $ nidaba batch ...  -f metadata:file:openphilology_meta.yaml -- *.tif
+    $ nidaba batch ...  -f metadata:metadata=file:openphilology_meta.yaml,validate=False -- *.tif
 
 Options and Syntax
 ------------------
 
 .. autofunction:: nidaba.tasks.output.tei_metadata(doc, method, metadata, validate)
-.. autofunction:: nidaba.tasks.output.tei2simplexml(doc, method)
+.. autofunction:: nidaba.tasks.output.tei2abbyyxml(doc, method)
 .. autofunction:: nidaba.tasks.output.tei2hocr(doc, method)
 .. autofunction:: nidaba.tasks.output.tei2txt(doc, method)
 
@@ -190,14 +189,33 @@ Metrics
 
 It is possible to calculate metrics on the textual output to assess its
 deviation from a given ground truth. The ground truth may be in one of several
-supported formats including plain text and hOCR. Currently two schemes for
-calculating character edit distances are included; one using a variant of the
-well-known ``diff`` algorithm and a task calculating the global minimal edit
-distance:
+supported formats including plain text, hOCR, and TEI XML. Currently two
+schemes for calculating character edit distances are included; one using a
+variant of the well-known ``diff`` algorithm and a task calculating the global
+minimal edit distance:
 
 .. code-block:: console
 
-   $ nidaba batch ... -s text_edit_ratio:file:14.gt.txt,gt_format=text -- 14.tif
+   $ nidaba batch ... -s text_edit_ratio:ground_truth=file:'*.gt.txt',xml_in=True,clean_gt=True,gt_format=text,clean_in=True,divert=True -- *.tif
+
+Note that we didn't associate a single ground truth with the batch but a
+pattern matching one more ground truth files. On runtime the task automatically
+selects the needed ground truth for its OCR result based on the filename prefix.
+
+Access to the metric is provided by the usual ``status`` command:
+
+.. code-block:: console
+
+  $ nidaba status 481964c3-fe5d-487a-9b73-a12869678ab3
+  Status: success (final)
+
+  3/3 tasks completed. 0 running.
+
+  Output files:
+
+  0016.tif → 0016_ocr.kraken_teubner.xml (94.0% / 0016.gt.txt)
+
+As you can see we got an accuracy of 94% on our scans which is good but not great.
 
 Options and Syntax
 ------------------

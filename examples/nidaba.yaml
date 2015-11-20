@@ -23,10 +23,11 @@ ocropus_models:
   fraktur: [models, fraktur.pyrnn.gz]
   fancy_ligatures: [models, ligatures.pyrnn.gz]
 
-# Models solely working with kraken (i.e. models in HDF5 format).
+# Models solely working with kraken (i.e. models in pronn format or CLSTM
+# models).
 kraken_models:
-  default: [models, en-default.hdf5]
-
+  default: [models, en-default.pronn]
+  fraktur_clstm: [models, fraktur.clstm]
 
 # List of plugins to load. Additional fields in the associative array will be
 # handed over to the setup function of the plugin.  Be aware that plugins
