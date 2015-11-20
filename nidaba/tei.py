@@ -171,8 +171,7 @@ class TEIFacsimile(object):
         """
         Returns a tuple containing a source document's path and its dimensions.
         """
-        surface = self.doc.find('//' + self.tei_ns + 'sourceDoc/' + self.tei_ns
-                                + 'surface')
+        surface = self.doc.find('//{0}sourceDoc/{0}surface'.format(self.tei_ns))
         return (surface.get('ulx'),
                 surface.get('uly'),
                 surface.get('lrx'),
@@ -226,8 +225,9 @@ class TEIFacsimile(object):
         Raises:
             NidabaTEIException if the identifier is unknown
         """
-        if self.doc.find(".//" + self.tei_ns + "respStmt[@" + self.xml_ns +
-                         "id='" + id + "']") is None:
+        if self.doc.find(".//{0}respStmt[@{1}id='{2}']".format(self.tei_ns,
+                                                               self.xml_ns,
+                                                               id)) is None:
             raise NidabaTEIException('No such responsibility statement.')
         self.resp = id
 
@@ -252,8 +252,8 @@ class TEIFacsimile(object):
         Args:
             dim (tuple): A tuple containing the bounding box (x0, y0, x1, y1)
         """
-        surface = self.doc.find('.//' + self.tei_ns + 'surface')
-        self.line_scope = SubElement(surface, self.tei_ns + 'line',
+        surface_zone = self.doc.find('.//{0}surface/{0}zone'.format(self.tei_ns))
+        self.line_scope = SubElement(surface_zone, self.tei_ns + 'line',
                                      ulx=str(dim[0]), uly=str(dim[1]),
                                      lrx=str(dim[2]), lry=str(dim[3]))
         self.line_cnt += 1
@@ -595,8 +595,7 @@ class TEIFacsimile(object):
         """
         page = etree.Element('document')
         p = etree.SubElement(page, 'page')
-        surface = self.doc.find('.//' + self.tei_ns + 'sourceDoc/' + self.tei_ns
-                                + 'surface')
+        surface = self.doc.find('.//{0}sourceDoc/{0}surface'.format(self.tei_ns))
         p.set('width', surface.get('lrx'))
         p.set('height', surface.get('lry'))
         p.set('originalCoords', '1')
