@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nidaba package &mdash; nidaba 0.9
+    <title>nidaba package &mdash; nidaba 0.9.6
  documentation</title>
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.9
+        VERSION:     '0.9.6
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.9
+    <link rel="top" title="nidaba 0.9.6
  documentation" href="../index.html" />
     <link rel="up" title="nidaba" href="modules.html" />
     <link rel="next" title="nidaba.algorithms package" href="nidaba.algorithms.html" />
@@ -709,15 +709,11 @@ values out of the list may be picked and value ranges</p>
 <span id="nidaba-cli-module"></span><h2>nidaba.cli module<a class="headerlink" href="#module-nidaba.cli" title="Permalink to this headline">¶</a></h2>
 <p>This module encapsulates all shell callable functions of nidaba.</p>
 <dl class="function">
-<dt id="nidaba.cli.help_tasks">
-<code class="descclassname">nidaba.cli.</code><code class="descname">help_tasks</code><span class="sig-paren">(</span><em>ctx</em>, <em>param</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.help_tasks" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nidaba.cli.int_float_bool_or_str">
-<code class="descclassname">nidaba.cli.</code><code class="descname">int_float_bool_or_str</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.int_float_bool_or_str" title="Permalink to this definition">¶</a></dt>
+<dt id="nidaba.cli.conv_arg_string">
+<code class="descclassname">nidaba.cli.</code><code class="descname">conv_arg_string</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.conv_arg_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>A small helper function intended to coerce an input string to types in the
-order int -&gt; float -&gt; bool -&gt; unicode -&gt; input.</p>
+order int -&gt; float -&gt; bool -&gt; unicode -&gt; input. Also resolves lists of
+these values.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -732,6 +728,11 @@ to the highest data type in the ordering.</td>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="function">
+<dt id="nidaba.cli.help_tasks">
+<code class="descclassname">nidaba.cli.</code><code class="descname">help_tasks</code><span class="sig-paren">(</span><em>ctx</em>, <em>param</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.cli.help_tasks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="nidaba.cli.move_to_storage">
@@ -1377,29 +1378,6 @@ The document tuple does not refer to a file.</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="nidaba.nidaba.Batch.add_scratchpad">
-<code class="descname">add_scratchpad</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.add_scratchpad" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a scratchpad to the database that allows suspending and resuming
-task assembly.</p>
-<p>All added documents and tasks will be stored persistently;
-reinstantiating the Batch object and calling restore_scratchpad will
-restore the object to the previous state.</p>
-<p>The scratchpad will be destroyed on task execution.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><strong>NidabaInputException if a scratchpad is already attached or the</strong> &#8211;</li>
-<li><strong>batch has been executed.</strong> &#8211;</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="nidaba.nidaba.Batch.add_step">
 <code class="descname">add_step</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.add_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a new step to the batch definition.</p>
@@ -1511,25 +1489,6 @@ SUCCESS: The batch has completed successfully.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">(unicode)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="nidaba.nidaba.Batch.restore_scratchpad">
-<code class="descname">restore_scratchpad</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.nidaba.Batch.restore_scratchpad" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves the scratchpad from the database and restores its contents
-to the current Batch object overwriting any information defined in it.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><strong>NidabaInputException if no scratchpad can be found either because</strong> &#8211;</li>
-<li><strong>none has been attached or the batch has already been executed.</strong> &#8211;</li>
-</ul>
-</td>
 </tr>
 </tbody>
 </table>
@@ -2490,12 +2449,12 @@ of the given arguments and keywords.</p>
 
 <dl class="attribute">
 <dt id="nidaba.tei.TEIFacsimile.fields">
-<code class="descname">fields</code><em class="property"> = OrderedDict([(u'title', (u'titleStmt', u'/{http://www.tei-c.org/ns/1.0}title')), (u'author', (u'titleStmt', u'/{http://www.tei-c.org/ns/1.0}author', u'ref')), (u'editor', (u'titleStmt', u'/{http://www.tei-c.org/ns/1.0}editor', u'ref')), (u'funder', (u'titleStmt', u'/{http://www.tei-c.org/ns/1.0}funder', u'ref')), (u'principal', (u'titleStmt', u'/{http://www.tei-c.org/ns/1.0}principal', u'ref')), (u'sponsor', (u'titleStmt', u'/{http://www.tei-c.org/ns/1.0}sponsor', u'ref')), (u'meeting', (u'titleStmt', u'/{http://www.tei-c.org/ns/1.0}meeting', u'meeting')), (u'edition', (u'editionStmt', u'/{http://www.tei-c.org/ns/1.0}edition')), (u'publisher', (u'publicationStmt', u'/{http://www.tei-c.org/ns/1.0}publisher', u'target')), (u'distributor', (u'publicationStmt', u'/{http://www.tei-c.org/ns/1.0}distributor', u'target')), (u'authority', (u'publicationStmt', u'/{http://www.tei-c.org/ns/1.0}authority', u'target')), (u'idno', (u'publicationStmt', u'/{http://www.tei-c.org/ns/1.0}idno', u'type')), (u'pub_place', (u'publicationStmt', u'/{http://www.tei-c.org/ns/1.0}pubPlace')), (u'licence', (u'publicationStmt', u'/{http://www.tei-c.org/ns/1.0}availability/{http://www.tei-c.org/ns/1.0}licence', u'target')), (u'series_title', (u'seriesStmt', u'/{http://www.tei-c.org/ns/1.0}p')), (u'note', (u'notesStmt', u'/{http://www.tei-c.org/ns/1.0}notes')), (u'source_desc', (u'sourceDesc', u'/{http://www.tei-c.org/ns/1.0}p'))])</em><a class="headerlink" href="#nidaba.tei.TEIFacsimile.fields" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fields</code><em class="property"> = OrderedDict([('title', ('titleStmt', '/{http://www.tei-c.org/ns/1.0}title')), ('author', ('titleStmt', '/{http://www.tei-c.org/ns/1.0}author', 'ref')), ('editor', ('titleStmt', '/{http://www.tei-c.org/ns/1.0}editor', 'ref')), ('funder', ('titleStmt', '/{http://www.tei-c.org/ns/1.0}funder', 'ref')), ('principal', ('titleStmt', '/{http://www.tei-c.org/ns/1.0}principal', 'ref')), ('sponsor', ('titleStmt', '/{http://www.tei-c.org/ns/1.0}sponsor', 'ref')), ('meeting', ('titleStmt', '/{http://www.tei-c.org/ns/1.0}meeting', 'meeting')), ('edition', ('editionStmt', '/{http://www.tei-c.org/ns/1.0}edition')), ('publisher', ('publicationStmt', '/{http://www.tei-c.org/ns/1.0}publisher', 'target')), ('distributor', ('publicationStmt', '/{http://www.tei-c.org/ns/1.0}distributor', 'target')), ('authority', ('publicationStmt', '/{http://www.tei-c.org/ns/1.0}authority', 'target')), ('idno', ('publicationStmt', '/{http://www.tei-c.org/ns/1.0}idno', 'type')), ('pub_place', ('publicationStmt', '/{http://www.tei-c.org/ns/1.0}pubPlace')), ('licence', ('publicationStmt', '/{http://www.tei-c.org/ns/1.0}availability/{http://www.tei-c.org/ns/1.0}licence', 'target')), ('series_title', ('seriesStmt', '/{http://www.tei-c.org/ns/1.0}p')), ('note', ('notesStmt', '/{http://www.tei-c.org/ns/1.0}notes')), ('source_desc', ('sourceDesc', '/{http://www.tei-c.org/ns/1.0}p'))])</em><a class="headerlink" href="#nidaba.tei.TEIFacsimile.fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="nidaba.tei.TEIFacsimile.fileDesc">
-<code class="descname">fileDesc</code><em class="property"> = [u'titleStmt', u'editionStmt', u'publicationStmt', u'seriesStmt', u'notesStmt', u'sourceDesc']</em><a class="headerlink" href="#nidaba.tei.TEIFacsimile.fileDesc" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fileDesc</code><em class="property"> = ['titleStmt', 'editionStmt', 'publicationStmt', 'seriesStmt', 'notesStmt', 'sourceDesc']</em><a class="headerlink" href="#nidaba.tei.TEIFacsimile.fileDesc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2676,7 +2635,7 @@ of the given arguments and keywords.</p>
 
 <dl class="attribute">
 <dt id="nidaba.tei.TEIFacsimile.tei_ns">
-<code class="descname">tei_ns</code><em class="property"> = u'{http://www.tei-c.org/ns/1.0}'</em><a class="headerlink" href="#nidaba.tei.TEIFacsimile.tei_ns" title="Permalink to this definition">¶</a></dt>
+<code class="descname">tei_ns</code><em class="property"> = '{http://www.tei-c.org/ns/1.0}'</em><a class="headerlink" href="#nidaba.tei.TEIFacsimile.tei_ns" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2701,9 +2660,17 @@ of the given arguments and keywords.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="nidaba.tei.TEIFacsimile.write_hocr">
-<code class="descname">write_hocr</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.write_hocr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes the TEI document as an hOCR file.</p>
+<dt id="nidaba.tei.TEIFacsimile.write_abbyyxml">
+<code class="descname">write_abbyyxml</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.write_abbyyxml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the TEI document in a format reminiscent of Abbyy FineReader&#8217;s
+XML output. Its basic format is:</p>
+<p>&lt;text&gt;
+&lt;line l=&#8221;0&#8221; r=&#8221;111&#8221; t=&#8221;6&#8221; b=&#8221;89&#8221;&gt;
+&lt;charParams l=&#8221;0&#8221; r=&#8221;78&#8221; t=&#8221;6&#8221; b=&#8221;89&#8221; charConfidence=&#8221;76&#8221; wordStart=&#8221;true&#8221;&gt;D&lt;/charParams&gt;
+&lt;charParams l=&#8221;86&#8221; r=&#8221;111&#8221; t=&#8221;24&#8221; b=&#8221;89&#8221; charConfidence=&#8221;76&#8221; wordStart=&#8221;false&#8221;&gt;e&lt;/charParams&gt;
+&lt;/line&gt;
+....
+&lt;/text&gt;</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2715,14 +2682,9 @@ of the given arguments and keywords.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="nidaba.tei.TEIFacsimile.write_simplexml">
-<code class="descname">write_simplexml</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.write_simplexml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes the TEI document as a grapheme cloud in a simple XML format. Its basic format is:</p>
-<p>&lt;text&gt;
-&lt;charParams l=&#8221;0&#8221; r=&#8221;78&#8221; t=&#8221;6&#8221; b=&#8221;89&#8221; charConfidence=&#8221;76&#8221; wordStart=&#8221;true&#8221;&gt;D&lt;/charParams&gt;
-&lt;charParams l=&#8221;86&#8221; r=&#8221;111&#8221; t=&#8221;24&#8221; b=&#8221;89&#8221; charConfidence=&#8221;76&#8221; wordStart=&#8221;false&#8221;&gt;e&lt;/charParams&gt;
-....
-&lt;/text&gt;</p>
+<dt id="nidaba.tei.TEIFacsimile.write_hocr">
+<code class="descname">write_hocr</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tei.TEIFacsimile.write_hocr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the TEI document as an hOCR file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2749,7 +2711,7 @@ of the given arguments and keywords.</p>
 
 <dl class="attribute">
 <dt id="nidaba.tei.TEIFacsimile.xml_ns">
-<code class="descname">xml_ns</code><em class="property"> = u'{http://www.w3.org/XML/1998/namespace}'</em><a class="headerlink" href="#nidaba.tei.TEIFacsimile.xml_ns" title="Permalink to this definition">¶</a></dt>
+<code class="descname">xml_ns</code><em class="property"> = '{http://www.w3.org/XML/1998/namespace}'</em><a class="headerlink" href="#nidaba.tei.TEIFacsimile.xml_ns" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Option Groups &mdash; nidaba 0.9
+    <title>Option Groups &mdash; nidaba 0.9.6
  documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.9
+        VERSION:     '0.9.6
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.9
+    <link rel="top" title="nidaba 0.9.6
  documentation" href="index.html" />
     <link rel="next" title="TEI Output" href="tei.html" />
     <link rel="prev" title="Plugins" href="plugins.html" />
@@ -53,7 +53,7 @@ methods implemented in nidaba operate only on bi-level images, it is paramount
 to create properly binarized images as a preprocessing step.</p>
 <p>Binarization is an own group of tasks and functions can be accessed using the
 <code class="docutils literal"><span class="pre">--binarization/-b</span></code> switch:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -b otsu -b sauvola ... -- *.tif
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -b otsu -b sauvola:... -- *.tif
 </pre></div>
 </div>
 <div class="section" id="options-and-syntax">
@@ -93,7 +93,7 @@ the <a class="reference internal" href="source/nidaba.plugins.html#module-nidaba
 columns, paragraphs, and lines, from the page. Page segmentation is a separate
 group of tasks and functions can be accessed using the <code class="docutils literal"><span class="pre">--segmentation/-l</span></code>
 switch:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="gp">#</span> nidaba batch ... -l kraken -l tesseract ... -- *.tif
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">#</span> nidaba batch ... -l tesseract ... -- *.tif
 </pre></div>
 </div>
 <div class="section" id="id2">
@@ -108,7 +108,7 @@ additional information.</p>
 <p><a class="reference external" href="http://en.wikipedia.org/wiki/Optical_character_recognition">OCR</a> is arguably
 the main part of nidaba. Currently 3 OCR engines are implemented and can be
 accessed using the <code class="docutils literal"><span class="pre">--ocr</span></code> group of task:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -o tesseract:eng -o kraken:en-default ... -- *.tif
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -o tesseract:languages<span class="o">=</span><span class="se">\[</span>eng<span class="se">\]</span> -o kraken:model<span class="o">=</span>en-default ... -- *.tif
 </pre></div>
 </div>
 <div class="section" id="id3">
@@ -134,7 +134,7 @@ section:</p>
 </div>
 <p>The spell-checker is part of the postprocessing group of tasks and can be
 accessed be the name <code class="docutils literal"><span class="pre">spell_check</span></code>, e.g.:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -p spell_check:polytonic_greek ... -- *.tif
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -p spell_check:language<span class="o">=</span>polytonic_greek,filter_punctuation<span class="o">=</span>False ... -- *.tif
 </pre></div>
 </div>
 <div class="section" id="creating-dictionaries">
@@ -221,7 +221,7 @@ plain text, hOCR, and a simple XML format. It can also use an external metadata
 file to complete raw TEI output to a valid TEI document.</p>
 <p>An example adding metadata from an external file using the <code class="docutils literal"><span class="pre">file:</span></code> syntax to
 copy it to the storage medium on task invocation:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ...  -f metadata:file:openphilology_meta.yaml -- *.tif
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ...  -f metadata:metadata<span class="o">=</span>file:openphilology_meta.yaml,validate<span class="o">=</span>False -- *.tif
 </pre></div>
 </div>
 <div class="section" id="id8">
@@ -360,9 +360,10 @@ directory.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="nidaba.tasks.output.tei2simplexml">
-<code class="descclassname">nidaba.tasks.output.</code><code class="descname">tei2simplexml</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.output.tei2simplexml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a TEI Facsimile to hOCR preserving as much metadata as possible.</p>
+<dt id="nidaba.tasks.output.tei2abbyyxml">
+<code class="descclassname">nidaba.tasks.output.</code><code class="descname">tei2abbyyxml</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.output.tei2abbyyxml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a TEI Facsimile to a format similar to Abbyy FineReader&#8217;s XML
+output.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -419,13 +420,28 @@ directory.</p>
 <span id="id9"></span><h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
 <p>It is possible to calculate metrics on the textual output to assess its
 deviation from a given ground truth. The ground truth may be in one of several
-supported formats including plain text and hOCR. Currently two schemes for
-calculating character edit distances are included; one using a variant of the
-well-known <code class="docutils literal"><span class="pre">diff</span></code> algorithm and a task calculating the global minimal edit
-distance:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -s text_edit_ratio:file:14.gt.txt,gt_format<span class="o">=</span>text -- 14.tif
+supported formats including plain text, hOCR, and TEI XML. Currently two
+schemes for calculating character edit distances are included; one using a
+variant of the well-known <code class="docutils literal"><span class="pre">diff</span></code> algorithm and a task calculating the global
+minimal edit distance:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -s text_edit_ratio:ground_truth<span class="o">=</span>file:<span class="s1">&#39;*.gt.txt&#39;</span>,xml_in<span class="o">=</span>True,clean_gt<span class="o">=</span>True,gt_format<span class="o">=</span>text,clean_in<span class="o">=</span>True,divert<span class="o">=</span>True -- *.tif
 </pre></div>
 </div>
+<p>Note that we didn&#8217;t associate a single ground truth with the batch but a
+pattern matching one more ground truth files. On runtime the task automatically
+selects the needed ground truth for its OCR result based on the filename prefix.</p>
+<p>Access to the metric is provided by the usual <code class="docutils literal"><span class="pre">status</span></code> command:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba status 481964c3-fe5d-487a-9b73-a12869678ab3
+<span class="go">Status: success (final)</span>
+
+<span class="go">3/3 tasks completed. 0 running.</span>
+
+<span class="go">Output files:</span>
+
+<span class="go">0016.tif → 0016_ocr.kraken_teubner.xml (94.0% / 0016.gt.txt)</span>
+</pre></div>
+</div>
+<p>As you can see we got an accuracy of 94% on our scans which is good but not great.</p>
 <div class="section" id="id10">
 <h3>Options and Syntax<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
@@ -441,10 +457,15 @@ value between 0.0 (no commonality) and 1.0 (identical strings).</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple</li>
 <li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to the output file.</li>
-<li><strong>ground_truth</strong> (<em>unicode</em>) &#8211; Ground truth location tuple</li>
+<li><strong>ground_truth</strong> (<em>unicode</em>) &#8211; Ground truth location tuple or a list of ground
+truths to choose from. When more than one is
+given, the file sharing the longest prefix with
+the input document is chosen.</li>
 <li><strong>xml_in</strong> (<em>bool</em>) &#8211; Switch to treat input as an TEI-XML document.</li>
 <li><strong>gt_format</strong> (<em>unicode</em>) &#8211; Switch to select ground truth format. Valid values
 are &#8216;tei&#8217;, &#8216;hocr&#8217;, and &#8216;text&#8217;.</li>
+<li><strong>clean_in</strong> (<em>bool</em>) &#8211; Normalize to NFD and strip input data. (DO NOT DISABLE!)</li>
+<li><strong>clean_gt</strong> (<em>bool</em>) &#8211; Normalize to NFD and strip ground truth. (DO NOT DISABLE!)</li>
 <li><strong>divert</strong> (<em>bool</em>) &#8211; Switch selecting output diversion. If enabled the output
 will be added to the tracking arguments and the input
 document will be returned as the result of the task. Use
@@ -476,10 +497,15 @@ using the Damerau-Levenshtein distance. The result is a value between 0.0
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple</li>
 <li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to the output file.</li>
-<li><strong>ground_truth</strong> (<em>unicode</em>) &#8211; Ground truth location tuple</li>
+<li><strong>ground_truth</strong> (<em>unicode</em>) &#8211; Ground truth location tuple or a list of ground
+truths to choose from. When more than one is
+given, the file sharing the longest prefix with
+the input document is chosen.</li>
 <li><strong>xml_in</strong> (<em>bool</em>) &#8211; Switch to treat input as an TEI-XML document.</li>
 <li><strong>gt_format</strong> (<em>unicode</em>) &#8211; Switch to select ground truth format. Valid values
 are &#8216;tei&#8217;, &#8216;hocr&#8217;, and &#8216;text&#8217;.</li>
+<li><strong>clean_in</strong> (<em>bool</em>) &#8211; Normalize to NFD and strip input data. (DO NOT DISABLE!)</li>
+<li><strong>clean_gt</strong> (<em>bool</em>) &#8211; Normalize to NFD and strip ground truth. (DO NOT DISABLE!)</li>
 <li><strong>divert</strong> (<em>bool</em>) &#8211; Switch selecting output diversion. If enabled the output
 will be added to the tracking arguments and the input
 document will be returned as the result of the task. Use

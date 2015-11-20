@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>TEI Output &mdash; nidaba 0.9
+    <title>TEI Output &mdash; nidaba 0.9.6
  documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.9
+        VERSION:     '0.9.6
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.9
+    <link rel="top" title="nidaba 0.9.6
  documentation" href="index.html" />
     <link rel="next" title="RESTful API" href="api.html" />
     <link rel="prev" title="Option Groups" href="options.html" />
@@ -53,30 +53,34 @@ further manual annotation.</p>
 <p>Fundamentally output is generated following the <a class="reference external" href="http://www.tei-c.org/release/doc/tei-p5-doc/en/html/PH.html#PHZLAB">embedded transcription</a> scheme
 with a single surface containing all recognized line elements with their
 textual representation.</p>
-<p>The skeleton of a TEI-OCR file will look like this:</p>
+<p>The (body) skeleton of a TEI-OCR file will look like this:</p>
 <div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;sourceDoc&gt;</span>
     <span class="nt">&lt;surface</span> <span class="na">ulx=</span><span class="s">&quot;0&quot;</span> <span class="na">uly=</span><span class="s">&quot;0&quot;</span> <span class="na">lrx=</span><span class="s">&quot;500&quot;</span> <span class="na">lry=</span><span class="s">&quot;500&quot;</span><span class="nt">&gt;</span>
         <span class="nt">&lt;graphic</span> <span class="na">url=</span><span class="s">&quot;foo.png&quot;</span><span class="nt">/&gt;</span>
         <span class="nt">&lt;zone&gt;</span>
-            <span class="nt">&lt;line</span> <span class="na">ulx=</span><span class="s">a</span> <span class="na">uly=</span><span class="s">b</span> <span class="na">lrx=</span><span class="s">c</span> <span class="na">lry=</span><span class="s">d</span><span class="nt">&gt;</span>
-                <span class="nt">&lt;zone</span> <span class="na">ulx=</span><span class="s">e</span> <span class="na">uly=</span><span class="s">f</span> <span class="na">lrx=</span><span class="s">g</span> <span class="na">lry=</span><span class="s">h</span> <span class="na">type=</span><span class="s">&#39;word&#39;</span><span class="nt">&gt;</span>
-                    <span class="nt">&lt;seg&gt;</span>
-                        <span class="nt">&lt;zone</span> <span class="na">ulx=</span><span class="s">i</span> <span class="na">uly=</span><span class="s">j</span> <span class="na">lrx=</span><span class="s">k</span> <span class="na">lry=</span><span class="s">l</span> <span class="na">type=</span><span class="s">&quot;grapheme&quot;</span><span class="nt">&gt;</span>
-                            <span class="nt">&lt;g&gt;</span>A<span class="nt">&lt;/g&gt;</span>
-                        <span class="nt">&lt;/zone&gt;</span>
-                        <span class="nt">&lt;zone</span> <span class="na">ulx=</span><span class="s">i</span> <span class="na">uly=</span><span class="s">j</span> <span class="na">lrx=</span><span class="s">k</span> <span class="na">lry=</span><span class="s">l</span> <span class="na">type=</span><span class="s">&quot;grapheme&quot;</span><span class="nt">&gt;</span>
-                            <span class="nt">&lt;g&gt;</span>w<span class="nt">&lt;/g&gt;</span>
-                        <span class="nt">&lt;/zone&gt;</span>
-                        <span class="nt">&lt;zone</span> <span class="na">ulx=</span><span class="s">i</span> <span class="na">uly=</span><span class="s">j</span> <span class="na">lrx=</span><span class="s">k</span> <span class="na">lry=</span><span class="s">l</span> <span class="na">type=</span><span class="s">&quot;grapheme&quot;</span><span class="nt">&gt;</span>
-                            <span class="nt">&lt;g&gt;</span>o<span class="nt">&lt;/g&gt;</span>
-                        <span class="nt">&lt;/zone&gt;</span>
-                        ...
-                    <span class="nt">&lt;/seg&gt;</span>
+            <span class="nt">&lt;line</span> <span class="na">ulx=</span><span class="s">a</span> <span class="na">uly=</span><span class="s">b</span> <span class="na">lrx=</span><span class="s">c</span> <span class="na">lry=</span><span class="s">d</span> <span class="na">resp=</span><span class="s">&quot;#resp_0&quot;</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;zone</span> <span class="na">lrx=</span><span class="s">&quot;1028&quot;</span> <span class="na">lry=</span><span class="s">&quot;182&quot;</span> <span class="na">type=</span><span class="s">&quot;segment&quot;</span> <span class="na">ulx=</span><span class="s">&quot;593&quot;</span> <span class="na">uly=</span><span class="s">&quot;119&quot;</span> <span class="na">xml:id=</span><span class="s">&quot;seg_0&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span><span class="nt">&gt;</span>
+                    <span class="nt">&lt;zone</span> <span class="na">lrx=</span><span class="s">&quot;629&quot;</span> <span class="na">lry=</span><span class="s">&quot;182&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span> <span class="na">type=</span><span class="s">&quot;grapheme&quot;</span> <span class="na">ulx=</span><span class="s">&quot;593&quot;</span> <span class="na">uly=</span><span class="s">&quot;119&quot;</span><span class="nt">&gt;</span>
+                        <span class="nt">&lt;seg&gt;</span>
+                            <span class="nt">&lt;g</span> <span class="na">xml:id=</span><span class="s">&quot;grapheme_0&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span><span class="nt">&gt;</span>5<span class="nt">&lt;/g&gt;</span>
+                        <span class="nt">&lt;/seg&gt;</span>
+                        <span class="nt">&lt;certainty</span> <span class="na">degree=</span><span class="s">&quot;0.83&quot;</span> <span class="na">locus=</span><span class="s">&quot;value&quot;</span> <span class="na">target=</span><span class="s">&quot;#grapheme_0&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span><span class="nt">/&gt;</span>
+                    <span class="nt">&lt;/zone&gt;</span>
+                    <span class="nt">&lt;zone</span> <span class="na">lrx=</span><span class="s">&quot;1028&quot;</span> <span class="na">lry=</span><span class="s">&quot;182&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span> <span class="na">type=</span><span class="s">&quot;grapheme&quot;</span> <span class="na">ulx=</span><span class="s">&quot;629&quot;</span> <span class="na">uly=</span><span class="s">&quot;119&quot;</span><span class="nt">&gt;</span>
+                        <span class="nt">&lt;seg&gt;</span>
+                            <span class="nt">&lt;g</span> <span class="na">xml:id=</span><span class="s">&quot;grapheme_1&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span><span class="nt">&gt;</span>4<span class="nt">&lt;/g&gt;</span>
+                        <span class="nt">&lt;/seg&gt;</span>
+                        <span class="nt">&lt;certainty</span> <span class="na">degree=</span><span class="s">&quot;0.99&quot;</span> <span class="na">locus=</span><span class="s">&quot;value&quot;</span> <span class="na">target=</span><span class="s">&quot;#grapheme_1&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span><span class="nt">/&gt;</span>
+                    <span class="nt">&lt;/zone&gt;</span>
                 <span class="nt">&lt;/zone&gt;</span>
-                <span class="nt">&lt;zone</span> <span class="na">ulx=</span><span class="s">e</span> <span class="na">uly=</span><span class="s">f</span> <span class="na">lrx=</span><span class="s">g</span> <span class="na">lry=</span><span class="s">h</span> <span class="na">type=</span><span class="s">&#39;word&#39;</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;zone</span> <span class="na">lrx=</span><span class="s">&quot;1066&quot;</span> <span class="na">lry=</span><span class="s">&quot;182&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span> <span class="na">type=</span><span class="s">&quot;grapheme&quot;</span> <span class="na">ulx=</span><span class="s">&quot;1028&quot;</span> <span class="na">uly=</span><span class="s">&quot;119&quot;</span><span class="nt">&gt;</span>
                     <span class="nt">&lt;seg&gt;</span>
-                    ...
+                        <span class="nt">&lt;g</span> <span class="na">xml:id=</span><span class="s">&quot;grapheme_2&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span><span class="nt">&gt;</span> <span class="nt">&lt;/g&gt;</span>
                     <span class="nt">&lt;/seg&gt;</span>
+                    <span class="nt">&lt;certainty</span> <span class="na">degree=</span><span class="s">&quot;0.97&quot;</span> <span class="na">locus=</span><span class="s">&quot;value&quot;</span> <span class="na">target=</span><span class="s">&quot;#grapheme_2&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;/zone&gt;</span>
+                <span class="nt">&lt;zone</span> <span class="na">lrx=</span><span class="s">&quot;1199&quot;</span> <span class="na">lry=</span><span class="s">&quot;182&quot;</span> <span class="na">type=</span><span class="s">&quot;segment&quot;</span> <span class="na">ulx=</span><span class="s">&quot;1066&quot;</span> <span class="na">uly=</span><span class="s">&quot;119&quot;</span> <span class="na">xml:id=</span><span class="s">&quot;seg_1&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span><span class="nt">&gt;</span>
+                ...
                 <span class="nt">&lt;/zone&gt;</span>
             <span class="nt">&lt;/line&gt;</span>
             <span class="nt">&lt;line</span> <span class="na">ulx=</span><span class="s">a</span> <span class="na">uly=</span><span class="s">b</span> <span class="na">lrx=</span><span class="s">c</span> <span class="na">lry=</span><span class="s">d</span><span class="nt">&gt;</span>
@@ -95,6 +99,11 @@ recognition engine. These entities are called <a class="reference external" href
 character/codepoint, multiple codepoints or in the case of ligatures
 decomposited by the engine even to multiple characters (œ to oe).</p>
 </div>
+</div>
+<div class="section" id="header">
+<h2>Header<a class="headerlink" href="#header" title="Permalink to this headline">¶</a></h2>
+<p>Most of the TEI header is filled using the
+<a class="reference internal" href="options.html#nidaba.tasks.output.tei_metadata" title="nidaba.tasks.output.tei_metadata"><code class="xref py py-func docutils literal"><span class="pre">nidaba.tasks.output.tei_metadata()</span></code></a> task.</p>
 </div>
 <div class="section" id="attribution">
 <h2>Attribution<a class="headerlink" href="#attribution" title="Permalink to this headline">¶</a></h2>
@@ -127,7 +136,9 @@ spellings provided by a spell checker will also be properly attributed.</p>
 <p>Some recognition results will have a confidence value using the certainty tag
 associated with them:</p>
 <div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;zone</span> <span class="na">lrx=</span><span class="s">&quot;526&quot;</span> <span class="na">lry=</span><span class="s">&quot;291&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span> <span class="na">type=</span><span class="s">&quot;grapheme&quot;</span> <span class="na">ulx=</span><span class="s">&quot;422&quot;</span> <span class="na">uly=</span><span class="s">&quot;225&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;g</span> <span class="na">xml:id=</span><span class="s">&quot;grapheme_0&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span><span class="nt">&gt;</span>Μ<span class="nt">&lt;/g&gt;</span>
+    <span class="nt">&lt;seg&gt;</span>
+        <span class="nt">&lt;g</span> <span class="na">xml:id=</span><span class="s">&quot;grapheme_0&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span><span class="nt">&gt;</span>Μ<span class="nt">&lt;/g&gt;</span>
+    <span class="nt">&lt;/seg&gt;</span>
     <span class="nt">&lt;certainty</span> <span class="na">degree=</span><span class="s">&quot;0.76&quot;</span> <span class="na">locus=</span><span class="s">&quot;value&quot;</span> <span class="na">target=</span><span class="s">&quot;#grapheme_0&quot;</span> <span class="na">resp=</span><span class="s">&quot;#resp_1&quot;</span><span class="nt">/&gt;</span>
 <span class="nt">&lt;/zone&gt;</span>
 </pre></div>
@@ -176,6 +187,7 @@ higher values indicating higher confidence in the results.</p>
 <li class="toctree-l1"><a class="reference internal" href="options.html">Option Groups</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">TEI</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#format">Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#header">Header</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#attribution">Attribution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#certainty">Certainty</a></li>
 </ul>

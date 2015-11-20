@@ -146,6 +146,7 @@ framework:
 .. code-block:: yaml
 
         storage_path: ~/OCR
+        redis_url: 'redis://127.0.0.1:6379'
         lang_dicts:
           polytonic_greek: {dictionary: [dicts, greek.dic], 
                             deletion_dictionary: [dicts, del_greek.dic]}
@@ -157,7 +158,8 @@ framework:
           fraktur: [models, fraktur.pyrnn.gz]
           fancy_ligatures: [models, ligatures.pyrnn.gz]
         kraken_models:
-          default: [models, en-default.hdf5]
+          default: [models, en-default.pronn]
+          fraktur_clstm: [models, fraktur.clstm]
         plugins_load:
           tesseract: {implementation: capi,
                      tessdata: /usr/share/tesseract-ocr}
@@ -171,6 +173,11 @@ framework:
 The home directory for nidaba to store files created by OCR jobs, i.e. the
 location of the shared storage medium. This may differ on different machines in
 the cluster.
+
+``redis_url``
+
+URL to the Redis key-value store which is required in addition to celery's
+broker but may be shared.
 
 ``lang_dicts`` (optional)
 
@@ -190,7 +197,7 @@ Running
 =======
 
 Celery requires a worker retrieving tasks from the message broker to actually
-execute them.  Starting the celery worker server is quite simple and the only
+execute them. Starting the celery worker server is quite simple and the only
 requirement is that it is NOT run inside the nidaba directory and the message
 broker is up and running:
 
@@ -215,7 +222,15 @@ The ``config`` subcommand is used to inspect the current nidabaconfig.py:
 .. code-block:: console
 
         $ nidaba config
-        {'kraken_models': {'default': ['models', 'en-default.hdf5']},
+        {'kraken_models': {'goodell': ['models', 'goodell.pyrnn.pronn'],
+                           'loeb_2013': ['models', 'loeb.pronn'],
+                           'migne': ['models', 'migne.pronn'],
+                           'migne_2013': ['models', 'migne_2013.pronn'],
+                           'non-teubner': ['models', 'non-teubner-german-serif.pronn'],
+                           'omnibus': ['models', 'omnibus.pyrnn.pronn'],
+                           'porson': ['models', 'porson.pyrnn.pronn'],
+                           'rahlfs': ['models', 'rahlfs.pyrnn.pronn'],
+                           'teubner': ['models', 'teubner-serif.pyrnn.pronn']},
          'lang_dicts': {'latin': {'deletion_dictionary': ['dicts', 'del_latin.dic'],
                                   'dictionary': ['dicts', 'latin.dic']},
                         'polytonic_greek': {'deletion_dictionary': ['dicts',
@@ -225,8 +240,10 @@ The ``config`` subcommand is used to inspect the current nidabaconfig.py:
                             'fancy_ligatures': ['models', 'ligatures.pyrnn.gz'],
                             'fraktur': ['models', 'fraktur.pyrnn.gz'],
                             'greek': ['models', 'greek.pyrnn.gz']},
-         'plugins_load': {'tesseract': {'implementation': 'capi',
-                                        'tessdata': '/usr/share/tesseract-ocr'}},
+         'plugins_load': {'kraken': {},
+                          'tesseract': {'implementation': 'capi',
+                                        'tessdata': '/home/mittagessen/git'}},
+         'redis_url': 'redis://127.0.0.1:6379',
          'storage_path': '~/OCR'}
 
 To see which plugins are available and enabled the ``plugins`` subcommand may be used:
@@ -264,13 +281,13 @@ invocation looks like this:
 
 .. code-block:: console
 
-        $ nidaba batch --binarize nlbin -b sauvola -l tesseract -o tesseract:languages=eng -- input.png
+        $ nidaba batch -b sauvola:whsize=10,factor=0.35 -l tesseract -o tesseract:languages=\[grc,eng\],extended=True -- 0007.tif
         90ae699a-7172-44ce-a8bf-5464bccd34d0
 
 It converts the input file ``input.png`` to grayscale, binarizes it using the
-Sauvola and nlbin algorithm, creates page segmentations of both images using
-tesseract's algorithm, and finally runs both binarizations/segmentations
-through tesseract with the English language model, creating two hOCR files.
+Sauvola algorithm, creates a page segmentation of the image using tesseract's
+algorithm, and finally runs everything through tesseract with the English and
+Greek language models, creating a TEI XML file.
 
 There are several groups of options, each associated with a particular set of
 functions of the pipeline. An option may appear multiple times to define
@@ -280,9 +297,9 @@ options. All paths through this tree will then be executed by the workers in
 the cluster.
 
 Each option must follow the same format
-``algorithm:param1=val1,param2=val2,...,paramN=N;param1=val1,param2=val2,...``
-where configurations of the same algorithm are divided by ``;`` and the
-parameters are divided by ``,``. Additionally, there is a helper preamble
+``algorithm:param1=val1,param2=\[val2,val3\],...,paramN=N`` where parameters
+are divided by ``,`` and lists of parameter values are contained in
+``\[val1,val2\]`` statements. Additionally, there is a helper preamble
 ``file:`` which must be followed by a valid path to a file. This file will be
 copied to the common storage medium and its new location will be used instead
 of the path when executing the function.
@@ -316,18 +333,21 @@ group but can't be included in other groups for several reasons:
         A switch to indicate that input files are already 8bpp grayscale and
         conversion to grayscale is unnecessary.
 
-
 Batch status
 ~~~~~~~~~~~~
 
 The ``status`` subcommand is used to retrieve the status of a job. It takes the
 return value of a previously executed ``batch`` command. A currently running
-command will return PENDING:
+command will return pending and some additional information about the batch:
 
 .. code-block:: console
 
         $ nidaba status 90ae699a-7172-44ce-a8bf-5464bccd34d0
-        PENDING
+        Status: pending 
+        
+        4/4 tasks completed. 0 running.
+        
+        Output files:
 
 When the job has been processed the status command will return a list of paths
 containing the final output:
@@ -335,19 +355,59 @@ containing the final output:
 .. code-block:: console
 
         $ nidaba status 90ae699a-7172-44ce-a8bf-5464bccd34d0
-        SUCCESS
-        input.png -> /home/mittagessen/OCR/90ae699a-7172-44ce-a8bf-5464bccd34d0/input_img.rgb_to_gray_binarize.nlbin_0.5_0.5_1.0_0.1_80_20_5_90_ocr.tesseract_eng.png.hocr
-        input.png -> /home/mittagessen/OCR/90ae699a-7172-44ce-a8bf-5464bccd34d0/input_img.rgb_to_gray_binarize.sauvola_10_0.35_ocr.tesseract_eng.png.hocr
+        Status: success (final)
+        
+        4/4 tasks completed. 0 running.
+        
+        Output files:
+        
+        0007.tif → 0007_ocr.tesseract_eng_grc.tif.xml
+        0009.tif → 0009_ocr.tesseract_eng_grc.tif.xml
 
 On failure the subtasks that failed and their error message will be printed:
 
 .. code-block:: console
 
         $ nidaba status 90ae699a-7172-44ce-a8bf-5464bccd34d0
-        FAILURE
-        ocr.tesseract failed while operating on input_img.rgb_to_gray_binarize.sauvola_10_0.35.png which is based on input.png
-        ocr.tesseract failed while operating on input_img.rgb_to_gray_binarize.nlbin_0.5_0.5_1.0_0.1_80_20_5_90.png which is based on input.png
+        Status: failed (final)
+        
+        1/2 tasks completed. 0 running.
+        
+        Output files:
+        
+        Errors:
+        
+        nidaba.ocr.kraken (0007.tif): IOError: [Errno 2] No such file or directory: '/home/mittagessen/OCR/t/e/u/b/n/e/r/-/s/e/r/i/f/-/2/0/1/3/-/1/2/-/1/6/-/1/1/-/2/6/-/0/0/0/6/7/0/0/0/p/y/r/n/n/p/r/o/n/n'
 
+A batch may contain failed and running tasks at the same time. To be able to
+distinguish failed batches which are still running and finalized failed batches
+the status command will add the ``(final)`` indicator on the latter.
+
+It is also possible to increase the verbosity of the error output:
+
+.. code-block:: console
+
+        $ nidaba status -vv 90ae699a-7172-44ce-a8bf-5464bccd34d0
+        Status: failed (final)
+
+        288/384 tasks completed. 0 running.
+
+        Output files:
+
+        Errors:
+        
+        nidaba.ocr.kraken (0046.tif, {u'model': u'teubner'}):   File "/home/mittagessen/git/nidaba/nidaba/tasks/helper.py", line 91, in __call__
+            ret = super(NidabaTask, self).__call__(*args, **nkwargs)
+          File "/home/mittagessen/envs/nidaba/local/lib/python2.7/site-packages/celery/app/trace.py", line 438, in __protected_call__
+            return self.run(*args, **kwargs)
+          File "/home/mittagessen/git/nidaba/nidaba/plugins/kraken.py", line 152, in ocr_kraken
+            rnn = models.load_any(model)
+          File "/home/mittagessen/git/kraken/kraken/lib/models.py", line 110, in load_any
+            seq = load_pyrnn(fname)
+          File "/home/mittagessen/git/kraken/kraken/lib/models.py", line 211, in load_pyrnn
+            with io.BufferedReader(of(fname, 'rb')) as fp:
+        IOError: [Errno 2] No such file or directory: '/home/mittagessen/OCR/t/e/u/b/n/e/r/-/s/e/r/i/f/-/2/0/1/3/-/1/2/-/1/6/-/1/1/-/2/6/-/0/0/0/6/7/0/0/0/p/y/r/n/n/p/r/o/n/n'
+        
 
 .. _contributing:
 
@@ -363,8 +423,8 @@ Here are a few hints and rules to get you started:
    and grammar bloopers as you can!
 -  Don’t *ever* break backward compatibility.
 -  *Always* add tests and docs for your code.
--  This is a hard rule; patches with missing tests or documentation
-   won’t be merged. If a feature is not tested or documented, it doesn’t
+-  This is a hard rule; patches with missing documentation
+   won’t be merged. If a feature is not documented, it doesn’t
    exist.
 -  Obey `PEP8 <http://www.python.org/dev/peps/pep-0008/>`__ and
    `PEP257 <http://www.python.org/dev/peps/pep-0257/>`__.
