@@ -404,7 +404,11 @@ def status(verbose, host, job_id):
         elif subtask['state'] == 'FAILURE':
             failed += 1
             children = []
+            if not isinstance(subtask['children'], list):
+                subtask['children'] = [subtask['children']]
             for child in subtask['children']:
+                if not isinstance(state[child]['children'], list):
+                    state[child]['children'] = [state[child]['children']]
                 children.extend(state[child]['children'])
                 failed_children.add(child)
             errors.append(subtask)
