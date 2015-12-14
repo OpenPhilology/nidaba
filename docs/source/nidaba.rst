@@ -118,6 +118,14 @@ nidaba.uzn module
     :undoc-members:
     :show-inheritance:
 
+nidaba.web module
+-----------------
+
+.. automodule:: nidaba.web
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------
