@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Option Groups &mdash; nidaba 0.9.7-4-gaa610eb
+    <title>Option Groups &mdash; nidaba 0.9.7-6-g5a8da99
  documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.9.7-4-gaa610eb
+        VERSION:     '0.9.7-6-g5a8da99
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.9.7-4-gaa610eb
+    <link rel="top" title="nidaba 0.9.7-6-g5a8da99
  documentation" href="index.html" />
     <link rel="next" title="TEI Output" href="tei.html" />
     <link rel="prev" title="Plugins" href="plugins.html" />
@@ -43,6 +43,80 @@
             
   <div class="section" id="option-groups">
 <h1>Option Groups<a class="headerlink" href="#option-groups" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="preprocessing">
+<span id="img"></span><h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this headline">¶</a></h2>
+<p>Several useful preprocessing tasks are grouped in here.</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -i any_to_png ... -- *.tif
+</pre></div>
+</div>
+<div class="section" id="options-and-syntax">
+<h3>Options and Syntax<a class="headerlink" href="#options-and-syntax" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="nidaba.tasks.img.any_to_png">
+<code class="descclassname">nidaba.tasks.img.</code><code class="descname">any_to_png</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.img.any_to_png" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts an image (color or otherwise) in any format recognized by pillow
+to PNG.</p>
+<p>The pillow image library relies on external libraries for loading and
+saving Image data. To recognize the most common image formats used for
+digital archival you&#8217;ll need:</p>
+<ul class="simple">
+<li>libtiff</li>
+<li>zlib</li>
+<li>libjpeg</li>
+<li>openjpeg (version 2.0 +)</li>
+<li>libwebp</li>
+</ul>
+<p>To have access to all formats run (on Debian/Ubuntu):</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">#</span> apt-get -y install libtiff5-dev libjpeg62-turbo-dev zlib1g-dev             libwebp-dev libopenjp2-dev
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nidaba.tasks.img.rgb_to_gray">
+<code class="descclassname">nidaba.tasks.img.</code><code class="descname">rgb_to_gray</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.img.rgb_to_gray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts an arbitrary bit depth image to grayscale and writes it back
+appending a suffix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doc</strong> (<em>unicode, unicode</em>) &#8211; The input document tuple</li>
+<li><strong>method</strong> (<em>unicode</em>) &#8211; The suffix string appended to all output files.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Storage tuple of the output file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(unicode, unicode)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
 <div class="section" id="binarization">
 <span id="bin"></span><h2>Binarization<a class="headerlink" href="#binarization" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="http://en.wikipedia.org/wiki/Thresholding_%28image_processing%29">Binarization</a> is the
@@ -56,11 +130,11 @@ to create properly binarized images as a preprocessing step.</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -b otsu -b sauvola:... -- *.tif
 </pre></div>
 </div>
-<div class="section" id="options-and-syntax">
-<h3>Options and Syntax<a class="headerlink" href="#options-and-syntax" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Options and Syntax<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="nidaba.tasks.binarize.otsu">
-<code class="descclassname">nidaba.tasks.binarize.</code><code class="descname">otsu</code><span class="sig-paren">(</span><em>doc</em>, <em>method=u'spell_check'</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.binarize.otsu" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nidaba.tasks.binarize.</code><code class="descname">otsu</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.binarize.otsu" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binarizes an input document utilizing a naive implementation of Otsu&#8217;s
 thresholding.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -96,8 +170,8 @@ switch:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">#</span> nidaba batch ... -l tesseract ... -- *.tif
 </pre></div>
 </div>
-<div class="section" id="id2">
-<h3>Options and Syntax<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Options and Syntax<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>Segmentation is usually an integral part of an OCR engine, so different
 implementations are situated in their respective plugins. See <a class="reference internal" href="source/nidaba.plugins.html#module-nidaba.plugins.tesseract" title="nidaba.plugins.tesseract"><code class="xref py py-mod docutils literal"><span class="pre">tesseract</span></code></a> and <a class="reference internal" href="source/nidaba.plugins.html#module-nidaba.plugins.kraken" title="nidaba.plugins.kraken"><code class="xref py py-mod docutils literal"><span class="pre">kraken</span></code></a> for
 additional information.</p>
@@ -111,8 +185,8 @@ accessed using the <code class="docutils literal"><span class="pre">--ocr</span>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ... -o tesseract:languages<span class="o">=</span><span class="se">\[</span>eng<span class="se">\]</span> -o kraken:model<span class="o">=</span>en-default ... -- *.tif
 </pre></div>
 </div>
-<div class="section" id="id3">
-<h3>Options and Syntax<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>Options and Syntax<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>As OCR engines are usually quite large and sometimes hard to install, all
 functionality is contained in plugins. See <a class="reference internal" href="source/nidaba.plugins.html#module-nidaba.plugins.tesseract" title="nidaba.plugins.tesseract"><code class="xref py py-mod docutils literal"><span class="pre">tesseract</span></code></a>, <a class="reference internal" href="source/nidaba.plugins.html#module-nidaba.plugins.kraken" title="nidaba.plugins.kraken"><code class="xref py py-mod docutils literal"><span class="pre">kraken</span></code></a>, and
 <a class="reference internal" href="source/nidaba.plugins.html#module-nidaba.plugins.ocropus" title="nidaba.plugins.ocropus"><code class="xref py py-mod docutils literal"><span class="pre">ocropus</span></code></a> for additional information,
@@ -120,7 +194,7 @@ configuration keys, etc.</p>
 </div>
 </div>
 <div class="section" id="spell-checking">
-<span id="id4"></span><h2>Spell Checking<a class="headerlink" href="#spell-checking" title="Permalink to this headline">¶</a></h2>
+<span id="id5"></span><h2>Spell Checking<a class="headerlink" href="#spell-checking" title="Permalink to this headline">¶</a></h2>
 <p>Nidaba includes support for an edit distance based spell checker out of the
 box. Particular configurations of the spell checking algorithm have to be
 predefined in the <code class="docutils literal"><span class="pre">nidaba.yaml</span></code> configuration file under the <code class="docutils literal"><span class="pre">lang_dicts</span></code>
@@ -155,8 +229,8 @@ calculates the dictionaries in a normalized format. For example:</p>
 of memory, e.g. for a 31Mb word list mkdict utilizes around 8Gb memory and the
 resulting deletion dictionary will be 750Mb large.</p>
 </div>
-<div class="section" id="id5">
-<h3>Options and Syntax<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id6">
+<h3>Options and Syntax<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="nidaba.tasks.postprocessing.spell_check">
 <code class="descclassname">nidaba.tasks.postprocessing.</code><code class="descname">spell_check</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>language</em>, <em>filter_punctuation</em>, <em>no_ocrx_words</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.postprocessing.spell_check" title="Permalink to this definition">¶</a></dt>
@@ -210,8 +284,8 @@ assume that all other documents have similar segmentation results.
 Issues like high variance in segmentation, especially word boundaries
 are not accounted for.</p>
 </div>
-<div class="section" id="id6">
-<h3>Options and Syntax<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id7">
+<h3>Options and Syntax<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="nidaba.tasks.postprocessing.blend_hocr">
 <code class="descclassname">nidaba.tasks.postprocessing.</code><code class="descname">blend_hocr</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>language</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.postprocessing.blend_hocr" title="Permalink to this definition">¶</a></dt>
@@ -242,7 +316,7 @@ parameterless.</p>
 </div>
 </div>
 <div class="section" id="output-layer">
-<span id="id7"></span><h2>Output Layer<a class="headerlink" href="#output-layer" title="Permalink to this headline">¶</a></h2>
+<span id="id8"></span><h2>Output Layer<a class="headerlink" href="#output-layer" title="Permalink to this headline">¶</a></h2>
 <p>The output layer handles conversion and extension of nidaba&#8217;s native <a class="reference internal" href="tei.html#tei-output"><span>TEI</span></a> format. It can be used to distill data from the TEI document into
 plain text, hOCR, and a simple XML format. It can also use an external metadata
 file to complete raw TEI output to a valid TEI document.</p>
@@ -251,8 +325,8 @@ copy it to the storage medium on task invocation:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> nidaba batch ...  -f metadata:metadata<span class="o">=</span>file:openphilology_meta.yaml,validate<span class="o">=</span>False -- *.tif
 </pre></div>
 </div>
-<div class="section" id="id8">
-<h3>Options and Syntax<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id9">
+<h3>Options and Syntax<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="nidaba.tasks.output.tei_metadata">
 <code class="descclassname">nidaba.tasks.output.</code><code class="descname">tei_metadata</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>metadata</em>, <em>validate</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.output.tei_metadata" title="Permalink to this definition">¶</a></dt>
@@ -444,7 +518,7 @@ output.</p>
 </div>
 </div>
 <div class="section" id="metrics">
-<span id="id9"></span><h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
+<span id="id10"></span><h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
 <p>It is possible to calculate metrics on the textual output to assess its
 deviation from a given ground truth. The ground truth may be in one of several
 supported formats including plain text, hOCR, and TEI XML. Currently two
@@ -469,8 +543,8 @@ selects the needed ground truth for its OCR result based on the filename prefix.
 </pre></div>
 </div>
 <p>As you can see we got an accuracy of 94% on our scans which is good but not great.</p>
-<div class="section" id="id10">
-<h3>Options and Syntax<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id11">
+<h3>Options and Syntax<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="nidaba.tasks.stats.text_diff_ratio">
 <code class="descclassname">nidaba.tasks.stats.</code><code class="descname">text_diff_ratio</code><span class="sig-paren">(</span><em>doc</em>, <em>method</em>, <em>ground_truth</em>, <em>xml_in</em>, <em>gt_format</em>, <em>clean_in</em>, <em>clean_gt</em>, <em>divert</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.tasks.stats.text_diff_ratio" title="Permalink to this definition">¶</a></dt>
@@ -591,6 +665,7 @@ without affecting the results.</li>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Option Groups</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#preprocessing">Preprocessing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#binarization">Binarization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#page-segmentation">Page Segmentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#optical-character-recognition">Optical Character Recognition</a></li>

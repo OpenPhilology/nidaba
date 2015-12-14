@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nidaba.algorithms package &mdash; nidaba 0.9.7-4-gaa610eb
+    <title>nidaba.algorithms package &mdash; nidaba 0.9.7-6-g5a8da99
  documentation</title>
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.9.7-4-gaa610eb
+        VERSION:     '0.9.7-6-g5a8da99
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.9.7-4-gaa610eb
+    <link rel="top" title="nidaba 0.9.7-6-g5a8da99
  documentation" href="../index.html" />
     <link rel="up" title="nidaba package" href="nidaba.html" />
     <link rel="next" title="nidaba.contrib package" href="nidaba.contrib.html" />
@@ -46,128 +46,6 @@
 <h1>nidaba.algorithms package<a class="headerlink" href="#nidaba-algorithms-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-nidaba.algorithms.median">
-<span id="nidaba-algorithms-median-module"></span><h2>nidaba.algorithms.median module<a class="headerlink" href="#module-nidaba.algorithms.median" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="nidaba-algorithms-median">
-<h3>nidaba.algorithms.median<a class="headerlink" href="#nidaba-algorithms-median" title="Permalink to this headline">¶</a></h3>
-<p>Implementation of various algorithms to calculate approximate generalized
-median strings on recognition results.</p>
-<dl class="function">
-<dt id="nidaba.algorithms.median.approximate_median">
-<code class="descclassname">nidaba.algorithms.median.</code><code class="descname">approximate_median</code><span class="sig-paren">(</span><em>strings</em>, <em>distance_class=&lt;class 'nidaba.algorithms.median.naive_edit_distance'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.median.approximate_median" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates an approximate generalized median string using the greedy
-algorithm described in [0].</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>strings</strong> (<em>list</em>) &#8211; A list ocr_records.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A unicode string representing the generalized median string.</td>
-</tr>
-</tbody>
-</table>
-<p>[0]  F. Casacuberta and M. de Antonio. A greedy algorithm for computing
-approximate median strings. In VII Simposium Nacional de Reconocimiento de
-Formas y Analisis de Imagenes., pages 193–198, april 1997.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="nidaba.algorithms.median.confidence_weighted_edit_distance">
-<em class="property">class </em><code class="descclassname">nidaba.algorithms.median.</code><code class="descname">confidence_weighted_edit_distance</code><span class="sig-paren">(</span><em>strings</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.median.confidence_weighted_edit_distance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Edit distance function using symbol-based confidence weighted edit
-distance to an unweighted input string adapted from [0].</p>
-<p>[0] Barat, Cécile, et al. &#8220;Weighted symbols-based edit distance for
-string-structured image classification.&#8221; Machine Learning and Knowledge
-Discovery in Databases. Springer Berlin Heidelberg, 2010. 72-86.</p>
-<dl class="method">
-<dt id="nidaba.algorithms.median.confidence_weighted_edit_distance.distance">
-<code class="descname">distance</code><span class="sig-paren">(</span><em>string</em>, <em>record</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.median.confidence_weighted_edit_distance.distance" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.median.fast_levenshtein">
-<code class="descclassname">nidaba.algorithms.median.</code><code class="descname">fast_levenshtein</code><span class="sig-paren">(</span><em>seq1</em>, <em>seq2</em>, <em>cost_func</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.median.fast_levenshtein" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate the Levenshtein distance between sequences.</p>
-<p>This implementation is taken from [0] and available under MIT licence with
-some minor tweaks to enable symbol-based weighted edit distance calculation
-(cost function and removal of transposition operation). It runs in O(N*M)
-time and O(M) space.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>seq1</strong> &#8211; A hashable object providing the __getitem__ function</li>
-<li><strong>seq2</strong> &#8211; Another hashable object</li>
-<li><strong>cost_func</strong> &#8211; Function returning a numeric cost from the i-th character in
-seq1 to the j-th character in seq2</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An integer/float value for the edit distance</p>
-</td>
-</tr>
-</tbody>
-</table>
-<p>[0] <a class="reference external" href="http://mwh.geek.nz/2009/04/26/python-damerau-levenshtein-distance/">http://mwh.geek.nz/2009/04/26/python-damerau-levenshtein-distance/</a></p>
-</dd></dl>
-
-<dl class="function">
-<dt id="nidaba.algorithms.median.improve_median">
-<code class="descclassname">nidaba.algorithms.median.</code><code class="descname">improve_median</code><span class="sig-paren">(</span><em>candidate</em>, <em>strings</em>, <em>distance_class=&lt;class 'nidaba.algorithms.median.naive_edit_distance'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.median.improve_median" title="Permalink to this definition">¶</a></dt>
-<dd><p>Tries to improve an approximate generalized median string using iterative
-systematic perturbation as described in [0]</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>candidate</strong> (<em>unicode</em>) &#8211; Approximate generalized median string</li>
-<li><strong>strings</strong> (<em>list</em>) &#8211; A list of lists of tuples (s, c) where s is a unicode
-object and c is an integer confidence attached to it.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A unicode string representing the approximate median string.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<p>[0] Martínez-Hinarejos, Carlos D., Alfons Juan, and Francisco Casacuberta.
-Use of median string for classification. Pattern Recognition, 2000.
-Proceedings. 15th International Conference on. Vol. 2. IEEE, 2000.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="nidaba.algorithms.median.naive_edit_distance">
-<em class="property">class </em><code class="descclassname">nidaba.algorithms.median.</code><code class="descname">naive_edit_distance</code><span class="sig-paren">(</span><em>strings</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.median.naive_edit_distance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Edit distance function using the unweighted Levenshtein distance measure.</p>
-<dl class="method">
-<dt id="nidaba.algorithms.median.naive_edit_distance.distance">
-<code class="descname">distance</code><span class="sig-paren">(</span><em>string</em>, <em>record</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.median.naive_edit_distance.distance" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="nidaba.algorithms.median.ocr_record">
-<em class="property">class </em><code class="descclassname">nidaba.algorithms.median.</code><code class="descname">ocr_record</code><span class="sig-paren">(</span><em>prediction</em>, <em>cuts</em>, <em>confidences</em><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.median.ocr_record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>A record object containing the recognition result of a single line</p>
-<dl class="method">
-<dt id="nidaba.algorithms.median.ocr_record.next">
-<code class="descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nidaba.algorithms.median.ocr_record.next" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
 </div>
 <div class="section" id="module-nidaba.algorithms.otsu">
 <span id="nidaba-algorithms-otsu-module"></span><h2>nidaba.algorithms.otsu module<a class="headerlink" href="#module-nidaba.algorithms.otsu" title="Permalink to this headline">¶</a></h2>

@@ -2,6 +2,23 @@
 Option Groups
 =============
 
+.. _img:
+
+Preprocessing
+=============
+
+Several useful preprocessing tasks are grouped in here. 
+
+.. code-block:: console
+
+        $ nidaba batch ... -i any_to_png ... -- *.tif
+
+Options and Syntax
+------------------
+
+.. autofunction:: nidaba.tasks.img.any_to_png(doc, method)
+.. autofunction:: nidaba.tasks.img.rgb_to_gray(doc, method)
+
 .. _bin:
 
 Binarization
@@ -25,7 +42,7 @@ Binarization is an own group of tasks and functions can be accessed using the
 Options and Syntax
 ------------------
 
-.. autofunction:: nidaba.tasks.binarize.otsu(doc, method=u'spell_check')
+.. autofunction:: nidaba.tasks.binarize.otsu(doc, method)
 
 There are also additional, more advanced binarization algorithms available in
 the :mod:`leptonica <nidaba.plugins.leptonica>` and :mod:`kraken
