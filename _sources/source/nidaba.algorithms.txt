@@ -4,6 +4,14 @@ nidaba.algorithms package
 Submodules
 ----------
 
+nidaba.algorithms.median module
+-------------------------------
+
+.. automodule:: nidaba.algorithms.median
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 nidaba.algorithms.otsu module
 -----------------------------
 

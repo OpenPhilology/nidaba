@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nidaba package &mdash; nidaba 0.9.6
+    <title>nidaba package &mdash; nidaba 0.9.7-4-gaa610eb
  documentation</title>
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.9.6
+        VERSION:     '0.9.7-4-gaa610eb
 ',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="nidaba 0.9.6
+    <link rel="top" title="nidaba 0.9.7-4-gaa610eb
  documentation" href="../index.html" />
     <link rel="up" title="nidaba" href="modules.html" />
     <link rel="next" title="nidaba.algorithms package" href="nidaba.algorithms.html" />
@@ -50,6 +50,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="nidaba.algorithms.html">nidaba.algorithms package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.algorithms.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nidaba.algorithms.html#module-nidaba.algorithms.median">nidaba.algorithms.median module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nidaba.algorithms.html#nidaba-algorithms-median">nidaba.algorithms.median</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="nidaba.algorithms.html#module-nidaba.algorithms.otsu">nidaba.algorithms.otsu module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="nidaba.algorithms.html#nidaba-algorithms-otsu">nidaba.algorithms.otsu</a></li>
 </ul>
@@ -1609,7 +1613,7 @@ tasks and their parameters.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>NidabaInputException if the batch hasn&#8217;t been executed yet.</strong> &#8211;</td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">NidabaInputException if the batch hasn&#8217;t been executed yet.</td>
 </tr>
 </tbody>
 </table>
@@ -1786,7 +1790,7 @@ contained in the task definition.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>NidabaInputException if validation failed.</strong> &#8211;</td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">NidabaInputException if validation failed.</td>
 </tr>
 </tbody>
 </table>
@@ -2107,7 +2111,7 @@ document such paltry information as exceptions.</p>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>Standard python library caveats apply.</strong> &#8211;</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">Standard python library caveats apply.</td>
 </tr>
 </tbody>
 </table>
@@ -2133,7 +2137,7 @@ document such paltry information as exceptions.</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">list</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NidabaNoSuchStorageBin if the job identifer is not known.</strong> &#8211;</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">NidabaNoSuchStorageBin if the job identifer is not known.</p>
 </td>
 </tr>
 </tbody>
@@ -2150,7 +2154,7 @@ document such paltry information as exceptions.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>jobID</strong> (<em>unicode</em>) &#8211; Identifier of the bin to be created.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>NidabaStorageViolationException if the job ID already exists.</strong> &#8211;</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">NidabaStorageViolationException if the job ID already exists.</td>
 </tr>
 </tbody>
 </table>
@@ -2177,7 +2181,7 @@ for retrieving unicode text use retrieve_text().</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">Dictionary</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NidabaNoSuchStorageBin if the job identifer is not known.</strong> &#8211;</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">NidabaNoSuchStorageBin if the job identifer is not known.</p>
 </td>
 </tr>
 </tbody>
@@ -2204,7 +2208,7 @@ for retrieving unicode text use retrieve_text().</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">Dictionary</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NidabaNoSuchStorageBin if the job identifer is not known.</strong> &#8211;</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">NidabaNoSuchStorageBin if the job identifer is not known.</p>
 </td>
 </tr>
 </tbody>
@@ -2583,7 +2587,7 @@ disables the current segment scope.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>id</strong> (<em>unicode</em>) &#8211; XML id of the line tag</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>NidabaTEIException if the identifier is unknown</strong> &#8211;</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">NidabaTEIException if the identifier is unknown</td>
 </tr>
 </tbody>
 </table>
@@ -2599,7 +2603,7 @@ disables the current segment scope.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>id</strong> (<em>unicode</em>) &#8211; XML id of the responsibility statement</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>NidabaTEIException if the identifier is unknown</strong> &#8211;</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">NidabaTEIException if the identifier is unknown</td>
 </tr>
 </tbody>
 </table>
@@ -2843,7 +2847,7 @@ XML output. Its basic format is:</p>
       &copy;2014-2015, Open Greek and Latin.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
       
       |
