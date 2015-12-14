@@ -161,8 +161,12 @@ def move_to_storage(batch, kwargs):
 @click.option('-h', '--host', default=None, 
               help='Address of the API service. If none is given a local '
               'installation of nidaba will be invoked.')
+@click.option('--preprocessing', '-i', multiple=True,
+              callback=validate_definition, help='a configuration for a single'
+              'image preprocessing algorithm in the format '
+              'algorithm:param1,param2;param1,param2;...')
 @click.option('--binarize', '-b', multiple=True, callback=validate_definition,
-              help='A configuration for a single binarization algorithm in '
+              help='a configuration for a single binarization algorithm in '
               'the format algorithm:param1,param2;param1,param2;...')
 @click.option('--segmentation', '-l', multiple=True,
               callback=validate_definition,
@@ -191,8 +195,8 @@ def move_to_storage(batch, kwargs):
               help='Accesses the documentation of all tasks contained in '
               'nidaba itself and in configured plugins.')
 @click.argument('files', type=click.Path(exists=True), nargs=-1, required=True)
-def batch(files, host, binarize, ocr, segmentation, stats, postprocessing, output,
-          grayscale, help_tasks):
+def batch(files, host, preprocessing, binarize, ocr, segmentation, stats,
+          postprocessing, output, grayscale, help_tasks):
     """
     Add a new job to the pipeline.
     """
@@ -231,6 +235,11 @@ def batch(files, host, binarize, ocr, segmentation, stats, postprocessing, outpu
     click.echo(u'Building batch\t\t\t[', nl=False)
     if not grayscale:
         batch.add_task('img', 'rgb_to_gray')
+    if preprocessing:
+        for alg in preprocessing:
+            for kwargs in alg[1]:
+                kwargs = move_to_storage(batch, kwargs)
+                batch.add_task('img', alg[0], **kwargs)
     if binarize:
         for alg in binarize:
             for kwargs in alg[1]:

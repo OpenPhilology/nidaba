@@ -45,3 +45,19 @@ def rgb_to_gray(imagepath, resultpath):
     img = Image.open(imagepath)
     img.convert('L').save(resultpath)
     return resultpath
+
+
+def any_to_png(imagepath, resultpath):
+    """
+    Converts an image in any format recognized by pillow to PNG.
+
+    Arguments:
+        imagepath: Path of the input image
+        resultpath: Path of the output image
+
+    Returns:
+        unicode: Path of the actual output file
+    """
+    img = Image.open(imagepath)
+    img.save(resultpath, format='png')
+    return resultpath
