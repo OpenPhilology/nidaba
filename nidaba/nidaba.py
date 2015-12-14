@@ -533,6 +533,14 @@ class SimpleBatch(Batch):
                                   ('postprocessing', []),
                                   ('output', [])])
 
+        # defines if tasks in a group are run in parallel or in sequence
+        self.order = {'img': 'sequence',
+                      'binarize': 'parallel',
+                      'segmentation': 'parallel',
+                      'ocr': 'parallel',
+                      'stats': 'parallel',
+                      'postprocessing': 'sequence',
+                      'output': 'sequence'}
         if id is None:
             id = unicode(uuid.uuid4())
             self.storage.prepare_filestore(id)
@@ -697,6 +705,8 @@ class SimpleBatch(Batch):
                 super(SimpleBatch, self).add_task('{}.{}'.format(group,
                                                                  task[0]),
                                                   **task[1])
+                if self.order[group] == 'sequence':
+                    self.add_tick()
         self.lock = True
         return super(SimpleBatch, self).run()
 
