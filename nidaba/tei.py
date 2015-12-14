@@ -576,6 +576,7 @@ class TEIFacsimile(object):
                          'Transitional//EN" '
                          '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
                  xml_declaration=True, encoding='utf-8'))
+        fp.flush()
 
     def write_abbyyxml(self, fp):
         """
@@ -626,6 +627,7 @@ class TEIFacsimile(object):
                 if len(cert):
                    el.set('charConfidence', str(100.0 * float(cert[0].get('degree'))))
         fp.write(etree.tostring(page, xml_declaration=True, encoding='utf-8'))
+        fp.flush()
 
     def write_text(self, fp):
         """
@@ -637,6 +639,7 @@ class TEIFacsimile(object):
         for line in self.lines:
             fp.write(line[-1].encode('utf-8').strip())
             fp.write('\n')
+        fp.flush()
 
     def write(self, fp):
         """
@@ -647,6 +650,7 @@ class TEIFacsimile(object):
         """
         fp.write(etree.tostring(self.doc, xml_declaration=True, pretty_print=True,
                                 encoding='utf-8'))
+        fp.flush()
 
     def read(self, fp):
         """
