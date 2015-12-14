@@ -170,9 +170,9 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
                 tei.add_graphemes([(x[0], x[1], int(x[2] * 100)) for x in rec[line_offset:line_offset+len(segment)]])
                 line_offset += len(segment)
             if whitespace:
-                tei.clear_segment()
                 logger.debug('Adding graphemes (whitespace): {}'.format(rec.prediction[line_offset:line_offset+len(whitespace)]))
-
+                seg_bbox = max_bbox(rec.cuts[line_offset:line_offset + len(whitespace)])
+                tei.add_segment(seg_bbox)
                 tei.add_graphemes([(x[0], x[1], int(x[2] * 100)) for x in rec[line_offset:line_offset+len(whitespace)]])
                 line_offset += len(whitespace)
     with storage.StorageFile(*output_path, mode='wb') as fp:

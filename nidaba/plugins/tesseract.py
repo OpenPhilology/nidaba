@@ -502,7 +502,8 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                     # insert space between word boundaries as they don't get
                     # returned by GetUTF8Text
                     if last_word is not None:
-                        facsimile.clear_segment()
+                        facsimile.add_segment((last_word, y0.value, x1.value,
+                                               y1.value), lang, 100)
                         facsimile.add_graphemes([(u' ', (last_word,
                                                          y0.value,
                                                          x0.value,
