@@ -600,7 +600,7 @@ class TEIFacsimile(object):
         p.set('width', surface.get('lrx'))
         p.set('height', surface.get('lry'))
         p.set('originalCoords', '1')
-        text = etree.SubElement(page, 'text')
+        text = etree.SubElement(p, 'text')
         last_seg_id = None
         for line in self.doc.iter(self.tei_ns + 'line'):
             lel = SubElement(text, 'line')
