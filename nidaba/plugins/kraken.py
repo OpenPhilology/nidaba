@@ -100,7 +100,7 @@ def segmentation_kraken(doc, method=u'segment_kraken', black_colseps=False):
         for seg in pageseg.segment(img, black_colseps):
             logger.debug('Found line at {} {} {} {}'.format(*seg))
             tei.add_line(seg)
-        logger.debug('Write segmentation to {}'.format(fp.abs_path))
+        logger.debug('Write segmentation to {}'.format(fp.name))
         tei.write(fp)
     return (storage.get_storage_path(output_path + '.xml'),
             storage.get_storage_path(output_path + ext))
