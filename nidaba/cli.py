@@ -27,17 +27,15 @@ spinner = cycle([u'⣾', u'⣽', u'⣻', u'⢿', u'⡿', u'⣟', u'⣯', u'⣷']
 def spin(msg):
     click.echo(u'\r\033[?25l{}\t\t{}'.format(msg, next(spinner)), nl=False)
 
-required_host=False
 
+@click.group()
 @click.version_option()
 def client_only():
     """
     API-only version of the nidaba client
     """
-    global required_host
-    required_host = True
 
-
+@click.group()
 @click.version_option()
 def main():
     """
@@ -164,7 +162,7 @@ def move_to_storage(batch, kwargs):
 @main.command()
 @click.option('-h', '--host', default=None, 
               help='Address of the API service. If none is given a local '
-              'installation of nidaba will be invoked.', required=required_host)
+              'installation of nidaba will be invoked.')
 @click.option('--preprocessing', '-i', multiple=True,
               callback=validate_definition, help='a configuration for a single'
               'image preprocessing algorithm in the format '
@@ -382,10 +380,10 @@ def plugins(ctx):
 
 
 @main.command()
-@click.option('-v', '--verbose', count=True)
 @click.option('-h', '--host', default=None, 
               help='Address of the API service. If none is given a local '
-              'installation of nidaba will be invoked.', required=required_host)
+              'installation of nidaba will be invoked.')
+@click.option('-v', '--verbose', count=True)
 @click.argument('job_id', nargs=1)
 def status(verbose, host, job_id):
     """
@@ -489,3 +487,6 @@ def status(verbose, host, job_id):
                                                      args,
                                                      tb,
                                                      task['errors'][1]))
+
+client_only.add_command(status)
+client_only.add_command(batch)

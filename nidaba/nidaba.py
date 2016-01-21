@@ -13,9 +13,6 @@ from nidaba.nidabaexceptions import (NidabaInputException,
                                      NidabaNoSuchAlgorithmException,
                                      NidabaTickException, NidabaStepException)
 
-from celery import chain
-from celery import group
-from redis import WatchError
 from itertools import product
 from inspect import getcallargs
 from collections import OrderedDict, Iterable
@@ -169,7 +166,7 @@ class Batch(object):
                     self._restore_and_create_scratchpad(pipe)
                     pipe.execute()
                     break
-                except WatchError:
+                except self.redis.WatchError:
                     continue
 
     def _restore_and_create_scratchpad(self, pipe):
@@ -297,7 +294,7 @@ class Batch(object):
                     pipe.set(self.id, json.dumps(self.scratchpad))
                     pipe.execute()
                     break
-                except WatchError:
+                except self.redis.WatchError:
                     continue
 
     def add_task(self, method, **kwargs):
@@ -330,7 +327,7 @@ class Batch(object):
                     pipe.set(self.id, json.dumps(self.scratchpad))
                     pipe.execute()
                     break
-                except WatchError:
+                except self.redis.WatchError:
                     continue
 
     def add_tick(self):
@@ -357,7 +354,7 @@ class Batch(object):
                     pipe.set(self.id, json.dumps(self.scratchpad))
                     pipe.execute()
                     break
-                except WatchError:
+                except self.redis.WatchError:
                     continue
 
     def add_step(self):
@@ -385,7 +382,7 @@ class Batch(object):
                     pipe.set(self.id, json.dumps(self.scratchpad))
                     pipe.execute()
                     break
-                except WatchError:
+                except self.redis.WatchError:
                     continue
 
     def run(self):
@@ -419,12 +416,12 @@ class Batch(object):
                             for sequence in product(*tset):
                                 method = self.celery.app.tasks['nidaba.' +
                                                                sequence[0]['method']]
-                                ch = chain(method.s(**(sequence[0])))
+                                ch = self.celery.chain(method.s(**(sequence[0])))
                                 for seq in sequence[1:]:
                                     method = self.celery.app.tasks['nidaba.' + seq['method']]
                                     ch |= method.s(**seq)
                                 tick.append(ch)
-                            groups.append(group(tick))
+                            groups.append(self.celery.group(tick))
                             groups.append(self.task_reg.util.sync.s())
             
                     # The expansion steps described above is redone for each input document
@@ -436,15 +433,15 @@ class Batch(object):
                         for sequence in product([doc], *self.batch_def[0]):
                             method = self.celery.app.tasks['nidaba.' + sequence[1]['method']]
                             root = sequence[0]
-                            ch = chain(method.s(doc=root, **(sequence[1])))
+                            ch = self.celery.chain(method.s(doc=root, **(sequence[1])))
                             for seq in sequence[2:]:
                                 method = self.celery.app.tasks['nidaba.' + seq['method']]
                                 ch |= method.s(**seq)
                             tick.append(ch)
-                        doc_group = group(tick)
+                        doc_group = self.celery.group(tick)
                         parents = []
                         group_list = [doc_group] + groups
-                        chains.append(chain(group_list))
+                        chains.append(self.celery.chain(group_list))
             
                         # Now we give out another set of unique task identifiers and save
                         # them to the database. Presetting the celery task ID does not work
@@ -492,7 +489,7 @@ class Batch(object):
                     pipe.set(self.id, json.dumps(result_data))
                     pipe.execute()
                     break
-                except WatchError:
+                except self.redis.WatchError:
                     continue
         [x.apply_async() for x in chains]
         return self.id
@@ -557,7 +554,7 @@ class SimpleBatch(Batch):
                         self.lock = True
                     pipe.execute()
                     break
-                except WatchError:
+                except self.redis.WatchError:
                     continue
 
     def is_running(self):
@@ -680,7 +677,7 @@ class SimpleBatch(Batch):
                     pipe.set(self.id, json.dumps(self.scratchpad))
                     pipe.execute()
                     break
-                except WatchError:
+                except self.redis.WatchError:
                     continue
 
     def run(self):
