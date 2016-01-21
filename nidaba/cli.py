@@ -7,10 +7,8 @@ from __future__ import absolute_import, print_function
 
 from signal import signal, SIGPIPE, SIG_DFL
 from inspect import getcallargs, getdoc
-from gunicorn.six import iteritems
 from itertools import cycle
 from pprint import pprint
-from flask import Flask
 from glob import glob
 
 from nidaba.nidaba import NetworkSimpleBatch, SimpleBatch
@@ -20,9 +18,6 @@ import shutil
 import os.path
 import sys
 import click
-import stevedore
-import logging
-import gunicorn.app.base
 
 # ignore SIGPIPE
 signal(SIGPIPE,SIG_DFL) 
@@ -32,8 +27,17 @@ spinner = cycle([u'⣾', u'⣽', u'⣻', u'⢿', u'⡿', u'⣟', u'⣯', u'⣷']
 def spin(msg):
     click.echo(u'\r\033[?25l{}\t\t{}'.format(msg, next(spinner)), nl=False)
 
+required_host=False
 
-@click.group(epilog='This nidaba may or may not have Super Cow Powers')
+@click.version_option()
+def client_only():
+    """
+    API-only version of the nidaba client
+    """
+    global required_host
+    required_host = True
+
+
 @click.version_option()
 def main():
     """
@@ -160,7 +164,7 @@ def move_to_storage(batch, kwargs):
 @main.command()
 @click.option('-h', '--host', default=None, 
               help='Address of the API service. If none is given a local '
-              'installation of nidaba will be invoked.')
+              'installation of nidaba will be invoked.', required=required_host)
 @click.option('--preprocessing', '-i', multiple=True,
               callback=validate_definition, help='a configuration for a single'
               'image preprocessing algorithm in the format '
@@ -304,11 +308,18 @@ def api_server(ctx, **kwargs):
             click.echo('No configuration file found at {}'.format(e.filename))
             ctx.exit()
 
+    import logging
+    import gunicorn.app.base
+
+    from flask import Flask
+    from gunicorn.six import iteritems
+
     logging.basicConfig(level=logging.DEBUG)
 
     app = Flask('nidaba')
     app.register_blueprint(api.get_blueprint())
     app.register_blueprint(web.get_blueprint())
+
 
     class APIServer(gunicorn.app.base.BaseApplication):
 
@@ -357,6 +368,8 @@ def plugins(ctx):
             click.echo('plugins command only available for local installations.')
             ctx.exit()
 
+    import stevedore
+
     mgr = stevedore.ExtensionManager(namespace='nidaba.plugins')
     enabled = set(nidaba_cfg['plugins_load'].keys()).intersection(set(mgr.names()))
     disabled = set(mgr.names()) - enabled
@@ -372,7 +385,7 @@ def plugins(ctx):
 @click.option('-v', '--verbose', count=True)
 @click.option('-h', '--host', default=None, 
               help='Address of the API service. If none is given a local '
-              'installation of nidaba will be invoked.')
+              'installation of nidaba will be invoked.', required=required_host)
 @click.argument('job_id', nargs=1)
 def status(verbose, host, job_id):
     """

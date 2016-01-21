@@ -1,0 +1,2 @@
+click>=4.0
+requests-toolbelt
