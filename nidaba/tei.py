@@ -832,7 +832,7 @@ class OCRRecord(object):
                     text_el.set('HEIGHT', str(seg['bbox'][1] - seg['bbox'][3]))
                     text_el.set('ID', seg_id)
                     if 'alternatives' in seg:
-                        for corr in seg['alternatives']:
+                        for corr in seg['alternatives']['content']:
                             SubElement(text_el, 'ALTERNATIVE').text = corr['alternative']
             # add an empty String element if no children exist
             if not list(text_line):
