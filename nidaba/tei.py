@@ -383,11 +383,22 @@ class OCRRecord(object):
         """
         Deletes all segments and their content from the record.
         """
-
         self.reset_segment_scope()
         self.segment_scope = None
         for line in self.lines.itervalues():
             line['content'] = OrderedDict()
+
+    def clear_graphemes(self):
+        """
+        Deletes all graphemes from the record.
+        """
+        for line in self.lines.itervalues():
+            for seg in line['content'].itervalues():
+                if seg['type'] == 'grapheme':
+                    line['content'] = OrderedDict()
+                    break
+                else:
+                    seg['content'] = OrderedDict()
 
     # properties offering short cuts (line are already top-level records)
     @property
@@ -592,12 +603,14 @@ class OCRRecord(object):
 
         def _add_grapheme(grapheme_id, grapheme, parent):
             g_el = Element(self.tei_ns + 'zone',
-                           ulx=str(grapheme['bbox'][0]),
-                           uly=str(grapheme['bbox'][1]),
-                           lrx=str(grapheme['bbox'][2]),
-                           lry=str(grapheme['bbox'][3]),
                            type='grapheme')
             g_el.set(self.xml_ns + 'id', grapheme_id)
+            if 'bbox' in grapheme:
+                g_el.set('ulx', str(grapheme['bbox'][0]))
+                g_el.set('uly', str(grapheme['bbox'][1]))
+                g_el.set('lrx', str(grapheme['bbox'][2]))
+                g_el.set('lry', str(grapheme['bbox'][3]))
+
             if 'alternatives' in grapheme:
                 _wrap_choices(grapheme['alternatives'], g_el, parent)
             else:
@@ -856,7 +869,7 @@ class OCRRecord(object):
         page = doc.find('body/div[@class="ocr_page"]')
         o = _parse_hocr(page.get('title'))
         if 'bbox' in o:
-            self.dimensions = tuple(int(x) for x in o['bbox'][0].split(',')[2:])
+            self.dimensions = o['bbox'][2:]
         if 'image' in o:
             self.img = o['image'][0]
 
@@ -880,7 +893,7 @@ class OCRRecord(object):
                              'alternative': ''.join(el.itertext())})
             elif el_class == 'ocr_line':
                 o = _parse_hocr(el.get('title'))
-                id = self.add_line(tuple(int(x) for x in o['bbox'][0].split(',')))
+                id = self.add_line(o['bbox'])
                 if el.xpath('.//span[starts-with(@class, "ocrx")]') is None:
                     sym = ''.join(el.itertext())
                     self.add_graphemes([{'grapheme': x} for x in sym])
@@ -924,7 +937,7 @@ class OCRRecord(object):
         body = SubElement(page, 'body')
 	p_hocr = _micro_hocr()
         if 'dimensions' in self.meta:
-		p_hocr.add('bbox', (0, 0) + self.meta['dimensions'])
+		p_hocr.add('bbox', 0, 0, *self.meta['dimensions'])
 	if self.img is not None:
 		p_hocr.add('image', self.img)
         ocr_page = SubElement(body, 'div', title=str(p_hocr))
