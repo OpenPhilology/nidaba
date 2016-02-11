@@ -324,21 +324,41 @@ class TEITests(unittest.TestCase):
         """
         fp = StringIO.StringIO()
         id = self.record.add_respstmt('recognition', 'baz')
-
         self.record.write_alto(fp)
         doc = etree.fromstring(fp.getvalue())
-
+       
     def validate_alto(self):
         """
         Validate ALTO 
         """
-	pass
+        fp = StringIO.StringIO()
+        id = self.record.add_respstmt('recognition', 'baz')
+        self.record.write_alto(fp)
+        doc = etree.fromstring(fp.getvalue())
+
+        with open(os.path.join(resources, 'alto-3-1.xsd')) as schema_fp:
+            alto_schema = etree.XMLSchema(etree.parse(schema_fp))
+            alto_schema.assertValid(doc)
 
     def validate_abbyyxml(self):
-	pass
+        fp = StringIO.StringIO()
+        id = self.record.add_respstmt('recognition', 'baz')
+        self.record.write_abbyyxml(fp)
+        doc = etree.fromstring(fp.getvalue())
+
+        with open(os.path.join(resources, 'FineReader10-schema-v1.xml')) as schema_fp:
+            alto_schema = etree.XMLSchema(etree.parse(schema_fp))
+            alto_schema.assertValid(doc)
 
     def validate_tei(self):
-	pass
+        fp = StringIO.StringIO()
+        id = self.record.add_respstmt('recognition', 'baz')
+        self.record.write_tei(fp)
+        doc = etree.fromstring(fp.getvalue())
+
+        with open(os.path.join(resources, 'tei_ocr.rng')) as schema_fp:
+            tei_schema = etree.RelaxNG(etree.parse(schema_fp))
+            tei_schema.assertValid(doc)
 
 if __name__ == '__main__':
     unittest.main()
