@@ -7,7 +7,6 @@ import os
 
 from lxml import etree
 from distutils import spawn
-from nose.plugins.skip import SkipTest
 from mock import patch, MagicMock
 
 thisfile = os.path.abspath(os.path.dirname(__file__))
@@ -24,7 +23,7 @@ class OcropusTests(unittest.TestCase):
         if None in [spawn.find_executable('ocropus-rpred'),
                     spawn.find_executable('ocropus-gpageseg'),
                     spawn.find_executable('ocropus-hocr')]:
-            raise SkipTest
+            raise unittest.SkipTest
         self.config_mock = MagicMock()
         storage_path = unicode(tempfile.mkdtemp())
         self.config_mock.nidaba_cfg = {

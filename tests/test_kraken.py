@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
+
+from __future__ import absolute_import
+
 import unittest
 import os
 import shutil
 import tempfile
 
 from lxml import etree
-from nose.plugins.skip import SkipTest
 from mock import patch, MagicMock
 
 thisfile = os.path.abspath(os.path.dirname(__file__))
@@ -20,34 +22,35 @@ class KrakenTests(unittest.TestCase):
 
     def setUp(self):
         try:
-            config_mock = MagicMock()
+            self.config_mock = MagicMock()
             storage_path = unicode(tempfile.mkdtemp())
-            config_mock.nidaba_cfg = {
+            self.config_mock.nidaba_cfg = { 
                 'storage_path': storage_path,
                 'lang_dicts': {},
                 'kraken_models': {'default': ('test', 'en-default.hdf5')},
                 'ocropus_models': {'ocropus': ('test', 'en-default.pyrnn.gz')},
                 'plugins_load': {}
             }
-    
-            self.patches = {
-                'nidaba.config': config_mock,
+            self.patches = { 
+                'nidaba.config': self.config_mock,
             }
             self.patcher = patch.dict('sys.modules', self.patches)
+            self.patcher2 = patch('nidaba.storage.nidaba_cfg', self.config_mock.nidaba_cfg)
+            self.addCleanup(self.patcher2.stop)
             self.addCleanup(self.patcher.stop)
             self.patcher.start()
+            self.patcher2.start()
             self.storage_path = storage_path
             shutil.copytree(resources, self.storage_path + '/test')
             from nidaba.plugins import kraken
             kraken.setup()
             self.kraken = kraken
         except:
-            raise SkipTest
+            raise unittest.SkipTest
 
     def tearDown(self):
         self.patcher.stop()
         shutil.rmtree(self.storage_path)
-
 
     def test_segmentation(self):
         """
@@ -61,25 +64,12 @@ class KrakenTests(unittest.TestCase):
         except etree.XMLSyntaxError as e:
             print(e.message)
             self.fail(msg='The outpath was not valid xml!')
-
-
-    def test_hdf5_model(self):
-        """
-        Test that kraken creates hocr output with HDF5 models.
-        """
-        ocr = self.kraken.ocr_kraken.run((('test', 'segmentation.xml'), 
-                                      ('test', 'image_png.png')), 
-                                     model='default')
-        try:
-            etree.parse(open(os.path.join(self.storage_path, *ocr)))
-        except etree.XMLSyntaxError as e:
-            print(e.message)
-            self.fail(msg='The outpath was not valid html/xml!')
-
+        except IOError:
+            self.fail('Kraken did not output a file!')
 
     def test_file_outpath_png(self):
         """
-        Test that kraken creates hocr output for pngs.
+        Test that kraken creates TEI output for pngs.
         """
         ocr = self.kraken.ocr_kraken.run((('test', 'segmentation.xml'), 
                                       ('test', 'image_png.png')), 
@@ -89,6 +79,8 @@ class KrakenTests(unittest.TestCase):
         except etree.XMLSyntaxError as e:
             print(e.message)
             self.fail(msg='The outpath was not valid xml!')
+        except IOError:
+            self.fail('Kraken did not output a file!')
 
     def test_file_outpath_tiff(self):
         """
@@ -101,6 +93,8 @@ class KrakenTests(unittest.TestCase):
             etree.parse(open(os.path.join(self.storage_path, *ocr)))
         except etree.XMLSyntaxError:
             self.fail(msg='The outpath was not valid xml!')
+        except IOError:
+            self.fail('Kraken did not output a file!')
 
 
     def test_file_outpath_jpg(self):
@@ -114,6 +108,8 @@ class KrakenTests(unittest.TestCase):
             etree.parse(open(os.path.join(self.storage_path, *ocr)))
         except etree.XMLSyntaxError:
             self.fail(msg='The outpath was not valid xml!')
+        except IOError:
+            self.fail('Kraken did not output a file!')
 
 
     def test_nlbin(self):
