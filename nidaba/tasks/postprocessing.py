@@ -13,7 +13,7 @@ from nidaba import storage
 from nidaba import merge_hocr
 from nidaba import lex
 from nidaba.celery import app
-from nidaba.tei import TEIFacsimile
+from nidaba.tei import OCRRecord 
 from nidaba.config import nidaba_cfg
 from nidaba.tasks.helper import NidabaTask
 
@@ -52,14 +52,14 @@ def spell_check(doc, method=u'spell_check', language=u'',
     del_dictionary = storage.get_abs_path(*nidaba_cfg['lang_dicts'][language]['deletion_dictionary'])
     with storage.StorageFile(*doc) as fp:
         logger.debug('Reading TEI ({})'.format(fp.abs_path))
-        tei = TEIFacsimile()
-        tei.read(fp)
+        tei = OCRRecord()
+        tei.load_tei(fp)
         logger.debug('Performing spell check')
         ret = lex.tei_spellcheck(tei, dictionary, del_dictionary,
                                  filter_punctuation)
     with storage.StorageFile(*storage.get_storage_path(output_path), mode='wb') as fp:
         logger.debug('Writing TEI ({})'.format(fp.abs_path))
-        ret.write(fp)
+        ret.write_tei(fp)
     return storage.get_storage_path(output_path)
 
 
