@@ -69,7 +69,6 @@ class TesseractTests(unittest.TestCase):
                         'output a file!')
         try:
             doc = etree.parse(open(os.path.join(self.storage_path, *ocr)))
-            print(etree.tostring(doc))
         except etree.XMLSyntaxError:
             self.fail(msg='The output was not valid html/xml!')
 
