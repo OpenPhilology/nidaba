@@ -25,7 +25,7 @@ from PIL import Image
 from celery.utils.log import get_task_logger
 
 from nidaba import storage
-from nidaba.tei import TEIFacsimile
+from nidaba.tei import OCRRecord 
 from nidaba.config import nidaba_cfg
 from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
@@ -126,9 +126,9 @@ def ocr(image_path, segmentation_path, output_path, model_path):
     im = Image.open(image_path)
 
     logger.debug('Loading TEI segmentation {}'.format(segmentation_path))
-    tei = TEIFacsimile()
+    tei = OCRRecord()
     with open(segmentation_path, 'r') as seg_fp:
-        tei.read(seg_fp)
+        tei.load_tei(seg_fp)
 
     logger.debug('Clearing out word/grapheme boxes')
     # ocropus is a line recognizer
@@ -136,10 +136,9 @@ def ocr(image_path, segmentation_path, output_path, model_path):
     tei.clear_segments()
     # add and scope new responsibility statement
     tei.add_respstmt('ocropus', 'character recognition')
-    for box in tei.lines:
-        logger.debug('Recognizing line {}'.format(box[4]))
-        ib = tuple(int(x) for x in box[:-2])
-        line = ocrolib.pil2array(im.crop(ib))
+    for line_id, box in tei.lines.iteritems():
+        logger.debug('Recognizing line {}'.format(box['bbox']))
+        line = ocrolib.pil2array(im.crop(box['bbox']))
         temp = np.amax(line) - line
         temp = temp * 1.0 / np.amax(temp)
         lnorm.measure(temp)
@@ -149,11 +148,11 @@ def ocr(image_path, segmentation_path, output_path, model_path):
         line = ocrolib.lstm.prepare_line(line, 16)
         pred = network.predictString(line)
         pred = ocrolib.normalize_text(pred)
-        logger.debug('Scoping line {}'.format(box[4]))
-        tei.scope_line(box[4])
+        logger.debug('Scoping line {}'.format(line_id))
+        tei.scope_line(line_id)
         logger.debug('Adding graphemes: {}'.format(pred))
-        tei.add_graphemes(pred)
+        tei.add_graphemes({'grapheme': x} for x in pred)
     with open(output_path, 'wb') as fp:
-        logger.debug('Writing TEI to {}'.format(fp.abs_path))
-        tei.write(fp)
+        logger.debug('Writing TEI to {}'.format(fp.name))
+        tei.write_tei(fp)
     return output_path
