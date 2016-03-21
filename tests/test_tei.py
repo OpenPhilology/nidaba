@@ -327,20 +327,30 @@ class TEITests(unittest.TestCase):
         self.record.write_alto(fp)
         doc = etree.fromstring(fp.getvalue())
        
-    def validate_alto(self):
+    def test_validate_alto(self):
         """
         Validate ALTO 
         """
         fp = StringIO.StringIO()
         id = self.record.add_respstmt('recognition', 'baz')
+        self.record.add_segment((0, 0, 0, 0), language='foo', confidence=80)
+        self.record.add_graphemes([{'bbox': (0, 0, 0, 0), 
+                               'confidence': 95,
+                               'grapheme': ' '}])
+        self.record.add_segment((0, 0, 0, 0), language='foo', confidence=80)
+        self.record.add_graphemes([{'bbox': (0, 0, 0, 0), 
+                               'confidence': 95,
+                               'grapheme': 'AB'}])
+        self.record.add_choices('line_11', [{'confidence': 95,
+                                           'alternative': ''.join(x)} for x in itertools.permutations('ABCD', 2)])
         self.record.write_alto(fp)
         doc = etree.fromstring(fp.getvalue())
-
+        print('\n' + fp.getvalue())
         with open(os.path.join(resources, 'alto-3-1.xsd')) as schema_fp:
             alto_schema = etree.XMLSchema(etree.parse(schema_fp))
             alto_schema.assertValid(doc)
 
-    def validate_abbyyxml(self):
+    def test_validate_abbyyxml(self):
         fp = StringIO.StringIO()
         id = self.record.add_respstmt('recognition', 'baz')
         self.record.write_abbyyxml(fp)
@@ -350,7 +360,7 @@ class TEITests(unittest.TestCase):
             alto_schema = etree.XMLSchema(etree.parse(schema_fp))
             alto_schema.assertValid(doc)
 
-    def validate_tei(self):
+    def test_validate_tei(self):
         fp = StringIO.StringIO()
         id = self.record.add_respstmt('recognition', 'baz')
         self.record.write_tei(fp)
