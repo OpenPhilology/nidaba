@@ -677,25 +677,36 @@ class OCRRecord(object):
         Args:
             fp (file): File descriptor to write to.
         """
-        page = Element('document')
+        page = Element('document',
+                       xmlns='http://www.abbyy.com/FineReader_xml/FineReader10-schema-v1.xml',
+                       version='1.0',
+                       producer='nidaba')
         p = SubElement(page, 'page')
         p.set('width', str(self.dimensions[0]))
         p.set('height', str(self.dimensions[1]))
+        p.set('resolution', '0')
         p.set('originalCoords', '1')
-        text = SubElement(p, 'text')
+        b = SubElement(p, 'block', blockType='Text')
+        text = SubElement(b, 'text')
+        par = SubElement(text, 'par')
         for line in self.lines.itervalues():
-            lel = SubElement(text, 'line')
+            lel = SubElement(par, 'line')
+            # XXX: meaning of baseline is nowere documented
+            lel.set('baseline', '0')
             lel.set('l', str(line['bbox'][0]))
             lel.set('t', str(line['bbox'][1]))
             lel.set('r', str(line['bbox'][2]))
             lel.set('b', str(line['bbox'][3]))
             for seg in line['content'].itervalues():
                 if seg['type'] == 'segment':
+                    formatting = SubElement(lel, 'formatting')
+                    if 'language' in seg:
+                        formatting.set('lang', seg['language'])
                     word_start = True
                     for g in seg['content'].itervalues():
                         if 'bbox' not in g:
                             raise NidabaRecordException('No bounding box for grapheme')
-                        el = SubElement(lel, 'charParams')
+                        el = SubElement(formatting, 'charParams')
                         if word_start:
                             el.set('wordStart', 'true')
                             word_start = False
@@ -709,7 +720,10 @@ class OCRRecord(object):
                         if 'confidence' in g:
                            el.set('charConfidence', str(g['confidence']))
                 elif seg['type'] == 'grapheme':
-                    el = SubElement(lel, 'charParams')
+                    formatting = SubElement(lel, 'formatting')
+                    if 'language' in seg:
+                        formatting.set('lang', seg['language'])
+                    el = SubElement(formatting, 'charParams')
                     el.text = g['grapheme']
                     el.set('l', str(g['bbox'][0]))
                     el.set('t', str(g['bbox'][1]))
