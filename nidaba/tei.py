@@ -838,7 +838,9 @@ class OCRRecord(object):
                     break
                 elif seg['type'] == 'segment':
                     text = ''.join(x['grapheme'] for x in seg['content'].itervalues())
-                    if text:
+                    if text.isspace():
+                        text_el = SubElement(text_line, 'SP')
+                    else:
                         text_el = SubElement(text_line, 'String')
                         text_el.set('CONTENT', text)
                         # extract word confidences
@@ -851,8 +853,7 @@ class OCRRecord(object):
                                 certs.append(str(int(10 - 10 * (g['confidence']/100.0))))
                         if certs:
                             text_el.set('CC', ' '.join(certs))
-                    else:
-                        text_el = SubElement(text_line, 'SP')
+
                     text_el.set('HPOS', str(seg['bbox'][0]))
                     text_el.set('VPOS', str(seg['bbox'][1]))
                     text_el.set('WIDTH', str(seg['bbox'][2] - seg['bbox'][0]))
