@@ -115,6 +115,7 @@ class OCRRecord(object):
 
     xml_ns = '{http://www.w3.org/XML/1998/namespace}'
     tei_ns = '{http://www.tei-c.org/ns/1.0}'
+    abbyy_ns = '{http://www.abbyy.com/FineReader_xml/FineReader10-schema-v1.xml}'
 
     # automatically generated properties in the fileDesc element and xpath to their location
     _tei_fields = [('titleStmt', [('title', '/' + tei_ns + 'title',), 
@@ -134,7 +135,7 @@ class OCRRecord(object):
                                         ('licence', '/{0}availability/{0}licence'.format(tei_ns), 'target'),
                                        ]),
                    ('seriesStmt', [('series_title', '/' + tei_ns + 'p')]),
-                   ('notesStmt', [('note', '/' + tei_ns + 'notes')]),
+                   ('notesStmt', [('note', '/' + tei_ns + 'note')]),
                    ('sourceDesc', [('source_desc', '/' + tei_ns + 'p')])
                   ] 
 
@@ -650,7 +651,7 @@ class OCRRecord(object):
                     _add_grapheme(seg_id, seg, line_el)
                 else:
                     raise NidabaRecordException('Unknown nodes beneath line records')
-        fp.write(etree.tostring(doc, xml_declaration=True, encoding='utf-8'))
+        fp.write(etree.tostring(doc, xml_declaration=True, encoding='utf-8', pretty_print=True))
         fp.flush()
 
     def write_abbyyxml(self, fp):
