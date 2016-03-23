@@ -22,9 +22,8 @@ import os
 import shutil
 import regex
 
-from nidaba import uzn
 from nidaba import storage
-from nidaba.tei import TEIFacsimile
+from nidaba.tei import OCRRecord
 from nidaba.config import nidaba_cfg
 from nidaba.celery import app
 from nidaba.nidabaexceptions import NidabaInvalidParameterException
@@ -93,15 +92,16 @@ def segmentation_kraken(doc, method=u'segment_kraken', black_colseps=False):
     img = Image.open(input_path)
     with open(output_path + '.xml', 'w') as fp:
         logger.debug('Initializing TEI with {} ({} {})'.format(doc[1], *img.size))
-        tei = TEIFacsimile()
-        tei.document(img.size, os.path.join(*doc))
+        tei = OCRRecord()
+        tei.img = os.path.join(*doc)
+        tei.dimensions = img.size
         tei.title = os.path.basename(doc[1])
         tei.add_respstmt('kraken', 'page segmentation')
         for seg in pageseg.segment(img, black_colseps):
             logger.debug('Found line at {} {} {} {}'.format(*seg))
             tei.add_line(seg)
         logger.debug('Write segmentation to {}'.format(fp.name))
-        tei.write(fp)
+        tei.write_tei(fp)
     return (storage.get_storage_path(output_path + '.xml'),
             storage.get_storage_path(output_path + ext))
 
@@ -136,9 +136,9 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
                                               'configuration')
     img = Image.open(input_path)
     logger.debug('Reading TEI segmentation from {}'.format(doc[1]))
-    tei = TEIFacsimile()
+    tei = OCRRecord()
     with storage.StorageFile(*doc[0]) as seg:
-        tei.read(seg)
+        tei.load_tei(seg)
 
     logger.debug('Clearing out word/grapheme boxes')
     # kraken is a line recognizer
@@ -152,11 +152,11 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     rnn = models.load_any(model)
     i = 0
     logger.debug('Start recognizing characters')
-    for rec in rpred.rpred(rnn, img, [(int(x[0]), int(x[1]), int(x[2]), int(x[3])) for x in lines]):
+    for line_id, rec in zip(lines, rpred.rpred(rnn, img, [x['bbox'] for x in lines.itervalues()])):
         # scope the current line and add all graphemes recognized by kraken to
         # it.
-        logger.debug('Scoping line {}'.format(lines[i][4]))
-        tei.scope_line(lines[i][4])
+        logger.debug('Scoping line {}'.format(line_id))
+        tei.scope_line(line_id)
         i += 1
 
         splits = regex.split(u'(\s+)', rec.prediction)
@@ -167,17 +167,21 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
                 logger.debug('Creating new segment at {} {} {} {}'.format(*seg_bbox))
                 tei.add_segment(seg_bbox)
                 logger.debug('Adding graphemes (segment): {}'.format(rec.prediction[line_offset:line_offset+len(segment)]))
-                tei.add_graphemes([(x[0], x[1], int(x[2] * 100)) for x in rec[line_offset:line_offset+len(segment)]])
+                tei.add_graphemes([{'grapheme': x[0], 
+                                    'bbox': x[1],
+                                    'confidence': int(x[2] * 100)} for x in rec[line_offset:line_offset+len(segment)]])
                 line_offset += len(segment)
             if whitespace:
                 logger.debug('Adding graphemes (whitespace): {}'.format(rec.prediction[line_offset:line_offset+len(whitespace)]))
                 seg_bbox = max_bbox(rec.cuts[line_offset:line_offset + len(whitespace)])
                 tei.add_segment(seg_bbox)
-                tei.add_graphemes([(x[0], x[1], int(x[2] * 100)) for x in rec[line_offset:line_offset+len(whitespace)]])
+                tei.add_graphemes([{'grapheme': x[0], 
+                                    'bbox': x[1],
+                                    'confidence': int(x[2] * 100)} for x in rec[line_offset:line_offset+len(whitespace)]])
                 line_offset += len(whitespace)
     with storage.StorageFile(*output_path, mode='wb') as fp:
         logger.debug('Writing TEI to {}'.format(fp.abs_path))
-        tei.write(fp)
+        tei.write_tei(fp)
     return output_path
 
 
@@ -221,33 +225,8 @@ def nlbin(doc, method=u'nlbin', threshold=0.5, zoom=0.5, escale=1.0,
                                         unicode(border), unicode(perc),
                                         unicode(range), unicode(low),
                                         unicode(high))
-    kraken_nlbin(input_path, output_path, threshold, zoom, escale, border,
-                 perc, range, low, high)
-    return storage.get_storage_path(output_path)
-
-
-def kraken_nlbin(input_path, output_path, threshold=0.5, zoom=0.5, escale=1.0,
-                 border=0.1, perc=80, range=20, low=5, high=90):
-    """
-    Binarizes an input document utilizing ocropus'/kraken's nlbin algorithm.
-
-    Args:
-        input_path (unicode): Path to the input image
-        output_path (unicode): Path to the output image
-        threshold (float):
-        zoom (float):
-        escale (float):
-        border (float)
-        perc (int):
-        range (int):
-        low (int):
-        high (int):
-
-    Raises:
-        NidabaInvalidParameterException: Input parameters are outside the valid
-                                         range.
-
-    """
     img = Image.open(input_path)
-    binarization.nlbin(img, threshold, zoom, escale, border, perc, range, low,
-                       high).save(output_path)
+    o_img = binarization.nlbin(img, threshold, zoom, escale, border, perc, range, low,
+                       high)
+    o_img.save(output_path)
+    return storage.get_storage_path(output_path)

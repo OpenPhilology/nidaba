@@ -65,7 +65,7 @@ from celery.utils.log import get_task_logger
 
 from nidaba.uzn import UZNWriter
 from nidaba import storage
-from nidaba.tei import TEIFacsimile
+from nidaba.tei import OCRRecord
 from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
 from nidaba.nidabaexceptions import NidabaTesseractException
@@ -195,6 +195,9 @@ def setup(*args, **kwargs):
         tesseract.TessPageIteratorDelete.argtypes = [POINTER(TessPageIterator)]
         tesseract.TessPageIteratorDelete.restype = None
 
+        tesseract.TessDeleteText.argtypes = [POINTER(ctypes.c_char)]
+        tesseract.TessDeleteText.restype = None
+
         leptonica.pixRead.argtypes = [ctypes.c_char_p]
         leptonica.pixRead.restype = POINTER(Pix)
 
@@ -202,7 +205,7 @@ def setup(*args, **kwargs):
         leptonica.pixDestroy.restype = None
 
         tesseract.TessBaseAPIGetHOCRText.argtypes = [POINTER(TessBaseAPI), ctypes.c_int]
-        tesseract.TessBaseAPIGetHOCRText.restype = ctypes.c_char_p
+        tesseract.TessBaseAPIGetHOCRText.restype = POINTER(ctypes.c_char)
 
         tesseract.TessBaseAPIGetAvailableLanguagesAsVector.argtypes = [POINTER(TessBaseAPI)]
         tesseract.TessBaseAPIGetAvailableLanguagesAsVector.restype = POINTER(ctypes.c_char_p)
@@ -274,8 +277,9 @@ def segmentation_tesseract(doc, method=u'segment_tesseract'):
 
     w, h = Image.open(input_path).size
     logger.info('Initializing TEI XML file with {}x{} {}/{}'.format(w, h, *doc))
-    tei = TEIFacsimile()
-    tei.document((w, h), os.path.join(*doc))
+    tei = OCRRecord()
+    tei.dimensions = (w, h)
+    tei.img = os.path.join(*doc)
     tei.title = os.path.basename(doc[1])
     tei.add_respstmt('tesseract', 'page segmentation')
 
@@ -311,7 +315,7 @@ def segmentation_tesseract(doc, method=u'segment_tesseract'):
                                               ctypes.byref(y0),
                                               ctypes.byref(x1),
                                               ctypes.byref(y1))
-        tei.add_graphemes([(None, (x0.value, y0.value, x1.value, y1.value))])
+        tei.add_graphemes([{'grapheme': '', 'bbox': (x0.value, y0.value, x1.value, y1.value)}])
         logger.debug('Segmenter found new symbol at {} {} {} {}'.format(x0.value,
                                                                         y0.value,
                                                                         x1.value,
@@ -325,7 +329,7 @@ def segmentation_tesseract(doc, method=u'segment_tesseract'):
     tesseract.TessBaseAPIDelete(api)
     logger.info('Writing segmentation to {}'.format(output_path))
     with open(output_path, 'w') as fp:
-        tei.write(fp)
+        tei.write_tei(fp)
     logger.info('Quitting child process')
     os._exit(os.EX_OK)
     return storage.get_storage_path(output_path), doc
@@ -369,13 +373,13 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
     logger.debug('Rewriting TEI ({}) -> UZN ({})'.format(doc[0][1],
                                                          splitext(doc[1][1])[0]
                                                          + '.uzn'))
-    seg = TEIFacsimile()
+    seg = OCRRecord()
     with storage.StorageFile(*doc[0]) as fp:
-        seg.read(fp)
+        seg.load_tei(fp)
     with storage.StorageFile(doc[1][0], splitext(doc[1][1])[0] + '.uzn', mode='wb') as fp:
         uzn = UZNWriter(fp)
-        for line in seg.lines:
-            uzn.writerow(*line[:4])
+        for line in seg.lines.itervalues():
+            uzn.writerow(*line['bbox'])
 
     if isinstance(languages, basestring):
         languages = [languages]
@@ -399,12 +403,12 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
         logger.debug('Converting hOCR ({}) -> TEI ({})'.format(result_path,
                                                                output_path +
                                                                '.xml'))
-        tei = TEIFacsimile()
+        tei = OCRRecord()
         with open(result_path) as fp:
             tei.load_hocr(fp)
         os.unlink(result_path)
         with open(output_path + '.xml', 'wb') as fp:
-            tei.write(fp)
+            tei.write_tei(fp)
         result_path = output_path + '.xml'
     return storage.get_storage_path(result_path)
 
@@ -416,7 +420,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
 
     Args:
         image_path (unicode): Path to the input image
-        facsimile (nidaba.tei.TEIFacsimile): Facsimile object of the
+        facsimile (nidaba.tei.OCRRecord): Facsimile object of the
                                              segmentation
         output_path (unicode): Path to the hOCR output
         languages (list): List of valid tesseract language identifiers
@@ -475,9 +479,12 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
         w, h = Image.open(image_path).size
         x0, y0, x1, y1 = (ctypes.c_int(), ctypes.c_int(), ctypes.c_int(),
                           ctypes.c_int())
-        for line in facsimile.lines:
-            logger.debug('Clipping input image to recognition box ({})'.format(line[4]))
-            tesseract.TessBaseAPISetRectangle(api, line[0], line[1], line[2] - line[0], line[3] - line[1])
+        for line_id, line in facsimile.lines.iteritems():
+            logger.debug('Clipping input image to recognition box ({})'.format(line['bbox']))
+            tesseract.TessBaseAPISetRectangle(api, line['bbox'][0],
+                                              line['bbox'][1], 
+                                              line['bbox'][2] - line['bbox'][0],
+                                              line['bbox'][3] - line['bbox'][1])
             logger.debug('Recognizing line.')
             if tesseract.TessBaseAPIRecognize(api, None):
                 leptonica.pixDestroy(ctypes.byref(pix))
@@ -487,8 +494,8 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
             logger.debug('Retrieving result and page iterator.')
             ri = tesseract.TessBaseAPIGetIterator(api)
             pi = tesseract.TessResultIteratorGetPageIterator(ri)
-            logger.debug('Scoping line {}'.format(line[4]))
-            facsimile.scope_line(line[4])
+            logger.debug('Scoping line {}'.format(line_id))
+            facsimile.scope_line(line_id)
             last_word = None
             while True:
                 if tesseract.TessPageIteratorIsAtBeginningOf(pi, RIL_WORD):
@@ -504,10 +511,9 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                     if last_word is not None:
                         facsimile.add_segment((last_word, y0.value, x1.value,
                                                y1.value), lang, 100)
-                        facsimile.add_graphemes([(u' ', (last_word,
-                                                         y0.value,
-                                                         x0.value,
-                                                         y1.value), 100.0)])
+                        facsimile.add_graphemes([{'grapheme': u' ', 
+                                                  'bbox': (last_word, y0.value,x0.value, y1.value),
+                                                  'confidence': 100}])
                     last_word = x1.value
                     facsimile.add_segment((x0.value, y0.value, x1.value, y1.value),
                                           lang, conf)
@@ -526,8 +532,9 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                 grapheme = tesseract.TessResultIteratorGetUTF8Text(ri, RIL_SYMBOL)
                 if grapheme is not None:
                     grapheme = grapheme.decode('utf-8')
-                facsimile.add_graphemes([(grapheme, (x0.value, y0.value, x1.value,
-                                          y1.value), conf)])
+                facsimile.add_graphemes([{'grapheme': grapheme, 
+                                          'bbox': (x0.value, y0.value, x1.value,y1.value), 
+                                          'confidence': conf}])
                 logger.debug('New symbol {} at {} {} {} {} (conf: {})'.format(grapheme,
                                                                               x0.value,
                                                                               y0.value,
@@ -542,7 +549,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
             tesseract.TessResultIteratorDelete(ri)
         logger.info('Writing TEI ({})'.format(output_path))
         with open(output_path, 'wb') as fp:
-            facsimile.write(fp)
+            facsimile.write_tei(fp)
     else:
         logger.debug('Set page segmentation to single column')
         tesseract.TessBaseAPISetPageSegMode(api, 4)
@@ -559,7 +566,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
             hocr.seek(0)
             logger.debug('Converting hOCR -> TEI ({})'.format(output_path))
             facsimile.load_hocr(hocr)
-            facsimile.write(fp)
+            facsimile.write_tei(fp)
             logger.debug('Freeing hOCR string')
             tesseract.TessDeleteText(tp)
     logger.debug('Deleting base API')

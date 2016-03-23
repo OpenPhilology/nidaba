@@ -28,29 +28,30 @@ def tei_spellcheck(facsimile, dictionary, deletion_dictionary,
     correction candidates will be sorted by edit distance.
 
     Args:
-        facsimile (nidaba.tei.TEIFacsimile): TEIFacsimile object.
+        facsimile (nidaba.tei.OCRRecord): OCR record object.
         dictionary (unicode): Path to a base dictionary.
         deletion_dictionary (unicode): Path to a deletion dictionary.
         filter_punctuation (bool): Switch to filter punctuation inside
                                    segments.
 
     Returns:
-        A TEIFacsimile object containing the spelling corrections.
+        A OCRRecord object containing the spelling corrections.
     """
-    text_tokens = [x[-1] for x in facsimile.segments]
+    text_tokens = set(''.join(y['grapheme'] for y in x.get('content').itervalues()) for x in facsimile.segments.itervalues())
+    text_tokens.remove('')
+    text_tokens = list(text_tokens)
     if filter_punctuation:
         text_tokens = [regex.sub('[^\w]', '', x) for x in text_tokens]
     suggestions = spellcheck(text_tokens, dictionary, deletion_dictionary)
     facsimile.add_respstmt('spell-checker', 'nidaba-levenshtein')
-    for segment in facsimile.segments:
-        key = alg.sanitize(segment[-1])
+    for seg_id, segment in facsimile.segments.iteritems():
+        key = alg.sanitize(''.join(x['grapheme'] for x in segment['content'].itervalues()))
         if filter_punctuation:
             key = regex.sub('[^\w]', '', key)
         if key not in suggestions:
             continue
         for sugg in suggestions[key]:
-            facsimile.add_choices(segment[-2], [(sugg, 100 - 10 *
-                                  alg.edit_distance(key, sugg))])
+            facsimile.add_choices(seg_id, [{'alternative': sugg, 'confidence': 100 - 10 * alg.edit_distance(key, sugg)}])
     return facsimile
 
 

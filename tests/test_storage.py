@@ -4,7 +4,6 @@ import os
 import shutil
 import tempfile
 
-from nose.plugins.skip import SkipTest
 from mock import patch, MagicMock
 
 thisfile = os.path.abspath(os.path.dirname(__file__))

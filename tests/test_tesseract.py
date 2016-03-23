@@ -10,7 +10,6 @@ import ctypes
 
 from lxml import etree
 from distutils import spawn
-from nose.plugins.skip import SkipTest
 from mock import patch, MagicMock
 
 thisfile = os.path.abspath(os.path.dirname(__file__))
@@ -59,7 +58,7 @@ class TesseractTests(unittest.TestCase):
         try:
             t = ctypes.cdll.LoadLibrary('libtesseract.so.3')
         except:
-            raise SkipTest
+            raise unittest.SkipTest
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
         ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
                                            'image.tiff')),
@@ -70,7 +69,6 @@ class TesseractTests(unittest.TestCase):
                         'output a file!')
         try:
             doc = etree.parse(open(os.path.join(self.storage_path, *ocr)))
-            print(etree.tostring(doc))
         except etree.XMLSyntaxError:
             self.fail(msg='The output was not valid html/xml!')
 
@@ -81,7 +79,7 @@ class TesseractTests(unittest.TestCase):
         languages.
         """
         if not spawn.find_executable('tesseract'):
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
         ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
@@ -106,7 +104,7 @@ class TesseractTests(unittest.TestCase):
         try:
             ctypes.cdll.LoadLibrary('libtesseract.so.3')
         except:
-            raise SkipTest
+            raise unittest.SkipTest
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
         ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
                                            'image.tiff')),
@@ -133,7 +131,7 @@ class TesseractTests(unittest.TestCase):
         try:
             t = ctypes.cdll.LoadLibrary('libtesseract.so.3')
         except:
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
         ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
@@ -156,7 +154,7 @@ class TesseractTests(unittest.TestCase):
         try:
             t = ctypes.cdll.LoadLibrary('libtesseract.so.3')
         except:
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
         ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
@@ -180,7 +178,7 @@ class TesseractTests(unittest.TestCase):
         try:
             t = ctypes.cdll.LoadLibrary('libtesseract.so.3')
         except:
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
         ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
@@ -202,7 +200,7 @@ class TesseractTests(unittest.TestCase):
         """
 
         if not spawn.find_executable('tesseract'):
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
         ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
@@ -223,7 +221,7 @@ class TesseractTests(unittest.TestCase):
         Test that direct tesseract calls create hocr output for tiffs.
         """
         if not spawn.find_executable('tesseract'):
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
         ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
@@ -244,7 +242,7 @@ class TesseractTests(unittest.TestCase):
         Test that direct tesseract calls create hocr output for jpgs.
         """
         if not spawn.find_executable('tesseract'):
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
         ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',

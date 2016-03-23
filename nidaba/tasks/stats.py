@@ -17,7 +17,7 @@ from lxml import html
 from pyxdameraulevenshtein import normalized_damerau_levenshtein_distance, damerau_levenshtein_distance
 
 from nidaba import storage
-from nidaba.tei import TEIFacsimile
+from nidaba.tei import OCRRecord
 from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
 from nidaba.algorithms.string import sanitize
@@ -86,8 +86,8 @@ def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
         ground_truth = find_matching(doc, ground_truth)
     with storage.StorageFile(*ground_truth) as fp:
         if gt_format == 'tei':
-            tei = TEIFacsimile()
-            tei.read(fp)
+            tei = OCRRecord()
+            tei.load_tei(fp)
             t = StringIO.StringIO()
             tei.write_text(t)
             gt = t.getvalue()
@@ -99,8 +99,8 @@ def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
             raise NidabaInvalidParameterException('Input format ' + gt_format + ' unknown.')
     with storage.StorageFile(*doc) as fp:
         if xml_in:
-            tei = TEIFacsimile()
-            tei.read(fp)
+            tei = OCRRecord()
+            tei.load_tei(fp)
             t = StringIO.StringIO()
             tei.write_text(t)
             text = t.getvalue()
@@ -166,8 +166,8 @@ def text_edit_ratio(doc, method=u'text_edit_ratio', ground_truth=None,
         ground_truth = find_matching(doc, ground_truth)
     with storage.StorageFile(*ground_truth) as fp:
         if gt_format == 'tei':
-            tei = TEIFacsimile()
-            tei.read(fp)
+            tei = OCRRecord()
+            tei.load_tei(fp)
             t = StringIO.StringIO()
             tei.write_text(t)
             gt = t.getvalue()
@@ -179,8 +179,8 @@ def text_edit_ratio(doc, method=u'text_edit_ratio', ground_truth=None,
             raise NidabaInvalidParameterException('Input format ' + gt_format + ' unknown.')
     with storage.StorageFile(*doc) as fp:
         if xml_in:
-            tei = TEIFacsimile()
-            tei.read(fp)
+            tei = OCRRecord()
+            tei.load_tei(fp)
             t = StringIO.StringIO()
             tei.write_text(t)
             text = t.getvalue()

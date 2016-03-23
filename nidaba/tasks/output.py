@@ -14,7 +14,7 @@ import yaml
 
 from nidaba import storage
 from nidaba.celery import app
-from nidaba.tei import TEIFacsimile
+from nidaba.tei import OCRRecord
 from nidaba.nidabaexceptions import NidabaTEIException
 from nidaba.tasks.helper import NidabaTask
 
@@ -100,9 +100,9 @@ def tei_metadata(doc, method=u'metadata', metadata=None, validate=False):
         validation is enabled.
     """
     with storage.StorageFile(*doc) as fp:
-        tei = TEIFacsimile()
+        tei = OCRRecord()
         logger.debug('Reading TEI ({}/{})'.format(*doc))
-        tei.read(fp)
+        tei.load_tei(fp)
     logger.debug('Reading metadata file ({}/{})'.format(*metadata))
     with storage.StorageFile(*metadata) as fp:
         meta = yaml.safe_load(fp)
@@ -115,7 +115,29 @@ def tei_metadata(doc, method=u'metadata', metadata=None, validate=False):
     output_path = storage.insert_suffix(doc[1], method, metadata[1])
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
         logger.debug('Writing TEI to {}'.format(fp.abs_path))
-        tei.write(fp)
+        tei.write_tei(fp)
+    return (doc[0], output_path)
+
+
+@app.task(base=NidabaTask, name=u'nidaba.output.tei2alto')
+def tei2alto(doc, method=u'alto'):
+    """
+    Convert a TEI Facsimile to ALTO XML.
+
+    Args:
+        doc (unicode, unicode): Storage tuple of the input document
+
+    Returns:
+        (unicode, unicode): Storage tuple of the output document
+    """
+    with storage.StorageFile(*doc) as fp:
+        tei = OCRRecord()
+        logger.debug('Reading TEI ({}/{})'.format(*doc))
+        tei.load_tei(fp)
+    output_path = storage.insert_suffix(doc[1], method)
+    with storage.StorageFile(doc[0], output_path, 'wb') as fp:
+        logger.debug('Writing alto to {}'.format(fp.abs_path))
+        tei.write_alto(fp)
     return (doc[0], output_path)
 
 
@@ -132,9 +154,9 @@ def tei2abbyyxml(doc, method=u'abbyyxml'):
         (unicode, unicode): Storage tuple of the output document
     """
     with storage.StorageFile(*doc) as fp:
-        tei = TEIFacsimile()
+        tei = OCRRecord()
         logger.debug('Reading TEI ({}/{})'.format(*doc))
-        tei.read(fp)
+        tei.load_tei(fp)
     output_path = storage.insert_suffix(doc[1], method)
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
         logger.debug('Writing abbyyxml to {}'.format(fp.abs_path))
@@ -154,9 +176,9 @@ def tei2hocr(doc, method=u'tei2hocr'):
         (unicode, unicode): Storage tuple of the output document
     """
     with storage.StorageFile(*doc) as fp:
-        tei = TEIFacsimile()
+        tei = OCRRecord()
         logger.debug('Reading TEI ({}/{})'.format(*doc))
-        tei.read(fp)
+        tei.load_tei(fp)
     output_path = storage.insert_suffix(doc[1], method)
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
         logger.debug('Writing hOCR to {}'.format(fp.abs_path))
@@ -176,9 +198,9 @@ def tei2txt(doc, method=u'tei2txt'):
         (unicode, unicode): Storage tuple of the output document
     """
     with storage.StorageFile(*doc) as fp:
-        tei = TEIFacsimile()
+        tei = OCRRecord()
         logger.debug('Reading TEI ({}/{})'.format(*doc))
-        tei.read(fp)
+        tei.load_tei(fp)
     output_path = storage.insert_suffix(doc[1], method)
     with storage.StorageFile(doc[0], output_path, 'wb') as fp:
         logger.debug('Writing text to {}'.format(fp.abs_path))

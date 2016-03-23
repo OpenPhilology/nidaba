@@ -1,11 +1,10 @@
 import os
-import urllib2
-import urlparse
-import shutil
+import sys
+import urllib
+import tarfile
 from distutils.core import Command
 
-manifest_url = "http://l.unchti.me/nidaba/MANIFEST"
-download_prefix = "http://l.unchti.me/nidaba/"
+target = "http://l.unchti.me/nidaba/tests.tar.bz2"
 
 class DownloadCommand(Command):
     command_name = 'download'
@@ -20,16 +19,13 @@ class DownloadCommand(Command):
         pass
 
     def run(self):
-        print("Downloading manifest...")
-        manifest = [x.strip() for x in
-                    urllib2.urlopen(manifest_url).readlines()]
-        print("Downloading: ")
-        for f in manifest:
-            print('\t* ' + f)
-            try:
-                os.makedirs(os.path.dirname(f))
-            except OSError:
-                pass
-            r = urllib2.urlopen(urlparse.urljoin(download_prefix, f))
-            with open(f, 'wb') as fp:
-                shutil.copyfileobj(r, fp)
+	def dlProgress(count, blockSize, totalSize):
+	    percent = int(count*blockSize*100/totalSize)
+	    sys.stdout.write("\rDownloading test data... %d%%" % percent)
+	    sys.stdout.flush()
+	 
+	file_tmp = urllib.urlretrieve(target, filename=None, reporthook=dlProgress)[0]
+	tar = tarfile.open(file_tmp)
+	tar.extractall()
+	tar.close()
+        print('')
