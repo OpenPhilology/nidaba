@@ -17,6 +17,7 @@ from itertools import product
 from inspect import getcallargs
 from collections import OrderedDict, Iterable
 from requests_toolbelt.multipart import encoder
+from redis import WatchError
 
 import os
 import json
@@ -166,7 +167,7 @@ class Batch(object):
                     self._restore_and_create_scratchpad(pipe)
                     pipe.execute()
                     break
-                except self.redis.WatchError:
+                except WatchError:
                     continue
 
     def _restore_and_create_scratchpad(self, pipe):
@@ -294,7 +295,7 @@ class Batch(object):
                     pipe.set(self.id, json.dumps(self.scratchpad))
                     pipe.execute()
                     break
-                except self.redis.WatchError:
+                except WatchError:
                     continue
 
     def add_task(self, method, **kwargs):
@@ -327,7 +328,7 @@ class Batch(object):
                     pipe.set(self.id, json.dumps(self.scratchpad))
                     pipe.execute()
                     break
-                except self.redis.WatchError:
+                except WatchError:
                     continue
 
     def add_tick(self):
@@ -354,7 +355,7 @@ class Batch(object):
                     pipe.set(self.id, json.dumps(self.scratchpad))
                     pipe.execute()
                     break
-                except self.redis.WatchError:
+                except WatchError:
                     continue
 
     def add_step(self):
@@ -382,7 +383,7 @@ class Batch(object):
                     pipe.set(self.id, json.dumps(self.scratchpad))
                     pipe.execute()
                     break
-                except self.redis.WatchError:
+                except WatchError:
                     continue
 
     def run(self):
@@ -489,7 +490,7 @@ class Batch(object):
                     pipe.set(self.id, json.dumps(result_data))
                     pipe.execute()
                     break
-                except self.redis.WatchError:
+                except WatchError:
                     continue
         [x.apply_async() for x in chains]
         return self.id
@@ -554,7 +555,7 @@ class SimpleBatch(Batch):
                         self.lock = True
                     pipe.execute()
                     break
-                except self.redis.WatchError:
+                except WatchError:
                     continue
 
     def is_running(self):
@@ -677,7 +678,7 @@ class SimpleBatch(Batch):
                     pipe.set(self.id, json.dumps(self.scratchpad))
                     pipe.execute()
                     break
-                except self.redis.WatchError:
+                except WatchError:
                     continue
 
     def run(self):
