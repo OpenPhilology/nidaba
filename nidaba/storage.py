@@ -19,6 +19,7 @@ import os
 import fnmatch
 import re
 
+from flask_restful import url_for
 
 class StorageFile(io.IOBase):
     """
@@ -150,6 +151,25 @@ def is_file(jobID, path):
                    document such paltry information as exceptions.
     """
     return os.path.isfile(get_abs_path(jobID, path))
+
+
+def get_url(jobID, *paths):
+    """
+    Returns the URL on the api server for a file tuple.
+    Args:
+        jobID (unicode): A unique job ID
+        *path (unicode): A list of path components that are concatenated to
+        calculate the absolute path.
+
+    Returns:
+        (unicode): A string containing the absolute path of the storage tuple.
+    """
+    from nidaba import api
+    app = api.create_app()
+    app.config['SERVER_NAME'] =  nidaba_cfg['nidaba_server']
+    with app.app_context():
+        return url_for('api.page', batch=jobID, file=os.path.join(*paths))
+    raise NidabaStorageViolationException('Invalid path')
 
 
 def get_abs_path(jobID, *path):

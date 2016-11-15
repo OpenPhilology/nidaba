@@ -279,7 +279,7 @@ def segmentation_tesseract(doc, method=u'segment_tesseract'):
     logger.info('Initializing TEI XML file with {}x{} {}/{}'.format(w, h, *doc))
     tei = OCRRecord()
     tei.dimensions = (w, h)
-    tei.img = os.path.join(*doc)
+    tei.img = storage.get_url(*doc)
     tei.title = os.path.basename(doc[1])
     tei.add_respstmt('tesseract', 'page segmentation')
 
