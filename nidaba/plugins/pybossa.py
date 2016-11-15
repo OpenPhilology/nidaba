@@ -23,7 +23,7 @@ def setup(*args, **kwargs):
         pbclient.set('endpoint', kwargs.get('server'))
         pbclient.set('api_key', kwargs.get('api_key'))
         global project
-        project = pbclient.find_project(short_name=kwargs.get('project'))[0]
+        project = pbclient.find_project(short_name=kwargs.get('project'))[0].data['id']
     except Exception as e:
         raise NidabaPluginException(e.message)
 
