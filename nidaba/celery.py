@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function, absolute_import
 
-from celery import Celery
+from celery import Celery, chain, group
 from nidaba.config import celery_cfg
 app = Celery('nidaba',
              include=['nidaba.tasks'])
