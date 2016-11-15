@@ -45,3 +45,6 @@ plugins_load:
   #ocropus: {}
   #kraken: {}
   #leptonica: {}
+  #pybossa: {server: http://theserver.com,
+  #          apikey: yourkey,
+  #          project: yourproject}
