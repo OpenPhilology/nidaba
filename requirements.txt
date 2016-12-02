@@ -1,5 +1,5 @@
 stevedore
-celery
+celery<4.0
 click>=4.0
 lxml
 redis
