@@ -11,7 +11,8 @@ from itertools import cycle
 from pprint import pprint
 from glob import glob
 
-from nidaba.nidaba import NetworkSimpleBatch, SimpleBatch
+from nidaba.nidaba import NetworkSimpleBatch, Batch
+from nidaba.nidabaexceptions import NidabaInputException
 
 import uuid
 import shutil
@@ -224,8 +225,9 @@ def batch(files, host, preprocessing, binarize, ocr, segmentation, stats,
         from nidaba import storage
         click.echo(u'Preparing filestore\t\t[', nl=False)
         try:
-            batch = SimpleBatch()
+            batch = Batch()
         except:
+            raise
             click.secho(u'\u2717', fg='red', nl=False)
             click.echo(']')
             exit()
@@ -389,14 +391,18 @@ def status(verbose, host, job_id):
     """
     Diplays the status and results of jobs.
     """
+    click.secho('Status:', underline=True, nl=False)
     if host:
         batch = NetworkSimpleBatch(host, job_id)
     else:
-        batch = SimpleBatch(job_id)
+        try:
+            batch = Batch(job_id)
+        except NidabaInputException:
+            click.echo(' UNKNOWN')
+            return
 
     state = batch.get_extended_state()
 
-    click.secho('Status:', underline=True, nl=False)
     if not state:
         click.echo(' UNKNOWN')
         return
@@ -434,7 +440,7 @@ def status(verbose, host, job_id):
             errors.append(subtask)
             bs = 'failed'
 
-        if len(subtask['children']) == 0 and not subtask['housekeeping'] and subtask['result'] is not None:
+        if len(subtask['children']) == 0 and subtask['result'] is not None:
             # try to find statistics results
             parents = [task_id] + subtask['parents']
             misc = None
@@ -443,8 +449,7 @@ def status(verbose, host, job_id):
                 if 'misc' in state[parent]:
                     misc = state[parent]['misc']
                     break
-            results.append((subtask['result'], subtask['root_document'], misc))
-
+            results.append((subtask['result'], subtask['root_documents'], misc))
     final = '(final)' if not expected - failed - done - len(failed_children) else ''
     click.echo(' {} {}\n'.format(bs, final))
     click.echo('{}/{} tasks completed. {} running.\n'.format(done, len(state), running))
@@ -459,19 +464,12 @@ def status(verbose, host, job_id):
                                                                  doc[2]['edit_ratio'],
                                                                  doc[2]['ground_truth'][1]))
             else:
-                click.echo(u'{} \u2192 {}'.format(doc[1], doc[0]))
+                click.echo(u'{} \u2192 {}'.format(', '.join(x[1] for x in doc[1]), doc[0]))
     elif results:
         from nidaba import storage
         for doc in results:
             output = click.format_filename(storage.get_abs_path(*doc[0]))
-            if doc[2] is not None:
-                click.echo(u'{} \u2192 {} ({:.1f}% / {})'.format(doc[1][1], 
-                                                                 output,
-                                                                 100 *
-                                                                 doc[2]['edit_ratio'],
-                                                                 doc[2]['ground_truth'][1]))
-            else:
-                click.echo(u'{} \u2192 {}'.format(doc[1][1], output))
+            click.echo(u'{} \u2192 {}'.format(', '.join(x[1] for x in doc[1]), output))
     if errors:
         click.secho('\nErrors:\n', underline=True)
         for task in errors:
