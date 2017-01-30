@@ -239,8 +239,7 @@ class Batch(object):
         else:
             return state
 
-    @staticmethod
-    def get_available_tasks():
+    def get_available_tasks(self):
         """
         Returns all available tasks and their valid argument values.
 
@@ -253,6 +252,8 @@ class Batch(object):
             try:
                 _, group, method = task.split('.')
             except:
+                continue
+            if group == 'util':
                 continue
             if group not in tasks:
                 tasks[group] = {}
