@@ -189,6 +189,10 @@ def move_to_storage(batch, kwargs):
               callback=validate_definition, help='A configuration for a '
               'single output layer transformation in the format'
               'task:param1,param2;param1;param1...')
+@click.option('--archive', '-a', multiple=True,
+              callback=validate_definition, help='A configuration for a '
+              'single archiving layer transformation in the format'
+              'task:param1,param2;param1;param1...')
 # @click.option('--willitblend', 'blend',  default=False, help='Blend all '
 #              'output files into a single hOCR document.', is_flag=True)
 @click.option('--grayscale', default=False, help='Skip grayscale '
@@ -199,7 +203,7 @@ def move_to_storage(batch, kwargs):
               'nidaba itself and in configured plugins.')
 @click.argument('files', type=click.Path(exists=True), nargs=-1, required=True)
 def batch(files, host, preprocessing, binarize, ocr, segmentation, stats,
-          postprocessing, output, grayscale, help_tasks):
+          postprocessing, output, archive, grayscale, help_tasks):
     """
     Add a new job to the pipeline.
     """
@@ -274,6 +278,11 @@ def batch(files, host, preprocessing, binarize, ocr, segmentation, stats,
             for kwargs in alg[1]:
                 kwargs = move_to_storage(batch, kwargs)
                 batch.add_task('output', alg[0], **kwargs)
+    if archive:
+        for alg in archive:
+            for kwargs in alg[1]:
+                kwargs = move_to_storage(batch, kwargs)
+                batch.add_task('archive', alg[0], **kwargs)
     batch.run()
     click.secho(u'\u2713', fg='green', nl=False)
     click.echo(']')
