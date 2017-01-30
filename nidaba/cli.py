@@ -464,21 +464,21 @@ def status(verbose, host, job_id):
     click.echo('{}/{} tasks completed. {} running.\n'.format(done, len(state), running))
     click.secho('Output files:\n', underline=True)
     results = sorted(results, key=lambda x: x[0][1])
-    if results and host:
+    if results:
         for doc in results:
+            if host:
+                output = doc[0]
+            else:
+                from nidaba import storage
+                output = click.format_filename(storage.get_abs_path(*doc[0]))
             if doc[2] is not None:
-                click.echo(u'{} \u2192 {} ({:.1f}% / {})'.format(doc[1], 
-                                                                 doc[0],
+                click.echo(u'{} \u2192 {} ({:.1f}% / {})'.format(', '.join(x[1] for x in doc[1]),
+                                                                 output,
                                                                  100 *
                                                                  doc[2]['edit_ratio'],
                                                                  doc[2]['ground_truth'][1]))
             else:
-                click.echo(u'{} \u2192 {}'.format(', '.join(x[1] for x in doc[1]), doc[0]))
-    elif results:
-        from nidaba import storage
-        for doc in results:
-            output = click.format_filename(storage.get_abs_path(*doc[0]))
-            click.echo(u'{} \u2192 {}'.format(', '.join(x[1] for x in doc[1]), output))
+                click.echo(u'{} \u2192 {}'.format(', '.join(x[1] for x in doc[1]), output))
     if errors:
         click.secho('\nErrors:\n', underline=True)
         for task in errors:
