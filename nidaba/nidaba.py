@@ -14,7 +14,6 @@ from nidaba.nidabaexceptions import (NidabaInputException,
                                      NidabaTickException, NidabaStepException)
 
 from celery import chord, chain
-from itertools import product
 from inspect import getcallargs
 from collections import OrderedDict, Iterable
 from requests_toolbelt.multipart import encoder
@@ -23,7 +22,7 @@ import os
 import json
 import uuid
 import requests
-
+import itertools
 
 def task_arg_validator(arg_values, **kwargs):
     """
@@ -430,58 +429,69 @@ class Batch(object):
         self.lock = True
 
         # build chain
+        root_docs = self.docs
+        prev = []
         for group, step in tasks.iteritems():
             # skip groups without tasks
             if not step:
                 continue
+            sequential = True if self.order[group][0] == 'sequence' else False
+            mmode = self.order[group][1]
+
+            def _repeat(lst, n):
+                return list(itertools.chain.from_iterable(itertools.repeat(x, n) for x in lst))
+
+            if sequential:
+                step = [step]
             # multiply number of tasks in this step by number of tasks in
             # previous step if not merging
-            if not self.order[group][1]:
-                step = step * len(prev) if prev else step * len(self.docs)
-            # by number of docs if doc merging
-            elif self.order[group][1] == 'doc':
-                step = len(self.docs) * step
+            if not mmode:
+                step = _repeat(step, len(root_docs))
+                root_docs = root_docs * (len(step)/len(root_docs))
+            # by number of root docs if doc merging
+            elif mmode == 'doc':
+                step = _repeat(step, len(self.docs))
+                root_docs = self.docs
+            else:
+                root_docs = [root_docs] * len(step)
+            if not sequential:
+                step = [[x] for x in step]
+            nprev = []
             r = []
-            for idx, (fun, kwargs) in enumerate(step):
-                task_id = uuid.uuid4().get_hex()
-                root_documents = []
-                # if merging everything all tasks in previous step are parents
-                if self.order[group][1] == True:
-                    parents = [t['kwargs']['task_id'] for t in prev if prev]
-                    root_documents = self.docs
-                # if not merging a single task in previous step is the parent
-                # task
-                elif self.order[group][1] == False:
-                    if prev:
-                        parents = [prev[idx % len(prev)]['kwargs']['task_id']]
-                    else:
-                        parents = []
-                    root_documents = result_data[parents[0]]['root_documents'] if parents else [self.docs[idx % len(self.docs)]]
-                # if merging on a document level all outputs from n *
-                # (len(prev)/len(docs)) to n+1 ... are parent tasks
-                elif self.order[group][1] == 'doc':
-                    n = idx // (len(step)/len(self.docs))
-                    if prev:
-                        parents = [t['kwargs']['task_id'] for t in prev[n * len(prev)/len(self.docs):n+1 * len(prev)/len(self.docs)]]
-                    else:
-                        parents = None
-                    root_documents = [self.docs[n]]
-                result_data[task_id] = {
-                    'children': [],
-                    'parents': parents,
-                    'root_documents': root_documents,
-                    'state': 'PENDING',
-                    'result': None,
-                    'task': (fun, kwargs),
-                }
-                for parent in parents:
-                    result_data[parent]['children'].append(task_id)
-                task = self.celery.app.tasks[u'nidaba.{}.{}'.format(group, fun)]
-                r.append(task.s(batch_id=self.id, task_id=task_id, **kwargs))
-            t = self.celery.app.tasks[u'nidaba.util.barrier'].s(merging=self.order[group][1], replace=r)
+            for rd_idx, (rdoc, c) in enumerate(zip(root_docs, step)):
+                r.append([])
+                for idx, (fun, kwargs) in enumerate(c):
+                    # if idx > 0 (sequential == true) parent is previous task in sequence
+                    if idx > 0:
+                        parents = [task_id]
+                    # if merge mode is 'doc' base parents are tasks n * (len(prev)/len(docs)) to n+1 ... 
+                    elif mmode == 'doc':
+                        parents = prev[rd_idx::len(root_docs)]
+                    # if merging everything all tasks in previous step are parents
+                    elif mmode:
+                        parents = prev
+                    # if not merging a single task in previous step is the parent
+                    elif mmode == False:
+                        parents = [prev[rd_idx % len(prev)]] if prev else prev
+                    task_id = uuid.uuid4().get_hex()
+                    # last task in a sequence is entered into new prev array
+                    if idx+1 == len(c):
+                        nprev.append(task_id)
+                    result_data[task_id] = {
+                       'children': [],
+                       'parents': parents,
+                       'root_documents': rdoc,
+                       'state': 'PENDING',
+                       'result': None,
+                       'task': (fun, kwargs),
+                    }
+                    for parent in parents:
+                        result_data[parent]['children'].append(task_id)
+                    task = self.celery.app.tasks[u'nidaba.{}.{}'.format(group, fun)]
+                    r[-1].append(task.s(batch_id=self.id, task_id=task_id, **kwargs))
+            prev = nprev
+            t = self.celery.app.tasks[u'nidaba.util.barrier'].s(merging=mmode, sequential=sequential, replace=r)
             first.append(t)
-            prev = r
-
         with self.redis.pipeline() as pipe:
             while(1):
                 try:
@@ -493,7 +503,6 @@ class Batch(object):
                     break
                 except self.redis.WatchError:
                     continue
-
         chain(first).apply_async(args=[self.docs])
         return self.id
 
