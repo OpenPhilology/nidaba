@@ -193,8 +193,6 @@ def move_to_storage(batch, kwargs):
               callback=validate_definition, help='A configuration for a '
               'single archiving layer transformation in the format'
               'task:param1,param2;param1;param1...')
-# @click.option('--willitblend', 'blend',  default=False, help='Blend all '
-#              'output files into a single hOCR document.', is_flag=True)
 @click.option('--grayscale', default=False, help='Skip grayscale '
               'conversion using the ITU-R 601-2 luma transform if the input '
               'documents are already in grayscale.', is_flag=True)
@@ -411,7 +409,6 @@ def status(verbose, host, job_id):
             return
 
     state = batch.get_extended_state()
-
     if not state:
         click.echo(' UNKNOWN')
         return
