@@ -459,7 +459,8 @@ class Batch(object):
             nprev = []
             r = []
             for rd_idx, (rdoc, c) in enumerate(zip(root_docs, step)):
-                r.append([])
+                if sequential:
+                    r.append([])
                 for idx, (fun, kwargs) in enumerate(c):
                     # if idx > 0 (sequential == true) parent is previous task in sequence
                     if idx > 0:
@@ -480,7 +481,7 @@ class Batch(object):
                     result_data[task_id] = {
                        'children': [],
                        'parents': parents,
-                       'root_documents': rdoc,
+                       'root_documents': [rdoc],
                        'state': 'PENDING',
                        'result': None,
                        'task': (fun, kwargs),
@@ -488,7 +489,10 @@ class Batch(object):
                     for parent in parents:
                         result_data[parent]['children'].append(task_id)
                     task = self.celery.app.tasks[u'nidaba.{}.{}'.format(group, fun)]
-                    r[-1].append(task.s(batch_id=self.id, task_id=task_id, **kwargs))
+                    if sequential:
+                        r[-1].append(task.s(batch_id=self.id, task_id=task_id, **kwargs))
+                    else:
+                        r.append(task.s(batch_id=self.id, task_id=task_id, **kwargs))
             prev = nprev
             t = self.celery.app.tasks[u'nidaba.util.barrier'].s(merging=mmode, sequential=sequential, replace=r)
             first.append(t)
