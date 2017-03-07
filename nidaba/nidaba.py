@@ -494,7 +494,7 @@ class Batch(object):
                     else:
                         r.append(task.s(batch_id=self.id, task_id=task_id, **kwargs))
             prev = nprev
-            t = self.celery.app.tasks[u'nidaba.util.barrier'].s(merging=mmode, sequential=sequential, replace=r)
+            t = self.celery.app.tasks[u'nidaba.util.barrier'].s(merging=mmode, sequential=sequential, replace=r, root_docs=self.docs)
             first.append(t)
         with self.redis.pipeline() as pipe:
             while(1):
