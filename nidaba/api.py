@@ -3,7 +3,7 @@
 nidaba.api
 ~~~~~~~~~~
 
-Exposes the functionality of the ``SimpleBatch`` class using a restful
+Exposes the functionality of the ``Batch`` class using a restful
 interface.
 
 For a documentation of the interface see the :ref:`API docs <api>`.
@@ -22,7 +22,7 @@ from flask import send_file
 from flask_restful import abort, Api, Resource, url_for, reqparse
 
 from nidaba import storage
-from nidaba.nidaba import SimpleBatch
+from nidaba.nidaba import Batch as nBatch
 from nidaba.nidabaexceptions import NidabaStorageViolationException
 
 
@@ -215,7 +215,7 @@ class Task(Resource):
         values out of the list may be picked and value ranges
         """
         log.debug('Routing to tasks with group {}, method {}'.format(group, task))
-        tasks = SimpleBatch.get_available_tasks()
+        tasks = nBatch().get_available_tasks()
         if group and group not in tasks:
             return {'message': 'Unknown group {}'.format(group)}, 404
         elif task and task not in tasks[group]:
@@ -254,7 +254,9 @@ class Batch(Resource):
         log.debug('Routing to batch {} (GET)'.format(batch_id))
         res = {}
         try:
-            batch = SimpleBatch(batch_id)
+            batch = nBatch(batch_id)
+        except NidabaInputException:
+            return {'message': 'Batch Not Found: {}'.format(batch_id)}, 404
         except:
             return {'message': 'Batch Not Found: {}'.format(batch_id)}, 404
         res['pages'] = url_for('api.batchpages', batch_id=batch_id)
@@ -302,7 +304,7 @@ class Batch(Resource):
         """
         log.debug('Routing to batch {} (POST)'.format(batch_id))
         try:
-            batch = SimpleBatch(batch_id)
+            batch = nBatch(batch_id)
         except:
             log.debug('Batch {} not found'.format(batch_id))
             return {'message': 'Batch Not Found: {}'.format(batch_id)}, 404
@@ -345,7 +347,7 @@ class BatchCreator(Resource):
         :status 201: Successfully created
         """
         log.debug('Routing to batch with POST')
-        batch = SimpleBatch()
+        batch = nBatch()
         data = {'id': batch.id, 'url': url_for('api.batch', batch_id=batch.id)}
         log.debug('Created batch {}'.format(batch.id))
         return data, 201
@@ -413,7 +415,7 @@ class BatchTasks(Resource):
         """
         log.debug('Routing to task {}.{} of {} (GET)'.format(group, task, batch_id))
         try:
-            batch = SimpleBatch(batch_id)
+            batch = nBatch(batch_id)
         except:
             log.debug('Batch {} not found'.format(batch_id))
             return {'message': 'Batch Not Found: {}'.format(batch_id)}, 404
@@ -462,7 +464,7 @@ class BatchTasks(Resource):
         """
         log.debug('Routing to task {}.{} of {} (POST)'.format(group, task, batch_id))
         try:
-            batch = SimpleBatch(batch_id)
+            batch = nBatch(batch_id)
         except:
             return {'message': 'Batch Not Found: {}'.format(batch_id)}, 404
         try:
@@ -532,7 +534,7 @@ class BatchPages(Resource):
         """
         log.debug('Routing to pages of {} (GET)'.format(batch_id))
         try:
-            batch = SimpleBatch(batch_id)
+            batch = nBatch(batch_id)
         except:
             return {'message': 'Batch Not Found: {}'.format(batch_id)}, 404
         data = []
@@ -571,7 +573,7 @@ class BatchPages(Resource):
         log.debug('Routing to pages {} of {} (POST)'.format(
                     [x.filename for x in args['scans']], batch_id))
         try:
-            batch = SimpleBatch(batch_id)
+            batch = nBatch(batch_id)
         except:
             return {'message': 'Batch Not Found: {}'.format(batch_id)}, 404
         data = []

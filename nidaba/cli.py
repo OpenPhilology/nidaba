@@ -11,7 +11,8 @@ from itertools import cycle
 from pprint import pprint
 from glob import glob
 
-from nidaba.nidaba import NetworkSimpleBatch, SimpleBatch
+from nidaba.nidaba import NetworkSimpleBatch, Batch
+from nidaba.nidabaexceptions import NidabaInputException
 
 import uuid
 import shutil
@@ -188,8 +189,10 @@ def move_to_storage(batch, kwargs):
               callback=validate_definition, help='A configuration for a '
               'single output layer transformation in the format'
               'task:param1,param2;param1;param1...')
-# @click.option('--willitblend', 'blend',  default=False, help='Blend all '
-#              'output files into a single hOCR document.', is_flag=True)
+@click.option('--archive', '-a', multiple=True,
+              callback=validate_definition, help='A configuration for a '
+              'single archiving layer transformation in the format'
+              'task:param1,param2;param1;param1...')
 @click.option('--grayscale', default=False, help='Skip grayscale '
               'conversion using the ITU-R 601-2 luma transform if the input '
               'documents are already in grayscale.', is_flag=True)
@@ -198,7 +201,7 @@ def move_to_storage(batch, kwargs):
               'nidaba itself and in configured plugins.')
 @click.argument('files', type=click.Path(exists=True), nargs=-1, required=True)
 def batch(files, host, preprocessing, binarize, ocr, segmentation, stats,
-          postprocessing, output, grayscale, help_tasks):
+          postprocessing, output, archive, grayscale, help_tasks):
     """
     Add a new job to the pipeline.
     """
@@ -224,8 +227,9 @@ def batch(files, host, preprocessing, binarize, ocr, segmentation, stats,
         from nidaba import storage
         click.echo(u'Preparing filestore\t\t[', nl=False)
         try:
-            batch = SimpleBatch()
+            batch = Batch()
         except:
+            raise
             click.secho(u'\u2717', fg='red', nl=False)
             click.echo(']')
             exit()
@@ -272,6 +276,11 @@ def batch(files, host, preprocessing, binarize, ocr, segmentation, stats,
             for kwargs in alg[1]:
                 kwargs = move_to_storage(batch, kwargs)
                 batch.add_task('output', alg[0], **kwargs)
+    if archive:
+        for alg in archive:
+            for kwargs in alg[1]:
+                kwargs = move_to_storage(batch, kwargs)
+                batch.add_task('archive', alg[0], **kwargs)
     batch.run()
     click.secho(u'\u2713', fg='green', nl=False)
     click.echo(']')
@@ -389,14 +398,17 @@ def status(verbose, host, job_id):
     """
     Diplays the status and results of jobs.
     """
+    click.secho('Status:', underline=True, nl=False)
     if host:
         batch = NetworkSimpleBatch(host, job_id)
     else:
-        batch = SimpleBatch(job_id)
+        try:
+            batch = Batch(job_id)
+        except NidabaInputException:
+            click.echo(' UNKNOWN')
+            return
 
     state = batch.get_extended_state()
-
-    click.secho('Status:', underline=True, nl=False)
     if not state:
         click.echo(' UNKNOWN')
         return
@@ -434,7 +446,7 @@ def status(verbose, host, job_id):
             errors.append(subtask)
             bs = 'failed'
 
-        if len(subtask['children']) == 0 and not subtask['housekeeping'] and subtask['result'] is not None:
+        if len(subtask['children']) == 0 and subtask['result'] is not None:
             # try to find statistics results
             parents = [task_id] + subtask['parents']
             misc = None
@@ -443,35 +455,27 @@ def status(verbose, host, job_id):
                 if 'misc' in state[parent]:
                     misc = state[parent]['misc']
                     break
-            results.append((subtask['result'], subtask['root_document'], misc))
-
+            results.append((subtask['result'], subtask['root_documents'], misc))
     final = '(final)' if not expected - failed - done - len(failed_children) else ''
     click.echo(' {} {}\n'.format(bs, final))
     click.echo('{}/{} tasks completed. {} running.\n'.format(done, len(state), running))
     click.secho('Output files:\n', underline=True)
     results = sorted(results, key=lambda x: x[0][1])
-    if results and host:
+    if results:
         for doc in results:
-            if doc[2] is not None:
-                click.echo(u'{} \u2192 {} ({:.1f}% / {})'.format(doc[1], 
-                                                                 doc[0],
-                                                                 100 *
-                                                                 doc[2]['edit_ratio'],
-                                                                 doc[2]['ground_truth'][1]))
+            if host:
+                output = doc[0]
             else:
-                click.echo(u'{} \u2192 {}'.format(doc[1], doc[0]))
-    elif results:
-        from nidaba import storage
-        for doc in results:
-            output = click.format_filename(storage.get_abs_path(*doc[0]))
+                from nidaba import storage
+                output = click.format_filename(storage.get_abs_path(*doc[0]))
             if doc[2] is not None:
-                click.echo(u'{} \u2192 {} ({:.1f}% / {})'.format(doc[1][1], 
+                click.echo(u'{} \u2192 {} ({:.1f}% / {})'.format(', '.join(x[1] for x in doc[1]),
                                                                  output,
                                                                  100 *
                                                                  doc[2]['edit_ratio'],
                                                                  doc[2]['ground_truth'][1]))
             else:
-                click.echo(u'{} \u2192 {}'.format(doc[1][1], output))
+                click.echo(u'{} \u2192 {}'.format(', '.join(x[1] for x in doc[1]), output))
     if errors:
         click.secho('\nErrors:\n', underline=True)
         for task in errors:
