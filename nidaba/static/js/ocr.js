@@ -367,6 +367,7 @@ Iris.Views.PreProcess = Backbone.View.extend({
 		$('#submit-batch').on('click', function(e) {
 			console.log('submitting batch');
 			if(Iris.batch.tasks.length == 0) {
+				Iris.batch.add_task('img', 'any_to_png', {});
 				Iris.batch.add_task('binarize', 'nlbin', {threshold: 0.5, 
 									  zoom: 0.5, 
 									  escale: 1.0, 
@@ -386,8 +387,7 @@ Iris.Views.PreProcess = Backbone.View.extend({
 					});
 					Iris.batch.add_task('ocr', 'tesseract', {languages: langs, extended: true});
 				}
-				Iris.batch.add_task('output', 'metadata', {metadata: Iris.batch.metadata_url, 
-									   validate: false});
+				Iris.batch.add_task('output', 'pybossa', {});
 				Iris.batch.execute();
 			}
 		});

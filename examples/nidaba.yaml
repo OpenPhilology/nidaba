@@ -6,6 +6,9 @@ storage_path: ~/OCR
 # URL to the redis database. May be shared with celery.
 redis_url: 'redis://127.0.0.1:6379'
 
+# set server name used by some tasks and the api server
+nidaba_server: 'http://nidaba.dh.uni-leipzig.de'
+
 # Spell check configuration. Dictionaries are kept on the common medium (i.e.
 # at STORAGE_PATH/tuple[0]/tuple[1]). Each spell checker requires a list of
 # valid words ('dictionary') and a dictionary containing all variants of words
@@ -45,3 +48,6 @@ plugins_load:
   #ocropus: {}
   #kraken: {}
   #leptonica: {}
+  pybossa: {server: http://theserver.com,
+            apikey: yourkey,
+            project: yourproject}

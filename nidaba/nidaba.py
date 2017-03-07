@@ -358,10 +358,9 @@ class Batch(object):
             raise NidabaInputException('Executed batch may not be modified')
         # validate that the task exists
         if group not in self.tasks:
-            raise NidabaNoSuchAlgorithmException('Unknown task group')
+            raise NidabaNoSuchAlgorithmException('Unknown task group {}'.format(group))
         if u'nidaba.{}.{}'.format(group, method) not in self.celery.app.tasks:
-            raise NidabaNoSuchAlgorithmException('Unknown task')
-
+            raise NidabaNoSuchAlgorithmException('Unknown task {} {}'.format(group, method))
         task = self.celery.app.tasks[u'nidaba.{}.{}'.format(group, method)]
         # validate arguments first against getcallargs
         try:
@@ -380,7 +379,7 @@ class Batch(object):
                     pipe.set(self.id, json.dumps(self.scratchpad))
                     pipe.execute()
                     break
-                except self.redis.WatchError:
+                except WatchError:
                     continue
 
     def _add_step(self, merging=False):

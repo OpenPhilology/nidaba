@@ -93,7 +93,7 @@ def segmentation_kraken(doc, method=u'segment_kraken', black_colseps=False):
     with open(output_path + '.xml', 'w') as fp:
         logger.debug('Initializing TEI with {} ({} {})'.format(doc[1], *img.size))
         tei = OCRRecord()
-        tei.img = os.path.join(*doc)
+        tei.img = storage.get_url(*doc)
         tei.dimensions = img.size
         tei.title = os.path.basename(doc[1])
         tei.add_respstmt('kraken', 'page segmentation')
