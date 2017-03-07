@@ -23,7 +23,7 @@ def _group_by_prefix(data, prefixes):
     """
     ret = [[] for _ in prefixes]
     for doc in data:
-        ret[sorted(enumerate(commonprefix([doc[1], pre]) for pre in prefixes),
+        ret[sorted(enumerate(commonprefix([doc[1], pre[1]]) for pre in prefixes),
                    key=lambda x: len(x[1]))[-1][0]].append(doc)
     return ret
 
@@ -32,7 +32,7 @@ def barrier(self, data, merging=False, sequential=False, replace=None, root_docs
     replacement = []
     # merge output from same source documents
     if merging == 'doc':
-        for docs, task in izip(cycle(_group_by_prefix(data)), task):
+        for docs, task in izip(cycle(_group_by_prefix(data, root_docs)), replace):
             if sequential:
                 task[0]['args'] = [docs]
                 replacement.append(chain(signature(t) for t in task))
