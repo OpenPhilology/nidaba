@@ -28,8 +28,8 @@ def setup(*args, **kwargs):
         raise NidabaPluginException(e.message)
 
 
-@app.task(base=NidabaTask, name=u'nidaba.output.pybossa')
-def output_pybossa(doc, method=u'output_pybossa'):
+@app.task(base=NidabaTask, name=u'nidaba.archive.pybossa')
+def archive_pybossa(doc, method=u'archive_pybossa'):
     """
     Adds recognition result to a pybossa service for postcorrection.
 
@@ -41,5 +41,6 @@ def output_pybossa(doc, method=u'output_pybossa'):
         The input storage tuple.
     """
     logger.debug('Creating pybossa task {} {}'.format(*doc))
-    pbclient.create_task(project, {'batch_id': doc[0], 'xml': storage.get_url(*doc)})
+    for d in doc:
+        pbclient.create_task(project, {'batch_id': doc[0], 'xml': storage.get_url(*d)})
     return doc
