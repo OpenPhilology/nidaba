@@ -19,8 +19,6 @@ from copy import deepcopy
 from nidaba.nidabaexceptions import NidabaTEIException, NidabaRecordException
 
 
-
-
 class _micro_hocr(object):
     """ 
     A simple class encapsulating hOCR attributes
@@ -495,7 +493,7 @@ class OCRRecord(object):
                 sic = None
             elif el.tag == self.tei_ns + 'corr':
                 corr_flag = True
-                alts.append({'alternative': ''.join(el.itertext())})
+                alts.append({'alternative': ''.join(el.text)})
                 last_el = alts[-1]
             elif el.tag == self.tei_ns + 'line':
                 if el.get('resp') is not None:
@@ -514,7 +512,7 @@ class OCRRecord(object):
             elif el.tag == self.tei_ns + 'zone' and el.get('type') == 'grapheme':
                 gr = {'bbox': (int(el.get('ulx')), int(el.get('uly')),
                                int(el.get('lrx')), int(el.get('lry'))), 
-                           'grapheme': ''.join(el.itertext())
+                           'grapheme': el.findtext('./{0}seg/{0}g'.format(self.tei_ns))
                           }
                 id = self.add_graphemes([gr])[0]
                 last_el = _get_dict_from_key(id)
