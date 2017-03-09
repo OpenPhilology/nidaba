@@ -282,10 +282,8 @@ class Batch(object):
                                  ('output', [])])
 
             for task in state.itervalues():
-                _, group, method = task['task'][0].split('.')
-                if group in tasks:
-                    tasks[group].append(('{}.{}'.format(group, method),
-                                         task['task'][1]))
+                if task['task'][0] in tasks:
+                    tasks[task['task'][0]].append(task['task'])
             return tasks
 
     def get_documents(self):
@@ -299,8 +297,9 @@ class Batch(object):
             state = self.get_extended_state()
             docs = []
             for task in state.itervalues():
-                if task['root_document'] not in docs:
-                    docs.append(task['root_document'])
+                for doc in task['root_documents']:
+                    if doc not in docs:
+                        docs.append(doc)
             return docs
 
     def is_running(self):
@@ -484,7 +483,7 @@ class Batch(object):
                        'root_documents': [rdoc],
                        'state': 'PENDING',
                        'result': None,
-                       'task': (fun, kwargs),
+                       'task': (group, fun, kwargs),
                     }
                     for parent in parents:
                         result_data[parent]['children'].append(task_id)
