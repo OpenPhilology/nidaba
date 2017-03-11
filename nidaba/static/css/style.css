@@ -14,40 +14,40 @@ h1, h2, h3, h4, h5, h6 {
   font-family: "Book Antiqua", "Georgia", serif; }
 
 a {
-  color: #a71e25;
+  color: #A71E25;
   text-decoration: none;
-  border-bottom: 1px dotted #cc271e; }
+  border-bottom: 1px dotted #CC271E; }
   a:hover {
-    color: #a71e25;
+    color: #A71E25;
     text-decoration: none; }
 
 .btn {
-  background-image: linear-gradient(bottom, #a71e25 25%, #cc271e 100%);
-  background-image: -o-linear-gradient(bottom, #a71e25 25%, #cc271e 100%);
-  background-image: -moz-linear-gradient(bottom, #a71e25 25%, #cc271e 100%);
-  background-image: -webkit-linear-gradient(bottom, #a71e25 25%, #cc271e 100%);
-  background-image: -ms-linear-gradient(bottom, #a71e25 25%, #cc271e 100%);
-  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.25, #a71e25), color-stop(1, #cc271e));
+  background-image: linear-gradient(bottom, #A71E25 25%, #CC271E 100%);
+  background-image: -o-linear-gradient(bottom, #A71E25 25%, #CC271E 100%);
+  background-image: -moz-linear-gradient(bottom, #A71E25 25%, #CC271E 100%);
+  background-image: -webkit-linear-gradient(bottom, #A71E25 25%, #CC271E 100%);
+  background-image: -ms-linear-gradient(bottom, #A71E25 25%, #CC271E 100%);
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.25, #A71E25), color-stop(1, #CC271E));
   border-radius: 2px;
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
   box-shadow: 0px 2px 4px 0px #CCC;
-  border: 1px solid #7c2424;
+  border: 1px solid #7C2424;
   color: #FDFDFD;
   font-weight: normal;
-  text-shadow: 0px 1px 1px #7c2424; }
+  text-shadow: 0px 1px 1px #7C2424; }
   .btn:hover {
     color: #FFF;
-    background-image: linear-gradient(bottom, #a71e25 55%, #cc271e 100%);
-    background-image: -o-linear-gradient(bottom, #a71e25 55%, #cc271e 100%);
-    background-image: -moz-linear-gradient(bottom, #a71e25 55%, #cc271e 100%);
-    background-image: -webkit-linear-gradient(bottom, #a71e25 55%, #cc271e 100%);
-    background-image: -ms-linear-gradient(bottom, #a71e25 55%, #cc271e 100%);
-    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.55, #a71e25), color-stop(1, #cc271e)); }
+    background-image: linear-gradient(bottom, #A71E25 55%, #CC271E 100%);
+    background-image: -o-linear-gradient(bottom, #A71E25 55%, #CC271E 100%);
+    background-image: -moz-linear-gradient(bottom, #A71E25 55%, #CC271E 100%);
+    background-image: -webkit-linear-gradient(bottom, #A71E25 55%, #CC271E 100%);
+    background-image: -ms-linear-gradient(bottom, #A71E25 55%, #CC271E 100%);
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.55, #A71E25), color-stop(1, #CC271E)); }
 
 /* General Styles */
 strong.error {
-  color: #cc271e; }
+  color: #CC271E; }
 
 .side-menu {
   padding-left: 0;
@@ -64,7 +64,7 @@ strong.error {
       background-color: #FFF; }
     .side-menu ul li.active {
       font-weight: bold;
-      color: #cc271e;
+      color: #CC271E;
       box-shadow: -7px 0px 7px 0px #CCC; }
 
 .main {
@@ -73,19 +73,19 @@ strong.error {
 /* Header Styles */
 #header {
   box-shadow: 0px 2px 4px 0px #CCC;
-  background-image: linear-gradient(bottom, #a71e25 25%, #cc271e 100%);
-  background-image: -o-linear-gradient(bottom, #a71e25 25%, #cc271e 100%);
-  background-image: -moz-linear-gradient(bottom, #a71e25 25%, #cc271e 100%);
-  background-image: -webkit-linear-gradient(bottom, #a71e25 25%, #cc271e 100%);
-  background-image: -ms-linear-gradient(bottom, #a71e25 25%, #cc271e 100%);
-  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.25, #a71e25), color-stop(1, #cc271e));
+  background-image: linear-gradient(bottom, #A71E25 25%, #CC271E 100%);
+  background-image: -o-linear-gradient(bottom, #A71E25 25%, #CC271E 100%);
+  background-image: -moz-linear-gradient(bottom, #A71E25 25%, #CC271E 100%);
+  background-image: -webkit-linear-gradient(bottom, #A71E25 25%, #CC271E 100%);
+  background-image: -ms-linear-gradient(bottom, #A71E25 25%, #CC271E 100%);
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.25, #A71E25), color-stop(1, #CC271E));
   /* So menu shadow doesn't go over the header*/
   position: relative;
   z-index: 2; }
 
 .logo-container img {
   padding: 10px;
-  border-right: 1px solid #7c2424; }
+  border-right: 1px solid #7C2424; }
 
 /* Left Main Menu Styles */
 /* OCR-specific Styles */
@@ -115,7 +115,7 @@ strong.error {
     margin-right: 5px;
     display: inline-block;
     color: #222;
-    background-color: #eeeeee;
+    background-color: #EEE;
     padding-top: 8px;
     padding-bottom: 5px;
     padding-left: 10px;
@@ -125,7 +125,7 @@ strong.error {
       -moz-transition: background-color 0.2s ease-in;
       -o-transition: background-color 0.2s ease-in;
       transition: background-color 0.2s ease-in;
-      background-color: #dddddd; }
+      background-color: #DDD; }
     .helper-links a .glyphicon {
       margin-right: 5px; }
 
@@ -149,13 +149,13 @@ strong.error {
       -o-transition: background-color 0.2s linear;
       transition: background-color 0.2s linear; }
     #step-progress .step-bar.complete {
-      background-color: #cc271e;
+      background-color: #CC271E;
       -webkit-transition: background-color 0.2s linear;
       -moz-transition: background-color 0.2s linear;
       -o-transition: background-color 0.2s linear;
       transition: background-color 0.2s linear; }
       #step-progress .step-bar.complete:hover {
-        background-color: #a71e25;
+        background-color: #A71E25;
         -webkit-transition: background-color 0.2s linear;
         -moz-transition: background-color 0.2s linear;
         -o-transition: background-color 0.2s linear;
@@ -199,3 +199,8 @@ strong.error {
   margin: 10px; }
   .pane .pane-footer a {
     margin-right: 3px; }
+
+.modal-dialog {
+  width: 1200px; }
+
+/*# sourceMappingURL=style.css.map */

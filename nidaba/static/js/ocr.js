@@ -423,15 +423,15 @@ Iris.Views.Status = Backbone.View.extend({
 					running += 1;
 				} else if(value['state'] === 'FAILURE') {
 					alert = $('<a>').attr('class', 'list-group-item list-group-item-success')
-							.attr('href', value['root_document'])
+							.attr('href', value['root_documents'])
 							.text(value['errors'][value['errors'].length - 2]);
 					$('#task-errors').append(alert);
 				}
 				// leaf nodes are results
-				if(!value['children'].length && !value['housekeeping']) {
+				if(!value['children'].length) {
 					res = $('<a>').attr('class', 'list-group-item clearfix')
 						      .attr('href', value['result'])
-						      .text(_.last(value['root_document'].split('/')));
+						      .text(_.last(value['root_documents'][0].split('/')));
 					file_buttons = $('<span>').attr('class', 'pull-right');
 					if(value['result']) {
 						res.on('click', function(e) {
