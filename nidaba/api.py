@@ -266,7 +266,7 @@ class Batch(Resource):
             # replace all document tuples with URLs to the page resource
             def replace_docs(state):
                 for k in state.keys():
-                    if k in ['root_document', 'result', 'doc']:
+                    if k in ['root_documents', 'result', 'doc']:
                         if state[k] is not None and isinstance(state[k][0], list):
                             docs = []
                             for doc in state[k]:
