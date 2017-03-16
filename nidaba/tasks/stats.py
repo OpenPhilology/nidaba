@@ -10,6 +10,7 @@ Various tasks calculating metrics on documents.
 from __future__ import unicode_literals, print_function, absolute_import
 
 import os
+import numpy
 import difflib
 import StringIO
 
@@ -121,6 +122,33 @@ def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
         return output_path
     else:
         return {'diff_ratio': sm.ratio(), 'ground_truth': ground_truth, 'doc': doc}
+
+
+@app.task(base=NidabaTask, name=u'nidaba.stats.text_rep_confidence')
+def text_rep_confidence(doc, method=u'text_rep_confidence', divert=True):
+    """
+    Extracts self reported confidence values from input documents.
+
+    Args:
+        doc (unicode, unicode): The input document tuple
+        method (unicode): The suffix string appended to the output file.
+
+    Returns:
+        (unicode, unicode): Storage tuple of the output document
+    """
+    input_path = storage.get_abs_path(*doc[0])
+    output_path = storage.insert_suffix(input_path, method,
+                                        os.path.basename(input_path))
+    with storage.StorageFile(*doc) as fp:
+        tei = OCRRecord()
+        tei.load_tei(fp)
+    edist = numpy.mean([x['confidence'] for x in tei.graphemes.itervalues()])
+    if not divert:
+        storage.write_text(*storage.get_storage_path(output_path),
+                           text=unicode(edist))
+        return output_path
+    else:
+        return {'edit_ratio': edist, 'ground_truth': '', 'doc': doc}
 
 
 @app.task(base=NidabaTask, name=u'nidaba.stats.text_edit_ratio',
