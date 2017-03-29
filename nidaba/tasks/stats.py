@@ -11,15 +11,18 @@ from __future__ import unicode_literals, print_function, absolute_import
 
 import os
 import numpy
+import regex
 import difflib
 import StringIO
+import nidaba.algorithms.string as alg
 
 from lxml import html
 from pyxdameraulevenshtein import normalized_damerau_levenshtein_distance, damerau_levenshtein_distance
 
 from nidaba import storage
-from nidaba.tei import OCRRecord
 from nidaba.celery import app
+from nidaba.tei import OCRRecord
+from nidaba.config import nidaba_cfg
 from nidaba.tasks.helper import NidabaTask
 from nidaba.algorithms.string import sanitize
 from nidaba.nidabaexceptions import NidabaInvalidParameterException
@@ -124,7 +127,8 @@ def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
         return {'diff_ratio': sm.ratio(), 'ground_truth': ground_truth, 'doc': doc}
 
 
-@app.task(base=NidabaTask, name=u'nidaba.stats.text_rep_confidence')
+@app.task(base=NidabaTask, name=u'nidaba.stats.text_rep_confidence', 
+          arg_values={'divert': [True, False]})
 def text_rep_confidence(doc, method=u'text_rep_confidence', divert=True):
     """
     Extracts self reported confidence values from input documents.
@@ -149,6 +153,42 @@ def text_rep_confidence(doc, method=u'text_rep_confidence', divert=True):
         return output_path
     else:
         return {'edit_ratio': edist, 'ground_truth': '', 'doc': doc}
+
+
+@app.task(base=NidabaTask, name=u'nidaba.stats.text_lexicality', 
+          arg_values={'language': nidaba_cfg['lang_dicts'].keys(), 'divert': [True, False]})
+def text_lexicality(doc, method=u'text_lexicality', language=u'', divert=True):
+    """
+    Calculates the lexicality of text in input documents.
+
+    Args:
+        doc (unicode, unicode): The input document tuple
+        method (unicode): The suffix string appended to the output file.
+
+    Returns:
+        (unicode, unicode): Storage tuple of the output document
+    """
+    input_path = storage.get_abs_path(*doc[0])
+    output_path = storage.insert_suffix(input_path, method,
+                                        os.path.basename(input_path))
+    dictionary = storage.get_abs_path(*nidaba_cfg['lang_dicts'][language]['dictionary'])
+    with storage.StorageFile(*doc) as fp:
+        tei = OCRRecord()
+        tei.load_tei(fp)
+    cnt = 0
+    err_cnt = 0
+    for seg_id, segment in facsimile.segments.iteritems():
+        tok = alg.sanitize(''.join(x['grapheme'] for x in segment['content'].itervalues()))
+        tok = regex.sub('[^\w]', '', key)
+        cnt += 1
+        if not alg.mmap_bin_search(tok, dictionary, entryparser_fn=alg.key_for_single_word):
+            err_cnt += 1
+    if not divert:
+        storage.write_text(*storage.get_storage_path(output_path),
+                           text=unicode(err_cnt/float(cnt)))
+        return output_path
+    else:
+        return {'edit_ratio': err_cnt/float(cnt), 'ground_truth': '', 'doc': doc}
 
 
 @app.task(base=NidabaTask, name=u'nidaba.stats.text_edit_ratio',
