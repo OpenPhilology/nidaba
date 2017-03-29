@@ -4,11 +4,13 @@ from celery import Celery
 from celery import chain
 from celery import group
 from nidaba.config import celery_cfg
+
 app = Celery('nidaba',
              strict_typing=False,
              include=['nidaba.tasks'])
 app.config_from_object(celery_cfg)
-from nidaba import plugins
+
+from nidaba import plugins  # NOQA
 
 if __name__ == '__main__':
     app.start()

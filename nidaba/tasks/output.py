@@ -22,6 +22,7 @@ from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
 
+
 @app.task(base=NidabaTask, name=u'nidaba.output.metadata',
           arg_values={'metadata': 'file', 'validate': [True, False]})
 def tei_metadata(doc, method=u'metadata', metadata=None, validate=False):

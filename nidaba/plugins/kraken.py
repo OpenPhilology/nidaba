@@ -52,7 +52,7 @@ def setup(*args, **kwargs):
 
 
 def max_bbox(boxes):
-    """ 
+    """
     Calculates the minimal bounding box containing all boxes contained in an
     iterator.
 
@@ -108,7 +108,7 @@ def segmentation_kraken(doc, method=u'segment_kraken', black_colseps=False):
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.kraken',
           arg_values={'model': nidaba_cfg['ocropus_models'].keys() +
-                               nidaba_cfg['kraken_models'].keys()})
+                      nidaba_cfg['kraken_models'].keys()})
 def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     """
     Runs kraken on an input document and writes a TEI file.
@@ -124,8 +124,7 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     input_path = storage.get_abs_path(*doc[1])
     output_path = (doc[1][0], os.path.splitext(storage.insert_suffix(doc[1][1],
                                                                      method,
-                                                                     model))[0]
-                   + '.xml')
+                                                                     model))[0] + '.xml')
     logger.debug('Searching for model {}'.format(model))
     if model in nidaba_cfg['kraken_models']:
         model = storage.get_abs_path(*(nidaba_cfg['kraken_models'][model]))
@@ -166,18 +165,18 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
                 seg_bbox = max_bbox(rec.cuts[line_offset:line_offset + len(segment)])
                 logger.debug('Creating new segment at {} {} {} {}'.format(*seg_bbox))
                 tei.add_segment(seg_bbox)
-                logger.debug('Adding graphemes (segment): {}'.format(rec.prediction[line_offset:line_offset+len(segment)]))
-                tei.add_graphemes([{'grapheme': x[0], 
+                logger.debug('Adding graphemes (segment): {}'.format(rec.prediction[line_offset:line_offset + len(segment)]))
+                tei.add_graphemes([{'grapheme': x[0],
                                     'bbox': x[1],
-                                    'confidence': int(x[2] * 100)} for x in rec[line_offset:line_offset+len(segment)]])
+                                    'confidence': int(x[2] * 100)} for x in rec[line_offset:line_offset + len(segment)]])
                 line_offset += len(segment)
             if whitespace:
-                logger.debug('Adding graphemes (whitespace): {}'.format(rec.prediction[line_offset:line_offset+len(whitespace)]))
+                logger.debug('Adding graphemes (whitespace): {}'.format(rec.prediction[line_offset:line_offset + len(whitespace)]))
                 seg_bbox = max_bbox(rec.cuts[line_offset:line_offset + len(whitespace)])
                 tei.add_segment(seg_bbox)
-                tei.add_graphemes([{'grapheme': x[0], 
+                tei.add_graphemes([{'grapheme': x[0],
                                     'bbox': x[1],
-                                    'confidence': int(x[2] * 100)} for x in rec[line_offset:line_offset+len(whitespace)]])
+                                    'confidence': int(x[2] * 100)} for x in rec[line_offset:line_offset + len(whitespace)]])
                 line_offset += len(whitespace)
     with storage.StorageFile(*output_path, mode='wb') as fp:
         logger.debug('Writing TEI to {}'.format(fp.abs_path))
@@ -187,13 +186,13 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
 
 @app.task(base=NidabaTask, name=u'nidaba.binarize.nlbin',
           arg_values={'threshold': (0.0, 1.0),
-                                      'zoom': (0.0, 1.0),
-                                      'escale': 'float',
-                                      'border': 'float',
-                                      'perc': (0, 100),
-                                      'range': (0, 100),
-                                      'low': (0, 100),
-                                      'high': (0, 100)})
+                      'zoom': (0.0, 1.0),
+                      'escale': 'float',
+                      'border': 'float',
+                      'perc': (0, 100),
+                      'range': (0, 100),
+                      'low': (0, 100),
+                      'high': (0, 100)})
 def nlbin(doc, method=u'nlbin', threshold=0.5, zoom=0.5, escale=1.0,
           border=0.1, perc=80, range=20, low=5, high=90):
     """
@@ -227,6 +226,6 @@ def nlbin(doc, method=u'nlbin', threshold=0.5, zoom=0.5, escale=1.0,
                                         unicode(high))
     img = Image.open(input_path)
     o_img = binarization.nlbin(img, threshold, zoom, escale, border, perc, range, low,
-                       high)
+                               high)
     o_img.save(output_path)
     return storage.get_storage_path(output_path)

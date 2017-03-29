@@ -21,9 +21,10 @@ import sys
 import click
 
 # ignore SIGPIPE
-signal(SIGPIPE,SIG_DFL) 
+signal(SIGPIPE, SIG_DFL)
 
 spinner = cycle([u'⣾', u'⣽', u'⣻', u'⢿', u'⡿', u'⣟', u'⣯', u'⣷'])
+
 
 def spin(msg):
     click.echo(u'\r\033[?25l{}\t\t{}'.format(msg, next(spinner)), nl=False)
@@ -35,6 +36,7 @@ def client_only():
     """
     API-only version of the nidaba client
     """
+
 
 @click.group()
 @click.version_option()
@@ -132,13 +134,15 @@ def move_to_storage(batch, kwargs):
 
     It is assumed that the filestore is already created.
     """
-
     nkwargs = {}
+
     def do_move(batch, src):
         if isinstance(batch, NetworkSimpleBatch):
             dst = os.path.basename(src)
+
             def callback(monitor):
                 spin(u'Uploading {}'.format(dst))
+
             batch.add_document(src, callback, auxiliary=True)
             click.secho(u'\b\u2713', fg='green', nl=False)
             click.echo('\033[?25h\n', nl=False)
@@ -161,7 +165,7 @@ def move_to_storage(batch, kwargs):
 
 
 @main.command()
-@click.option('-h', '--host', default=None, 
+@click.option('-h', '--host', default=None,
               help='Address of the API service. If none is given a local '
               'installation of nidaba will be invoked.')
 @click.option('--preprocessing', '-i', multiple=True,
@@ -205,7 +209,7 @@ def batch(files, host, preprocessing, binarize, ocr, segmentation, stats,
     """
     Add a new job to the pipeline.
     """
-   
+
     if host:
         batch = NetworkSimpleBatch(host)
         click.echo(u'Preparing filestore\t\t[', nl=False)
@@ -298,9 +302,9 @@ def worker():
 
 @main.command()
 @click.pass_context
-@click.option('-b', '--bind', default='127.0.0.1:8080', 
+@click.option('-b', '--bind', default='127.0.0.1:8080',
               help='Address and port to bind the application worker to.')
-@click.option('-w', '--workers', default=1, type=click.INT, 
+@click.option('-w', '--workers', default=1, type=click.INT,
               help='Number of request workers')
 def api_server(ctx, **kwargs):
     """
@@ -326,7 +330,6 @@ def api_server(ctx, **kwargs):
     app = Flask('nidaba')
     app.register_blueprint(api.get_blueprint())
     app.register_blueprint(web.get_blueprint())
-
 
     class APIServer(gunicorn.app.base.BaseApplication):
 
@@ -389,7 +392,7 @@ def plugins(ctx):
 
 
 @main.command()
-@click.option('-h', '--host', default=None, 
+@click.option('-h', '--host', default=None,
               help='Address of the API service. If none is given a local '
               'installation of nidaba will be invoked.')
 @click.option('-v', '--verbose', count=True)
@@ -491,6 +494,7 @@ def status(verbose, host, job_id):
                                                      args,
                                                      tb,
                                                      task['errors'][1]))
+
 
 client_only.add_command(status)
 client_only.add_command(batch)

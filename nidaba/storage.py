@@ -21,6 +21,7 @@ import re
 
 from flask_restful import url_for
 
+
 class StorageFile(io.IOBase):
     """
     A file-like interface to a file on the storage medium.
@@ -166,7 +167,7 @@ def get_url(jobID, *paths):
     """
     from nidaba import api
     app = api.create_app()
-    app.config['SERVER_NAME'] =  nidaba_cfg['nidaba_server']
+    app.config['SERVER_NAME'] = nidaba_cfg['nidaba_server']
     with app.app_context():
         return url_for('api.page', batch=jobID, file=os.path.join(*paths))
     raise NidabaStorageViolationException('Invalid path')

@@ -20,11 +20,11 @@ from nidaba.nidabaexceptions import NidabaTEIException, NidabaRecordException
 
 
 class _micro_hocr(object):
-    """ 
+    """
     A simple class encapsulating hOCR attributes
     """
     def __init__(self):
-        self.output = u'' 
+        self.output = u''
 
     def __str__(self):
         return self.output
@@ -34,7 +34,7 @@ class _micro_hocr(object):
             self.output += u'; '
         for arg in args:
             if isinstance(arg, str):
-                self.output += arg + ' ' 
+                self.output += arg + ' '
             elif isinstance(arg, tuple):
                 self.output += u','.join([str(v) for v in arg]) + u' '
             else:
@@ -100,7 +100,7 @@ class OCRRecord(object):
     practical purposes this means that the appropriate line or segment (the
     later overriding the first) has to be brought into scope first before
     adding any characters to it.
-    
+
     Each element may be associated with a responsibility statement, identifying
     the origin of each alteration if the final serialization supports it.
     """
@@ -116,26 +116,23 @@ class OCRRecord(object):
     abbyy_ns = '{http://www.abbyy.com/FineReader_xml/FineReader10-schema-v1.xml}'
 
     # automatically generated properties in the fileDesc element and xpath to their location
-    _tei_fields = [('titleStmt', [('title', '/' + tei_ns + 'title',), 
+    _tei_fields = [('titleStmt', [('title', '/' + tei_ns + 'title',),
                                   ('author', '/' + tei_ns + 'author', 'ref'),
-                                  ('editor', '/' + tei_ns + 'editor',  'ref'),
+                                  ('editor', '/' + tei_ns + 'editor', 'ref'),
                                   ('funder', '/' + tei_ns + 'funder', 'ref'),
                                   ('principal', '/' + tei_ns + 'principal', 'ref'),
                                   ('sponsor', '/' + tei_ns + 'sponsor', 'ref'),
-                                  ('meeting', '/' + tei_ns + 'meeting'),
-                                  ]),
+                                  ('meeting', '/' + tei_ns + 'meeting')]),
                    ('editionStmt', [('edition', '/' + tei_ns + 'edition')]),
                    ('publicationStmt', [('publisher', '/' + tei_ns + 'publisher', 'target'),
                                         ('distributor', '/' + tei_ns + 'distributor', 'target'),
                                         ('authority', '/' + tei_ns + 'authority', 'target'),
                                         ('idno', '/' + tei_ns + 'idno', 'type'),
                                         ('pub_place', '/' + tei_ns + 'pubPlace'),
-                                        ('licence', '/{0}availability/{0}licence'.format(tei_ns), 'target'),
-                                       ]),
+                                        ('licence', '/{0}availability/{0}licence'.format(tei_ns), 'target')]),
                    ('seriesStmt', [('series_title', '/' + tei_ns + 'p')]),
                    ('notesStmt', [('note', '/' + tei_ns + 'note')]),
-                   ('sourceDesc', [('source_desc', '/' + tei_ns + 'p')])
-                  ] 
+                   ('sourceDesc', [('source_desc', '/' + tei_ns + 'p')])]
 
     def __init__(self):
         self.meta = {}
@@ -286,8 +283,8 @@ class OCRRecord(object):
             id = u'grapheme_' + unicode(gr_cnt)
             ids.append(id)
             glyph['type'] = 'grapheme'
-            if 'confidence' in glyph and (glyph['confidence'] < 0 or \
-                                          glyph['confidence'] > 100 ):
+            if 'confidence' in glyph and (glyph['confidence'] < 0 or
+                                          glyph['confidence'] > 100):
                 raise NidabaRecordException('Glyph confidence {} outside valid '
                                             'range'.format(glyph['confidence']))
             if 'grapheme' not in glyph:
@@ -297,7 +294,6 @@ class OCRRecord(object):
             target[id] = glyph
         return ids
 
-    
     def add_choices(self, id, it):
         """
         Adds alternative interpretations to an element.
@@ -486,7 +482,7 @@ class OCRRecord(object):
         for el in islice(root_zone.iter(), 1, None):
             if el.tag != self.tei_ns + 'corr' and corr_flag:
                 corr_flag = False
-                #flush alternatives
+                # flush alternatives
                 self.add_choices(sic, alts)
                 alts = []
             elif el.tag == self.tei_ns + 'sic':
@@ -511,9 +507,8 @@ class OCRRecord(object):
                 sic = id if not sic else None
             elif el.tag == self.tei_ns + 'zone' and el.get('type') == 'grapheme':
                 gr = {'bbox': (int(el.get('ulx')), int(el.get('uly')),
-                               int(el.get('lrx')), int(el.get('lry'))), 
-                           'grapheme': el.findtext('./{0}seg/{0}g'.format(self.tei_ns))
-                          }
+                               int(el.get('lrx')), int(el.get('lry'))),
+                      'grapheme': el.findtext('./{0}seg/{0}g'.format(self.tei_ns))}
                 id = self.add_graphemes([gr])[0]
                 last_el = _get_dict_from_key(id)
                 sic = id if not sic else None
@@ -539,10 +534,9 @@ class OCRRecord(object):
         sourceDoc = SubElement(doc, self.tei_ns + 'sourceDoc')
         kwargs = {}
         if self.dimensions:
-            kwargs = {'ulx': '0', 'uly': '0', 
+            kwargs = {'ulx': '0', 'uly': '0',
                       'lrx': str(self.dimensions[0]),
-                      'lry': str(self.dimensions[1])
-                     }
+                      'lry': str(self.dimensions[1])}
         surface = SubElement(sourceDoc, self.tei_ns + 'surface', **kwargs)
         if self.img:
             SubElement(surface, self.tei_ns + 'graphic', url=self.img)
@@ -582,7 +576,7 @@ class OCRRecord(object):
             cert = None
             if 'confidence' in dic:
                 cert = SubElement(el, self.tei_ns + 'certainty',
-                                  degree=u'{0:.2f}'.format(dic['confidence'] / 100.0), 
+                                  degree=u'{0:.2f}'.format(dic['confidence'] / 100.0),
                                   locus='value')
                 if el.get(self.xml_ns + 'id'):
                     cert.set('target', '#' + el.get(self.xml_ns + 'id'))
@@ -622,7 +616,7 @@ class OCRRecord(object):
             line_el = Element(self.tei_ns + 'line', ulx=str(line['bbox'][0]),
                               uly=str(line['bbox'][1]),
                               lrx=str(line['bbox'][2]),
-                              lry=str(line['bbox'][3])) 
+                              lry=str(line['bbox'][3]))
             line_el.set(self.xml_ns + 'id', line_id)
             _set_confidence(line_el, line, line)
             if 'alternatives' in line:
@@ -717,7 +711,7 @@ class OCRRecord(object):
                         el.set('r', str(g['bbox'][2]))
                         el.set('b', str(g['bbox'][3]))
                         if 'confidence' in g:
-                           el.set('charConfidence', str(g['confidence']))
+                            el.set('charConfidence', str(g['confidence']))
                 elif seg['type'] == 'grapheme':
                     formatting = SubElement(lel, 'formatting')
                     if 'language' in seg:
@@ -729,7 +723,7 @@ class OCRRecord(object):
                     el.set('r', str(g['bbox'][2]))
                     el.set('b', str(g['bbox'][3]))
                     if 'confidence' in g:
-                       el.set('charConfidence', str(g['confidence']))
+                        el.set('charConfidence', str(g['confidence']))
                 else:
                     raise NidabaRecordException('Unknown nodes beneath line records')
         fp.write(etree.tostring(page, xml_declaration=True, encoding='utf-8'))
@@ -807,7 +801,7 @@ class OCRRecord(object):
         if self.dimensions is not None:
             text_block.set('WIDTH', str(self.dimensions[0]))
             text_block.set('HEIGHT', str(self.dimensions[1]))
-      
+
         for line_id, line in self.lines.iteritems():
             text_line = SubElement(text_block, 'TextLine')
             text_line.set('HPOS', str(line['bbox'][0]))
@@ -830,7 +824,7 @@ class OCRRecord(object):
                         # confidences for graphemes are integers between 0 and
                         # 9 with 0 (wtf?) representing highest confidence
                         if 'confidence' in g:
-                            certs.append(str(int(10 - 10 * (g['confidence']/100.0))))
+                            certs.append(str(int(10 - 10 * (g['confidence'] / 100.0))))
                     text_el = SubElement(text_line, 'String')
                     text_el.set('CONTENT', text)
                     text_el.set('CC', ' '.join(certs))
@@ -849,7 +843,7 @@ class OCRRecord(object):
                         # extract character confidences
                         for g in seg['content'].itervalues():
                             if 'confidence' in g:
-                                certs.append(str(int(10 - 10 * (g['confidence']/100.0))))
+                                certs.append(str(int(10 - 10 * (g['confidence'] / 100.0))))
                         if certs:
                             text_el.set('CC', ' '.join(certs))
 
@@ -895,7 +889,7 @@ class OCRRecord(object):
             el_class = el.get('class')
             if el_class != 'alt' and corr_flag:
                 corr_flag = False
-                #flush alternatives
+                # flush alternatives
                 self.add_choices(sic, alts)
                 alts = []
             if el.tag == 'ins':
@@ -949,11 +943,11 @@ class OCRRecord(object):
         SubElement(head, 'meta', name='ocr-capabilities', content=capa)
 
         body = SubElement(page, 'body')
-	p_hocr = _micro_hocr()
+        p_hocr = _micro_hocr()
         if 'dimensions' in self.meta:
-		p_hocr.add('bbox', 0, 0, *self.meta['dimensions'])
-	if self.img is not None:
-		p_hocr.add('image', self.img)
+            p_hocr.add('bbox', 0, 0, *self.meta['dimensions'])
+        if self.img is not None:
+            p_hocr.add('image', self.img)
         ocr_page = SubElement(body, 'div', title=str(p_hocr))
         ocr_page.set('class', 'ocr_page')
 
@@ -1031,7 +1025,7 @@ class OCRRecord(object):
             header (bool): Serialize metadata before the recognized text
                            between '+++'.
         """
-        if self.meta and header == True:
+        if self.meta and header is True:
             fp.write('+++\n')
             for key, val in self.meta.iteritems():
                 fp.write(u'{} = {}\n'.format(key, val).encode('utf-8'))

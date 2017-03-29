@@ -30,4 +30,5 @@ def reload_config():
     with open(cpath, 'rb') as fp:
         celery_cfg = yaml.safe_load(fp)
 
+
 reload_config()

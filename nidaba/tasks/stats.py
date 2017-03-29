@@ -31,12 +31,14 @@ from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
 
+
 def cleanup(text):
     """
     Removes lines containing only whitespace and normalizes to NFD.
     """
     text = sanitize(text)
     return '\n'.join([s for s in text.splitlines() if len(s.strip())])
+
 
 def find_matching(doc, ground_truths):
     """
@@ -46,6 +48,7 @@ def find_matching(doc, ground_truths):
     def cmp_prefix(x, y):
         return len(os.path.commonprefix([y[1], doc[1]])) - len(os.path.commonprefix([x[1], doc[1]]))
     return sorted(ground_truths, cmp=cmp_prefix)[0]
+
 
 @app.task(base=NidabaTask, name=u'nidaba.stats.text_diff_ratio',
           arg_values={'ground_truth': 'files',
@@ -127,7 +130,7 @@ def text_diff_ratio(doc, method=u'text_diff_ratio', ground_truth=None,
         return {'diff_ratio': sm.ratio(), 'ground_truth': ground_truth, 'doc': doc}
 
 
-@app.task(base=NidabaTask, name=u'nidaba.stats.text_rep_confidence', 
+@app.task(base=NidabaTask, name=u'nidaba.stats.text_rep_confidence',
           arg_values={'divert': [True, False]})
 def text_rep_confidence(doc, method=u'text_rep_confidence', divert=True):
     """
@@ -155,7 +158,7 @@ def text_rep_confidence(doc, method=u'text_rep_confidence', divert=True):
         return {'edit_ratio': edist, 'ground_truth': '', 'doc': doc}
 
 
-@app.task(base=NidabaTask, name=u'nidaba.stats.text_lexicality', 
+@app.task(base=NidabaTask, name=u'nidaba.stats.text_lexicality',
           arg_values={'language': nidaba_cfg['lang_dicts'].keys(), 'divert': [True, False]})
 def text_lexicality(doc, method=u'text_lexicality', language=u'', divert=True):
     """
@@ -185,10 +188,10 @@ def text_lexicality(doc, method=u'text_lexicality', language=u'', divert=True):
             err_cnt += 1
     if not divert:
         storage.write_text(*storage.get_storage_path(output_path),
-                           text=unicode(err_cnt/float(cnt)))
+                           text=unicode(err_cnt / float(cnt)))
         return output_path
     else:
-        return {'edit_ratio': err_cnt/float(cnt), 'ground_truth': '', 'doc': doc}
+        return {'edit_ratio': err_cnt / float(cnt), 'ground_truth': '', 'doc': doc}
 
 
 @app.task(base=NidabaTask, name=u'nidaba.stats.text_edit_ratio',

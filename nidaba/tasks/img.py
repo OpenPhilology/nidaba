@@ -17,6 +17,7 @@ from nidaba.tasks.helper import NidabaTask
 
 import os.path
 
+
 @app.task(base=NidabaTask, name=u'nidaba.img.any_to_png')
 def any_to_png(doc, method=u'any_to_png'):
     """

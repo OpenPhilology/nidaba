@@ -214,6 +214,7 @@ def setup(*args, **kwargs):
         # after setting the tessdata directory.
         ocr_tesseract.arg_values['languages'] = _get_available_classifiers()
 
+
 @app.task(base=NidabaTask, name=u'nidaba.segmentation.tesseract')
 def segmentation_tesseract(doc, method=u'segment_tesseract'):
     """
@@ -349,7 +350,7 @@ def _get_available_classifiers():
 
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.tesseract',
-          arg_values={'languages': None, # is filled by the setup function
+          arg_values={'languages': None,  # is filled by the setup function
                       'extended': [False, True]})
 def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
                   extended=False):
@@ -371,8 +372,7 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
 
     # rewrite the segmentation file to lines in UZN format
     logger.debug('Rewriting TEI ({}) -> UZN ({})'.format(doc[0][1],
-                                                         splitext(doc[1][1])[0]
-                                                         + '.uzn'))
+                                                         splitext(doc[1][1])[0] + '.uzn'))
     seg = OCRRecord()
     with storage.StorageFile(*doc[0]) as fp:
         seg.load_tei(fp)
@@ -482,7 +482,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
         for line_id, line in facsimile.lines.iteritems():
             logger.debug('Clipping input image to recognition box ({})'.format(line['bbox']))
             tesseract.TessBaseAPISetRectangle(api, line['bbox'][0],
-                                              line['bbox'][1], 
+                                              line['bbox'][1],
                                               line['bbox'][2] - line['bbox'][0],
                                               line['bbox'][3] - line['bbox'][1])
             logger.debug('Recognizing line.')
@@ -511,8 +511,8 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                     if last_word is not None:
                         facsimile.add_segment((last_word, y0.value, x1.value,
                                                y1.value), lang, 100)
-                        facsimile.add_graphemes([{'grapheme': u' ', 
-                                                  'bbox': (last_word, y0.value,x0.value, y1.value),
+                        facsimile.add_graphemes([{'grapheme': u' ',
+                                                  'bbox': (last_word, y0.value, x0.value, y1.value),
                                                   'confidence': 100}])
                     last_word = x1.value
                     facsimile.add_segment((x0.value, y0.value, x1.value, y1.value),
@@ -532,8 +532,8 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                 grapheme = tesseract.TessResultIteratorGetUTF8Text(ri, RIL_SYMBOL)
                 if grapheme is not None:
                     grapheme = grapheme.decode('utf-8')
-                facsimile.add_graphemes([{'grapheme': grapheme, 
-                                          'bbox': (x0.value, y0.value, x1.value,y1.value), 
+                facsimile.add_graphemes([{'grapheme': grapheme,
+                                          'bbox': (x0.value, y0.value, x1.value, y1.value),
                                           'confidence': conf}])
                 logger.debug('New symbol {} at {} {} {} {} (conf: {})'.format(grapheme,
                                                                               x0.value,

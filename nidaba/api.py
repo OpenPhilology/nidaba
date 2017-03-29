@@ -29,7 +29,7 @@ from nidaba.nidabaexceptions import NidabaStorageViolationException
 log = logging.getLogger(__name__)
 log.propagate = False
 ch = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s [%(process)d] [%(levelname)s] %(message)s', 
+formatter = logging.Formatter('%(asctime)s [%(process)d] [%(levelname)s] %(message)s',
                               datefmt='[%Y-%m-%d %H:%M:%S %z]')
 ch.setFormatter(formatter)
 log.addHandler(ch)
@@ -37,8 +37,10 @@ log.addHandler(ch)
 api_v1 = Blueprint('api', __name__, url_prefix='/api/v1')
 api = Api(api_v1)
 
+
 def get_blueprint():
     return api_v1
+
 
 # helper so autodoc finds endpoints
 def create_app():
@@ -46,28 +48,29 @@ def create_app():
     app.register_blueprint(get_blueprint())
     return app
 
+
 @api.resource('/pages/<batch>/<path:file>', methods=['GET'])
 class Page(Resource):
 
     def get(self, batch, file):
         """
         Retrieves the file at *file* in batch *batch*.
-    
+
         ** Request **
-    
+
         .. sourcecode:: http
-    
+
             GET /pages/:batch/:path
-    
+
         ** Response **
-    
+
         .. sourcecode:: http
-    
+
             HTTP/1.1 200 OK
             Content-Type: application/octet-stream
-    
+
             ...
-    
+
         :param batch: batch's unique id
         :type batch: str
         :param file: path to the batch's file
@@ -83,6 +86,7 @@ class Page(Resource):
             return {'message': 'File not found'}, 404
         return send_file(fp, mimetype=mimetypes.guess_type(file)[0])
 
+
 @api.resource('/tasks', '/tasks/<group>', '/tasks/<group>/<task>')
 class Task(Resource):
     def get(self, group=None, task=None):
@@ -91,92 +95,92 @@ class Task(Resource):
         for those arguments.
 
         ** Request **
-    
+
         .. sourcecode:: http
-    
+
             GET /tasks
-    
+
         ** Response **
-    
+
         .. sourcecode:: http
-    
+
             HTTP/1.1 200 OK
 
             {
                 "img": {
-                    "deskew": {}, 
-                    "dewarp": {}, 
+                    "deskew": {},
+                    "dewarp": {},
                     "rgb_to_gray": {}
                 },
                 "binarize": {
                     "nlbin": {
-                        "border": "float", 
-                        "escale": "float", 
+                        "border": "float",
+                        "escale": "float",
                         "high": [
-                            0, 
+                            0,
                             100
-                        ], 
+                        ],
                         "low": [
-                            0, 
+                            0,
                             100
-                        ], 
-                    }, 
-                    "otsu": {}, 
+                        ],
+                    },
+                    "otsu": {},
                     "sauvola": {
                         "factor": [
-                            0.0, 
+                            0.0,
                             1.0
-                        ], 
+                        ],
                         "whsize": "int"
                     }
-                },
+                }
                 "segmentation": {
-                    "kraken": {}, 
+                    "kraken": {},
                     "tesseract": {}
                 },
                 "ocr": {
                     "kraken": {
                         "model": [
-                            "fraktur.pyrnn.gz", 
-                            "default", 
+                            "fraktur.pyrnn.gz",
+                            "default",
                             "teubner"
                         ]
-                    }, 
+                    },
                     "tesseract": {
                         "extended": [
-                            false, 
+                            false,
                             true
-                        ], 
+                        ],
                         "languages": [
-                            "chr", 
-                            "chi_tra", 
-                            "ita_old", 
-                            "ceb", 
+                            "chr",
+                            "chi_tra",
+                            "ita_old",
+                            "ceb",
                         ]
                     }
-                }, 
+                },
                 "postprocessing": {
                     "spell_check": {
                         "filter_punctuation": [
-                            true, 
+                            true,
                             false
-                        ], 
+                        ],
                         "language": [
-                            "latin", 
+                            "latin",
                             "polytonic_greek"
                         ]
                     }
                 },
                 "output": {
                     "metadata": {
-                        "metadata": "file", 
+                        "metadata": "file",
                         "validate": [
-                            true, 
+                            true,
                             false
                         ]
-                    }, 
-                    "tei2hocr": {}, 
-                    "tei2simplexml": {}, 
+                    },
+                    "tei2hocr": {},
+                    "tei2simplexml": {},
                     "tei2txt": {}
                 }
             }
@@ -187,7 +191,7 @@ class Task(Resource):
         ** Request **
 
         .. sourcecode:: http
-    
+
             GET /tasks/segmentation
 
         ** Response **
@@ -195,10 +199,10 @@ class Task(Resource):
         .. sourcecode:: http
 
             HTTP/1.1 200 OK
-            
+
             {
                 "segmentation": {
-                    "kraken": {}, 
+                    "kraken": {},
                     "tesseract": {}
                 }
             }
@@ -233,17 +237,17 @@ class Batch(Resource):
     def get(self, batch_id):
         """
         Retrieves the state of batch *batch_id*.
-    
+
         ** Request **
-    
+
         .. sourcecode:: http
-    
+
             GET /batch/:batch_id
-    
+
         ** Response **
-    
+
         .. sourcecode:: http
-    
+
             HTTP/1.1 200 OK
 
         :param batch_id: batch identifier
@@ -263,6 +267,7 @@ class Batch(Resource):
         res['tasks'] = url_for('api.batchtasks', batch_id=batch_id)
         if batch.is_running():
             res['chains'] = batch.get_extended_state()
+
             # replace all document tuples with URLs to the page resource
             def replace_docs(state):
                 for k in state.keys():
@@ -282,21 +287,21 @@ class Batch(Resource):
     def post(self, batch_id):
         """
         Executes batch with identifier *batch_id*
-    
+
         ** Request **
-    
+
         .. sourcecode:: http
-    
+
             POST /batch/:batch_id
-    
+
         ** Response **
-    
+
         .. sourcecode:: http
-    
+
             HTTP/1.1 202 ACCEPTED
-   
+
         :param batch_id: batch's unique id
-        :type batch_id: string 
+        :type batch_id: string
         :status 202: Successfully executed
         :status 400: Batch could not be executed
         :status 404: No such batch
@@ -328,22 +333,22 @@ class BatchCreator(Resource):
         Creates a new batch and returns it identifier.
 
         ** Request **
-    
+
         .. sourcecode:: http
-    
+
             POST /batch
-    
+
         ** Response **
-    
+
         .. sourcecode:: http
-    
+
             HTTP/1.1 201 CREATED
 
             {
-                "id": "78a1f1e4-cc76-40ce-8a98-77b54362a00e", 
+                "id": "78a1f1e4-cc76-40ce-8a98-77b54362a00e",
                 "url": "/batch/78a1f1e4-cc76-40ce-8a98-77b54362a00e"
             }
-    
+
         :status 201: Successfully created
         """
         log.debug('Routing to batch with POST')
@@ -351,6 +356,7 @@ class BatchCreator(Resource):
         data = {'id': batch.id, 'url': url_for('api.batch', batch_id=batch.id)}
         log.debug('Created batch {}'.format(batch.id))
         return data, 201
+
 
 @api.resource('/batch/<batch_id>/tasks',
               '/batch/<batch_id>/tasks/<group>',
@@ -363,25 +369,25 @@ class BatchTasks(Resource):
         batch, optionally limited to a specific group.
 
         ** Request **
-    
+
         .. sourcecode:: http
 
-            GET /batch/:batch_id/tasks    
-    
+            GET /batch/:batch_id/tasks
+
         ** Response **
-    
+
         .. sourcecode:: http
-    
+
             HTTP/1.1 200 OK
-            
+
             {
                 "segmentation": [
                     ["tesseract", {}]
                 ],
                 "ocr": [
-                    ["kraken", 
+                    ["kraken",
                         {
-                            "model": "teubner", 
+                            "model": "teubner",
                         }
                     ]
                 ]
@@ -492,7 +498,7 @@ class BatchTasks(Resource):
 class BatchPages(Resource):
 
     parser = reqparse.RequestParser(bundle_errors=True)
-    parser.add_argument('auxiliary', type=bool, default=False, location='args', 
+    parser.add_argument('auxiliary', type=bool, default=False, location='args',
                         help='Files not added as batch input but accessible for '
                         'other purposes')
     parser.add_argument('scans', type=werkzeug.datastructures.FileStorage,
@@ -503,28 +509,28 @@ class BatchPages(Resource):
         Returns the list of pages associated with the batch with *batch_id*.
 
         ** Request **
-    
+
         .. sourcecode:: http
-    
+
             GET /batch/:batch/pages
-    
+
         ** Response **
-    
+
         .. sourcecode:: http
-    
+
             HTTP/1.1 200 OK
 
             [
                 {
-                    "name": "0033.tif", 
+                    "name": "0033.tif",
                     "url": "/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0033.tif"
-                }, 
+                },
                 {
-                    "name": "0072.tif", 
+                    "name": "0072.tif",
                     "url": "/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0072.tif"
-                }, 
+                },
                 {
-                    "name": "0014.tif", 
+                    "name": "0014.tif",
                     "url": "/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0014.tif"
                 }
             ]
@@ -555,10 +561,10 @@ class BatchPages(Resource):
         ** Response **
 
             HTTP/1.1 201 OK
-            
+
             [
                 {
-                    "name": "0033.tif", 
+                    "name": "0033.tif",
                     "url": "/pages/63ca3ec7-2592-4c7d-9009-913aac42535d/0033.tif"
                 }
             ]
@@ -571,7 +577,7 @@ class BatchPages(Resource):
         """
         args = self.parser.parse_args()
         log.debug('Routing to pages {} of {} (POST)'.format(
-                    [x.filename for x in args['scans']], batch_id))
+                  [x.filename for x in args['scans']], batch_id))
         try:
             batch = nBatch(batch_id)
         except:
@@ -589,7 +595,7 @@ class BatchPages(Resource):
                     file.save(fp)
                     file.close()
                     if args['auxiliary'] is False:
-                        log.debug('Adding {}/{} to {}'.format(fp.storage_path[0], 
+                        log.debug('Adding {}/{} to {}'.format(fp.storage_path[0],
                                                               fp.storage_path[1],
                                                               batch_id))
                         batch.add_document(fp.storage_path)

@@ -96,9 +96,7 @@ def lept_sauvola(image_path, output_path, whsize=10, factor=0.35):
     """
 
     if whsize < 2 or factor >= 1.0 or factor < 0:
-        raise NidabaInvalidParameterException('Parameters (' + unicode(whsize)
-                                              + ',' + unicode(factor) +
-                                              ') outside of valid range')
+        raise NidabaInvalidParameterException('Parameters ({}, {}) outside of valid range'.format(whsize, factor))
     try:
         lept = ctypes.cdll.LoadLibrary(leptlib)
     except OSError as e:

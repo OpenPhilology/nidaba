@@ -13,7 +13,7 @@ from nidaba import storage
 from nidaba import merge_hocr
 from nidaba import lex
 from nidaba.celery import app
-from nidaba.tei import OCRRecord 
+from nidaba.tei import OCRRecord
 from nidaba.config import nidaba_cfg
 from nidaba.tasks.helper import NidabaTask
 
@@ -22,7 +22,7 @@ from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
 
-@app.task(base=NidabaTask, name=u'nidaba.postprocessing.spell_check', 
+@app.task(base=NidabaTask, name=u'nidaba.postprocessing.spell_check',
           arg_values={'language': nidaba_cfg['lang_dicts'].keys(),
                       'filter_punctuation': [True, False]})
 def spell_check(doc, method=u'spell_check', language=u'',

@@ -25,6 +25,7 @@ import uuid
 import requests
 import itertools
 
+
 def task_arg_validator(arg_values, **kwargs):
     """
     Validates keyword arguments against the list of valid argument values
@@ -109,11 +110,11 @@ class Batch(object):
         self.scratchpad = {}
         self.redis = config.Redis
 
-        self.tasks = OrderedDict([('img', []), 
+        self.tasks = OrderedDict([('img', []),
                                   ('binarize', []),
-                                  ('segmentation', []), 
+                                  ('segmentation', []),
                                   ('ocr', []),
-                                  ('stats', []), 
+                                  ('stats', []),
                                   ('postprocessing', []),
                                   ('output', []),
                                   ('archive', [])])
@@ -155,7 +156,7 @@ class Batch(object):
                     setattr(self, k, v)
                 # reorder task definitions
         else:
-            self.scratchpad = {'scratchpad': {'docs': self.docs, 
+            self.scratchpad = {'scratchpad': {'docs': self.docs,
                                               'tasks': self.tasks}}
             pipe.set(self.id, json.dumps(self.scratchpad))
 
@@ -272,11 +273,11 @@ class Batch(object):
             return scratch['scratchpad']['simple_tasks']
         else:
             state = self.get_extended_state()
-            tasks = OrderedDict([('img', []), 
+            tasks = OrderedDict([('img', []),
                                  ('binarize', []),
-                                 ('segmentation', []), 
+                                 ('segmentation', []),
                                  ('ocr', []),
-                                 ('stats', []), 
+                                 ('stats', []),
                                  ('postprocessing', []),
                                  ('output', []),
                                  ('output', [])])
@@ -324,7 +325,7 @@ class Batch(object):
 
         if not self.storage.is_file(*doc):
             raise NidabaInputException('Input document is not a file.')
-        
+
         with self.redis.pipeline() as pipe:
             while(1):
                 try:
@@ -381,31 +382,6 @@ class Batch(object):
                 except WatchError:
                     continue
 
-    def _add_step(self, merging=False):
-        """Add a new step to the batch definition.
-
-        A step is a synchronization barrier in the execution graph. It may
-        either distribute the output of previous tasks across all subsequent
-        tasks (merging=False), run each task with all outputs from a single
-        source document (doc), or merge all outputs and run each task on all of
-        them (True).
-
-        Args:
-            merging (False, True, doc): 
-        """
-        with self.redis.pipeline() as pipe:
-            while(1):
-                try:
-                    pipe.watch(self.id)
-                    self._restore_and_create_scratchpad(pipe)
-                    self.tasks.append({'tasks': [], 'merging': merging})
-                    self.scratchpad['scratchpad']['tasks'] = self.tasks
-                    pipe.set(self.id, json.dumps(self.scratchpad))
-                    pipe.execute()
-                    break
-                except WatchError:
-                    continue
-
     def run(self):
         """Executes the current batch definition.
 
@@ -446,7 +422,7 @@ class Batch(object):
             # previous step if not merging
             if not mmode:
                 step = _repeat(step, len(root_docs))
-                root_docs = root_docs * (len(step)/len(root_docs))
+                root_docs = root_docs * (len(step) / len(root_docs))
             # by number of root docs if doc merging
             elif mmode == 'doc':
                 step = _repeat(step, len(self.docs))
@@ -464,27 +440,25 @@ class Batch(object):
                     # if idx > 0 (sequential == true) parent is previous task in sequence
                     if idx > 0:
                         parents = [task_id]
-                    # if merge mode is 'doc' base parents are tasks n * (len(prev)/len(docs)) to n+1 ... 
+                    # if merge mode is 'doc' base parents are tasks n * (len(prev)/len(docs)) to n+1 ...
                     elif mmode == 'doc':
                         parents = prev[rd_idx::len(root_docs)]
                     # if merging everything all tasks in previous step are parents
                     elif mmode:
                         parents = prev
                     # if not merging a single task in previous step is the parent
-                    elif mmode == False:
+                    elif mmode is False:
                         parents = [prev[rd_idx % len(prev)]] if prev else prev
                     task_id = uuid.uuid4().get_hex()
                     # last task in a sequence is entered into new prev array
-                    if idx+1 == len(c):
+                    if idx + 1 == len(c):
                         nprev.append(task_id)
-                    result_data[task_id] = {
-                       'children': [],
-                       'parents': parents,
-                       'root_documents': [rdoc],
-                       'state': 'PENDING',
-                       'result': None,
-                       'task': (group, fun, kwargs),
-                    }
+                    result_data[task_id] = {'children': [],
+                                            'parents': parents,
+                                            'root_documents': [rdoc],
+                                            'state': 'PENDING',
+                                            'result': None,
+                                            'task': (group, fun, kwargs)}
                     for parent in parents:
                         result_data[parent]['children'].append(task_id)
                     task = self.celery.app.tasks[u'nidaba.{}.{}'.format(group, fun)]
@@ -500,7 +474,7 @@ class Batch(object):
                 try:
                     pipe.watch(self.id)
                     self._restore_and_create_scratchpad(pipe)
-                    # also deletes the scratchpad 
+                    # also deletes the scratchpad
                     pipe.set(self.id, json.dumps(result_data))
                     pipe.execute()
                     break
@@ -508,6 +482,7 @@ class Batch(object):
                     continue
         chain(first).apply_async(args=[self.docs])
         return self.id
+
 
 class NetworkSimpleBatch(object):
     """
@@ -526,7 +501,6 @@ class NetworkSimpleBatch(object):
         if id is not None:
             r = requests.get('{}/batch/{}'.format(host, id))
             r.raise_for_status()
-
 
     def create_batch(self):
         """
@@ -669,7 +643,7 @@ class NetworkSimpleBatch(object):
         Args:
             path (unicode): Path to the document
             callback (function): A function that is called with a
-                                 ``requests_toolbelt.multipart.encoder.MultipartEncoderMonitor`` 
+                                 ``requests_toolbelt.multipart.encoder.MultipartEncoderMonitor``
                                 instance.
             auxiliary (bool): Switch to disable setting the file as an input
                               document. May be used to upload ground truths,
@@ -715,7 +689,7 @@ class NetworkSimpleBatch(object):
             raise NidabaInputException('Unknown task {}'.format(method))
         r = requests.post('{}/batch/{}/tasks/{}/{}'.format(self.host, self.id,
                                                            group, method),
-                          json=kwargs)  
+                          json=kwargs)
         r.raise_for_status()
 
     def run(self):

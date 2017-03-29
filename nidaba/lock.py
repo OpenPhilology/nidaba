@@ -15,6 +15,7 @@ import random
 
 from nidaba.nidabaexceptions import NidabaStorageViolationException
 
+
 class lock(object):
     """
     A global lock implementation for files on the common storage medium. It is

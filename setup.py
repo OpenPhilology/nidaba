@@ -7,4 +7,3 @@ setup(
     test_suite='tests',
     pbr=True,
 )
-

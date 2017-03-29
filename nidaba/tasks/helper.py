@@ -21,6 +21,7 @@ import sys
 
 logger = get_task_logger(__name__)
 
+
 def _redis_set_atomically(batch_id, subtask, key, val):
     """
     Atomically sets a field in the Redis batch object to a value.
@@ -48,7 +49,7 @@ class NidabaTask(Task):
     """
     abstract = True
     acks_late = True
-    
+
     # a dictionary containing all keyword arguments to the task including valid
     # values
     arg_values = {}

@@ -17,6 +17,7 @@ from celery import signature, group, chain
 from os.path import commonprefix
 from itertools import cycle, izip
 
+
 def _group_by_prefix(data, prefixes):
     """
     Groups a list of input files by longest common prefix over a given list of prefixes
@@ -26,6 +27,7 @@ def _group_by_prefix(data, prefixes):
         ret[sorted(enumerate(commonprefix([doc[1], pre[1]]) for pre in prefixes),
                    key=lambda x: len(x[1]))[-1][0]].append(doc)
     return ret
+
 
 @app.task(bind=True, name='nidaba.util.barrier')
 def barrier(self, data, merging=False, sequential=False, replace=None, root_docs=None):

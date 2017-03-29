@@ -25,7 +25,7 @@ from PIL import Image
 from celery.utils.log import get_task_logger
 
 from nidaba import storage
-from nidaba.tei import OCRRecord 
+from nidaba.tei import OCRRecord
 from nidaba.config import nidaba_cfg
 from nidaba.celery import app
 from nidaba.tasks.helper import NidabaTask
