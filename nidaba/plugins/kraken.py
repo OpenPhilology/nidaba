@@ -14,6 +14,9 @@ e.g. the current virtualenv. It is available from pypi::
 
 It should be able to utilize any model trained for ocropus and is configured
 using the same global configuration options.
+
+.. note::
+    nidaba requires kraken version 0.9.2 or higher.
 """
 
 from __future__ import unicode_literals, print_function, absolute_import
@@ -97,7 +100,7 @@ def segmentation_kraken(doc, method=u'segment_kraken', black_colseps=False):
         tei.dimensions = img.size
         tei.title = os.path.basename(doc[1])
         tei.add_respstmt('kraken', 'page segmentation')
-        for seg in pageseg.segment(img, black_colseps):
+        for seg in pageseg.segment(img, black_colseps)['boxes']:
             logger.debug('Found line at {} {} {} {}'.format(*seg))
             tei.add_line(seg)
         logger.debug('Write segmentation to {}'.format(fp.name))
@@ -151,7 +154,7 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     rnn = models.load_any(model)
     i = 0
     logger.debug('Start recognizing characters')
-    for line_id, rec in zip(lines, rpred.rpred(rnn, img, [x['bbox'] for x in lines.itervalues()])):
+    for line_id, rec in zip(lines, rpred.rpred(rnn, img, {'text_direction': 'horizontal-tb', 'boxes': [x['bbox'] for x in lines.itervalues()]})):
         # scope the current line and add all graphemes recognized by kraken to
         # it.
         logger.debug('Scoping line {}'.format(line_id))
