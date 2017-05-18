@@ -154,7 +154,7 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     rnn = models.load_any(model)
     i = 0
     logger.debug('Start recognizing characters')
-    for line_id, rec in zip(lines, rpred.rpred(rnn, img, {'text_direction': 'horizontal-tb', 'boxes': [x['bbox'] for x in lines.itervalues()]})):
+    for line_id, rec in zip(lines, rpred.rpred(rnn, img, {'text_direction': 'horizontal-tb', 'boxes': [list(x['bbox']) for x in lines.itervalues()]})):
         # scope the current line and add all graphemes recognized by kraken to
         # it.
         logger.debug('Scoping line {}'.format(line_id))
