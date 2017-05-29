@@ -10,6 +10,7 @@ from nidaba import storage
 from nidaba.celery import app
 from nidaba.nidabaexceptions import NidabaPluginException
 from nidaba.tasks.helper import NidabaTask
+from nidaba import tei
 
 from celery.utils.log import get_task_logger
 
@@ -42,5 +43,18 @@ def archive_pybossa(doc, method=u'archive_pybossa'):
     """
     logger.debug('Creating pybossa task {} {}'.format(*doc))
     for d in doc:
-        pbclient.create_task(project, {'batch_id': d[0], 'xml': storage.get_url(*d)})
+        data = tei.OCRRecord()
+        data.load_tei(d[1])
+        for line_id, line in data.lines.iteritems():
+            pbclient.create_task(project, {
+                'image': data.img,
+                'dimensions': data.dimensions,
+                'line_text': line,
+                'bbox': [
+                    str(line['bbox'][0]),
+                    str(line['bbox'][1]),
+                    str(line['bbox'][2]),
+                    str(line['bbox'][3])
+                ]
+            })
     return doc
