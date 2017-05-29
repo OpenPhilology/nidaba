@@ -42,5 +42,5 @@ def archive_pybossa(doc, method=u'archive_pybossa'):
     """
     logger.debug('Creating pybossa task {} {}'.format(*doc))
     for d in doc:
-        pbclient.create_task(project, {'batch_id': doc[0], 'xml': storage.get_url(*d)})
+        pbclient.create_task(project, {'batch_id': d[0], 'xml': storage.get_url(*d)})
     return doc
