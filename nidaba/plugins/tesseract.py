@@ -333,7 +333,7 @@ def segmentation_tesseract(doc, method=u'segment_tesseract'):
         tei.write_tei(fp)
     logger.info('Quitting child process')
     os._exit(os.EX_OK)
-    return storage.get_storage_path(output_path), doc
+    return storage.get_storage_path(output_path)
 
 
 def _get_available_classifiers():
@@ -368,19 +368,19 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
     Returns:
         (unicode, unicode): Storage tuple for the output file
     """
-    image_path = storage.get_abs_path(*doc[1])
 
     # rewrite the segmentation file to lines in UZN format
     logger.debug('Rewriting TEI ({}) -> UZN ({})'.format(doc[0][1],
-                                                         splitext(doc[1][1])[0] + '.uzn'))
+                                                         splitext(doc[1])[0] + '.uzn'))
     seg = OCRRecord()
-    with storage.StorageFile(*doc[0]) as fp:
+    with storage.StorageFile(*doc) as fp:
         seg.load_tei(fp)
-    with storage.StorageFile(doc[1][0], splitext(doc[1][1])[0] + '.uzn', mode='wb') as fp:
+    with storage.StorageFile(doc[0], splitext(doc[1])[0] + '.uzn', mode='wb') as fp:
         uzn = UZNWriter(fp)
         for line in seg.lines.itervalues():
             uzn.writerow(*line['bbox'])
 
+    image_path = storage.get_abs_path(*storage.get_storage_path_url(seg.img))
     if isinstance(languages, basestring):
         languages = [languages]
     output_path = storage.insert_suffix(image_path, method, *languages)

@@ -105,8 +105,7 @@ def segmentation_kraken(doc, method=u'segment_kraken', black_colseps=False):
             tei.add_line(seg)
         logger.debug('Write segmentation to {}'.format(fp.name))
         tei.write_tei(fp)
-    return (storage.get_storage_path(output_path + '.xml'),
-            storage.get_storage_path(output_path + ext))
+    return storage.get_storage_path(output_path + '.xml')
 
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.kraken',
@@ -124,8 +123,7 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     Returns:
         (unicode, unicode): Storage tuple for the output file
     """
-    input_path = storage.get_abs_path(*doc[1])
-    output_path = (doc[1][0], os.path.splitext(storage.insert_suffix(doc[1][1],
+    output_path = (doc[0], os.path.splitext(storage.insert_suffix(doc[1],
                                                                      method,
                                                                      model))[0] + '.xml')
     logger.debug('Searching for model {}'.format(model))
@@ -136,11 +134,12 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     else:
         raise NidabaInvalidParameterException('Model not defined in '
                                               'configuration')
-    img = Image.open(input_path)
-    logger.debug('Reading TEI segmentation from {}'.format(doc[1]))
+    logger.debug('Reading TEI segmentation from {}'.format(doc))
     tei = OCRRecord()
-    with storage.StorageFile(*doc[0]) as seg:
+    with storage.StorageFile(*doc) as seg:
         tei.load_tei(seg)
+
+    img = Image.open(storage.get_abs_path(*storage.get_storage_path_url(tei.img)))
 
     logger.debug('Clearing out word/grapheme boxes')
     # kraken is a line recognizer

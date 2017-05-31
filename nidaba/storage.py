@@ -16,8 +16,9 @@ from nidaba.nidabaexceptions import (NidabaStorageViolationException,
 
 import io
 import os
-import fnmatch
 import re
+import fnmatch
+import urlparse
 
 from flask_restful import url_for
 
@@ -124,7 +125,7 @@ def _sanitize_path(base_path, *paths):
                                          raise this week.
     """
 
-    if len(paths) < 1:
+    if not paths:
         raise NidabaStorageViolationException('Path not beneath STORAGE_PATH')
     base_path = os.path.expanduser(base_path)
     base_path = os.path.abspath(base_path)
@@ -153,6 +154,19 @@ def is_file(jobID, path):
     """
     return os.path.isfile(get_abs_path(jobID, path))
 
+
+def get_storage_path_url(url):
+    """
+    Returns the file tuple for an API server URL
+
+    Args:
+        url (unicode): API server URL
+
+    Returns:
+        (unicode, unicode): file tuple
+    """
+    o = urlparse.urlsplit(url)[2]
+    return get_storage_path(_sanitize_path(nidaba_cfg['storage_path'], os.path.join(*o.split('/')[4:])))
 
 def get_url(jobID, *paths):
     """
