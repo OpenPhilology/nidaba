@@ -32,6 +32,8 @@ def _group_by_prefix(data, prefixes):
 @app.task(bind=True, name='nidaba.util.barrier')
 def barrier(self, data, merging=False, sequential=False, replace=None, root_docs=None):
     replacement = []
+    if isinstance(data[0], basestring):
+        data = [data]
     # merge output from same source documents
     if merging == 'doc':
         for docs, task in izip(cycle(_group_by_prefix(data, root_docs)), replace):
