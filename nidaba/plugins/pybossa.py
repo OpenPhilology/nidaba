@@ -41,20 +41,21 @@ def archive_pybossa(doc, method=u'archive_pybossa'):
     Returns:
         The input storage tuple.
     """
-    logger.debug('Creating pybossa task {} {}'.format(*doc))
+    logger.debug('Creating pybossa tasks for {}'.format(doc))
     for d in doc:
-        data = tei.OCRRecord()
-        data.load_tei(d[1])
-        for line_id, line in data.lines.iteritems():
-            pbclient.create_task(project, {
-                'image': data.img,
-                'dimensions': data.dimensions,
-                'line_text': line,
-                'bbox': [
-                    str(line['bbox'][0]),
-                    str(line['bbox'][1]),
-                    str(line['bbox'][2]),
-                    str(line['bbox'][3])
-                ]
-            })
+        data = tei.OCRRecord(
+        with StorageFile(*doc, 'rb') as fp:
+            data.load_tei(fp)
+            for line_id, line in data.lines.iteritems():
+                pbclient.create_task(project, {
+                    'image': data.img,
+                    'dimensions': data.dimensions,
+                    'line_text': line,
+                    'bbox': [
+                        str(line['bbox'][0]),
+                        str(line['bbox'][1]),
+                        str(line['bbox'][2]),
+                        str(line['bbox'][3])
+                    ]
+                })
     return doc
