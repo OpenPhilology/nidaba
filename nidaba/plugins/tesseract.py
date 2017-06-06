@@ -250,10 +250,10 @@ def segmentation_tesseract(doc, method=u'segment_tesseract'):
         except OSError as e:
             if e.errno not in (errno.EINTR, errno.ECHILD):
                 raise
-            return storage.get_storage_path(output_path), doc
+            return storage.get_storage_path(output_path)
         if os.WIFSIGNALED(status):
             raise NidabaTesseractException('Tesseract killed by signal: {0}'.format(os.WTERMSIG(status)))
-        return storage.get_storage_path(output_path), doc
+        return storage.get_storage_path(output_path)
 
     api = tesseract.TessBaseAPICreate()
     rc = tesseract.TessBaseAPIInit3(api, tessdata.encode('utf-8'), None)
@@ -368,10 +368,6 @@ def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None,
     Returns:
         (unicode, unicode): Storage tuple for the output file
     """
-
-    # rewrite the segmentation file to lines in UZN format
-    logger.debug('Rewriting TEI ({}) -> UZN ({})'.format(doc[0][1],
-                                                         splitext(doc[1])[0] + '.uzn'))
     seg = OCRRecord()
     with storage.StorageFile(*doc) as fp:
         seg.load_tei(fp)
