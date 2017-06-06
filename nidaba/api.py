@@ -23,7 +23,12 @@ from flask_restful import abort, Api, Resource, url_for, reqparse
 
 from nidaba import storage
 from nidaba.nidaba import Batch as nBatch
-from nidaba.nidabaexceptions import NidabaStorageViolationException
+from nidaba.nidabaexceptions import NidabaStorageViolationException, NidabaInputException
+
+# not actually needed but speeds up the first response and shows errors when starting the API server
+from nidaba import tasks
+from nidaba import plugins
+from nidaba import celery
 
 
 log = logging.getLogger(__name__)
