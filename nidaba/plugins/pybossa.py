@@ -40,8 +40,8 @@ def archive_pybossa(doc, method=u'archive_pybossa', name='', description=''):
     Returns:
         The input storage tuple.
     """
-    logger.debug('Creating pybossa project named {}'.format(shortname))
-    proj = pbclient.create_project('{} ({})'.format(name, d[0][0]), d[0][0], description)
+    logger.debug('Creating pybossa project named {}'.format(name))
+    proj = pbclient.create_project('{} ({})'.format(name, doc[0][0]), doc[0][0], description)
     logger.debug('Creating pybossa tasks for docs {}'.format(doc))
     for d in doc:
         data = tei.OCRRecord()
