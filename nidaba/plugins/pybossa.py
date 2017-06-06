@@ -43,19 +43,22 @@ def archive_pybossa(doc, method=u'archive_pybossa'):
     """
     logger.debug('Creating pybossa tasks for {}'.format(doc))
     for d in doc:
-        data = tei.OCRRecord(
-        with StorageFile(*doc, 'rb') as fp:
+        data = tei.OCRRecord()
+        with storage.StorageFile(*d, mode='rb') as fp:
             data.load_tei(fp)
             for line_id, line in data.lines.iteritems():
+                text = u''
+                for seg in line['content'].itervalues():
+                    text += u''.join(x['grapheme'] for x in seg['content'].itervalues())
                 pbclient.create_task(project, {
                     'image': data.img,
                     'dimensions': data.dimensions,
-                    'line_text': line,
+                    'line_text': text.encode('utf-8'),
                     'bbox': [
-                        str(line['bbox'][0]),
-                        str(line['bbox'][1]),
-                        str(line['bbox'][2]),
-                        str(line['bbox'][3])
+                        line['bbox'][0],
+                        line['bbox'][1],
+                        line['bbox'][2],
+                        line['bbox'][3]
                     ]
                 })
     return doc
