@@ -23,14 +23,13 @@ def setup(*args, **kwargs):
         import pbclient
         pbclient.set('endpoint', kwargs.get('server'))
         pbclient.set('api_key', kwargs.get('api_key'))
-        global project
-        project = pbclient.find_project(short_name=kwargs.get('project'))[0].data['id']
     except Exception as e:
         raise NidabaPluginException(e.message)
 
 
-@app.task(base=NidabaTask, name=u'nidaba.archive.pybossa')
-def archive_pybossa(doc, method=u'archive_pybossa'):
+@app.task(base=NidabaTask, name=u'nidaba.archive.pybossa',
+          arg_values={'name': 'str', 'description': 'str'})
+def archive_pybossa(doc, method=u'archive_pybossa', name='', description=''):
     """
     Adds recognition result to a pybossa service for postcorrection.
 
@@ -41,7 +40,9 @@ def archive_pybossa(doc, method=u'archive_pybossa'):
     Returns:
         The input storage tuple.
     """
-    logger.debug('Creating pybossa tasks for {}'.format(doc))
+    logger.debug('Creating pybossa project named {}'.format(shortname))
+    proj = pbclient.create_project('{} ({})'.format(name, d[0][0]), d[0][0], description)
+    logger.debug('Creating pybossa tasks for docs {}'.format(doc))
     for d in doc:
         data = tei.OCRRecord()
         with storage.StorageFile(*d, mode='rb') as fp:
@@ -50,7 +51,7 @@ def archive_pybossa(doc, method=u'archive_pybossa'):
                 text = u''
                 for seg in line['content'].itervalues():
                     text += u''.join(x['grapheme'] for x in seg['content'].itervalues())
-                pbclient.create_task(project, {
+                pbclient.create_task(proj.id, {
                     'image': data.img,
                     'dimensions': data.dimensions,
                     'line_text': text.encode('utf-8'),

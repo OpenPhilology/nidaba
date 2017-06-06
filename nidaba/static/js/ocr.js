@@ -387,7 +387,9 @@ Iris.Views.PreProcess = Backbone.View.extend({
 					});
 					Iris.batch.add_task('ocr', 'tesseract', {languages: langs, extended: true});
 				}
-				Iris.batch.add_task('output', 'pybossa', {});
+				Iris.batch.add_task('output', 'metadata', {metadata: Iris.batch.metadata_url, validate: false});
+				Iris.batch.add_task('archive', 'pybossa', {name: Iris.batch.metadata['title'], 
+									   description=Iris.batch.metadata['notes']});
 				Iris.batch.execute();
 			}
 		});
