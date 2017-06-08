@@ -51,6 +51,8 @@ def any_to_png(imagepath, resultpath):
     """
     Converts an image in any format recognized by pillow to PNG.
 
+    Also converts to color space to RGB.
+
     Arguments:
         imagepath: Path of the input image
         resultpath: Path of the output image
@@ -59,5 +61,6 @@ def any_to_png(imagepath, resultpath):
         unicode: Path of the actual output file
     """
     img = Image.open(imagepath)
+    img = img.convert('RGB')
     img.save(resultpath, format='png')
     return resultpath
