@@ -54,7 +54,7 @@ def create_app():
     return app
 
 
-@api.resource('/pages/<batch>/<path:file>', methods=['GET'])
+@api.resource('/pages/<batch>/<path:file>')
 class Page(Resource):
 
     def get(self, batch, file):
@@ -94,6 +94,7 @@ class Page(Resource):
 
 @api.resource('/tasks', '/tasks/<group>', '/tasks/<group>/<task>')
 class Task(Resource):
+
     def get(self, group=None, task=None):
         """
         Retrieves the list of available tasks, their arguments and valid values
@@ -472,6 +473,7 @@ class BatchTasks(Resource):
 
         :status 201: task created
         :status 404: batch, group, or task not found.
+        :status 422: invalid task configuration
         """
         log.debug('Routing to task {}.{} of {} (POST)'.format(group, task, batch_id))
         try:
@@ -498,6 +500,56 @@ class BatchTasks(Resource):
             return {'message': str(e)}, 422
         return {}, 201
 
+    def delete(self, batch_id, group=None, task=None):
+        """
+        Removes a particular configuration of a task from the batch identified by
+        *batch_id*.
+
+        ** Request **
+
+            DELETE /batch/:batch_id/:group/:task
+
+            {
+                kwarg_1: "value",
+                kwarg_2: 10,
+                kwarg_3: 'true',
+                kwarg_4: ["a", "b"],
+                kwarg_5: '/pages/:batch_id/path'
+            }
+
+        ** Response **
+
+        .. sourcecode:: http
+
+            HTTP/1.1 204 No Content
+
+        :status 204: task deleted
+        :status 404: batch, group, or task not found.
+        """
+        log.debug('Routing to task {}.{} of {} (DELETE)'.format(group, task, batch_id))
+        try:
+            batch = nBatch(batch_id)
+        except:
+            return {'message': 'Batch Not Found: {}'.format(batch_id)}, 404
+        try:
+            def arg_conversion(s):
+                # JSON does not support booleans
+                if s in ['True', 'true']:
+                    return True
+                elif s in ['False', 'false']:
+                    return False
+                # XXX: find a nicer way to rewrite page URLs
+                base_url = url_for('api.page', batch=batch_id, file='')
+                if isinstance(s, basestring) and s.startswith(base_url):
+                    rem = s.replace(base_url, '', 1)
+                    return (batch_id, rem)
+                return s
+            kwargs = {k: arg_conversion(v) for k, v in request.get_json().iteritems()}
+            batch.rm_task(group, task, **kwargs)
+        except Exception as e:
+            log.debug('Removing task {} from {} failed: {}'.format(task, batch_id, str(e)))
+            return {'message': str(e)}, 404
+        return {}, 204
 
 @api.resource('/batch/<batch_id>/pages')
 class BatchPages(Resource):
@@ -576,7 +628,7 @@ class BatchPages(Resource):
 
         :form scans: file(s) to add to the batch
 
-        :status 201: task created
+        :status 201: file created
         :status 403: file couldn't be created
         :status 404: batch not found
         """
@@ -607,3 +659,38 @@ class BatchPages(Resource):
             data.append({'name': file.filename,
                          'url': url_for('api.page', batch=batch_id, file=file.filename)})
         return data, 201
+
+    def delete(self, batch_id):
+        """
+        Removes a page (really any type of file) from the batch identified by
+        *batch_id*.
+
+        ** Request **
+
+            DELETE /batch/:batch/pages
+
+            {
+                'scans': ['0033.tif', '0034.tif']
+            }
+
+        ** Response **
+
+            HTTP/1.1 204 
+
+        :status 204: file deleted
+        :status 404: batch not found
+        """
+        args = request.get_json()
+        print(request.data)
+        log.debug('Routing to pages {} of {} (DELETE)'.format(args['scans'], batch_id))
+        try:
+            batch = nBatch(batch_id)
+        except:
+            return {'message': 'Batch Not Found: {}'.format(batch_id)}, 404
+        data = []
+        for file in args['scans']:
+            try:
+                batch.rm_document((batch_id, file))
+            except NidabaInputException as e:
+                return {'message': str(e)}, 403
+        return {}, 204

@@ -336,22 +336,52 @@ class Batch(object):
                     pipe.set(self.id, json.dumps(self.scratchpad))
                     pipe.execute()
                     break
-                except self.redis.WatchError:
+                except WatchError:
                     continue
 
+    def rm_document(self, doc):
+        """Removes a document from the (unexecuted) batch.
+
+        Removes a document tuple from the batch.
+
+        Args:
+            doc (tuple): A standard document tuple.
+
+        Raises:
+            NidabaInputException: The document tuple does not refer to a file.
+        """
+        if self.lock:
+            raise NidabaInputException('Executed batch may not be modified')
+
+        with self.redis.pipeline() as pipe:
+            while(1):
+                try:
+                    pipe.watch(self.id)
+                    self._restore_and_create_scratchpad(pipe)
+                    self.docs.remove(list(doc))
+                    self.scratchpad['scratchpad']['docs'] = self.docs
+                    pipe.set(self.id, json.dumps(self.scratchpad))
+                    pipe.execute()
+                    break
+                except WatchError:
+                    continue
+                except ValueError:
+                    raise NidabaInputException('Document not part of the batch')
+
     def add_task(self, group, method, **kwargs):
-        """Add a task to the current tick.
+        """Add a task.
 
         Adds a ``task``, a single executable task gathering one or more input
         documents and returning a single output document, to the current tick.
         Multiple jobs are run in parallel.
 
         Args:
+            group (unicode): A task group identifier
             method (unicode): A task identifier
             **kwargs: Arguments to the task
 
         Raises:
-            NidabaTickException: There is no tick to add a task to.
+            NidabaInputException: Trying to modify executed task.
             NidabaNoSuchAlgorithmException: Invalid method given.
         """
         if self.lock:
@@ -381,6 +411,43 @@ class Batch(object):
                     break
                 except WatchError:
                     continue
+
+    def rm_task(self, group, method, **kwargs):
+        """Removes a task from the (unexecuted) batch.
+
+        Removes a task from the batch.
+
+        Args:
+            group (unicode): A task group identifier
+            method (unicode): A task identifier
+            **kwargs: Arguments to the task
+
+        Raises:
+            NidabaInputException: Trying to modify executed task.
+            NidabaNoSuchAlgorithmException: Invalid method given.
+        """
+        if self.lock:
+            raise NidabaInputException('Executed batch may not be modified')
+        # validate that the task exists
+        if group not in self.tasks:
+            raise NidabaNoSuchAlgorithmException('Unknown task group {}'.format(group))
+        if u'nidaba.{}.{}'.format(group, method) not in self.celery.app.tasks:
+            raise NidabaNoSuchAlgorithmException('Unknown task {} {}'.format(group, method))
+        task = self.celery.app.tasks[u'nidaba.{}.{}'.format(group, method)]
+        with self.redis.pipeline() as pipe:
+            while(1):
+                try:
+                    pipe.watch(self.id)
+                    self._restore_and_create_scratchpad(pipe)
+                    self.tasks[group].remove([method, kwargs])
+                    self.scratchpad['scratchpad']['simple_tasks'] = self.tasks
+                    pipe.set(self.id, json.dumps(self.scratchpad))
+                    pipe.execute()
+                    break
+                except WatchError:
+                    continue
+                except ValueError:
+                    raise NidabaInputException('Task not part of the batch')
 
     def run(self):
         """Executes the current batch definition.
@@ -478,7 +545,7 @@ class Batch(object):
                     pipe.set(self.id, json.dumps(result_data))
                     pipe.execute()
                     break
-                except self.redis.WatchError:
+                except WatchError:
                     continue
         chain(first).apply_async(args=[self.docs])
         return self.id
@@ -671,6 +738,31 @@ class NetworkSimpleBatch(object):
         r.raise_for_status()
         return r.json()[0]['url']
 
+    def rm_document(self, path):
+        """
+        Removes a document from the batch.
+
+        ..note::
+            Note that this function accepts a standard file system path and NOT
+            a storage tuple as a client using the web API is not expected to
+            keep a separate, local storage medium.
+
+        Args:
+            path (unicode): Path to the document
+
+        Raises:
+            NidabaInputException: The document does not refer to a file or the
+                                  batch is locked because the run() method has
+                                  been called.
+        """
+        if not self.id:
+            raise NidabaInputException('Object not attached to batch.')
+        if self.lock:
+            raise NidabaInputException('Executed batch may not be modified')
+        r = requests.delete('{}/batch/{}/pages'.format(self.host, self.id),
+                            json={'scans': [path]})
+        r.raise_for_status()
+
     def add_task(self, group, method, *args, **kwargs):
         """
         Add a particular task configuration to a task group.
@@ -690,6 +782,27 @@ class NetworkSimpleBatch(object):
         r = requests.post('{}/batch/{}/tasks/{}/{}'.format(self.host, self.id,
                                                            group, method),
                           json=kwargs)
+        r.raise_for_status()
+
+    def rm_task(self, group, method, *args, **kwargs):
+        """
+        Removes a particular task configuration from the batch.
+
+        Args:
+            group (unicode): Group the task belongs to
+            method (unicode): Name of the task
+            kwargs: Arguments to the task
+        """
+        if not self.id:
+            raise NidabaInputException('Object not attached to batch.')
+        if self.lock:
+            raise NidabaInputException('Executed batch may not be modified')
+        # validate that the task exists
+        if group not in self.allowed_tasks or method not in self.allowed_tasks[group]:
+            raise NidabaInputException('Unknown task {}'.format(method))
+        r = requests.delete('{}/batch/{}/tasks/{}/{}'.format(self.host, self.id,
+                                                             group, method),
+                            json=kwargs)
         r.raise_for_status()
 
     def run(self):
