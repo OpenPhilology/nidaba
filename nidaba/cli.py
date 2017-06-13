@@ -458,27 +458,37 @@ def status(verbose, host, job_id):
                 if 'misc' in state[parent]:
                     misc = state[parent]['misc']
                     break
-            results.append((subtask['result'], subtask['root_documents'], misc))
+            if isinstance(subtask['result'][0], list):
+                for res, rd in zip(sorted(subtask['result']), sorted(subtask['root_documents'])):
+                    results.append((res, [rd], misc))
+            else:
+                results.append((subtask['result'], subtask['root_documents'], misc))
     final = '(final)' if not expected - failed - done - len(failed_children) else ''
     click.echo(' {} {}\n'.format(bs, final))
     click.echo('{}/{} tasks completed. {} running.\n'.format(done, len(state), running))
     click.secho('Output files:\n', underline=True)
-    results = sorted(results, key=lambda x: x[0][1])
+    results = sorted(results, key=lambda x: x[0][0][1] if isinstance(x[0], list) else x[0][1])
     if results:
         for doc in results:
             if host:
                 output = doc[0]
+                input = doc[1]
             else:
                 from nidaba import storage
-                output = click.format_filename(storage.get_abs_path(*doc[0]))
+                if isinstance(doc[0][0], list):
+                    for d in doc:
+                        output = ', '.join(click.format_filename(storage.get_abs_path(*d)))
+                else:
+                    output = click.format_filename(storage.get_abs_path(*doc[0]))
+                input = ', '.join(d[1] for d in doc[1])
             if doc[2] is not None:
-                click.echo(u'{} \u2192 {} ({:.1f}% / {})'.format(', '.join(x[1] for x in doc[1]),
+                click.echo(u'{} \u2192 {} ({:.1f}% / {})'.format(input,
                                                                  output,
                                                                  100 *
                                                                  doc[2]['edit_ratio'],
                                                                  doc[2]['ground_truth'][1]))
             else:
-                click.echo(u'{} \u2192 {}'.format(', '.join(x[1] for x in doc[1]), output))
+                click.echo(u'{} \u2192 {}'.format(input, output))
     if errors:
         click.secho('\nErrors:\n', underline=True)
         for task in errors:
@@ -490,7 +500,7 @@ def status(verbose, host, job_id):
                 task['errors'][0].pop('method')
                 args = ', ' + str(task['errors'][0])
             click.echo('{0} ({1}{2}): {3}{4}'.format(task['task'][0],
-                                                     task['root_document'][1],
+                                                     task['root_documents'][1],
                                                      args,
                                                      tb,
                                                      task['errors'][1]))
