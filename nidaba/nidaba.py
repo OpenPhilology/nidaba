@@ -224,7 +224,7 @@ class Batch(object):
         outfiles = []
         for subtask in batch.itervalues():
             if len(subtask['children']) == 0 and subtask['result'] is not None:
-                outfiles.append((subtask['result'], subtask['root_document']))
+                outfiles.append((subtask['result'], subtask['root_documents']))
         return outfiles
 
     def get_extended_state(self):
@@ -299,7 +299,7 @@ class Batch(object):
             docs = []
             for task in state.itervalues():
                 for doc in task['root_documents']:
-                    if doc not in docs:
+                    if doc not in docs and isinstance(doc[0], basestring):
                         docs.append(doc)
             return docs
 
@@ -522,7 +522,7 @@ class Batch(object):
                         nprev.append(task_id)
                     result_data[task_id] = {'children': [],
                                             'parents': parents,
-                                            'root_documents': [rdoc],
+                                            'root_documents': rdoc if mmode else [rdoc],
                                             'state': 'PENDING',
                                             'result': None,
                                             'task': (group, fun, kwargs)}
@@ -670,7 +670,7 @@ class NetworkSimpleBatch(object):
             outfiles = []
             for subtask in batch.itervalues():
                 if len(subtask['children']) == 0 and not subtask['housekeeping'] and subtask['result'] is not None:
-                    outfiles.append((subtask['result'], subtask['root_document']))
+                    outfiles.append((subtask['result'], subtask['root_documents']))
             return outfiles
         else:
             return None
