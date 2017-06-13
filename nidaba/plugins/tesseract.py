@@ -511,13 +511,14 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                                                   'bbox': (last_word, y0.value, x0.value, y1.value),
                                                   'confidence': 100}])
                     last_word = x1.value
-                    facsimile.add_segment((x0.value, y0.value, x1.value, y1.value),
-                                          lang, conf)
-                    logger.debug('New word at {} {} {} {} (conf: {})'.format(x0.value,
-                                                                             y0.value,
-                                                                             x1.value,
-                                                                             y1.value,
-                                                                             conf))
+                    seg_id = facsimile.add_segment((x0.value, y0.value, x1.value, y1.value),
+                                                    lang, conf)
+                    logger.debug('New word {} at {} {} {} {} (conf: {})'.format(seg_id, 
+                                                                                x0.value,
+                                                                                y0.value,
+                                                                                x1.value,
+                                                                                y1.value,
+                                                                                conf))
 
                 conf = tesseract.TessResultIteratorConfidence(ri, RIL_SYMBOL)
                 tesseract.TessPageIteratorBoundingBox(pi, RIL_SYMBOL,
@@ -528,15 +529,15 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                 grapheme = tesseract.TessResultIteratorGetUTF8Text(ri, RIL_SYMBOL)
                 if grapheme is not None:
                     grapheme = grapheme.decode('utf-8')
-                facsimile.add_graphemes([{'grapheme': grapheme,
-                                          'bbox': (x0.value, y0.value, x1.value, y1.value),
-                                          'confidence': conf}])
-                logger.debug('New symbol {} at {} {} {} {} (conf: {})'.format(grapheme,
-                                                                              x0.value,
-                                                                              y0.value,
-                                                                              x1.value,
-                                                                              y1.value,
-                                                                              conf))
+                    facsimile.add_graphemes([{'grapheme': grapheme,
+                                              'bbox': (x0.value, y0.value, x1.value, y1.value),
+                                              'confidence': conf}])
+                    logger.debug('New symbol {} at {} {} {} {} (conf: {})'.format(grapheme,
+                                                                                  x0.value,
+                                                                                  y0.value,
+                                                                                  x1.value,
+                                                                                  y1.value,
+                                                                                  conf))
                 if not tesseract.TessResultIteratorNext(ri, RIL_SYMBOL):
                     logger.debug('No more symbols on page')
                     break
