@@ -335,6 +335,7 @@ class OCRRecord(object):
         """
         if id not in self.lines:
             raise NidabaRecordException('Invalid line ID.')
+        self.reset_segment_scope()
         self.line_scope = id
 
     def scope_segment(self, id):
