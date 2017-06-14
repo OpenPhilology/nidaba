@@ -431,49 +431,55 @@ Iris.Views.Status = Backbone.View.extend({
 				}
 				// leaf nodes are results
 				if(!value['children'].length) {
-					res = $('<a>').attr('class', 'list-group-item clearfix')
-						      .attr('href', value['result'])
-						      .text(_.last(value['root_documents'][0].split('/')));
-					file_buttons = $('<span>').attr('class', 'pull-right');
-					if(value['result']) {
-						res.on('click', function(e) {
-							e.preventDefault();
-							$.get(this.href, function(data) {
-								var fragment = Iris.xsltProcessor.transformToFragment(data, document);
-								Iris.fragment = fragment;
-								$('#tei_modal_content').replaceWith(fragment);
-								$('#tei_modal').modal('show');
+					var res = [];
+					value['root_documents'].sort();
+					for (var i = 0; i < value['root_documents'].length; i++) {
+						var rd = _.last(value['root_documents'][i].split('/'));
+						res.push($('<a>').attr('class', 'list-group-item clearfix')
+							      .attr('href', value['result'][i])
+							      .text(rd));
+						var file_buttons = $('<span>').attr('class', 'pull-right');
+						if(value['result']) {
+							value['result'].sort();
+							res[i].attr('href', value['result'][i]);
+							res[i].on('click', function(e) {
+								e.preventDefault();
+								$.get(this.href, function(data) {
+									var fragment = Iris.xsltProcessor.transformToFragment(data, document);
+									Iris.fragment = fragment;
+									$('#tei_modal_content').replaceWith(fragment);
+									$('#tei_modal').modal('show');
+								});
 							});
-						});
+							var link_el = $('<a>').attr('href', value['result'][i])
+									      .attr('class', 'btn btn-xs btn-success')
+									      .attr('download', _.last(value['result'][i].split('/')));
+							link_el.append($('<span>').attr('class', 'glyphicon glyphicon-save'));
+							link_el.on('click', function(e) {
+								e.stopPropagation();
+							});
 
-						var link_el = $('<a>').attr('href', value['result'])
-								      .attr('class', 'btn btn-xs btn-success')
-								      .attr('download', _.last(value['result'].split('/')));
-						link_el.append($('<span>').attr('class', 'glyphicon glyphicon-save'));
-						link_el.on('click', function(e) {
-							e.stopPropagation();
-						});
-
-						file_buttons.append(link_el);
-					}
-					// look for failures up the chain and
-					// reduce expected task count
-					// correspondingly. Also add a failure
-					// glyphicon. 
-					parent = value;
-					var parent_counter = 1;
-					while(parent) {
-						if(parent['state'] == 'FAILURE') {
-							file_buttons.append($('<span>').attr('class', 'glyphicon glyphicon-remove'));
-							tasks -= parent_counter;
+							file_buttons.append(link_el);
 						}
-						parent_counter++;
-						if(!parent['parents']) {
-							break;
+						// look for failures up the chain and
+						// reduce expected task count
+						// correspondingly. Also add a failure
+						// glyphicon. 
+						parent = value;
+						var parent_counter = 1;
+						while(parent) {
+							if(parent['state'] == 'FAILURE') {
+								file_buttons.append($('<span>').attr('class', 'glyphicon glyphicon-remove'));
+								tasks -= parent_counter;
+							}
+							parent_counter++;
+							if(!parent['parents']) {
+								break;
+							}
+							parent = parent['parents'][0];
 						}
-						parent = parent['parents'][0];
+						res[i].append(file_buttons);
 					}
-					res.append(file_buttons);
 					$('#task-output').append(res);
 				}
 			});
