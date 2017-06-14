@@ -436,7 +436,6 @@ Iris.Views.Status = Backbone.View.extend({
 					for (var i = 0; i < value['root_documents'].length; i++) {
 						var rd = _.last(value['root_documents'][i].split('/'));
 						res.push($('<a>').attr('class', 'list-group-item clearfix')
-							      .attr('href', value['result'][i])
 							      .text(rd));
 						var file_buttons = $('<span>').attr('class', 'pull-right');
 						if(value['result']) {
