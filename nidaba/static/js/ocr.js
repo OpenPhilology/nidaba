@@ -386,11 +386,12 @@ Iris.Views.PreProcess = Backbone.View.extend({
 									  low: 5, 
 									  high: 90});
 				Iris.batch.add_task('segmentation', 'tesseract', {});
-				var font = $("input[type='radio'][name='greek-font']:checked");
-				if(show_greek_fonts && !blacklisted_scripts && font.val() != 'none') {
-					Iris.batch.add_task('ocr', 'kraken', {model: font.val()});
-				} else if(show_arab_fonts && !blacklisted_scripts && font.val() != 'none') {
-					Iris.batch.add_task('ocr', 'kraken', {model: font.val()});
+				var gr_font = $("input[type='radio'][name='greek-font']:checked");
+				var ara_font = $("input[type='radio'][name='arabic-font']:checked");
+				if(show_greek_fonts && !blacklisted_scripts && gr_font.val() != 'none') {
+					Iris.batch.add_task('ocr', 'kraken', {model: gr_font.val()});
+				} if(show_arab_fonts && !blacklisted_scripts && ara_font.val() != 'none') {
+					Iris.batch.add_task('ocr', 'kraken', {model: ara_font.val()});
 
 				} else {
 					var langs = []
