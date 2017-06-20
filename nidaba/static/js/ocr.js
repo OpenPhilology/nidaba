@@ -254,7 +254,7 @@ Iris.Views.Upload = Backbone.View.extend({
 						$("#upload-progress").css("width", uploadProgress + '%');
 					}
 				});
-			this.on("queuecomplete", function() {
+				this.on("queuecomplete", function() {
 					Iris.batch.docs.fetch();
 				});
 			}
@@ -333,9 +333,10 @@ Iris.Views.PreProcess = Backbone.View.extend({
 			onChange: function(option, checked) {
 				blacklisted_scripts = false;
 				show_greek_fonts = false;
+				show_arab_fonts = false;
 
 				// font selection enabler/disabler
-				lang_whitelist = ['lat', 'eng', 'grc']
+				lang_whitelist = ['lat', 'eng', 'grc', 'ara']
 				$('#languages option:selected').each(function(idx, sel) {
 					if(lang_whitelist.indexOf(sel.value) === -1) {
 						blacklisted_scripts = true;
@@ -343,13 +344,21 @@ Iris.Views.PreProcess = Backbone.View.extend({
 					if(sel.value == 'grc') {
 						show_greek_fonts = true;
 					}
+					if(sel.value == 'ara') {
+						show_arab_fonts = true;
+					}
 				});
 				if(show_greek_fonts && !blacklisted_scripts) {
 					$('#greek-fonts').show();
 				} else {
 					$('#greek-fonts').hide();
 				}
-				
+				if(show_arab_fonts && !blacklisted_scripts) {
+					$('#arabic-fonts').show();
+				} else {
+					$('#arabic-fonts').hide();
+				}
+
 				// submit button enabler/disabler
 				if(checked) {
 					checked_opts += 1;
@@ -380,6 +389,9 @@ Iris.Views.PreProcess = Backbone.View.extend({
 				var font = $("input[type='radio'][name='greek-font']:checked");
 				if(show_greek_fonts && !blacklisted_scripts && font.val() != 'none') {
 					Iris.batch.add_task('ocr', 'kraken', {model: font.val()});
+				} else if(show_arab_fonts && !blacklisted_scripts && font.val() != 'none') {
+					Iris.batch.add_task('ocr', 'kraken', {model: font.val()});
+
 				} else {
 					var langs = []
 					$('#languages option:selected').each(function(idx, sel) {

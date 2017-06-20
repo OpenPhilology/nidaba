@@ -203,7 +203,7 @@
 							<input type="text" class="form-control" name="notes"/>
 							<p class="help-block">Misc. notes about the text</p>
 						</div>
-	
+
 						<div class="form-group">
 							<label for="licence">Rights Applicable to this Collection</label>
 							<div class="radio">
@@ -249,12 +249,51 @@
 								<option value="lat">Latin</option>
 								<option value="chi_tra">Chinese (Traditional)</option>
 								<option value="ara">Arabic</option>
+								<option value="fas">Persian</option>
 								<option value="heb">Hebrew</option>
 								<option value="syr">Syriac</option>
 							</select>
 						</div>
 					</form>
 					<hr>
+					<div id="arabic-fonts" style="display: none">
+						<h4>Which font is your text in?</h4>
+						<p>If none of these look like the font of your text, skip this section.</p>
+
+						<form id="arabic-font-form">
+							<div class="form-group">
+								<div class="radio">
+									<label>
+										<input type="radio" name="arabic-font" value="hayawan"/>
+										<img src="/static/images/tutorial-font-hayawan.png" class="img-thumbnail" data-font="hayawan">
+										fonty mcfontface
+									</label>
+								</div>
+								<div class="radio">
+									<label>
+										<input type="radio" name="arabic-font" value="qutayba"/>
+										<img src="/static/images/tutorial-font-qutayba.png" class="img-thumbnail" data-font="qutayba">
+										fonty mcfontface
+									</label>
+								</div>
+								<div class="radio">
+									<label>
+										<input type="radio" name="arabic-font" value="yacqubi"/>
+										<img src="/static/images/tutorial-font-yacqubi.png" class="img-thumbnail" data-font="yacqubi">
+										fonty mcfontface
+									</label>
+								</div>
+								<div class="radio">
+									<label>
+										<input type="radio" name="arabic-font" value="none" checked="checked"/>
+										None of these or cannot tell.
+									</label>
+								</div>
+							</div>
+						</form>
+						<hr>
+					</div>
+
 					<div id="greek-fonts" style="display: none">
 						<h4>Which font is your text in?</h4>
 						<p>If none of these look like the font of your text, skip this section.</p>
