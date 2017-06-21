@@ -22,7 +22,8 @@ using the same global configuration options.
 from __future__ import unicode_literals, print_function, absolute_import
 
 import os
-import shutil
+import glob
+import json
 import regex
 
 from nidaba import storage
@@ -46,13 +47,32 @@ def setup(*args, **kwargs):
         global pageseg
         global rpred
         global models
+        global mod_db
         from kraken import binarization
         from kraken import pageseg
         from kraken import rpred
         from kraken.lib import models
+        # pronn/clstm models get prioritized over pyrnn ones
+        mod_db = {k: storage.get_abs_path(*v) for k, v in nidaba_cfg['ocropus_models'].iteritems()}
+        if kwargs.get('modeldata'):
+            md = kwargs.get('modeldata')
+            if isinstance(md, list):
+                md = storage.get_abs_path(md)
+            for model in glob.glob(md + '/*/*/DESCRIPTION'):
+                with open(model) as fp:
+                    meta = json.load(fp)
+                    mod_db[model.split('/')[-2]] = os.path.join(os.path.dirname(model), meta['name'])
+        ocr_kraken.arg_values['model'] = mod_db.keys()
+
     except ImportError as e:
         raise NidabaPluginException(e.message)
 
+
+
+def get_classifier(id):
+    """
+    Resolves a model identifier to an absolute classifier path.
+    """
 
 def max_bbox(boxes):
     """
@@ -89,8 +109,6 @@ def segmentation_kraken(doc, method=u'segment_kraken', black_colseps=False):
     input_path = storage.get_abs_path(*doc)
     output_path, ext = os.path.splitext(storage.insert_suffix(input_path,
                                         method))
-    logger.debug('Copying input image {} to {}'.format(input_path, output_path))
-    shutil.copy2(input_path, output_path + ext)
     logger.debug('Reading image using PIL')
     img = Image.open(input_path)
     with open(output_path + '.xml', 'w') as fp:
@@ -109,8 +127,7 @@ def segmentation_kraken(doc, method=u'segment_kraken', black_colseps=False):
 
 
 @app.task(base=NidabaTask, name=u'nidaba.ocr.kraken',
-          arg_values={'model': nidaba_cfg['ocropus_models'].keys() +
-                      nidaba_cfg['kraken_models'].keys()})
+          arg_values={'model': None})
 def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     """
     Runs kraken on an input document and writes a TEI file.
@@ -126,14 +143,11 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     output_path = (doc[0], os.path.splitext(storage.insert_suffix(doc[1],
                                                                      method,
                                                                      model))[0] + '.xml')
-    logger.debug('Searching for model {}'.format(model))
-    if model in nidaba_cfg['kraken_models']:
-        model = storage.get_abs_path(*(nidaba_cfg['kraken_models'][model]))
-    elif model in nidaba_cfg['ocropus_models']:
-        model = storage.get_abs_path(*(nidaba_cfg['ocropus_models'][model]))
-    else:
-        raise NidabaInvalidParameterException('Model not defined in '
-                                              'configuration')
+    logger.debug('Loading model {}'.format(model))
+    try:
+        rnn = models.load_any(mod_db[model])
+    except Exception as e:
+        raise NidabaInvalidParameterException(str(e))
     logger.debug('Reading TEI segmentation from {}'.format(doc))
     tei = OCRRecord()
     with storage.StorageFile(*doc) as seg:
@@ -149,9 +163,8 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     tei.add_respstmt('kraken', 'character recognition')
     lines = tei.lines
 
-    logger.debug('Loading model {}'.format(model))
-    rnn = models.load_any(model)
     i = 0
+    rnn = models.load_any(mod_db[model])
     logger.debug('Start recognizing characters')
     for line_id, rec in zip(lines, rpred.rpred(rnn, img, {'text_direction': 'horizontal-tb', 'boxes': [list(x['bbox']) for x in lines.itervalues()]})):
         # scope the current line and add all graphemes recognized by kraken to

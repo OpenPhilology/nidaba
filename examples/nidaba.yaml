@@ -26,12 +26,6 @@ ocropus_models:
   fraktur: [models, fraktur.pyrnn.gz]
   fancy_ligatures: [models, ligatures.pyrnn.gz]
 
-# Models solely working with kraken (i.e. models in pronn format or CLSTM
-# models).
-kraken_models:
-  default: [models, en-default.pronn]
-  fraktur_clstm: [models, fraktur.clstm]
-
 # List of plugins to load. Additional fields in the associative array will be
 # handed over to the setup function of the plugin.  Be aware that plugins
 # utilizing external components that aren't installed will cause nidaba to
@@ -46,8 +40,15 @@ plugins_load:
                                                  # path. May also be a storage
                                                  # tuple.
   #ocropus: {}
-  #kraken: {}
+  kraken: {modeldata: /home/mittagessen/git/kraken-models} # location of models
+                                                           # used for
+                                                           # recognition. May
+                                                           # also be a storage
+                                                           # tuple. Format
+                                                           # should be the one
+                                                           # of
+                                                           # mittagessen/kraken-models
+                                                           # repository.
   #leptonica: {}
   pybossa: {server: http://theserver.com,
-            apikey: yourkey,
-            project: yourproject}
+            apikey: yourkey}
