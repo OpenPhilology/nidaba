@@ -270,7 +270,10 @@ class Batch(object):
         entry = json.loads(self.redis.get(self.id))
         if 'scratchpad' in entry:
             scratch = json.loads(self.redis.get(self.id))
-            return scratch['scratchpad']['simple_tasks']
+            if 'simple_tasks' in scratch['scratchpad']:
+                return scratch['scratchpad']['simple_tasks']
+            else:
+                return {}
         else:
             state = self.get_extended_state()
             tasks = OrderedDict([('img', []),
