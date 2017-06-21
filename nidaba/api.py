@@ -17,11 +17,14 @@ import werkzeug
 import json
 import mimetypes
 
+from os.path import abspath, expanduser
+
 from flask import Flask, Blueprint, request
-from flask import send_file
+from flask import safe_join, send_from_directory
 from flask_restful import abort, Api, Resource, url_for, reqparse
 
 from nidaba import storage
+from nidaba.config import nidaba_cfg
 from nidaba.nidaba import Batch as nBatch
 from nidaba.nidabaexceptions import NidabaStorageViolationException, NidabaInputException
 
@@ -84,12 +87,7 @@ class Page(Resource):
         :status 404: File not found
         """
         log.debug('routing to pages with URN: {}/{}'.format(batch, file))
-        try:
-            fp = storage.StorageFile(batch, file, 'rb')
-        except:
-            log.debug('File {} not found in {}'.format(file, batch))
-            return {'message': 'File not found'}, 404
-        return send_file(fp, mimetype=mimetypes.guess_type(file)[0])
+        return send_from_directory(abspath(expanduser(nidaba_cfg['storage_path'])), safe_join(batch, file))
 
 
 @api.resource('/tasks', '/tasks/<group>', '/tasks/<group>/<task>')

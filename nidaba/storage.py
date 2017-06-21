@@ -30,18 +30,11 @@ class StorageFile(io.IOBase):
 
     def __init__(self, jobID, path, *args, **kwargs):
         self.path = get_abs_path(jobID, path)
-        self.lock = lock(self.path)
-        self.lock.acquire()
-        try:
-            self.fd = io.OpenWrapper(self.path, *args, **kwargs)
-        except:
-            self.lock.release()
-            raise
+        self.fd = io.OpenWrapper(self.path, *args, **kwargs)
 
     def __del__(self):
         try:
             self.fd.close()
-            self.lock.release()
         except:
             pass
 
@@ -77,7 +70,6 @@ class StorageFile(io.IOBase):
 
     def close(self):
         self.fd.close()
-        self.lock.release()
 
     @property
     def closed(self):
