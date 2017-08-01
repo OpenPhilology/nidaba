@@ -424,7 +424,6 @@ def status(verbose, host, job_id):
     results = []
     errors = []
     expected = len(state)
-    failed_children = set()
     for task_id, subtask in state.iteritems():
         if subtask['state'] == 'SUCCESS':
             done += 1
@@ -437,18 +436,10 @@ def status(verbose, host, job_id):
             if bs == 'success':
                 bs = 'pending'
         elif subtask['state'] == 'FAILURE':
-            failed += 1
-            children = []
-            if not isinstance(subtask['children'], list):
-                subtask['children'] = [subtask['children']]
-            for child in subtask['children']:
-                if not isinstance(state[child]['children'], list):
-                    state[child]['children'] = [state[child]['children']]
-                children.extend(state[child]['children'])
-                failed_children.add(child)
             errors.append(subtask)
             bs = 'failed'
 
+        # leaf nodes/result extraction
         if len(subtask['children']) == 0 and subtask['result'] is not None:
             # try to find statistics results
             parents = [task_id] + subtask['parents']
@@ -458,21 +449,27 @@ def status(verbose, host, job_id):
                 if 'misc' in state[parent]:
                     misc = state[parent]['misc']
                     break
-            if isinstance(subtask['result'][0], list):
+            # archival tasks bunch everything together. do a sort-based matching of input and output tasks
+            if isinstance(subtask['result'][0], list) or host and len(subtask['result']) > 1:
                 for res, rd in zip(sorted(subtask['result']), sorted(subtask['root_documents'])):
+                    if host:
+                        res = [res]
                     results.append((res, [rd], misc))
             else:
                 results.append((subtask['result'], subtask['root_documents'], misc))
-    final = '(final)' if not expected - failed - done - len(failed_children) else ''
+
+    final = '(final)' if expected - done == 0 else ''
     click.echo(' {} {}\n'.format(bs, final))
-    click.echo('{}/{} tasks completed. {} running.\n'.format(done, len(state), running))
+    click.echo('{}/{} tasks completed. {} running.\n'.format(done, expected, running))
+
+    # render results
     click.secho('Output files:\n', underline=True)
     results = sorted(results, key=lambda x: x[0][0][1] if isinstance(x[0], list) else x[0][1])
     if results:
         for doc in results:
             if host:
-                output = doc[0]
-                input = doc[1]
+                output = ', '.join(doc[0])
+                input = ', '.join(doc[1])
             else:
                 from nidaba import storage
                 if isinstance(doc[0][0], list):
@@ -489,6 +486,8 @@ def status(verbose, host, job_id):
                                                                  doc[2]['ground_truth'][1]))
             else:
                 click.echo(u'{} \u2192 {}'.format(input, output))
+
+    # render errors
     if errors:
         click.secho('\nErrors:\n', underline=True)
         for task in errors:
@@ -499,11 +498,16 @@ def status(verbose, host, job_id):
             if verbose > 1:
                 task['errors'][0].pop('method')
                 args = ', ' + str(task['errors'][0])
-            click.echo('{0} ({1}{2}): {3}{4}'.format(task['task'][0],
-                                                     task['root_documents'][1],
-                                                     args,
-                                                     tb,
-                                                     task['errors'][1]))
+            if host:
+                rd = ', '.join(os.path.basename(x) for x in task['root_documents'])
+            else:
+                rd = ', '.join(os.path.basename(x[1]) for x in task['root_documents'])
+            click.echo('{}.{} ({}{}): {}{}'.format(task['task'][0],
+                                                   task['task'][1],
+                                                   rd,
+                                                   args,
+                                                   tb,
+                                                   task['errors'][1]))
 
 
 client_only.add_command(status)
