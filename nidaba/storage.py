@@ -158,7 +158,7 @@ def get_storage_path_url(url):
         (unicode, unicode): file tuple
     """
     o = urlparse.urlsplit(url)[2]
-    return get_storage_path(_sanitize_path(nidaba_cfg['storage_path'], os.path.join(*o.split('/')[4:])))
+    return get_storage_path(_sanitize_path(nidaba_cfg['storage_path'], urlparse.unquote(os.path.join(*o.split('/')[4:]))))
 
 def get_url(jobID, *paths):
     """
