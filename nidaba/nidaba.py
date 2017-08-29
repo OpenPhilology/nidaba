@@ -471,97 +471,87 @@ class Batch(object):
                 try:
                     pipe.watch(self.id)
                     self._restore_and_create_scratchpad(pipe)
-                    pipe.execute()
-                    break
-                except WatchError:
-                    continue
 
-        # reorder task definitions
-        keys = ['img', 'binarize', 'segmentation', 'ocr', 'stats', 'postprocessing', 'output', 'archive']
-        tasks = OrderedDict((key, self.tasks[key]) for key in keys)
-        first = []
-        prev = None
-        result_data = {}
-        self.lock = True
+                    # reorder task definitions
+                    keys = ['img', 'binarize', 'segmentation', 'ocr', 'stats', 'postprocessing', 'output', 'archive']
+                    tasks = OrderedDict((key, self.tasks[key]) for key in keys)
+                    first = []
+                    prev = None
+                    result_data = {}
+                    self.lock = True
+            
+                    # build chain
+                    root_docs = self.docs
+                    prev = []
+                    for group, step in tasks.iteritems():
+                        # skip groups without tasks
+                        if not step:
+                            continue
+                        sequential = True if self.order[group][0] == 'sequence' else False
+                        mmode = self.order[group][1]
+            
+                        def _repeat(lst, n):
+                            return list(itertools.chain.from_iterable(itertools.repeat(x, n) for x in lst))
+            
+                        if sequential:
+                            step = [step]
+                        # multiply number of tasks in this step by number of tasks in
+                        # previous step if not merging
+                        if not mmode:
+                            step = _repeat(step, len(root_docs))
+                            root_docs = root_docs * (len(step) / len(root_docs))
+                        # by number of root docs if doc merging
+                        elif mmode == 'doc':
+                            step = _repeat(step, len(self.docs))
+                            root_docs = self.docs
+                        else:
+                            root_docs = [root_docs] * len(step)
+                        if not sequential:
+                            step = [[x] for x in step]
+                        nprev = []
+                        r = []
+                        for rd_idx, (rdoc, c) in enumerate(zip(root_docs, step)):
+                            if sequential:
+                                r.append([])
+                            for idx, (fun, kwargs) in enumerate(c):
+                                # if idx > 0 (sequential == true) parent is previous task in sequence
+                                if idx > 0:
+                                    parents = [task_id]
+                                # if merge mode is 'doc' base parents are tasks n * (len(prev)/len(docs)) to n+1 ...
+                                elif mmode == 'doc':
+                                    parents = prev[rd_idx::len(root_docs)]
+                                # if merging everything all tasks in previous step are parents
+                                elif mmode:
+                                    parents = prev
+                                # if not merging a single task in previous step is the parent
+                                elif mmode is False:
+                                    parents = [prev[rd_idx % len(prev)]] if prev else prev
+                                task_id = uuid.uuid4().get_hex()
+                                # last task in a sequence is entered into new prev array
+                                if idx + 1 == len(c):
+                                    nprev.append(task_id)
+                                result_data[task_id] = {'children': [],
+                                                        'parents': parents,
+                                                        'root_documents': rdoc if mmode else [rdoc],
+                                                        'state': 'PENDING',
+                                                        'result': None,
+                                                        'task': (group, fun, kwargs)}
+                                for parent in parents:
+                                    result_data[parent]['children'].append(task_id)
+                                task = self.celery.app.tasks[u'nidaba.{}.{}'.format(group, fun)]
+                                if sequential:
+                                    r[-1].append(task.s(batch_id=self.id, task_id=task_id, **kwargs))
+                                else:
+                                    r.append(task.s(batch_id=self.id, task_id=task_id, **kwargs))
+                        prev = nprev
+                        t = self.celery.app.tasks[u'nidaba.util.barrier'].s(merging=mmode, sequential=sequential, replace=r, root_docs=self.docs)
+                        first.append(t)
 
-        # build chain
-        root_docs = self.docs
-        prev = []
-        for group, step in tasks.iteritems():
-            # skip groups without tasks
-            if not step:
-                continue
-            sequential = True if self.order[group][0] == 'sequence' else False
-            mmode = self.order[group][1]
-
-            def _repeat(lst, n):
-                return list(itertools.chain.from_iterable(itertools.repeat(x, n) for x in lst))
-
-            if sequential:
-                step = [step]
-            # multiply number of tasks in this step by number of tasks in
-            # previous step if not merging
-            if not mmode:
-                step = _repeat(step, len(root_docs))
-                root_docs = root_docs * (len(step) / len(root_docs))
-            # by number of root docs if doc merging
-            elif mmode == 'doc':
-                step = _repeat(step, len(self.docs))
-                root_docs = self.docs
-            else:
-                root_docs = [root_docs] * len(step)
-            if not sequential:
-                step = [[x] for x in step]
-            nprev = []
-            r = []
-            for rd_idx, (rdoc, c) in enumerate(zip(root_docs, step)):
-                if sequential:
-                    r.append([])
-                for idx, (fun, kwargs) in enumerate(c):
-                    # if idx > 0 (sequential == true) parent is previous task in sequence
-                    if idx > 0:
-                        parents = [task_id]
-                    # if merge mode is 'doc' base parents are tasks n * (len(prev)/len(docs)) to n+1 ...
-                    elif mmode == 'doc':
-                        parents = prev[rd_idx::len(root_docs)]
-                    # if merging everything all tasks in previous step are parents
-                    elif mmode:
-                        parents = prev
-                    # if not merging a single task in previous step is the parent
-                    elif mmode is False:
-                        parents = [prev[rd_idx % len(prev)]] if prev else prev
-                    task_id = uuid.uuid4().get_hex()
-                    # last task in a sequence is entered into new prev array
-                    if idx + 1 == len(c):
-                        nprev.append(task_id)
-                    result_data[task_id] = {'children': [],
-                                            'parents': parents,
-                                            'root_documents': rdoc if mmode else [rdoc],
-                                            'state': 'PENDING',
-                                            'result': None,
-                                            'task': (group, fun, kwargs)}
-                    for parent in parents:
-                        result_data[parent]['children'].append(task_id)
-                    task = self.celery.app.tasks[u'nidaba.{}.{}'.format(group, fun)]
-                    if sequential:
-                        r[-1].append(task.s(batch_id=self.id, task_id=task_id, **kwargs))
-                    else:
-                        r.append(task.s(batch_id=self.id, task_id=task_id, **kwargs))
-            prev = nprev
-            t = self.celery.app.tasks[u'nidaba.util.barrier'].s(merging=mmode, sequential=sequential, replace=r, root_docs=self.docs)
-            first.append(t)
-        with self.redis.pipeline() as pipe:
-            while(1):
-                try:
-                    pipe.watch(self.id)
-                    self._restore_and_create_scratchpad(pipe)
-                    # also deletes the scratchpad
                     pipe.set(self.id, json.dumps(result_data))
-                    pipe.execute()
+                    chain(first).apply_async(args=[self.docs])
                     break
                 except WatchError:
                     continue
-        chain(first).apply_async(args=[self.docs])
         return self.id
 
 
