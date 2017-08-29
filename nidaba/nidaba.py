@@ -465,6 +465,17 @@ class Batch(object):
         if self.lock:
             raise NidabaInputException('Executed batch may not be modified')
 
+        # resync batch before execution
+        with self.redis.pipeline() as pipe:
+            while(1):
+                try:
+                    pipe.watch(self.id)
+                    self._restore_and_create_scratchpad(pipe)
+                    pipe.execute()
+                    break
+                except WatchError:
+                    continue
+
         # reorder task definitions
         keys = ['img', 'binarize', 'segmentation', 'ocr', 'stats', 'postprocessing', 'output', 'archive']
         tasks = OrderedDict((key, self.tasks[key]) for key in keys)
