@@ -35,7 +35,7 @@ from nidaba.nidabaexceptions import NidabaPluginException
 from nidaba.tasks.helper import NidabaTask
 
 from PIL import Image
-from itertools import izip_longest
+from itertools import izip_longest, izip
 from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
@@ -68,11 +68,22 @@ def setup(*args, **kwargs):
         raise NidabaPluginException(e.message)
 
 
+def is_bitonal(im):
+    """
+    Tests a PIL.Image for bitonality.
 
-def get_classifier(id):
+    Args:
+        im (PIL.Image): Image to test
+    
+    Returns:
+        True if the image contains only two different color values. False
+        otherwise.
     """
-    Resolves a model identifier to an absolute classifier path.
-    """
+    if im.getcolors(2):
+        return True
+    else:
+        return False
+
 
 def max_bbox(boxes):
     """
@@ -154,6 +165,10 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
         tei.load_tei(seg)
 
     img = Image.open(storage.get_abs_path(*storage.get_storage_path_url(tei.img)))
+    if is_bitonal(img):
+        img = img.convert('1')
+    else:
+        raise NidabaInvalidParameterException('Input image is not bitonal')
 
     logger.debug('Clearing out word/grapheme boxes')
     # kraken is a line recognizer
@@ -166,7 +181,7 @@ def ocr_kraken(doc, method=u'ocr_kraken', model=None):
     i = 0
     rnn = models.load_any(mod_db[model])
     logger.debug('Start recognizing characters')
-    for line_id, rec in zip(lines, rpred.rpred(rnn, img, {'text_direction': 'horizontal-tb', 'boxes': [list(x['bbox']) for x in lines.itervalues()]})):
+    for line_id, rec in izip(lines, rpred.rpred(rnn, img, {'text_direction': 'horizontal-tb', 'boxes': [list(x['bbox']) for x in lines.itervalues()]})):
         # scope the current line and add all graphemes recognized by kraken to
         # it.
         logger.debug('Scoping line {}'.format(line_id))
