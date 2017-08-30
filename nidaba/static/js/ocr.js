@@ -39,7 +39,7 @@ Iris.Batch = Backbone.Model.extend({
 		blob = new Blob([data])
 		form_data.append('scans', blob, 'metadata.yaml');
 		var that = this;
-		$.ajax({
+		return $.ajax({
 			url: this.url() + '/pages?auxiliary=1',
 			data: form_data,
 			processData: false,
@@ -54,7 +54,7 @@ Iris.Batch = Backbone.Model.extend({
 	// methods.
 	add_task: function(group, task, args) {
 		var that = this;
-		$.ajax({
+		return $.ajax({
 			url: this.url() + '/tasks/' + group + '/' + task,
 			data: JSON.stringify(args),
 			contentType: "application/json",
@@ -68,7 +68,7 @@ Iris.Batch = Backbone.Model.extend({
 	},
 	// execute the batch.
 	execute: function() {
-		$.ajax({
+		return $.ajax({
 			url: this.url(),
 			type: 'POST'
 		});
@@ -376,34 +376,34 @@ Iris.Views.PreProcess = Backbone.View.extend({
 		$('#submit-batch').on('click', function(e) {
 			console.log('submitting batch');
 			if(Iris.batch.tasks.length == 0) {
-				Iris.batch.add_task('img', 'any_to_png', {});
-				Iris.batch.add_task('binarize', 'nlbin', {threshold: 0.5, 
+				var def = [];
+				def.push(Iris.batch.add_task('img', 'any_to_png', {}));
+				def.push(Iris.batch.add_task('binarize', 'nlbin', {threshold: 0.5,
 									  zoom: 0.5, 
 									  escale: 1.0, 
 									  border: 0.1, 
 									  perc: 80, 
 									  range: 20, 
 									  low: 5, 
-									  high: 90});
-				Iris.batch.add_task('segmentation', 'tesseract', {});
+									  high: 90}));
+				def.push(Iris.batch.add_task('segmentation', 'tesseract', {}));
 				var gr_font = $("input[type='radio'][name='greek-font']:checked");
 				var ara_font = $("input[type='radio'][name='arabic-font']:checked");
 				if(show_greek_fonts && !blacklisted_scripts && gr_font.val() != 'none') {
-					Iris.batch.add_task('ocr', 'kraken', {model: gr_font.val()});
+					def.push(Iris.batch.add_task('ocr', 'kraken', {model: gr_font.val()}));
 				} if(show_arab_fonts && !blacklisted_scripts && ara_font.val() != 'none') {
-					Iris.batch.add_task('ocr', 'kraken', {model: ara_font.val()});
-
+					def.push(Iris.batch.add_task('ocr', 'kraken', {model: ara_font.val()}));
 				} else {
 					var langs = []
 					$('#languages option:selected').each(function(idx, sel) {
 						langs.push(sel.value);
 					});
-					Iris.batch.add_task('ocr', 'tesseract', {languages: langs, extended: true});
+					def.push(Iris.batch.add_task('ocr', 'tesseract', {languages: langs, extended: true}));
 				}
-				Iris.batch.add_task('output', 'metadata', {metadata: Iris.batch.metadata_url, validate: false});
-				Iris.batch.add_task('archive', 'pybossa', {name: Iris.batch.metadata['title'], 
-									   description: Iris.batch.metadata['notes']});
-				Iris.batch.execute();
+				def.push(Iris.batch.add_task('output', 'metadata', {metadata: Iris.batch.metadata_url, validate: false}));
+				def.push(Iris.batch.add_task('archive', 'pybossa', {name: Iris.batch.metadata['title'], 
+									   description: Iris.batch.metadata['notes']}));
+				$.when.apply(null, def).done(function() { Iris.batch.execute() });
 			}
 		});
 		return this;
