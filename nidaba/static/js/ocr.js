@@ -29,6 +29,7 @@ Iris.Batch = Backbone.Model.extend({
 		this.tasks = new Iris.Tasks([], {batch_url: this.url.bind(this)});
 		this.metadata = {};
 		this.metadata_url;
+		this.metadata_complete = 0;
 		this.upload_complete = 0;
 	},
 	urlRoot: '/api/v1/batch',
@@ -232,7 +233,7 @@ Iris.Views.Upload = Backbone.View.extend({
 	},
 	initialize: function() {
 		this.listenTo(Iris.batch, "change", this.render);
-		this.$el.find('#upload-area').dropzone({
+		Iris.batch.dropzone = this.$el.find('#upload-area').dropzone({
 			paramName: 'scans',
 			acceptedFiles: 'image/*',
 			autoProcessQueue: false,
@@ -257,6 +258,11 @@ Iris.Views.Upload = Backbone.View.extend({
 				});
 				this.on("queuecomplete", function() {
 					Iris.batch.upload_complete = 1;
+					if (Iris.batch.metadata_complete) {
+						$('#submit-metadata').removeAttr('disabled');
+					} else {
+						$('#submit-metadata').prop('disabled', true);
+					}
 					Iris.batch.docs.fetch();
 				});
 			}
@@ -281,8 +287,8 @@ Iris.Views.Metadata = Backbone.View.extend({
 		$('#step-progress .step-bar').eq(2).addClass('complete');
 		$('#submit-metadata').prop('disabled', true);
 		// only enable the next step button if the form is complete.
-		var empty = false;
 		$('#metadata-form').change(function() {
+			var empty = false;
 			$('#metadata-form input').each(function() {
 				if($(this).val() == '') {
 					empty = true;
@@ -303,12 +309,13 @@ Iris.Views.Metadata = Backbone.View.extend({
 					Iris.batch.metadata[name] = $(this).val()
 				}
 			});
+			Iris.batch.metadata_complete = !empty;
+			if (Iris.batch.metadata_complete && Iris.batch.upload_complete) {
+				$('#submit-metadata').removeAttr('disabled');
+			} else {
+				$('#submit-metadata').prop('disabled', true);
+			}
 		});
-		if (empty || !Iris.batch.upload_complete) {
-			$('#submit-metadata').prop('disabled', true);
-		} else {
-			$('#submit-metadata').removeAttr('disabled');
-		}
 
 		$('#submit-metadata').on('click', function(e) {
 			console.log('submitting metadata');
