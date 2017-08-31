@@ -240,7 +240,6 @@ Iris.Views.Upload = Backbone.View.extend({
 				$('#submit-scans').prop('disabled', true);
 			        dz = this;
 				$('#submit-scans').on("click", function() {
-					dz.options.autoProcessQueue = true;
 					dz.processQueue(); 
 				});
 				this.on("addedfile", function(file) {
