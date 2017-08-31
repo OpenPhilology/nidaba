@@ -29,6 +29,7 @@ Iris.Batch = Backbone.Model.extend({
 		this.tasks = new Iris.Tasks([], {batch_url: this.url.bind(this)});
 		this.metadata = {};
 		this.metadata_url;
+		this.upload_complete = 0;
 	},
 	urlRoot: '/api/v1/batch',
 	// backbone isn't really compatible with a model just being a file on
@@ -243,6 +244,7 @@ Iris.Views.Upload = Backbone.View.extend({
 					dz.processQueue(); 
 				});
 				this.on("addedfile", function(file) {
+					Iris.batch.upload_complete = 0;
 					$('#submit-scans').prop('disabled', false);
 				});
 				this.on("complete", function(file) {
@@ -254,6 +256,7 @@ Iris.Views.Upload = Backbone.View.extend({
 					}
 				});
 				this.on("queuecomplete", function() {
+					Iris.batch.upload_complete = 1;
 					Iris.batch.docs.fetch();
 				});
 			}
@@ -278,8 +281,8 @@ Iris.Views.Metadata = Backbone.View.extend({
 		$('#step-progress .step-bar').eq(2).addClass('complete');
 		$('#submit-metadata').prop('disabled', true);
 		// only enable the next step button if the form is complete.
+		var empty = false;
 		$('#metadata-form').change(function() {
-			var empty = false;
 			$('#metadata-form input').each(function() {
 				if($(this).val() == '') {
 					empty = true;
@@ -300,12 +303,13 @@ Iris.Views.Metadata = Backbone.View.extend({
 					Iris.batch.metadata[name] = $(this).val()
 				}
 			});
-			if (empty) {
-				$('#submit-metadata').prop('disabled', true);
-			} else {
-				$('#submit-metadata').removeAttr('disabled');
-			}
 		});
+		if (empty || !Iris.batch.upload_complete) {
+			$('#submit-metadata').prop('disabled', true);
+		} else {
+			$('#submit-metadata').removeAttr('disabled');
+		}
+
 		$('#submit-metadata').on('click', function(e) {
 			console.log('submitting metadata');
 			Iris.batch.save_metadata();
