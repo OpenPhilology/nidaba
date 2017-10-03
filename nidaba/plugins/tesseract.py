@@ -539,7 +539,7 @@ def ocr_capi(image_path, output_path, facsimile, languages, extended=False):
                                                                                   y1.value,
                                                                                   conf))
                 if not tesseract.TessResultIteratorNext(ri, RIL_SYMBOL):
-                    logger.debug('No more symbols on page')
+                    logger.debug('No more symbols on line')
                     break
             # XXX: deleting the page iterator too hangs
             logger.debug('Deleting result iterator')

@@ -29,6 +29,7 @@ Iris.Batch = Backbone.Model.extend({
 		this.tasks = new Iris.Tasks([], {batch_url: this.url.bind(this)});
 		this.metadata = {};
 		this.metadata_url;
+		this.metadata_complete = 0;
 		this.upload_complete = 0;
 	},
 	urlRoot: '/api/v1/batch',
@@ -232,7 +233,7 @@ Iris.Views.Upload = Backbone.View.extend({
 	},
 	initialize: function() {
 		this.listenTo(Iris.batch, "change", this.render);
-		this.$el.find('#upload-area').dropzone({
+		Iris.batch.dropzone = this.$el.find('#upload-area').dropzone({
 			paramName: 'scans',
 			acceptedFiles: 'image/*',
 			autoProcessQueue: false,
@@ -257,6 +258,11 @@ Iris.Views.Upload = Backbone.View.extend({
 				});
 				this.on("queuecomplete", function() {
 					Iris.batch.upload_complete = 1;
+					if (Iris.batch.metadata_complete) {
+						$('#submit-metadata').removeAttr('disabled');
+					} else {
+						$('#submit-metadata').prop('disabled', true);
+					}
 					Iris.batch.docs.fetch();
 				});
 			}
@@ -281,8 +287,8 @@ Iris.Views.Metadata = Backbone.View.extend({
 		$('#step-progress .step-bar').eq(2).addClass('complete');
 		$('#submit-metadata').prop('disabled', true);
 		// only enable the next step button if the form is complete.
-		var empty = false;
 		$('#metadata-form').change(function() {
+			var empty = false;
 			$('#metadata-form input').each(function() {
 				if($(this).val() == '') {
 					empty = true;
@@ -303,15 +309,15 @@ Iris.Views.Metadata = Backbone.View.extend({
 					Iris.batch.metadata[name] = $(this).val()
 				}
 			});
+			Iris.batch.metadata_complete = !empty;
+			if (Iris.batch.metadata_complete && Iris.batch.upload_complete) {
+				$('#submit-metadata').removeAttr('disabled');
+			} else {
+				$('#submit-metadata').prop('disabled', true);
+			}
 		});
-		if (empty || !Iris.batch.upload_complete) {
-			$('#submit-metadata').prop('disabled', true);
-		} else {
-			$('#submit-metadata').removeAttr('disabled');
-		}
 
 		$('#submit-metadata').on('click', function(e) {
-			console.log('submitting metadata');
 			Iris.batch.save_metadata();
 		});
 		return this;
@@ -331,35 +337,40 @@ Iris.Views.PreProcess = Backbone.View.extend({
 		var checked_opts = 0;
 		var blacklisted_scripts = false;
 		var show_greek_fonts = false;
+		var show_arab_fonts = false;
+		var show_syr_fonts = false;
 
 		$('#languages').multiselect({
 			onChange: function(option, checked) {
-				blacklisted_scripts = false;
 				show_greek_fonts = false;
 				show_arab_fonts = false;
+				show_syr_fonts = false;
 
 				// font selection enabler/disabler
-				lang_whitelist = ['lat', 'eng', 'grc', 'ara']
-				$('#languages option:selected').each(function(idx, sel) {
-					if(lang_whitelist.indexOf(sel.value) === -1) {
-						blacklisted_scripts = true;
-					}
-					if(sel.value == 'grc') {
-						show_greek_fonts = true;
-					}
-					if(sel.value == 'ara') {
-						show_arab_fonts = true;
-					}
-				});
-				if(show_greek_fonts && !blacklisted_scripts) {
+				lang_whitelist = ['lat', 'eng', 'grc'];
+				var sel = $.map($('#languages option:selected'), function(e) { return e.value; });
+				if(sel.includes('grc') && !sel.some(val => lang_whitelist.indexOf(val) === -1)) {
 					$('#greek-fonts').show();
+					blacklisted_scripts = false;
 				} else {
+					blacklisted_scripts = true;
 					$('#greek-fonts').hide();
 				}
-				if(show_arab_fonts && !blacklisted_scripts) {
+				if(sel.length == 1 && sel.includes('ara')) {
+					blacklisted_scripts = false;
+					show_arab_fonts = true;
 					$('#arabic-fonts').show();
 				} else {
+					blacklisted_scripts = true;
 					$('#arabic-fonts').hide();
+				}
+				if(sel.length == 1 && sel.includes('syr')) {
+					blacklisted_scripts = false;
+					show_syr_fonts = true;
+					$('#syriac-fonts').show();
+				} else {
+					blacklisted_scripts = true;
+					$('#syriac-fonts').hide();
 				}
 
 				// submit button enabler/disabler
@@ -392,10 +403,14 @@ Iris.Views.PreProcess = Backbone.View.extend({
 				def.push(Iris.batch.add_task('segmentation', 'tesseract', {}));
 				var gr_font = $("input[type='radio'][name='greek-font']:checked");
 				var ara_font = $("input[type='radio'][name='arabic-font']:checked");
+				var syr_font = $("input[type='radio'][name='syriac-font']:checked");
+
 				if(show_greek_fonts && !blacklisted_scripts && gr_font.val() != 'none') {
 					def.push(Iris.batch.add_task('ocr', 'kraken', {model: gr_font.val()}));
-				} if(show_arab_fonts && !blacklisted_scripts && ara_font.val() != 'none') {
+				} else if(show_arab_fonts && !blacklisted_scripts && ara_font.val() != 'none') {
 					def.push(Iris.batch.add_task('ocr', 'kraken', {model: ara_font.val()}));
+				} else if(show_syr_fonts && !blacklisted_scripts && syr_font.val() != 'none') {
+					def.push(Iris.batch.add_task('ocr', 'kraken', {model: syr_font.val()}));
 				} else {
 					var langs = []
 					$('#languages option:selected').each(function(idx, sel) {
