@@ -318,6 +318,9 @@ class Batch(Resource):
             log.debug('Batch {} not found'.format(batch_id))
             return {'message': 'Batch Not Found: {}'.format(batch_id)}, 404
         if batch.get_state() == 'NONE':
+            if not batch.docs:
+                log.debug('Batch {} not executable (no docs)'.format(batch_id))
+                return {'message': 'Batch does not contain docs'}, 400
             try:
                 batch.run()
                 return {'id': batch_id, 'url': url_for('api.batch', batch_id=batch_id)}, 202
