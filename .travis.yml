@@ -1,51 +1,36 @@
 language: python
 python:
-# This is not actually used. Because it would take an overly long time
-# to build scipy we cannot use the virtual env of travis. Instead, we
-# use miniconda.
-  - 2.7
-
+- 2.7
 notifications:
   email: false
-
 sudo: false
-
 install:
-  # Install miniconda
-  # -----------------
-  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-
-  # Create the basic testing environment
-  # ------------------------------------
-  - conda config --set always_yes yes --set changeps1 no --set show_channel_urls yes
-  - conda update conda
-  - conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
-  - source activate test-environment
-
-  # Customise the testing environment
-  # ---------------------------------
-  - conda install pbr nose pip
-  - sed
-    '/gunicorn\|Flask\|Flask-RESTful\|requests-toolbelt\|stevedore\|click\|regex\|celery\|redis\|pyxDamerauLevenshtein\|beautifulsoup4/d'
-    requirements.txt | xargs conda install
-  # we have to install some kraken dependencies using conda, too
-  - conda install numpy Pillow scipy Cython h5py
-  # Conda does not package everything, so we install a couple others via pip.
-  - pip install -r requirements.txt
-  - pip install kraken
-  
-  # Package debug
-  # -------------
-  - conda list
-  - pip freeze
-
-  # Install nidaba
-  # --------------
-  - python setup.py install
-  # Download test data
-  - python setup.py download
-
+- wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
+- bash miniconda.sh -b -p $HOME/miniconda
+- export PATH="$HOME/miniconda/bin:$PATH"
+- conda config --set always_yes yes --set changeps1 no --set show_channel_urls yes
+- conda update conda
+- conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
+- source activate test-environment
+- conda install pbr nose pip
+- sed '/gunicorn\|Flask\|Flask-RESTful\|requests-toolbelt\|stevedore\|click\|regex\|celery\|redis\|pyxDamerauLevenshtein\|beautifulsoup4/d'
+  requirements.txt | xargs conda install
+- conda install numpy Pillow scipy Cython h5py
+- pip install -r requirements.txt
+- pip install kraken
+- conda list
+- pip freeze
+- python setup.py install
+- python setup.py download
 script:
-  - python setup.py test
+- python setup.py test
+deploy:
+  provider: pypi
+  username: ogliris
+  distributions: sdist bdist_wheel
+  skip_cleanup: true
+  skip_upload_docs: true
+  on:
+      tags: true
+  password:
+    secure: QDnD0VrYk1P1RJVi/TRPNvB1t3waoifRaVO2oHNFaFcJzsS11zg1C2ix1/FTsq3fp9+zgLVFLQZdoumjpkyy8CicBzIsJydBzYw/x2e9eKmUwWszt5X2U3e57sFK91gFHENefCmB+DC0UrevFIPGWDn+zcgU735RXdLEHsUFDZ8=
