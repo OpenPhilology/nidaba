@@ -450,12 +450,14 @@ def status(verbose, host, job_id):
                     misc = state[parent]['misc']
                     break
             # archival tasks bunch everything together. do a sort-based matching of input and output tasks
-            if isinstance(subtask['result'][0], list) or host and len(subtask['result']) > 1:
+            if isinstance(subtask['result'][0], list) or (host and isinstance(subtask['result'], list)):
                 for res, rd in zip(sorted(subtask['result']), sorted(subtask['root_documents'])):
                     if host:
                         res = [res]
                     results.append((res, [rd], misc))
             else:
+                if host:
+                    subtask['result'] = [subtask['result']]
                 results.append((subtask['result'], subtask['root_documents'], misc))
 
     final = '(final)' if expected - done == 0 else ''
