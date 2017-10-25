@@ -60,8 +60,7 @@ class TesseractTests(unittest.TestCase):
         except:
             raise unittest.SkipTest
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
-                                           'image.tiff')),
+        ocr = self.tesseract.ocr_tesseract.run(('test', 'segmentation_tiff.xml'),
                                            languages=['grc', 'eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -82,8 +81,7 @@ class TesseractTests(unittest.TestCase):
             raise unittest.SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
-                                           'image.tiff')),
+        ocr = self.tesseract.ocr_tesseract.run(('test', 'segmentation_tiff.xml'),
                                            languages=['grc', 'eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -106,8 +104,7 @@ class TesseractTests(unittest.TestCase):
         except:
             raise unittest.SkipTest
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
-                                           'image.tiff')),
+        ocr = self.tesseract.ocr_tesseract.run(('test', 'segmentation_tiff.xml'),
                                            languages=['eng'],
                                            extended=True)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -134,8 +131,7 @@ class TesseractTests(unittest.TestCase):
             raise unittest.SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
-                                           'image.png')),
+        ocr = self.tesseract.ocr_tesseract.run(('test', 'segmentation_png.xml'),
                                            languages=['eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -157,8 +153,7 @@ class TesseractTests(unittest.TestCase):
             raise unittest.SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
-                                           'image.tiff')),
+        ocr = self.tesseract.ocr_tesseract.run(('test', 'segmentation_tiff.xml'),
                                            languages=['eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -181,8 +176,7 @@ class TesseractTests(unittest.TestCase):
             raise unittest.SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='capi')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
-                                           'image.jpg')),
+        ocr = self.tesseract.ocr_tesseract.run(('test', 'segmentation_jpg.xml'),
                                            languages=['eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -203,8 +197,7 @@ class TesseractTests(unittest.TestCase):
             raise unittest.SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
-                                           'image.png')),
+        ocr = self.tesseract.ocr_tesseract.run(('test', 'segmentation_png.xml'),
                                            languages=['eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -224,8 +217,7 @@ class TesseractTests(unittest.TestCase):
             raise unittest.SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
-                                           'image.tiff')),
+        ocr = self.tesseract.ocr_tesseract.run(('test', 'segmentation_tiff.xml'),
                                            languages=['eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
@@ -245,8 +237,7 @@ class TesseractTests(unittest.TestCase):
             raise unittest.SkipTest
 
         self.tesseract.setup(tessdata=tessdata, implementation='direct')
-        ocr = self.tesseract.ocr_tesseract.run((('test', 'segmentation.xml'), ('test',
-                                           'image.jpg')),
+        ocr = self.tesseract.ocr_tesseract.run(('test', 'segmentation_jpg.xml'),
                                            languages=['eng'],
                                            extended=False)
         outpath = os.path.join(self.storage_path, *ocr)
