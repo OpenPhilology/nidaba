@@ -34,11 +34,11 @@ def archive_pybossa(doc, method=u'archive_pybossa', name='', description=''):
     Adds recognition result to a pybossa service for postcorrection.
 
     Args:
-        doc (unicode, unicode): The input document tuple
+        doc [(unicode, unicode), ...]: The input document tuple
         method (unicode): The suffix string appended to all output files.
 
     Returns:
-        The input storage tuple.
+        The list of input storage tuples.
     """
     logger.debug('Creating pybossa project named {}'.format(name))
     proj = pbclient.create_project('{} ({})'.format(name, doc[0][0]), doc[0][0], description)
