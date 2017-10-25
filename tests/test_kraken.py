@@ -56,7 +56,7 @@ class KrakenTests(unittest.TestCase):
         """
         Test that kraken's page segmentation is working
         """
-        o = self.kraken.segmentation_kraken.run(('test', 'image_png.png'))
+        o = self.kraken.segmentation_kraken.run(('test', 'image.png'))
         self.assertTrue(os.path.isfile(os.path.join(self.storage_path, *o[0])),
                         msg='Kraken did not output a file!')
         try:
@@ -71,8 +71,7 @@ class KrakenTests(unittest.TestCase):
         """
         Test that kraken creates TEI output for pngs.
         """
-        ocr = self.kraken.ocr_kraken.run((('test', 'segmentation.xml'), 
-                                      ('test', 'image_png.png')), 
+        ocr = self.kraken.ocr_kraken.run(('test', 'segmentation_png.xml'), 
                                      model='ocropus')
         try:
             etree.parse(open(os.path.join(self.storage_path, *ocr)))
@@ -86,8 +85,7 @@ class KrakenTests(unittest.TestCase):
         """
         Test that kraken creates hocr output for tiffs.
         """
-        ocr = self.kraken.ocr_kraken.run((('test', 'segmentation.xml'), 
-                                      ('test', 'image_tiff.tiff')), 
+        ocr = self.kraken.ocr_kraken.run(('test', 'segmentation_tiff.xml'), 
                                      model='ocropus')
         try:
             etree.parse(open(os.path.join(self.storage_path, *ocr)))
@@ -95,28 +93,12 @@ class KrakenTests(unittest.TestCase):
             self.fail(msg='The outpath was not valid xml!')
         except IOError:
             self.fail('Kraken did not output a file!')
-
-
-    def test_file_outpath_jpg(self):
-        """
-        Test that kraken creates hocr output for jpgs.
-        """
-        ocr = self.kraken.ocr_kraken.run((('test', 'segmentation.xml'), 
-                                      ('test', 'image_jpg.jpg')), 
-                                     model='ocropus')
-        try:
-            etree.parse(open(os.path.join(self.storage_path, *ocr)))
-        except etree.XMLSyntaxError:
-            self.fail(msg='The outpath was not valid xml!')
-        except IOError:
-            self.fail('Kraken did not output a file!')
-
 
     def test_nlbin(self):
         """
         Test that kraken's nlbin is callable.
         """
-        ret = self.kraken.nlbin.run(('test', 'image_jpg.jpg'))
+        ret = self.kraken.nlbin.run(('test', 'image.jpg'))
         self.assertTrue(os.path.isfile(os.path.join(self.storage_path, *ret)),
                         msg='Kraken did not output a file!')
 
