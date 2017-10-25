@@ -673,7 +673,7 @@ class NetworkSimpleBatch(object):
             batch = r.json()['chains']
             outfiles = []
             for subtask in batch.itervalues():
-                if len(subtask['children']) == 0 and not subtask['housekeeping'] and subtask['result'] is not None:
+                if len(subtask['children']) == 0 and subtask['result'] is not None:
                     outfiles.append((subtask['result'], subtask['root_documents']))
             return outfiles
         else:
