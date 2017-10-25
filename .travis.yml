@@ -36,12 +36,6 @@ install:
   - pip install -r requirements.txt
   - pip install kraken
   
-  # install ocropus
-  - git clone https://github.com/tmbdev/ocropy.git
-  - sed '/numexpr\|beautifulsoup4/d' ocropy/requirements_1.txt | xargs conda install
-  - touch ocropy/models/en-default.pyrnn.gz
-  - pip install ./ocropy
-
   # Package debug
   # -------------
   - conda list
