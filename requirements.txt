@@ -9,7 +9,7 @@ numpy
 Pillow>=4.0
 PyYAML
 beautifulsoup4
-gunicorn
+waitress
 Flask
 Flask-RESTful
 requests-toolbelt

@@ -151,7 +151,7 @@ def move_to_storage(batch, kwargs):
             suffix = uuid.uuid4()
             dst = os.path.basename(src) + '_' + unicode(suffix)
             shutil.copy2(src, storage.get_abs_path(batch.id, dst))
-        return (batch.id, dst)
+        return storage.StorageTuple(batch.id, dst)
     for k, v in kwargs.iteritems():
         if isinstance(v, basestring) and v.startswith('file:'):
             v = v.replace('file:', '', 1)
@@ -238,8 +238,9 @@ def batch(files, host, preprocessing, binarize, ocr, segmentation, stats,
             click.echo(']')
             exit()
         for doc in files:
-            shutil.copy2(doc, storage.get_abs_path(batch.id, os.path.basename(doc)))
-            batch.add_document((batch.id, os.path.basename(doc)))
+            st = StorageTuple(batch.id, os.path.basename(doc))
+            shutil.copy2(doc, s.get_abs_path())
+            batch.add_document(st)
         click.secho(u'\u2713', fg='green', nl=False)
         click.echo(']')
     click.echo(u'Building batch\t\t\t[', nl=False)
@@ -302,11 +303,11 @@ def worker():
 
 @main.command()
 @click.pass_context
-@click.option('-b', '--bind', default='127.0.0.1:8080',
+@click.option('-b', '--bind', default=["127.0.0.1:8080"], multiple=True,
               help='Address and port to bind the application worker to.')
-@click.option('-w', '--workers', default=1, type=click.INT,
-              help='Number of request workers')
-def api_server(ctx, **kwargs):
+@click.option('-w', '--workers', default=4, type=click.INT,
+              help='Number of request threads')
+def api_server(ctx, bind, workers):
     """
     Starts the nidaba API server using gunicorn.
     """
@@ -320,34 +321,17 @@ def api_server(ctx, **kwargs):
             ctx.exit()
 
     import logging
-    import gunicorn.app.base
 
+    from waitress import serve
     from flask import Flask
-    from gunicorn.six import iteritems
 
     logging.basicConfig(level=logging.DEBUG)
 
     app = Flask('nidaba')
     app.register_blueprint(api.get_blueprint())
     app.register_blueprint(web.get_blueprint())
-
-    class APIServer(gunicorn.app.base.BaseApplication):
-
-        def __init__(self, app, options=None):
-            self.options = options or {}
-            self.application = app
-            super(APIServer, self).__init__()
-
-        def load_config(self):
-            config = dict([(key, value) for key, value in iteritems(self.options)
-                           if key in self.cfg.settings and value is not None])
-            for key, value in iteritems(config):
-                self.cfg.set(key.lower(), value)
-
-        def load(self):
-            return self.application
-
-    APIServer(app, options=kwargs).run()
+    
+    serve(app, listen=' '.join(bind).encode('utf-8'), threads=workers)
 
 
 @main.command()
