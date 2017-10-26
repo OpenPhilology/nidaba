@@ -481,7 +481,7 @@ class Batch(object):
                     self.lock = True
             
                     # build chain
-                    root_docs = self.docs
+                    root_docs = sorted(self.docs, key=lambda x: x[1])
                     prev = []
                     for group, step in tasks.iteritems():
                         # skip groups without tasks

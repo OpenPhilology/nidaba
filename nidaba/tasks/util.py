@@ -34,6 +34,9 @@ def barrier(self, data, merging=False, sequential=False, replace=None, root_docs
     replacement = []
     if isinstance(data[0], basestring):
         data = [data]
+    # XXX: ordering might be incorrect because of suffixes. fix by replacing
+    # tuples with class
+    data = sorted(data, key=lambda x: x[1])
     # merge output from same source documents
     if merging == 'doc':
         for docs, task in izip(cycle(_group_by_prefix(data, root_docs)), replace):
