@@ -102,7 +102,7 @@ def max_bbox(boxes):
 
 @app.task(base=NidabaTask, name=u'nidaba.segmentation.kraken')
 def segmentation_kraken(doc, method=u'segment_kraken', black_colseps=False):
-    """
+    """ 
     Performs page segmentation using kraken's built-in algorithm and writes a
     skeleton TEI file.
 
@@ -129,7 +129,7 @@ def segmentation_kraken(doc, method=u'segment_kraken', black_colseps=False):
         tei.dimensions = img.size
         tei.title = os.path.basename(doc[1])
         tei.add_respstmt('kraken', 'page segmentation')
-        for seg in pageseg.segment(img, black_colseps)['boxes']:
+        for seg in pageseg.segment(img, black_colseps=black_colseps)['boxes']:
             logger.debug('Found line at {} {} {} {}'.format(*seg))
             tei.add_line(seg)
         logger.debug('Write segmentation to {}'.format(fp.name))
